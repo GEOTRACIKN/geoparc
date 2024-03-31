@@ -1,0 +1,49 @@
+.Table {
+  border: 1px solid gray;
+}
+
+.TableHead {
+  border: 1px dashed red; 
+}
+
+.TableBody {
+  border: 1px dashed blue;
+}
+
+.TableRow {
+  border: 1px dashed yellow
+}
+
+.TableCell {
+  border: 1px dashed lightgray;
+}
+
+/* long-term style */
+
+.TableRow {
+  z-index: 10;
+  position: relative;
+  margin-top: 0px;
+  display: flex;
+  background: white;
+  transition: all 0.2s ease-out;
+}
+
+.TableCell {
+  width: 100%;
+}
+
+.TableCell:nth-child(1) {
+  width: 30%;
+}
+
+.TableCell:nth-child(2) {
+  width: 40%;
+}
+
+/* tests */
+.slide-enter {
+  z-index: 1;
+  position: relative;
+  margin-top: -22px;
+}
