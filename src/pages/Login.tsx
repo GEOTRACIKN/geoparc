@@ -127,9 +127,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         <div className="row">
           <div className="col-sm-6" style={{ margin: 0, padding: 0 }}>
             <img
-              src="asset/images/geotrackin.jpg"
+              src="asset/images/geoparc.jpg"
               className="float-left img-fluid d-none d-sm-block"
-              alt="algerie geotrackin"
+              alt="algerie geoparc"
             />
           </div>
           <div className="col-sm-6" style={{ padding: "25px 30px" }}>

@@ -27,7 +27,7 @@ const cors = require("cors");
 dotenv.config();
 
 // Configuration des middlewares
-app.use(bodyParser.json({ limit: '5mb' })); // Augmentez la limite de taille ici
+app.use(bodyParser.json({ limit: '2mb' })); // Augmentez la limite de taille ici
 
 
 app.use(cors({

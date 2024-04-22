@@ -15,7 +15,7 @@ interface FooterProps {
                             Last account activity <i className="fa fa-clock-o"></i> <strong>52 mins &nbsp;</strong> 
                         </div>
                         <div className="col-lg-6 text-right">
-                            <span className="mr-1"> Solution IVMS  2008-<script>document.write(new Date().getFullYear())</script>2023©</span> <a href="#" className="">GEOTRACKIN 3.0</a>.
+                            <span className="mr-1"> Solution IVMS  2008-<script>document.write(new Date().getFullYear())</script>2023©</span> <a href="#" className="">GEOPARC 2.0</a>.
                         </div>
                     </div>
                 </div>

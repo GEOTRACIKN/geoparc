@@ -401,7 +401,7 @@ export function Dashboard() {
                 }}
               >
                 {translate(
-                  "Your dashboard monitors business processes. Fleet Management optimizes operations. Geotrackin provides location data, while ensuring real-time tracking."
+                  "Your dashboard monitors business processes. Parc Management optimizes operations. Geoparc provides location data, while ensuring real-time tracking."
                 )}
               </p>
             </div>

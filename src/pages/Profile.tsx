@@ -384,7 +384,7 @@ function Profile() {
                   <Form.Group className=''>
                       <Form.Label>{translate("Email address")}</Form.Label>
                     <div className="input-group  ">
-                      <Form.Control type="email" placeholder='e-mail.geotrackin.com' value={emailValue} onChange={(e) => setEmailValue(e.target.value)}   disabled  />
+                      <Form.Control type="email" placeholder='e-mail.geoparc.com' value={emailValue} onChange={(e) => setEmailValue(e.target.value)}   disabled  />
                     </div>
                   </Form.Group>
                 </form>
