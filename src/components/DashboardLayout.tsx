@@ -49,7 +49,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       )} */}
 
       <Sidebar onToggleSidebar={toggleSidebar} />
-      <Navbar  changNavbar={isSidebarOpen} onToggleSidebarinNavbar={toggleSidebar } />  
+      <Navbar  />  
       <div className={`content-page ${contentPageStat}`}>
         <div className="container-fluid">
           <div className="col-lg-12">{children}</div>
