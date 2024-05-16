@@ -107,6 +107,19 @@ export function Vehicleschecks() {
               {translate('entries')}
             </label>
           </div>
+          <Dropdown>
+            <Dropdown.Toggle variant="link" id="dropdown-basic">
+              Filtre   
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item >DateCréation</Dropdown.Item>
+              <Dropdown.Item >Vérificateur</Dropdown.Item>
+              <Dropdown.Item >Nom_Chaffeur_Sortant</Dropdown.Item>
+              <Dropdown.Item >Nom_Chaffeur_Entrant</Dropdown.Item>
+              <Dropdown.Item >Immatriculation</Dropdown.Item>
+              <Dropdown.Item >Maintenance</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
         <div className="row m-2">
           <Table>
