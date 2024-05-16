@@ -3,28 +3,40 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState } from "react";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 export function VehicleCost() {
 
   const { translate } = useTranslate();
+  const [selectedDates, setSelectedDates] = useState(Array(10).fill(null)); // Tableau d'états pour stocker les dates sélectionnées, initialisé à null pour chaque ligne
+
   const [currentPage, setCurrentPage] = useState(0); // État pour suivre la page actuelle
   const itemsPerPage = 5; // Nombre d'éléments par page
 
 
+  const handleDateChange = (date:any, index:number) => {
+    const newSelectedDates = [...selectedDates]; // Crée une copie du tableau d'états
+    newSelectedDates[index] = date; // Met à jour la date sélectionnée pour la ligne spécifiée
+    setSelectedDates(newSelectedDates); // Met à jour le tableau d'états
+  };
+  
+	
+
 
   // Données statiques
   const staticData = [
-    { id: 1, DateCréation: "2024-05-12", Vérificateur: "John Doe", Nom_Chaffeur_Sortant: "Alice", Nom_Chaffeur_Entrant: "Bob", immatriculation: "XYZ123", maintenance: "Scheduled", actions: "Edit/Delete" },
-    { id: 2, DateCréation: "2024-05-13", Vérificateur: "Jane Smith", Nom_Chaffeur_Sortant: "Eve", Nom_Chaffeur_Entrant: "Charlie", immatriculation: "ABC456", maintenance: "Unscheduled", actions: "Edit/Delete" },
-    { id: 3, DateCréation: "2024-05-14", Vérificateur: "Michael Johnson", Nom_Chaffeur_Sortant: "Grace", Nom_Chaffeur_Entrant: "David", immatriculation: "DEF789", maintenance: "Scheduled", actions: "Edit/Delete" },
-    { id: 4, DateCréation: "2024-05-15", Vérificateur: "Sarah Williams", Nom_Chaffeur_Sortant: "Frank", Nom_Chaffeur_Entrant: "Emily", immatriculation: "GHI012", maintenance: "Unscheduled", actions: "Edit/Delete" },
-    { id: 5, DateCréation: "2024-05-16", Vérificateur: "Chris Brown", Nom_Chaffeur_Sortant: "Hannah", Nom_Chaffeur_Entrant: "George", immatriculation: "JKL345", maintenance: "Scheduled", actions: "Edit/Delete" },
-    { id: 6, DateCréation: "2024-05-17", Vérificateur: "Amanda Davis", Nom_Chaffeur_Sortant: "Isaac", Nom_Chaffeur_Entrant: "Olivia", immatriculation: "MNO678", maintenance: "Unscheduled", actions: "Edit/Delete" },
-    { id: 7, DateCréation: "2024-05-18", Vérificateur: "Jason Taylor", Nom_Chaffeur_Sortant: "Julia", Nom_Chaffeur_Entrant: "Kevin", immatriculation: "PQR901", maintenance: "Scheduled", actions: "Edit/Delete" },
-    { id: 8, DateCréation: "2024-05-19", Vérificateur: "Lisa Martinez", Nom_Chaffeur_Sortant: "Liam", Nom_Chaffeur_Entrant: "Natalie", immatriculation: "STU234", maintenance: "Unscheduled", actions: "Edit/Delete" },
-    { id: 9, DateCréation: "2024-05-20", Vérificateur: "Matthew Rodriguez", Nom_Chaffeur_Sortant: "Sophia", Nom_Chaffeur_Entrant: "Robert", immatriculation: "VWX567", maintenance: "Scheduled", actions: "Edit/Delete" },
-    { id: 10, DateCréation: "2024-05-21", Vérificateur: "Jennifer Wilson", Nom_Chaffeur_Sortant: "Tom", Nom_Chaffeur_Entrant: "Victoria", immatriculation: "YZA890", maintenance: "Unscheduled", actions: "Edit/Delete" }
+    { id: 1, vehicule: "Ford US Fiesta 19953-114-31 / F500", Vérificateur: "John Doe", Nom_Chaffeur_Sortant: "Alice", Nom_Chaffeur_Entrant: "Bob", immatriculation: "XYZ123", maintenance: "Scheduled", actions: "Edit/Delete" },
+    { id: 2, vehicule: "Nissan Micra 02891-117-31 /", Vérificateur: "Jane Smith", Nom_Chaffeur_Sortant: "Eve", Nom_Chaffeur_Entrant: "Charlie", immatriculation: "ABC456", maintenance: "Unscheduled", actions: "Edit/Delete" },
+    { id: 3, vehicule: "Iveco Trakker AT400T46 04143-512-31 / 2909", Vérificateur: "Michael Johnson", Nom_Chaffeur_Sortant: "Grace", Nom_Chaffeur_Entrant: "David", immatriculation: "DEF789", maintenance: "Scheduled", actions: "Edit/Delete" },
+    { id: 4, vehicule: "Iveco Daily 3200-314-31 / 4055", Vérificateur: "Sarah Williams", Nom_Chaffeur_Sortant: "Frank", Nom_Chaffeur_Entrant: "Emily", immatriculation: "GHI012", maintenance: "Unscheduled", actions: "Edit/Delete" },
+    { id: 5, vehicule: "Liebherr Liebherr 974 Pelle hydraulique 1083-215-37 /", Vérificateur: "Chris Brown", Nom_Chaffeur_Sortant: "Hannah", Nom_Chaffeur_Entrant: "George", immatriculation: "JKL345", maintenance: "Scheduled", actions: "Edit/Delete" },
+    { id: 6, vehicule: "Renault Symbole 1111-114-31 /", Vérificateur: "Amanda Davis", Nom_Chaffeur_Sortant: "Isaac", Nom_Chaffeur_Entrant: "Olivia", immatriculation: "MNO678", maintenance: "Unscheduled", actions: "Edit/Delete" },
+    { id: 7, vehicule: "Peugeot 207 12345-112-16 / VP001", Vérificateur: "Jason Taylor", Nom_Chaffeur_Sortant: "Julia", Nom_Chaffeur_Entrant: "Kevin", immatriculation: "PQR901", maintenance: "Scheduled", actions: "Edit/Delete" },
+    { id: 8, vehicule: "Opel Corsa 20119-116-31 / 12", Vérificateur: "Lisa Martinez", Nom_Chaffeur_Sortant: "Liam", Nom_Chaffeur_Entrant: "Natalie", immatriculation: "STU234", maintenance: "Unscheduled", actions: "Edit/Delete" },
+    { id: 9, vehicule: "Nissan Micra 1111-111-11 /", Vérificateur: "Matthew Rodriguez", Nom_Chaffeur_Sortant: "Sophia", Nom_Chaffeur_Entrant: "Robert", immatriculation: "VWX567", maintenance: "Scheduled", actions: "Edit/Delete" },
+    { id: 10, vehicule: "Man TGA410 06050-506-42 /", Vérificateur: "Jennifer Wilson", Nom_Chaffeur_Sortant: "Tom", Nom_Chaffeur_Entrant: "Victoria", immatriculation: "YZA890", maintenance: "Unscheduled", actions: "Edit/Delete" }
   ];
 
 
@@ -120,7 +132,7 @@ export function VehicleCost() {
           <Table>
             <thead className="bg-white text-uppercase">
               <tr className="ligth ligth-data">
-                <th>
+                {/* <th>
                   <div className="form-check form-check-inline">
                     <input
                       className="form-check-input"
@@ -128,58 +140,48 @@ export function VehicleCost() {
                     />
                     <label className="form-check-label"></label>
                   </div>
-                </th>
+                </th> */}
                 <th>Vehicle</th>
                 <th>Date</th>
                 <th>Vehicle Cost</th>
-                <th>Nom_Chaffeur_Entrant</th>
               </tr>
             </thead>
             <tbody key="#" className="ligth-body">
-              {currentItems.map((data) => (
+              {currentItems.map((data,index) => (
                 <tr className={''} key={data.id}>
-                  <td>
+                  {/* <td>
                     <div className="form-check form-check-inline">
                       <input
                         type="checkbox"
                         className="form-check-input"
                       />
                     </div>
-                  </td>
-                  <td>{data.DateCréation}</td>
-                  <td>{data.Vérificateur}</td>
-                  <td>{data.Nom_Chaffeur_Sortant}</td>
-                  <td>{data.Nom_Chaffeur_Entrant}</td>
-                  <td>{data.immatriculation}</td>
-                  <td>{data.maintenance}</td>
+                  </td> */}
+                  <td>{data.vehicule}</td>
+                  <td>
+              <DatePicker
+                selected={selectedDates[index]} // Utilisez selectedDates[index] pour obtenir la date sélectionnée pour cette ligne
+                onChange={(date) => handleDateChange(date, index)} // Passez l'index de la ligne à la fonction de gestion de changement de date
+                dateFormat="yyyy-MM-dd HH:mm:ss"
+                showTimeSelect
+                timeFormat="HH:mm:ss"
+                timeIntervals={1}
+                timeCaption="Time"
+                placeholderText="select a date "
+              />
+            </td>
+
                   <td>
                     <div className="d-flex align-items-center list-action">
-                      <Link
-                        to={`#`}
-                        className="badge badge-success mr-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Détail"
-                      >
-                        <i className="fa fa-eye" style={{ fontSize: '1.2em' }}></i>
-                      </Link>
-                      <a
-                        className="badge bg-warning mr-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Delete"
-                        data-original-title="Delete"
-                      >
-                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: '1.2em' }}></i>
-                      </a>
+                    
                       <a
                         className="badge bg-primary mr-2"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="download"
-                        data-original-title="download"
+                        title="cost"
+                        data-original-title="cost"
                       >
-                        <i className="las la-download" style={{ fontSize: '1.2em' }}></i>
+                        <i className="las la-receipt" style={{ fontSize: '1.2em' }}></i>
                       </a>
                     </div>
                   </td>
