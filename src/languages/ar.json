@@ -498,8 +498,14 @@
 "Utilisateur ajouté avec succès": "تمت إضافة المستخدم بنجاح",
 "Utilisateur modifié avec succès":"تم تعديل المستخدم بنجاح",
 "User Restored successfully !":"تم استعادة المستخدم بنجاح!",
-"Reports Deleted successfully !":"حذف التقارير بنجاح!"
-
+"Reports Deleted successfully !":"حذف التقارير بنجاح!",
+"Verifier": "المدقق",
+"Outgoing Driver": "السائق المغادر",
+"Incoming Driver": "السائق القادم",
+"Tractor Registration": "تسجيل الجرار",
+"Trailer Registration": "تسجيل المقطورة",
+"Maintenance": "الصيانة",
+"Verified Vehicles": "المركبات المُتحقَّق منها"
 
 
 }
