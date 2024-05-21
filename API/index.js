@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const dotenv = require("dotenv");
 const vehicleRoute = require("./routes/vehicle");
+const VehiclecheckRoute = require("./routes/vehiclecheck");
 const cors = require("cors");
  
 dotenv.config();
@@ -17,9 +18,10 @@ app.use(cors({
 
 app.use(express.json());
 app.use("/api", vehicleRoute);
+app.use("/api", VehiclecheckRoute);
 
 
 
-app.listen( 5002, () => {
+app.listen(5000, () => {
   console.log("Backend server is running in 5000!");
 });

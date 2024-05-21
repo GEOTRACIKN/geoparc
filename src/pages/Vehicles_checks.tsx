@@ -15,6 +15,9 @@ type Vehicles = {
 }
 
 export function Vehicleschecks() {
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const userID = localStorage.getItem("userID");
+
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -22,17 +25,19 @@ export function Vehicleschecks() {
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
   let currentPage = 1;
 
+
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(``, { mode: 'cors' });
+      const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}`, 
+      { mode: 'cors' });
       const totalpages = await total_pages.json();
-      const total = totalpages[0].count;
+      const total = totalpages[0].total; 
       setTotal(total);
-
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
-
-      const res = await fetch(``, { mode: 'cors' });
+      
+      const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`,
+      { mode: 'cors' });
       const data = await res.json();
       setItems(data);
     } catch (error) {
@@ -41,7 +46,8 @@ export function Vehicleschecks() {
   };
 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(``, { mode: 'cors' });
+    const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`,
+    { mode: 'cors' });
     const data = await res.json();
     return data;
   };
@@ -62,7 +68,7 @@ export function Vehicleschecks() {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-            <i className="las la-car" data-rel="bootstrap-tooltip" title="Increased"></i>{translate('Verified Vehicles')}
+            <i className="las la-car" data-rel="bootstrap-tooltip" title="Increased"></i>{translate('Verified Vehicles')} ({total})
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">

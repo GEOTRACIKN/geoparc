@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+
 const dotenv = require("dotenv");
+
 const authRoutes = require("./routes/auth");
 const vehicleRoute = require("./routes/vehicle");
 const usersRouter = require("./routes/users");
@@ -21,6 +23,8 @@ const connexion =  require("./routes/connxion");
 const search = require("./routes/search"); 
 const role = require("./routes/role");
 const profile = require("./routes/profile");
+const Vehiclecheckroute = require("./routes/vehiclecheck");
+
 const https = require('https')
 const fs = require('fs')
 const cors = require("cors");
@@ -60,6 +64,7 @@ app.use("/api", role);
 app.use("/api", profile);
 app.use("/api", groupDevice);
 app.use("/api", search); 
+app.use("/api", Vehiclecheckroute); 
 
 
 const port = 8050;
