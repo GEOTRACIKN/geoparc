@@ -490,5 +490,14 @@
 "Utilisateur ajouté avec succès": "Utilisateur ajouté avec succès",
 "Utilisateur modifié avec succès":"Utilisateur modifié avec succès",
 "User Restored successfully !":"Utilisateur restauré avec succès !",
-"Reports Deleted successfully !":"Rapports supprimés avec succès !"
+"Reports Deleted successfully !":"Rapports supprimés avec succès !",
+"Creation Date": "Date Création",
+"Verifier": "Verificateur",
+"Outgoing Driver": "Chauffeur Sortant",
+"Incoming Driver": "Chauffeur Entrant",
+"Tractor Registration": "Matricule Tracteur",
+"Trailer Registration": "Matricule Remorque",
+"Verified Vehicles": "Véhicules Vérifiés"
+
+
 }

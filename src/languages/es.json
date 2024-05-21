@@ -577,7 +577,15 @@
 "Utilisateur ajouté avec succès": "Usuario agregado exitosament",
 "Utilisateur modifié avec succès":"Usuario modificado con éxit",
 "User Restored successfully !":"Usuario restaurado exitosamente!",
-"Reports Deleted successfully !":"Informes eliminados exitosamente!"
+"Reports Deleted successfully !":"Informes eliminados exitosamente!",
+"Creation Date": "Fecha de Creación",
+"Verifier": "Verificador",
+"Outgoing Driver": "Conductor Saliente",
+"Incoming Driver": "Conductor Entrante",
+"Tractor Registration": "Matrícula del Tractor",
+"Trailer Registration": "Matrícula del Remolque",
+"Maintenance": "Mantenimiento",
+"Verified Vehicles": "Vehículos Verificados"
 
- 
+
 }

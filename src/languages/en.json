@@ -483,7 +483,16 @@
 "Utilisateur ajouté avec succès": "User added successfull",
 "Utilisateur modifié avec succès":"User modified successfully",
 "User Restored successfully !":"User Restored successfully !",
-"Reports Deleted successfully !":"Reports Deleted successfully !"
+"Reports Deleted successfully !":"Reports Deleted successfully !",
+"Creation Date": "Creation Date",
+"Verifier": "Verifier",
+"Outgoing Driver": "Outgoing Driver",
+"Incoming Driver": "Incoming Driver",
+"Tractor Registration": "Tractor Registration",
+"Trailer Registration": "Trailer Registration",
+"Verified Vehicles": "Verified Vehicles"
+
+
 
 
 }
