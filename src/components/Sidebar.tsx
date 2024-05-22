@@ -26,8 +26,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const userID = localStorage.getItem("userID");
 
-
-
   interface Permission {
     id_rel: number;
     id_role: number;
@@ -51,7 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   }
 
   const checkPermission = (idPermission: number): boolean => {
-
     return userPermissions.some(
       (permission) => permission.id_permission === idPermission
     );
@@ -134,29 +131,84 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 style={{ padding: 0 }}
               >
                 <li>
-                  <Nav.Link to="/vehicles" className="svg-icon" as={NavLink}>
+                  <Nav.Link
+                    to="/Vehicles"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("Vehicles");
+                    }}
+                    as={NavLink}
+                  >
                     <i className="las la-car"></i>
                     <span className={`ml-4 ${activeMenuText}`}>
                       {translate("Vehicles")}
                     </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
                   </Nav.Link>
+                  <ul
+                    id="Vehicles"
+                    className={`iq-submenu ${
+                      openSubmenus.includes("Vehicles")
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
+                    }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link
+                        to="/vehicles"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-list-alt"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("List vehicles")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/Vehicle_checks"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-check-double"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("Vehicle checks")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/Vehicle_cost"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-hand-holding-usd"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("Vehicle cost")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                  </ul>
                 </li>
-                <li>
-                  <Nav.Link to="/Vehicle_checks" className="svg-icon" as={NavLink}>
-                    <i className="las la-car"></i>
-                    <span className={`ml-4 ${activeMenuText}`}>
-                      {translate("Vehicle checks")}
-                    </span>
-                  </Nav.Link>
-                </li>
-                <li>
-                  <Nav.Link to="/Vehicle_cost" className="svg-icon" as={NavLink}>
-                    <i className="las la-car"></i>
-                    <span className={`ml-4 ${activeMenuText}`}>
-                      {translate("Vehicle cost")}
-                    </span>
-                  </Nav.Link>
-                </li>
+
                 <li className="divider"></li>
                 <li>
                   <Nav.Link to="/Settings" className="svg-icon" as={NavLink}>
