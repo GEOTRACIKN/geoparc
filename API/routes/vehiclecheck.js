@@ -6,8 +6,16 @@ const router = require("express").Router();
 //GET ALL Vehiclecheck
 router.get("/vehiclecheck/:id_user/:page/:limit", async (req, res) => {
   const { page, limit, id_user } = req.params;
+    const searchTerm = req.query.searchTerm;
+    const searchType = req.query.searchType;
   try {
-    const results = await Vehiclecheck.getAllUserId(id_user, page, limit);
+    const results = await Vehiclecheck.getAllUserId(
+      id_user,
+      page,
+      limit,
+      searchTerm,
+      searchType
+    );
     res.json(results);
   } catch (err) {
     res.status(500).json({

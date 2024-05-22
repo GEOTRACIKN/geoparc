@@ -23,6 +23,8 @@ export function Vehicleschecks() {
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(15);
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('checker');
   const [selectedColumns, setSelectedColumns] = useState({
     id_verif: true,
     Creation_date: true,
@@ -32,18 +34,21 @@ export function Vehicleschecks() {
     license_vhc: true,
     maintenance: true,
   });
+
   let currentPage = 1;
 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}`, { mode: "cors" });
+      const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      { mode: "cors" });
       const totalpages = await total_pages.json();
       const total = totalpages[0].total;
       setTotal(total);
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
 
-      const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`, { mode: "cors" });
+      const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      { mode: "cors" });
       const data = await res.json();
       setItems(data);
     } catch (error) {
@@ -52,7 +57,8 @@ export function Vehicleschecks() {
   };
 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`, { mode: "cors" });
+    const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+  { mode: "cors" });
     const data = await res.json();
     return data;
   };
@@ -74,6 +80,30 @@ export function Vehicleschecks() {
   useEffect(() => {
     getVehicleschecks(currentPage, limit);
   }, [currentPage, limit]);
+
+  // Function to handle the change in the input field for search
+  const handleSearchTermChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+
+    getVehicleschecks(currentPage, limit);
+  };
+
+  const clearSearchTerm = () => {
+    setSearchTerm(''); // Réinitialise le terme de recherche à une chaîne vide
+  };
+  // Placeholder text based on search type
+  let placeholderText = 'searche ...';
+  if (searchType === 'checker') {
+    placeholderText = 'searche checker';
+  } else if (searchType === 'Driver_out') {
+    placeholderText = 'searche Driver_out';
+  } else if (searchType === 'Driver_in') {
+    placeholderText = 'searche Driver_in';
+  } else if (searchType === 'license_vhc') {
+    placeholderText = 'searche license_vhc';
+  }
+
 
   return (
     <>
@@ -99,14 +129,30 @@ export function Vehicleschecks() {
                 <i className="fas fa-chevron-down" style={{ color: 'black' }}></i>
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item>{translate('Verifier')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Outgoing Driver')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Incoming Driver')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Tractor Registration')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Trailer Registration')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSearchType('checker')}>{translate('checker')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSearchType('Driver_out')}>{translate('Driver_outr')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSearchType('Driver_in')}>{translate('Driver_in')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSearchType('license_vhc')}>{translate('license_vhc')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setSearchType('license_vhc')}>{translate('license_vhc')}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder="test" className="form-control" />
+            <input type="text"
+              placeholder={placeholderText}
+              onChange={handleSearchTermChange}
+              value={searchTerm}
+              className="form-control" />
+            {searchTerm && (
+              <button
+                className="btn btn-light"
+                style={{
+                  border: 'none',
+                  backgroundColor: '#B5C0D0',
+                }}
+                onClick={clearSearchTerm}
+              >
+                <i className="las la-times-circle" style={{ fontSize: '1.5em', color: 'black' }}></i>
+              </button>
+            )}
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
@@ -153,7 +199,7 @@ export function Vehicleschecks() {
                   checked={selectedColumns.checker}
                   onChange={() => handleColumnChange("checker")}
                 />{" "}
-                {translate("Verifier")}
+                {translate("checker")}
               </Dropdown.Item>
               <Dropdown.Item as="button">
                 <input
@@ -208,7 +254,7 @@ export function Vehicleschecks() {
               </th>
               <th>N°</th>
               {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}
-              {selectedColumns.checker && <th>{translate("Verifier")}</th>}
+              {selectedColumns.checker && <th>{translate("checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
               {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}
               {selectedColumns.license_vhc && <th>{translate("Tractor Registration")}</th>}
@@ -217,7 +263,7 @@ export function Vehicleschecks() {
             </tr>
           </thead>
           <tbody key="#" className="ligth-body">
-            {list_Vehicleschecks.map((data) => (
+            {Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 && list_Vehicleschecks.map((data)  => (  
               <tr className={""} key={data.id_verif}>
                 <td>
                   <div className="form-check form-check-inline">
@@ -265,6 +311,7 @@ export function Vehicleschecks() {
               </tr>
             ))}
           </tbody>
+
         </Table>
       </div>
       <div className="row">
