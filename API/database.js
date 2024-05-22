@@ -1,39 +1,30 @@
-const mysql = require('mysql2');
-require('dotenv').config(); 
+const mysql = require("mysql2/promise");
+require("dotenv").config();
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 0,
+  queueLimit: 0,
 });
 
+console.log("Pool de connexions créé");
 
-connection.connect(err => {
-    if(err) {
-        console.error('Erreur de connexion à la base de données: ' + err.stack);
-        return;
+async function keepAlive(pool) {
+  setInterval(async () => {
+    try {
+      await pool.query("SELECT 1");
+      console.log("Database connection is alive");
+    } catch (err) {
+      console.error("Error during database keep-alive:", err);
     }
-    console.log('Connecté à la base de données avec l\'ID ' + connection.threadId);
-});
-
-function keepAlive() {
-    setInterval(() => {
-        connection.query('SELECT 1', (err, results) => {
-            if (err) {
-                console.error('Error during database keep-alive:', err);
-            } else {
-                console.log('Database connection is alive');
-            }
-        });
-    }, 600000); // 1 minute interval, adjust as needed
+  }, 600000); // 10 minutes interval, adjust as needed
 }
 
-// Start the keep-alive function
-keepAlive();
+// Appelez keepAlive pour maintenir les connexions actives
+keepAlive(pool);
 
-global.db = connection;
-module.exports = connection;
+module.exports = pool;
