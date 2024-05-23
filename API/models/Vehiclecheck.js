@@ -7,6 +7,7 @@ const Vehiclecheck = {
       let sql;
       const offset = (page - 1) * limit;
       const params = [];
+
       if (id_user == 1) {
         sql = `SELECT 
           id_verif,
@@ -17,29 +18,7 @@ const Vehiclecheck = {
           license_vhc,
           maintenance 
           FROM gp_verif_vehicule 
-          ORDER BY gp_verif_vehicule.Creation_date ASC 
-          LIMIT ? OFFSET ?`;
-
-        if (searchTerm && searchType) {
-          if (searchType === "checker") {
-            sql += `
-          AND (gp_verif_vehicule.checker) LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_out") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_out LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_in") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_in LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "license_vhc") {
-            sql += `
-          AND (gp_verif_vehicule.license_vhc LIKE '%${searchTerm}%')
-        `;
-          }
-        }
-        params.push(parseInt(limit), parseInt(offset));
+          WHERE 1=1`;
       } else {
         sql = `SELECT 
           id_verif,
@@ -50,33 +29,25 @@ const Vehiclecheck = {
           license_vhc,
           maintenance 
           FROM gp_verif_vehicule 
-          WHERE id_user = ? 
-          ORDER BY gp_verif_vehicule.Creation_date ASC 
-          LIMIT ? OFFSET ?`;
-        if (searchTerm && searchType) {
-          if (searchType === "checker") {
-            sql += `
-          AND (gp_verif_vehicule.checker) LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_out") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_out LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_in") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_in LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "license_vhc") {
-            sql += `
-          AND (gp_verif_vehicule.license_vhc LIKE '%${searchTerm}%')
-        `;
-          }
-        }
-        params.push(id_user, parseInt(limit), parseInt(offset));
+          WHERE id_user = ?`;
+        params.push(id_user);
       }
+
+      if (searchTerm && searchType) {
+        sql += ` AND ${searchType} LIKE ?`;
+        params.push(`%${searchTerm}%`);
+      }
+
+      sql += ` ORDER BY gp_verif_vehicule.Creation_date ASC LIMIT ? OFFSET ?`;
+      params.push(parseInt(limit), parseInt(offset));
+
+
       const [results] = await pool.query(sql, params);
       return results;
     } catch (err) {
+      console.error(
+        `Erreur lors de l'exécution de la requête SQL: ${err.message}`
+      );
       throw new Error(
         `Erreur lors de la récupération des véhicules vérifiés: ${err.message}`
       );
@@ -90,53 +61,24 @@ const Vehiclecheck = {
       const params = [];
 
       if (id_user == 1) {
-        sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule`;
-        if (searchTerm && searchType) {
-          if (searchType === "Verifier") {
-            sql += `
-          AND (gp_verif_vehicule.Verifier) LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_out") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_out LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_in") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_in LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "license_vhc") {
-            sql += `
-          AND (gp_verif_vehicule.license_vhc LIKE '%${searchTerm}%')
-        `;
-          }
-        }
+        sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule WHERE 1=1`;
       } else {
         sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule WHERE id_user = ?`;
-        if (searchTerm && searchType) {
-          if (searchType === "Verifier") {
-            sql += `
-          AND (gp_verif_vehicule.Verifier) LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_out") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_out LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "Driver_in") {
-            sql += `
-          AND (gp_verif_vehicule.Driver_in LIKE '%${searchTerm}%')
-        `;
-          } else if (searchType === "license_vhc") {
-            sql += `
-          AND (gp_verif_vehicule.license_vhc LIKE '%${searchTerm}%')
-        `;
-          }
-        }
         params.push(id_user);
       }
+
+      if (searchTerm && searchType) {
+        sql += ` AND ${searchType} LIKE ?`;
+        params.push(`%${searchTerm}%`);
+      }
+
 
       const [results] = await pool.query(sql, params);
       return results;
     } catch (err) {
+      console.error(
+        `Erreur lors de l'exécution de la requête SQL: ${err.message}`
+      );
       throw new Error(
         `Erreur lors de la récupération du nombre total de véhicules vérifiés: ${err.message}`
       );

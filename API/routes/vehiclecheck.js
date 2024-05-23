@@ -8,6 +8,8 @@ router.get("/vehiclecheck/:id_user/:page/:limit", async (req, res) => {
   const { page, limit, id_user } = req.params;
     const searchTerm = req.query.searchTerm;
     const searchType = req.query.searchType;
+
+    
   try {
     const results = await Vehiclecheck.getAllUserId(
       id_user,
@@ -28,8 +30,11 @@ router.get("/vehiclecheck/:id_user/:page/:limit", async (req, res) => {
 //GET ALL COUNT Vehiclecheck
 router.get("/vehiclecheck/totalpage/:id_user", async (req, res) => {
   const { id_user } = req.params;
+    const { searchTerm, searchType } = req.query;
+
+
   try {
-    const results = await Vehiclecheck.getAll(id_user);
+    const results = await Vehiclecheck.getAll(id_user, searchTerm, searchType);
     res.json(results);
   } catch (err) {
     res.status(500).json({

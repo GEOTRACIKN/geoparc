@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
+import AdvancedSearch from "../components/AdvancedSearch";
+import { toTimestamp } from "../functions";
 
 type Vehicles = {
   id_verif: number;
@@ -24,11 +26,11 @@ export function Vehicleschecks() {
   const [limit, setLimit] = useState(15);
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchType, setSearchType] = useState('checker');
+  const [searchType, setSearchType] = useState('Checker');
   const [selectedColumns, setSelectedColumns] = useState({
     id_verif: true,
     Creation_date: true,
-    checker: true,
+    Checker: true,
     Driver_out: true,
     Driver_in: true,
     license_vhc: true,
@@ -40,7 +42,7 @@ export function Vehicleschecks() {
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
       const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
-      { mode: "cors" });
+        { mode: "cors" });
       const totalpages = await total_pages.json();
       const total = totalpages[0].total;
       setTotal(total);
@@ -48,7 +50,7 @@ export function Vehicleschecks() {
       setPageCount(calculatedPageCount);
 
       const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
-      { mode: "cors" });
+        { mode: "cors" });
       const data = await res.json();
       setItems(data);
     } catch (error) {
@@ -58,7 +60,7 @@ export function Vehicleschecks() {
 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
     const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
-  { mode: "cors" });
+      { mode: "cors" });
     const data = await res.json();
     return data;
   };
@@ -79,30 +81,24 @@ export function Vehicleschecks() {
 
   useEffect(() => {
     getVehicleschecks(currentPage, limit);
-  }, [currentPage, limit]);
+  }, [searchTerm]);
 
-  // Function to handle the change in the input field for search
-  const handleSearchTermChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const term = event.target.value;
-    setSearchTerm(term);
-
+  const clearSearchTerm = () => {
+    setSearchTerm('');
+    // Call getVehicleschecks with empty search term to reset table data
     getVehicleschecks(currentPage, limit);
   };
 
-  const clearSearchTerm = () => {
-    setSearchTerm(''); // Réinitialise le terme de recherche à une chaîne vide
+
+  // Function to handle search
+  const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'license_vhc'];
+  const handleSearch = (term: string, type: string) => {
+    setSearchTerm(term);
+    setSearchType(type);
+    getVehicleschecks(currentPage, limit);
   };
-  // Placeholder text based on search type
-  let placeholderText = 'searche ...';
-  if (searchType === 'checker') {
-    placeholderText = 'searche checker';
-  } else if (searchType === 'Driver_out') {
-    placeholderText = 'searche Driver_out';
-  } else if (searchType === 'Driver_in') {
-    placeholderText = 'searche Driver_in';
-  } else if (searchType === 'license_vhc') {
-    placeholderText = 'searche license_vhc';
-  }
+
+  const options = [15, 30, 60, 90, 180, 300, 600, 900];
 
 
   return (
@@ -122,120 +118,87 @@ export function Vehicleschecks() {
         </div>
       </div>
       <div className="row">
-        <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
-          <div className="input-group">
-            <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <i className="fas fa-chevron-down" style={{ color: 'black' }}></i>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => setSearchType('checker')}>{translate('checker')}</Dropdown.Item>
-                <Dropdown.Item onClick={() => setSearchType('Driver_out')}>{translate('Driver_outr')}</Dropdown.Item>
-                <Dropdown.Item onClick={() => setSearchType('Driver_in')}>{translate('Driver_in')}</Dropdown.Item>
-                <Dropdown.Item onClick={() => setSearchType('license_vhc')}>{translate('license_vhc')}</Dropdown.Item>
-                <Dropdown.Item onClick={() => setSearchType('license_vhc')}>{translate('license_vhc')}</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-            <input type="text"
-              placeholder={placeholderText}
-              onChange={handleSearchTermChange}
-              value={searchTerm}
-              className="form-control" />
-            {searchTerm && (
-              <button
-                className="btn btn-light"
-                style={{
-                  border: 'none',
-                  backgroundColor: '#B5C0D0',
-                }}
-                onClick={clearSearchTerm}
-              >
-                <i className="las la-times-circle" style={{ fontSize: '1.5em', color: 'black' }}></i>
-              </button>
-            )}
-          </div>
+        <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
+          <AdvancedSearch
+            searchOptions={searchOptions}
+            onSearch={handleSearch}
+            clearSearchTerm={clearSearchTerm}
+            placeholderText={`${searchType.toLowerCase()}`} // Placeholder text based on searchType
+          />
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
-            <label className="mr-2">
-              {translate("Show")}
-              <select
-                name="DataTables_Table_0_length"
-                aria-controls="DataTables_Table_0"
-                className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: "66px" }}
-                onChange={(e) => setLimit(Number(e.target.value))}
-              >
-                <option value="15">15</option>
-                <option value="30">30</option>
-                <option value="60">60</option>
-                <option value="90">90</option>
-                <option value="180">180</option>
-                <option value="300">300</option>
-                <option value="600">600</option>
-                <option value="900">900</option>
-              </select>
-              {translate("entries")}
-            </label>
-          </div>
+          {/* Dropdown Pour le Show du tableau */}
           <Dropdown>
-            <Dropdown.Toggle variant="link" id="dropdown-basic">
-              <i className="fas fa-chevron-down" style={{ color: "black" }}></i>
+            <Dropdown.Toggle variant="" id="dropdown-basic"  title="Résultats d'affichage">
+              <i className="fas fa-list-alt"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu >
+              {options.map((option) => (
+                <Dropdown.Item key={option} onClick={() => setLimit(option)}>
+                  {option}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+          {/* Dropdown Pour le filtrage du tableau */}
+          <Dropdown>
+            <Dropdown.Toggle variant="" id="dropdown-basic"  title="Colonnes dʼaffichage"> 
+              <i className="fas fa-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
                   checked={selectedColumns.Creation_date}
                   onChange={() => handleColumnChange("Creation_date")}
-                />{" "}
-                {translate("Creation Date")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Creation Date")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.checker}
-                  onChange={() => handleColumnChange("checker")}
-                />{" "}
-                {translate("checker")}
+                  checked={selectedColumns.Checker}
+                  onChange={() => handleColumnChange("Checker")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Checker")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
                   checked={selectedColumns.Driver_out}
                   onChange={() => handleColumnChange("Driver_out")}
-                />{" "}
-                {translate("Outgoing Driver")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Outgoing Driver")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
                   checked={selectedColumns.Driver_in}
                   onChange={() => handleColumnChange("Driver_in")}
-                />{" "}
-                {translate("Incoming Driver")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Incoming Driver")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
                   checked={selectedColumns.license_vhc}
                   onChange={() => handleColumnChange("license_vhc")}
-                />{" "}
-                {translate("Tractor Registration")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Tractor Registration")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as="button">
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   className="form-check-input"
                   checked={selectedColumns.maintenance}
                   onChange={() => handleColumnChange("maintenance")}
-                />{" "}
-                {translate("Maintenance")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Maintenance")}</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -253,8 +216,8 @@ export function Vehicleschecks() {
                 </div>
               </th>
               <th>N°</th>
-              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}
-              {selectedColumns.checker && <th>{translate("checker")}</th>}
+              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}  
+              {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
               {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}
               {selectedColumns.license_vhc && <th>{translate("Tractor Registration")}</th>}
@@ -263,7 +226,7 @@ export function Vehicleschecks() {
             </tr>
           </thead>
           <tbody key="#" className="ligth-body">
-            {Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 && list_Vehicleschecks.map((data)  => (  
+            {Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 && list_Vehicleschecks.map((data) => (
               <tr className={""} key={data.id_verif}>
                 <td>
                   <div className="form-check form-check-inline">
@@ -271,8 +234,8 @@ export function Vehicleschecks() {
                   </div>
                 </td>
                 <td>{data.id_verif}</td>
-                {selectedColumns.Creation_date && <td>{data.Creation_date}</td>}
-                {selectedColumns.checker && <td>{data.checker}</td>}
+                {selectedColumns.Creation_date && <td>{toTimestamp(data.Creation_date).split(' ')[0]}</td>}
+                {selectedColumns.Checker && <td>{data.checker}</td>}
                 {selectedColumns.Driver_out && <td>{data.Driver_out}</td>}
                 {selectedColumns.Driver_in && <td>{data.Driver_in}</td>}
                 {selectedColumns.license_vhc && <td>{data.license_vhc}</td>}
