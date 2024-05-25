@@ -13905,6 +13905,11 @@ a.bg-secondary-light:focus,a.bg-secondary-light:hover,button.bg-secondary-light:
     background-color: #d9ede0!important
 }
 
+.bg-success-user {
+    color: #408759!important;
+    background-color: #f7ffdb!important
+}
+
 a.bg-success-light:focus,a.bg-success-light:hover,button.bg-success-light:focus,button.bg-success-light:hover {
     color: #408759!important;
     background-color: #b6ddc4!important
