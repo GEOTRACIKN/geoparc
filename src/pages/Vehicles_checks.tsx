@@ -19,15 +19,15 @@ type Vehicles = {
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const userID = localStorage.getItem("userID");
-
+  let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(15);
+  const [limit, setLimit] = useState(10);
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('Checker');
-  const [selectedColumns, setSelectedColumns] = useState({
+  const initialColumns = {
     id_verif: true,
     Creation_date: true,
     Checker: true,
@@ -35,10 +35,15 @@ export function Vehicleschecks() {
     Driver_in: true,
     license_vhc: true,
     maintenance: true,
-  });
+  };
+  // Load selected columns from localStorage or use initial state
+  const loadSelectedColumns = () => {
+    const savedColumns = localStorage.getItem("selectedColumns");
+    return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+  };
+  const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
 
-  let currentPage = 1;
-
+  // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
       const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
@@ -57,13 +62,17 @@ export function Vehicleschecks() {
       console.error("Erreur lors du chargement des Vehicles Vérifié :", error);
     }
   };
-
+  // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
     const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
       { mode: "cors" });
     const data = await res.json();
     return data;
   };
+
+  useEffect(() => {
+    getVehicleschecks(currentPage, limit);
+  }, [searchTerm, limit]);
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -73,22 +82,19 @@ export function Vehicleschecks() {
   };
 
   const handleColumnChange = (column: string) => {
-    setSelectedColumns((prevState: any) => ({
-      ...prevState,
-      [column]: !prevState[column],
-    }));
+    const updatedColumns = {
+      ...selectedColumns,
+      [column]: !selectedColumns[column],
+    };
+    setSelectedColumns(updatedColumns);
+    localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns));  // Save selected columns to localStorage
   };
-
-  useEffect(() => {
-    getVehicleschecks(currentPage, limit);
-  }, [searchTerm]);
 
   const clearSearchTerm = () => {
     setSearchTerm('');
     // Call getVehicleschecks with empty search term to reset table data
     getVehicleschecks(currentPage, limit);
   };
-
 
   // Function to handle search
   const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'license_vhc'];
@@ -98,8 +104,7 @@ export function Vehicleschecks() {
     getVehicleschecks(currentPage, limit);
   };
 
-  const options = [15, 30, 60, 90, 180, 300, 600, 900];
-
+  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Les options de taille de page mises à jour
 
   return (
     <>
@@ -123,16 +128,16 @@ export function Vehicleschecks() {
             searchOptions={searchOptions}
             onSearch={handleSearch}
             clearSearchTerm={clearSearchTerm}
-            placeholderText={`${searchType.toLowerCase()}`} // Placeholder text based on searchType
+            placeholderText={`${searchType}`}
           />
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
           {/* Dropdown Pour le Show du tableau */}
           <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic"  title="Résultats d'affichage">
+            <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
               <i className="fas fa-list-alt"></i>
             </Dropdown.Toggle>
-            <Dropdown.Menu >
+            <Dropdown.Menu>
               {options.map((option) => (
                 <Dropdown.Item key={option} onClick={() => setLimit(option)}>
                   {option}
@@ -142,10 +147,19 @@ export function Vehicleschecks() {
           </Dropdown>
           {/* Dropdown Pour le filtrage du tableau */}
           <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic"  title="Colonnes dʼaffichage"> 
+            <Dropdown.Toggle variant="" id="dropdown-basic" title="Colonnes dʼaffichage">
               <i className="fas fa-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.id_verif}
+                  onChange={() => handleColumnChange("id_verif")}
+                />
+                <span style={{ marginLeft: '10px' }}>id</span>
+              </Dropdown.Item>
               <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
@@ -203,7 +217,6 @@ export function Vehicleschecks() {
             </Dropdown.Menu>
           </Dropdown>
         </div>
-
       </div>
       <div className="row m-1">
         <Table>
@@ -215,8 +228,8 @@ export function Vehicleschecks() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              <th>N°</th>
-              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}  
+              {selectedColumns.id_verif && <th>N°</th>}
+              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}
               {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
               {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}
@@ -233,7 +246,7 @@ export function Vehicleschecks() {
                     <input type="checkbox" className="form-check-input" />
                   </div>
                 </td>
-                <td>{data.id_verif}</td>
+                {selectedColumns.id_verif && <td>{data.id_verif}</td>}
                 {selectedColumns.Creation_date && <td>{toTimestamp(data.Creation_date).split(' ')[0]}</td>}
                 {selectedColumns.Checker && <td>{data.checker}</td>}
                 {selectedColumns.Driver_out && <td>{data.Driver_out}</td>}
@@ -274,12 +287,11 @@ export function Vehicleschecks() {
               </tr>
             ))}
           </tbody>
-
         </Table>
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
-          <span>Affichage 1 à 5 sur 5 </span>
+          <span>Affichage 1 à {limit} sur {total} </span>
         </div>
         <div className="col-md-6">
           <ReactPaginate
