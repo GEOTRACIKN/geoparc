@@ -1,68 +1,88 @@
-const db = require("../database");
+const pool = require("../database");
 
 const Vehiclecheck = {
   // Retrieve all Vehiclecheck User Id
-  getAllUserId: (id_user, page, limit) => {
-    return new Promise((resolve, reject) => {
+  getAllUserId: async (id_user, page, limit, searchTerm, searchType) => {
+    try {
       let sql;
       const offset = (page - 1) * limit;
       const params = [];
+
       if (id_user == 1) {
         sql = `SELECT 
-        id_verif,
-        Creation_date,
-        checker,
-        Driver_out,
-        Driver_in,
-        license_vhc,
-        maintenance 
-        FROM gp_verif_vehicule 
-        ORDER BY gp_verif_vehicule.Creation_date ASC 
-        LIMIT ? OFFSET ?`;
-        params.push(parseInt(limit), parseInt(offset));
+          id_verif,
+          Creation_date,
+          checker,
+          Driver_out,
+          Driver_in,
+          license_vhc,
+          maintenance 
+          FROM gp_verif_vehicule 
+          WHERE 1=1`;
       } else {
         sql = `SELECT 
-        id_verif,
-        Creation_date,
-        checker,
-        Driver_out,
-        Driver_in,
-        license_vhc,
-        maintenance 
-        FROM gp_verif_vehicule 
-        WHERE id_user = ? 
-        ORDER BY gp_verif_vehicule.Creation_date ASC 
-        LIMIT ? OFFSET ?`;
-        params.push(id_user, parseInt(limit), parseInt(offset));
+          id_verif,
+          Creation_date,
+          checker,
+          Driver_out,
+          Driver_in,
+          license_vhc,
+          maintenance 
+          FROM gp_verif_vehicule 
+          WHERE id_user = ?`;
+        params.push(id_user);
       }
 
-      db.query(sql, params, (err, results) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(results);
-      });
-    });
+      if (searchTerm && searchType) {
+        sql += ` AND ${searchType} LIKE ?`;
+        params.push(`%${searchTerm}%`);
+      }
+
+      sql += ` ORDER BY gp_verif_vehicule.Creation_date ASC LIMIT ? OFFSET ?`;
+      params.push(parseInt(limit), parseInt(offset));
+
+
+      const [results] = await pool.query(sql, params);
+      return results;
+    } catch (err) {
+      console.error(
+        `Erreur lors de l'exécution de la requête SQL: ${err.message}`
+      );
+      throw new Error(
+        `Erreur lors de la récupération des véhicules vérifiés: ${err.message}`
+      );
+    }
   },
 
   // Retrieve all COUNT Vehiclecheck User Id
-  getAll: (id_user) => {
-    return new Promise((resolve, reject) => {
+  getAll: async (id_user, searchTerm, searchType) => {
+    try {
       let sql;
+      const params = [];
 
       if (id_user == 1) {
-        sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule `;
+        sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule WHERE 1=1`;
       } else {
         sql = `SELECT COUNT(*) as total FROM gp_verif_vehicule WHERE id_user = ?`;
+        params.push(id_user);
       }
 
-      db.query(sql, (err, results) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(results);
-      });
-    });
+      if (searchTerm && searchType) {
+        sql += ` AND ${searchType} LIKE ?`;
+        params.push(`%${searchTerm}%`);
+      }
+
+
+      const [results] = await pool.query(sql, params);
+      return results;
+    } catch (err) {
+      console.error(
+        `Erreur lors de l'exécution de la requête SQL: ${err.message}`
+      );
+      throw new Error(
+        `Erreur lors de la récupération du nombre total de véhicules vérifiés: ${err.message}`
+      );
+    }
   },
 };
 

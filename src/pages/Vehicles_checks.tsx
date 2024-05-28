@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
+import AdvancedSearch from "../components/AdvancedSearch";
+import { toTimestamp } from "../functions";
 
 type Vehicles = {
   id_verif: number;
@@ -12,45 +14,65 @@ type Vehicles = {
   Driver_in: string;
   license_vhc: string;
   maintenance: number;
-}
+};
 
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const userID = localStorage.getItem("userID");
-
+  let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(15);
+  const [limit, setLimit] = useState(10);
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
-  let currentPage = 1;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('Checker');
+  const initialColumns = {
+    id_verif: true,
+    Creation_date: true,
+    Checker: true,
+    Driver_out: true,
+    Driver_in: true,
+    license_vhc: true,
+    maintenance: true,
+  };
+  // Load selected columns from localStorage or use initial state
+  const loadSelectedColumns = () => {
+    const savedColumns = localStorage.getItem("selectedColumns");
+    return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+  };
+  const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
 
-
+  // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}`, 
-      { mode: 'cors' });
+      const total_pages = await fetch(`${backendUrl}/api/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
+        { mode: "cors" });
       const totalpages = await total_pages.json();
-      const total = totalpages[0].total; 
+      const total = totalpages[0].total;
       setTotal(total);
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
-      
-      const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`,
-      { mode: 'cors' });
+
+      const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+        { mode: "cors" });
       const data = await res.json();
       setItems(data);
     } catch (error) {
       console.error("Erreur lors du chargement des Vehicles Vérifié :", error);
     }
   };
-
+  // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}`,
-    { mode: 'cors' });
+    const res = await fetch(`${backendUrl}/api/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      { mode: "cors" });
     const data = await res.json();
     return data;
   };
+
+  useEffect(() => {
+    getVehicleschecks(currentPage, limit);
+  }, [searchTerm, limit]);
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -59,78 +81,139 @@ export function Vehicleschecks() {
     window.scrollTo(0, 0);
   };
 
-  useEffect(() => {
+  const handleColumnChange = (column: string) => {
+    const updatedColumns = {
+      ...selectedColumns,
+      [column]: !selectedColumns[column],
+    };
+    setSelectedColumns(updatedColumns);
+    localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns));  // Save selected columns to localStorage
+  };
+
+  const clearSearchTerm = () => {
+    setSearchTerm('');
+    // Call getVehicleschecks with empty search term to reset table data
     getVehicleschecks(currentPage, limit);
-  }, [currentPage, limit]);
+  };
+
+  // Function to handle search
+  const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'license_vhc'];
+  const handleSearch = (term: string, type: string) => {
+    setSearchTerm(term);
+    setSearchType(type);
+    getVehicleschecks(currentPage, limit);
+  };
+
+  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Les options de taille de page mises à jour
 
   return (
     <>
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-            <i className="las la-car" data-rel="bootstrap-tooltip" title="Increased"></i>{translate('Verified Vehicles')} ({total})
+            <i className="las la-car" data-rel="bootstrap-tooltip" title="Increased"></i>
+            {translate("Verified Vehicles")} ({total})
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
           <Link to="#" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate('Add Verification')}
+            {translate("Add Verification")}
           </Link>
         </div>
       </div>
       <div className="row">
-        <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
-          <div className="input-group">
-            <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <i className="fas fa-chevron-down" style={{ color: 'black' }}></i>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item>{translate('Verifier')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Outgoing Driver')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Incoming Driver')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Tractor Registration')}</Dropdown.Item>
-                <Dropdown.Item>{translate('Trailer Registration')}</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-            <input type="text" placeholder="test" className="form-control" />
-          </div>
+        <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
+          <AdvancedSearch
+            searchOptions={searchOptions}
+            onSearch={handleSearch}
+            clearSearchTerm={clearSearchTerm}
+            placeholderText={`${searchType}`}
+          />
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
-            <label className="mr-2">
-              {translate('Show')}
-              <select
-                name="DataTables_Table_0_length"
-                aria-controls="DataTables_Table_0"
-                className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: "66px" }}
-              >
-                <option value="15">15</option>
-                <option value="30">30</option>
-                <option value="60">60</option>
-                <option value="90">90</option>
-                <option value="180">180</option>
-                <option value="300">300</option>
-                <option value="600">600</option>
-                <option value="900">900</option>
-              </select>
-              {translate('entries')}
-            </label>
-          </div>
+          {/* Dropdown Pour le Show du tableau */}
           <Dropdown>
-            <Dropdown.Toggle variant="link" id="dropdown-basic">
-              Filtre
+            <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
+              <i className="fas fa-list-alt"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item>N</Dropdown.Item>
-              <Dropdown.Item>{translate('Creation Date')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Verifier')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Outgoing Driver')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Incoming Driver')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Tractor Registration')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Trailer Registration')}</Dropdown.Item>
-              <Dropdown.Item>{translate('Maintenance')}</Dropdown.Item>
+              {options.map((option) => (
+                <Dropdown.Item key={option} onClick={() => setLimit(option)}>
+                  {option}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+          {/* Dropdown Pour le filtrage du tableau */}
+          <Dropdown>
+            <Dropdown.Toggle variant="" id="dropdown-basic" title="Colonnes dʼaffichage">
+              <i className="fas fa-eye"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.id_verif}
+                  onChange={() => handleColumnChange("id_verif")}
+                />
+                <span style={{ marginLeft: '10px' }}>id</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.Creation_date}
+                  onChange={() => handleColumnChange("Creation_date")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Creation Date")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.Checker}
+                  onChange={() => handleColumnChange("Checker")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Checker")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.Driver_out}
+                  onChange={() => handleColumnChange("Driver_out")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Outgoing Driver")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.Driver_in}
+                  onChange={() => handleColumnChange("Driver_in")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Incoming Driver")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.license_vhc}
+                  onChange={() => handleColumnChange("license_vhc")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Tractor Registration")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.maintenance}
+                  onChange={() => handleColumnChange("maintenance")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Maintenance")}</span>
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -145,33 +228,31 @@ export function Vehicleschecks() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              <th>N°</th>
-              <th>{translate('Creation Date')}</th>
-              <th>{translate('Verifier')}</th>
-              <th>{translate('Outgoing Driver')}</th>
-              <th>{translate('Incoming Driver')}</th>
-              <th>{translate('Tractor Registration')}</th>
-              <th>{translate('Trailer Registration')}</th>
-              <th>{translate('Maintenance')}</th>
-              <th>{translate('Actions')}</th>
+              {selectedColumns.id_verif && <th>N°</th>}
+              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}
+              {selectedColumns.Checker && <th>{translate("Checker")}</th>}
+              {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
+              {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}
+              {selectedColumns.license_vhc && <th>{translate("Tractor Registration")}</th>}
+              {selectedColumns.maintenance && <th>{translate("Maintenance")}</th>}
+              <th>{translate("Actions")}</th>
             </tr>
           </thead>
           <tbody key="#" className="ligth-body">
-            {list_Vehicleschecks.map((data) => (
-              <tr className={''}>
+            {Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 && list_Vehicleschecks.map((data) => (
+              <tr className={""} key={data.id_verif}>
                 <td>
                   <div className="form-check form-check-inline">
                     <input type="checkbox" className="form-check-input" />
                   </div>
                 </td>
-                <td>{data.id_verif}</td>
-                <td>{data.Creation_date}</td>
-                <td>{data.checker}</td>
-                <td>{data.Driver_out}</td>
-                <td>{data.Driver_in}</td>
-                <td>{data.license_vhc}</td>
-                <td>{data.license_vhc}</td>
-                <td>{data.maintenance}</td>
+                {selectedColumns.id_verif && <td>{data.id_verif}</td>}
+                {selectedColumns.Creation_date && <td>{toTimestamp(data.Creation_date).split(' ')[0]}</td>}
+                {selectedColumns.Checker && <td>{data.checker}</td>}
+                {selectedColumns.Driver_out && <td>{data.Driver_out}</td>}
+                {selectedColumns.Driver_in && <td>{data.Driver_in}</td>}
+                {selectedColumns.license_vhc && <td>{data.license_vhc}</td>}
+                {selectedColumns.maintenance && <td>{data.maintenance}</td>}
                 <td>
                   <div className="d-flex align-items-center list-action">
                     <Link
@@ -181,7 +262,7 @@ export function Vehicleschecks() {
                       data-placement="top"
                       title="Détail"
                     >
-                      <i className="fa fa-eye" style={{ fontSize: '1.2em' }}></i>
+                      <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
                     </Link>
                     <a
                       className="badge bg-warning mr-2"
@@ -190,7 +271,7 @@ export function Vehicleschecks() {
                       title="Delete"
                       data-original-title="Delete"
                     >
-                      <i className="ri-delete-bin-line mr-0" style={{ fontSize: '1.2em' }}></i>
+                      <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
                     </a>
                     <a
                       className="badge bg-primary mr-2"
@@ -199,7 +280,7 @@ export function Vehicleschecks() {
                       title="download"
                       data-original-title="download"
                     >
-                      <i className="las la-download" style={{ fontSize: '1.2em' }}></i>
+                      <i className="las la-download" style={{ fontSize: "1.2em" }}></i>
                     </a>
                   </div>
                 </td>
@@ -210,7 +291,7 @@ export function Vehicleschecks() {
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
-          <span>Affichage 1 à 5 sur 5 </span>
+          <span>Affichage 1 à {limit} sur {total} </span>
         </div>
         <div className="col-md-6">
           <ReactPaginate
@@ -235,5 +316,5 @@ export function Vehicleschecks() {
         </div>
       </div>
     </>
-  )
+  );
 }
