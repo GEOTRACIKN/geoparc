@@ -1,13 +1,14 @@
-import { Dropdown, Table } from "react-bootstrap";
+import { Dropdown, Modal, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
 import { toTimestamp } from "../functions";
+import { Bounce, toast } from "react-toastify";
 
 type Vehicles = {
-  id_verif: number;
+  id_verif: string;
   Creation_date: string;
   checker: string;
   Driver_out: string;
@@ -27,6 +28,10 @@ export function Vehicleschecks() {
   const [list_Vehicleschecks, setItems] = useState<Vehicles[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('Checker');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedvehiclecheckID, setSelectedvehiclecheckID] = useState<string | null>(null);
+
+
   const initialColumns = {
     id_verif: true,
     Creation_date: true,
@@ -106,6 +111,69 @@ export function Vehicleschecks() {
 
   const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Les options de taille de page mises à jour
 
+  //------- Partie Delete -------
+  const handleConfirmDelete = async () => {
+    try {
+      const loggedInUserID = 1;
+
+      const response = await fetch(`${backendUrl}/api/delete/${selectedvehiclecheckID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ loggedInUserID: loggedInUserID }),
+
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la suppression logique. Statut : ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Fermez le modal après la suppression
+      setShowDeleteModal(false);
+
+      if (response.ok) {
+       
+        toast.success("Vehcile check Deleted successfully !", {
+          position: "bottom-right",
+          autoClose: 2400,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        //refreshUserData();
+      }
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur Deleted Vehcile check", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      
+    }
+  };
+
+  const handleDeleteClick = async (idverif: string) => {
+    // Affichez le modal de confirmation avant la suppression
+    setSelectedvehiclecheckID(idverif);
+    setShowDeleteModal(true);
+  };
+  
+
   return (
     <>
       <div className="row">
@@ -116,7 +184,7 @@ export function Vehicleschecks() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Link to="#" className="btn btn-primary mt-2 mr-1">
+          <Link to="/Vehicle_check" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
             {translate("Add Verification")}
           </Link>
@@ -275,6 +343,7 @@ export function Vehicleschecks() {
                     </a>
                     <a
                       className="badge bg-primary mr-2"
+                      onClick={() => handleDeleteClick(data['id_verif'])}
                       data-toggle="tooltip"
                       data-placement="top"
                       title="download"
@@ -287,6 +356,28 @@ export function Vehicleschecks() {
               </tr>
             ))}
           </tbody>
+          <Modal
+              show={showDeleteModal}
+              onHide={() => setShowDeleteModal(false)}
+              dialogClassName="modal-90w"
+              aria-labelledby=""
+              centered
+              >
+              <Modal.Header closeButton>
+                <Modal.Title style={{ fontWeight: 'bold', color: 'grey' }}>{translate('Trash')}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="text-center">
+              {translate('Do you really want to remove this check vehicle?')}
+              </Modal.Body>
+              <Modal.Footer className="d-flex">
+              <button className="btn btn-outline-danger mt-2 mx-auto" onClick={() => setShowDeleteModal(false)}>
+              {translate('Cancel')}  
+              </button>
+              <button className="btn btn-outline-success mt-2 mx-auto" onClick={handleConfirmDelete}>
+              {translate('Confirm')} 
+              </button>
+              </Modal.Footer>
+            </Modal>
         </Table>
       </div>
       <div className="row">
