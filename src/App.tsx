@@ -14,6 +14,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
 import {VehicleCost} from "./pages/Vehicle_cost"
+import {VehicleSinister} from "./pages/Vehicle_sinister"
 
 
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/Vehicle_checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
           <Route path="/Vehicle_check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
           <Route path="/Vehicle_cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
+          <Route path="/Vehicle_sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
 
         </Routes>
       </div>
