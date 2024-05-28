@@ -24,7 +24,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-open");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
-  const userID = localStorage.getItem("userID");
 
   interface Permission {
     id_rel: number;
@@ -49,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   }
 
   const checkPermission = (idPermission: number): boolean => {
+
     return userPermissions.some(
       (permission) => permission.id_permission === idPermission
     );
@@ -90,9 +90,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     localStorage.removeItem("userPermissions");
     navigate("/login");
   };
-
+ 
   return (
-    <div className={`iq-sidebar  sidebar-default  ${sidebar}`}>
+    <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
           <Image
@@ -219,7 +219,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     }}
                     as={NavLink}
                   >
-                    <i className="las la-car"></i>
+                    <i className="las la-user-nurse"></i>
                     <span className={`ml-4 ${activeMenuText}`}>
                       {translate("Drivers")}
                     </span>
@@ -255,7 +255,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         className="svg-icon"
                         as={NavLink}
                       >
-                        <i className="las la-user-nurse"></i>
+                        <i className="las la-list-alt"></i>
                         <span className={`ml-4 ${activeMenuText}`}>
                           {translate("List Drivers")}
                         </span>

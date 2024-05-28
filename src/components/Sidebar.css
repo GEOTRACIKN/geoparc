@@ -826,7 +826,7 @@
             width: calc(100%); 
         }
     
-        .sidebar-close{   width: 0px;}  
+        .sidebar-close{  width: 0px;}  
         .sidebar-open{   width: 221px;}
     
     
@@ -848,4 +848,5 @@
     .navbar-list li>.dropdown { 
         line-height: 51px !important; 
     }
+    
     
