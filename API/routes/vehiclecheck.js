@@ -43,6 +43,22 @@ router.get("/vehiclecheck/totalpage/:id_user", async (req, res) => {
   }
 });
 
+// Delete route 
+router.put("/delete/:idverif_vehicle", async (req, res) => {
+  const idverif_vehicle = req.params.idverif_vehicle;
+  const loggedInUserID = req.body.loggedInUserID;
+
+  try {
+    await Vehiclecheck.deleteDriver(idverif_vehicle, loggedInUserID);
+    res.status(200).json({ message: "Suppression réussie." });
+  } catch (err) {
+    res.status(500).json({
+      error: "Erreur lors de la suppression logique de vehicle vérifié.",
+    });
+  }
+});
+;
+
 
 
 module.exports = router;
