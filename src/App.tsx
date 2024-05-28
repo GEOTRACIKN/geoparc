@@ -15,6 +15,7 @@ import { Dashboard } from "./pages/Dashboard";
 import {VehicleCost} from "./pages/Vehicle_cost"
 import { Role } from "./pages/Role";
 import { Permission } from "./pages/Permission";
+import { Drivers } from "./pages/Drivers";
 
 
 
@@ -47,7 +48,9 @@ function App() {
           <Route path="/Vehicle_cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
+          <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
 
+          
         </Routes>
       </div>
       <ToastContainer

@@ -209,6 +209,63 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </ul>
                 </li>
 
+                <li>
+                  <Nav.Link
+                    to="/Drivers"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("Drivers");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="las la-car"></i>
+                    <span className={`ml-4 ${activeMenuText}`}>
+                      {translate("Drivers")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="Vehicles"
+                    className={`iq-submenu ${
+                      openSubmenus.includes("Drivers")
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
+                    }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link
+                        to="/Drivers"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-user-nurse"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("List Drivers")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    
+                  </ul>
+                </li>
+                
+
                 <li className="divider"></li>
                 <li>
                   <Nav.Link to="/Settings" className="svg-icon" as={NavLink}>
