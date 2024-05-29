@@ -6,7 +6,9 @@ import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+
+const backendUrl = 'http://localhost:5000';
 
 interface VehiculeListInterface {
   id_vhc: number,
@@ -20,18 +22,22 @@ interface VehiculeListInterface {
   driver_last_name?: string
 }
 
+let currentPage = 1;
+
 export function Vehicles() {
   const { translate } = useTranslate();
-  const userID = localStorage.getItem("userID");
+  // const userID = localStorage.getItem("userID");
+  const userID = 21;
+  const [total, setTotal] = useState<number>(0);
   const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState(new Map());
   const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [sortType, setSortType] = useState("id_vehicule");
+  const [sortColumn, setSortColumn] = useState("id_vhc");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [searchValue, setSearchValue] = useState<null | string>(null);
+  const [searchValue, setSearchValue] = useState<null | string>("");
   const [searchColumn, setSearchColumn] = useState('license_vhc')
   const [visibleColumns, setVisibleColumns] = useState({
     id_vehicule: true,
@@ -47,8 +53,8 @@ export function Vehicles() {
 
   const handleSort = (type: string) => {
     let sortOrder = sortDirection === "asc" ? "desc" : "asc";
-    if (type !== sortType) sortOrder = "asc";
-    setSortType(type);
+    if (type !== sortColumn) sortOrder = "asc";
+    setSortColumn(type);
     setSortDirection(sortOrder);
   };
 
@@ -81,7 +87,7 @@ export function Vehicles() {
             <th style={{ width: "60px", cursor: "pointer" }} className="col-xs-3">
               <span onClick={() => handleSort("id_vehicule")} style={{ color: "#140A57" }}>
                 ID
-                {sortType === "id_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "id_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -89,7 +95,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("model")} style={{ color: "#140A57" }}>
                 Modèle
-                {sortType === "model" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "model" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -97,7 +103,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("imatriculation")} style={{ color: "#140A57" }}>
                 Immatriculation
-                {sortType === "imatriculation" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "imatriculation" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -105,7 +111,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("state")} style={{ color: "#140A57" }}>
                 État
-                {sortType === "state" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "state" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -113,7 +119,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("assignment")} style={{ color: "#140A57" }}>
                 Affectation
-                {sortType === "assignment" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "assignment" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -121,7 +127,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}>
                 Conducteur
-                {sortType === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -129,7 +135,7 @@ export function Vehicles() {
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}>
                 Remorque
-                {sortType === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
@@ -141,19 +147,54 @@ export function Vehicles() {
     );
   };
 
-  const fetchVehiculeData = async (currentPage: number, limit: number,sortType:string,sortDirection:string, searchColumn: string, searchValue?:null | string) => {
+  const fetchVehiculeData = async (currentPage: number, limit: number,sortColumn:string,sortDirection:string, searchColumn: string, searchValue?:null | string) => {
     try {
-      // setLoading(true); 
-      // const [ contData, viheculeData ] = await Promise.all([
-      //   fetch(`${backendUrl}/api/vehicles/count`)
-      // ])
-      
+      setLoading(true); 
+      const [ countData, viheculeData ] = await Promise.all([
+        fetch(`${backendUrl}/api/vehicules/count/${userID}`,{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              searchTerm: searchValue,
+              searchType: searchColumn
+          })
+        }).then((res) =>res.json()),
+        fetch(`${backendUrl}/api/vehicules/${userID}/${currentPage}/${limit}`,{
+          method: 'POST',
+          headers: {
+            'Content-Type':'application/json'
+          },
+          body: JSON.stringify({
+            sortColumn:sortColumn,
+            sortOrder:sortDirection,
+            searchColumn:searchColumn,
+            searchValue:searchValue
+          })
+        }).then((res) => res.json())
+      ]);
+
+      const total = countData[0].total;
+      setTotal(total);
+
+      const calculatedPageCount = Math.ceil(total / limit);
+      setPageCount(calculatedPageCount);
+      setVehiculeListList(viheculeData);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false); // Set loading to false on data fetch completion
     }
     }
+
+  const refreshVehiculeData = async () => {
+    fetchVehiculeData(currentPage, limit,sortColumn,sortDirection,searchColumn,searchValue);
+  }
+
+  useLayoutEffect(()=> {
+    refreshVehiculeData()
+  }, [userID, limit, sortColumn, sortDirection, searchColumn,searchValue])
 
   const vehiclesData = [
     {
