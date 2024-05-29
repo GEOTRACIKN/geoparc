@@ -4,17 +4,10 @@ const router = require("express").Router();
 
 
 //GET ALL Vehiclecheck
-router.get("/vehicules/:id_user/:page/:limit", async (req, res) => {
+router.post("/vehicules/:id_user/:page/:limit", async (req, res) => {
+  const {id_user,  page, limit } = req.params;
+  const { sortColumn, sortOrder, searchColumn, searchValue } = req.body;
 
-  // @exomple link {http://localhost:5000/api/vehicules/1/1/15?sortColumn=id_vhc&sortOrder=desc&searchColumn=license_vhc&searchValue=EFG123}
-
-  const { page, limit, id_user } = req.params;
-    const sortColumn = req.query.sortColumn;
-    const sortOrder = req.query.sortOrder;
-    const searchColumn = req.query.searchColumn;
-    const searchValue = req.query.searchValue;
-
-    
   try {
     const results = await getAllUserId(
       id_user,
@@ -32,10 +25,10 @@ router.get("/vehicules/:id_user/:page/:limit", async (req, res) => {
     });
   }
 });
-
 // Route pour récupérer le nombre total de véhicules vérifiés
-router.get('/vehicles/count', async (req, res) => {
-  const { id_user, searchTerm, searchType } = req.query;
+router.post('/vehicules/count/:id_user', async (req, res) => {
+  const { id_user } = req.params;
+  const { searchTerm, searchType } = req.body;
 
   try {
     const result = await getAll(Number(id_user), searchTerm, searchType);
