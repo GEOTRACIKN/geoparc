@@ -6,14 +6,33 @@ import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+interface VehiculeListInterface {
+  id_vhc: number,
+  type_vhc: string,
+  model_vhc: string,
+  license_vhc: string,
+  color_vhc: string,
+  cond_vhc: string,
+  id_driver?: number,
+  driver_first_name?: string,
+  driver_last_name?: string
+}
 
 export function Vehicles() {
   const { translate } = useTranslate();
-  const [limit, setLimit] = useState(15);
+  const userID = localStorage.getItem("userID");
+  const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
+  const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState(new Map());
+  const [pageCount, setPageCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
   const [sortType, setSortType] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectAllChecked, setSelectAllChecked] = useState(false);
+  const [searchValue, setSearchValue] = useState<null | string>(null);
+  const [searchColumn, setSearchColumn] = useState('license_vhc')
   const [visibleColumns, setVisibleColumns] = useState({
     id_vehicule: true,
     model: true,
@@ -24,6 +43,7 @@ export function Vehicles() {
     trailer: true,
     actions: true,
   });
+
 
   const handleSort = (type: string) => {
     let sortOrder = sortDirection === "asc" ? "desc" : "asc";
@@ -120,6 +140,21 @@ export function Vehicles() {
       </thead>
     );
   };
+
+  const fetchVehiculeData = async (currentPage: number, limit: number,sortType:string,sortDirection:string, searchColumn: string, searchValue?:null | string) => {
+    try {
+      // setLoading(true); 
+      // const [ contData, viheculeData ] = await Promise.all([
+      //   fetch(`${backendUrl}/api/vehicles/count`)
+      // ])
+      
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false); // Set loading to false on data fetch completion
+    }
+    }
+
   const vehiclesData = [
     {
       id_vehicule: 1,

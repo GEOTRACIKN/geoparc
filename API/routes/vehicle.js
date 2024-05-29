@@ -34,7 +34,7 @@ router.get("/vehicules/:id_user/:page/:limit", async (req, res) => {
 });
 
 // Route pour récupérer le nombre total de véhicules vérifiés
-router.get('/vehicles/count', async (req, res) => {
+router.get('/vehicles/count/:id_user', async (req, res) => {
   const { id_user, searchTerm, searchType } = req.query;
 
   try {
