@@ -15,6 +15,9 @@ import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
 import {VehicleCost} from "./pages/Vehicle_cost"
 import {VehicleSinister} from "./pages/Vehicle_sinister"
+import { Role } from "./pages/Role";
+import { Permission } from "./pages/Permission";
+import { Drivers } from "./pages/Drivers";
 
 
 
@@ -47,7 +50,11 @@ function App() {
           <Route path="/Vehicle_check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
           <Route path="/Vehicle_cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
           <Route path="/Vehicle_sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
+          <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+          <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
+          <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
 
+          
         </Routes>
       </div>
       <ToastContainer

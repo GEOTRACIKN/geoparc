@@ -13905,6 +13905,11 @@ a.bg-secondary-light:focus,a.bg-secondary-light:hover,button.bg-secondary-light:
     background-color: #d9ede0!important
 }
 
+.bg-success-user {
+    color: #408759!important;
+    background-color: #f7ffdb!important
+}
+
 a.bg-success-light:focus,a.bg-success-light:hover,button.bg-success-light:focus,button.bg-success-light:hover {
     color: #408759!important;
     background-color: #b6ddc4!important
@@ -23741,7 +23746,7 @@ table.dataTable {
     margin-top: 6px!important;
     margin-bottom: 6px!important;
     max-width: none!important;
-    border-collapse: separate!important;
+   /* border-collapse: separate!important;*/
     border-spacing: 0
 }
 
@@ -23833,12 +23838,12 @@ table.dataTable>thead .sorting:after,table.dataTable>thead .sorting:before,table
 
 table.dataTable>thead .sorting:before,table.dataTable>thead .sorting_asc:before,table.dataTable>thead .sorting_asc_disabled:before,table.dataTable>thead .sorting_desc:before,table.dataTable>thead .sorting_desc_disabled:before {
     right: 1em;
-    content: "ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“"
+    content: "↑"
 }
 
 table.dataTable>thead .sorting:after,table.dataTable>thead .sorting_asc:after,table.dataTable>thead .sorting_asc_disabled:after,table.dataTable>thead .sorting_desc:after,table.dataTable>thead .sorting_desc_disabled:after {
     right: .5em;
-    content: "ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ"
+    content: "↓"
 }
 
 table.dataTable>thead .sorting_asc:before,table.dataTable>thead .sorting_desc:after {
@@ -23857,7 +23862,7 @@ div.dataTables_scrollBody table {
     border-top: none;
     margin-top: 0!important;
     margin-bottom: 0!important
-}
+}  
 
 div.dataTables_scrollBody table thead .sorting:after,div.dataTables_scrollBody table thead .sorting:before,div.dataTables_scrollBody table thead .sorting_asc:after,div.dataTables_scrollBody table thead .sorting_asc:before,div.dataTables_scrollBody table thead .sorting_desc:after,div.dataTables_scrollBody table thead .sorting_desc:before {
     display: none

@@ -6,6 +6,7 @@ const vehicleRoute = require("./routes/vehicle");
 const VehiclecheckRoute = require("./routes/vehiclecheck");
 const VehiclesinitreRoute = require("./routes/vehiclesinistre");
 
+const RoleRoute = require("./routes/Role");
 const cors = require("cors");
  
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use("/api", vehicleRoute);
 app.use("/api", VehiclecheckRoute);
 app.use("/api", VehiclesinitreRoute);
+app.use("/api", RoleRoute);
 
 
 

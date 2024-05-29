@@ -24,7 +24,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-open");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
-  const userID = localStorage.getItem("userID");
 
   interface Permission {
     id_rel: number;
@@ -49,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   }
 
   const checkPermission = (idPermission: number): boolean => {
+
     return userPermissions.some(
       (permission) => permission.id_permission === idPermission
     );
@@ -90,9 +90,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     localStorage.removeItem("userPermissions");
     navigate("/login");
   };
-
+ 
   return (
-    <div className={`iq-sidebar  sidebar-default  ${sidebar}`}>
+    <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
           <Image
@@ -220,6 +220,63 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                   </ul>
                 </li>
+
+                <li>
+                  <Nav.Link
+                    to="/Drivers"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("Drivers");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="las la-user-nurse"></i>
+                    <span className={`ml-4 ${activeMenuText}`}>
+                      {translate("Drivers")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="Vehicles"
+                    className={`iq-submenu ${
+                      openSubmenus.includes("Drivers")
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
+                    }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link
+                        to="/Drivers"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-list-alt"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("List Drivers")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    
+                  </ul>
+                </li>
+                
 
                 <li className="divider"></li>
                 <li>

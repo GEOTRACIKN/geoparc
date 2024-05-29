@@ -59,14 +59,9 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   localStorage.removeItem("loginTime");
   localStorage.removeItem("userID");
   localStorage.removeItem("userPermissions");
-
   cookies.remove("jwtToken");
-
   navigate("/login");
 };
-
-  
-
 
   
   useEffect(() => {
@@ -86,11 +81,30 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
     };
   }, []);
 
+  useEffect(() => {
+    // Gérer l'événement unload pour la déconnexion
+    const handleUnload = () => {
+      handleLogout();
+    };
+
+    window.addEventListener("unload", handleUnload);
+
+    // Gérer la déconnexion après 30 minutes d'inactivité
+    const inactivityTimeout = setTimeout(() => {
+      handleLogout();
+    }, 30 * 60 * 1000); // 30 minutes
+
+    return () => {
+      window.removeEventListener("unload", handleUnload);
+      clearTimeout(inactivityTimeout);
+    };
+  }, []);
+
   const handleCloseConfirmation = () => setShowConfirmation(false);
   const handleShowConfirmation = () => setShowConfirmation(true);
 
   useEffect(() => {
-    const inactivityTimeout = setTimeout(handleLogout, 1800000); // 2 min
+    const inactivityTimeout = setTimeout(handleLogout, 30 * 60 * 1000); //  30 minutes
 
     return () => {
       clearTimeout(inactivityTimeout); // Annuler le minuteur si le composant est démonté
