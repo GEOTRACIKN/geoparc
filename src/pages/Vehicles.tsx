@@ -11,15 +11,16 @@ import { PropagateLoader } from "react-spinners";
 const backendUrl = 'http://localhost:5000';
 
 interface VehiculeListInterface {
-  id_vhc: number,
-  type_vhc: string,
-  model_vhc: string,
-  license_vhc: string,
-  color_vhc: string,
-  cond_vhc: string,
-  id_driver?: number,
+  id_vehicule: number,
+  vehicule_type: string,
+  modele_vehicule: string,
+  immatriculation_vehicule: string,
+  couleur_vehicule: string,
+  etat_vehicule: string,
+  id_conducteur_vehicule?: number,
   driver_first_name?: string,
   driver_last_name?: string
+  affectation?: string,
 }
 
 let currentPage = 1;
@@ -27,18 +28,18 @@ let currentPage = 1;
 export function Vehicles() {
   const { translate } = useTranslate();
   // const userID = localStorage.getItem("userID");
-  const userID = 21;
+  const userID = 1;
   const [total, setTotal] = useState<number>(0);
   const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
   const [selectedRows, setSelectedRows] = useState(new Map());
   const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [sortColumn, setSortColumn] = useState("id_vhc");
+  const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [searchValue, setSearchValue] = useState<null | string>("");
-  const [searchColumn, setSearchColumn] = useState('license_vhc')
+  const [searchColumn, setSearchColumn] = useState('immatriculation_vehicule')
   const [visibleColumns, setVisibleColumns] = useState({
     id_vehicule: true,
     model: true,
@@ -151,7 +152,7 @@ export function Vehicles() {
     try {
       setLoading(true); 
       const [ countData, viheculeData ] = await Promise.all([
-        fetch(`${backendUrl}/api/vehicules/count/${userID}`,{
+        fetch(`${backendUrl}/api/vehicles/count/${userID}`,{
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -161,12 +162,15 @@ export function Vehicles() {
               searchType: searchColumn
           })
         }).then((res) =>res.json()),
-        fetch(`${backendUrl}/api/vehicules/${userID}/${currentPage}/${limit}`,{
+        fetch(`${backendUrl}/api/vehicles`,{
           method: 'POST',
           headers: {
             'Content-Type':'application/json'
           },
           body: JSON.stringify({
+            id_user:userID,
+            page:currentPage,
+            limit:limit,
             sortColumn:sortColumn,
             sortOrder:sortDirection,
             searchColumn:searchColumn,
@@ -196,36 +200,10 @@ export function Vehicles() {
     refreshVehiculeData()
   }, [userID, limit, sortColumn, sortDirection, searchColumn,searchValue])
 
-  const vehiclesData = [
-    {
-      id_vehicule: 1,
-      model: "Model A",
-      imatriculation: "ABC-123",
-      state: "En bon état",
-      assignment: "Livraison",
-      conducteur: "Jean",
-      trailer: "Remorque 1",
-
-    },
-    {
-      id_vehicule: 2,
-      model: "Model B",
-      imatriculation: "DEF-456",
-      state: "Besoin de maintenance",
-      assignment: "Transport de marchandises",
-      conducteur: "Marie",
-      trailer: "Remorque 2",
-    },
-    {
-      id_vehicule: 3,
-      model: "Model C",
-      imatriculation: "GHI-789",
-      state: "En réparation",
-      assignment: "Voyage longue distance",
-      conducteur: "Pierre",
-      trailer: "Remorque 3",
-    },
-  ];
+  const handlePageClick = async (data: { selected: number }) => {
+    currentPage = data.selected + 1;   
+    refreshVehiculeData();
+  };
 
 
   return (
@@ -265,7 +243,7 @@ export function Vehicles() {
           >
             <h4 className="mb-3">
               <i className="las la-car mr-2"></i>
-              {translate("Vehicles")} ( )
+              {translate("Vehicles")} ({total})
             </h4>
             <div className="input-group">
               <Dropdown>
@@ -440,7 +418,7 @@ export function Vehicles() {
           <Table className="table-fixed">
             <TableHeader />
             <tbody className="ligth-body">
-              {vehiclesData.map((item) => (
+              {vehiculeListList.map((item) => (
                 <tr key={item.id_vehicule}>
                   <td>
                     <input
@@ -450,31 +428,31 @@ export function Vehicles() {
                     />
                   </td>
                   {visibleColumns.id_vehicule && <td>{item.id_vehicule}</td>}
-                  {visibleColumns.model && <td className="text-center">{item.model}</td>}
+                  {visibleColumns.model && <td className="text-center">{item.modele_vehicule}</td>}
                   
                   {visibleColumns.imatriculation && (
-                    <td className="text-center">{item.imatriculation}</td>
+                    <td className="text-center">{item.immatriculation_vehicule}</td>
                   )}
                   {visibleColumns.state && (
                     <td className="text-center">
                       <span className="badge p-1 fs-6 btn">
-                        {item.state}
+                        {item.etat_vehicule}
                       </span>
                     </td>
                   )}
                   {visibleColumns.assignment && (
                     <td className="text-center">
-                      {item.assignment}
+                      {item.affectation}
                     </td>
                   )}
                   {visibleColumns.conducteur && (
                     <td className="text-center">
-                      {item.conducteur}
+                      {item.driver_first_name} - {item.driver_last_name}
                     </td>
                   )}
                   {visibleColumns.trailer && (
                     <td className="text-center">
-                      {item.trailer}
+                      {/* {item.trailer} */}
                     </td>
                   )}
                   {visibleColumns.actions && (
@@ -521,12 +499,13 @@ export function Vehicles() {
               <tr>
                 <td colSpan={6}>
                   <ReactPaginate 
-                    previousLabel="previous"
-                    nextLabel="next"
+                    previousLabel={translate("previous")}
+                    nextLabel={translate("next")}
                     breakLabel="..."
-                    pageCount={7}
-                    marginPagesDisplayed={2}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={1}
                     pageRangeDisplayed={3}
+                    onPageChange={handlePageClick}
                     containerClassName={"pagination justify-content-center"}
                     pageClassName={"page-item"}
                     pageLinkClassName={"page-link"}
