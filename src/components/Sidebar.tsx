@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Nav, Image } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import "./Sidebar.css";
 import { useTranslate } from "./LanguageProvider";
 import Cookies from "universal-cookie";
 import Logout from "./Logout";
+import axios from "axios";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface SidebarProps {
@@ -24,6 +25,70 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-open");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
+
+
+  const location = useLocation();
+
+  // Extraction du paramètre apikey de l'URL
+  const getApiKeyFromURL = () => {
+    const searchParams = new URLSearchParams(location.search);
+    return searchParams.get('apikey');
+  };
+
+  const apiKey = getApiKeyFromURL();
+
+
+  const handleLogin = async () => {
+    try {
+   
+      const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {  
+        
+      });
+
+    //  onLogin(response.data);
+      localStorage.setItem("authToken", response.data.token);
+      console.log(response.data.username);
+      const loginTime = new Date().getTime(); // Store current time
+      localStorage.setItem("loginTime", loginTime.toString());
+      localStorage.setItem("userID", response.data.id_user);
+      localStorage.setItem("username", response.data.username);
+      localStorage.setItem("api_key", response.data.api_key); 
+
+      // Fetch permissions for the user
+      const permissionsResponse = await axios.get(
+        `${backendUrl}/api/permission/all/${response.data.id_user}`
+      );
+      localStorage.setItem(
+        "userPermissions",
+        JSON.stringify(permissionsResponse.data)
+      );
+
+      navigate("/");
+    } catch (error) {
+      console.error("Login error", error);
+    } finally {
+      
+      // Set loading to false on login completion (success or failure)
+    }
+  };
+
+  useEffect(() => { 
+    handleLogin()
+    const savedToken = localStorage.getItem("authToken");
+    const savedUserID = localStorage.getItem("userID");
+    if (savedToken && savedUserID === "1") {
+      navigate("/"); // Rediriger directement vers la page principale si l'userID est égal à 1
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("authToken");
+    if (savedToken) {
+      navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
+    }
+  }, [location.pathname]);
+
+
 
   interface Permission {
     id_rel: number;
@@ -90,10 +155,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     localStorage.removeItem("userPermissions");
     navigate("/login");
   };
- 
+  console.log(apiKey) 
   return (
     <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
+        
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
           <Image
             className="img-fluid rounded-normal light-logo"

@@ -13,7 +13,7 @@ router.get("/vehiclecheck/:id_user/:page/:limit", async (req, res) => {
   try {
     const results = await Vehiclecheck.getAllUserId(
       id_user,
-      page,
+      page,  
       limit,
       searchTerm,
       searchType
