@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import Cookies from 'universal-cookie';
 import axios from "axios";
 import { useTranslate } from "../components/LanguageProvider";
-import { useNavigate , useLocation} from "react-router-dom";
+import { useNavigate , useLocation, redirect} from "react-router-dom";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface LogoutButtonProps {
@@ -60,7 +60,7 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   localStorage.removeItem("userID");
   localStorage.removeItem("userPermissions");
   cookies.remove("jwtToken");
-  navigate("/login");
+  window.location.href ="http://localhost:3000/login";
 };
 
   
