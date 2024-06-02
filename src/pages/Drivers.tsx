@@ -7,15 +7,14 @@ import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from 'react-spinners'; 
 
 interface Drivers {
-  id_driver:number;
-  code:number;
-  last_name:string;
-  first_Name:string;
-  Date_of_birth:string;
-  function:string;
-  email:string;	
-  phone:string;
-  park:string;
+  id_conducteur:number;
+  code_conducteur:number;
+  nom_conducteur:string;
+  prenom_conducteur:string;
+  date_naissance_conducteur:string;
+  email_conducteur:string;	
+  telephone_conducteur:string;
+  id_parc:number; 
 }
 
 
@@ -33,11 +32,11 @@ export function Drivers() {
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);   
-  const [colum, setSortColum] = useState("id_alarme");
+  const [colum, setSortColum] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(""); 
   const [type, setType] = useState(0); 
-  const [typeSeach, setTypeSeach] = useState("Alarm ID");
+  const [typeSeach, setTypeSeach] = useState("ID");
   
 
   const [show, setShow] = useState(false);
@@ -64,7 +63,7 @@ export function Drivers() {
       });
 
       // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/alarm/totalpage`, {
+      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/driver/totalpage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,10 +74,10 @@ export function Drivers() {
 
       const totalPagesJson = await totalPagesResponse.json();
       const total = totalPagesJson[0]["count"];
-      settotal(total);
+      settotal(total); 
 
       // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/alarm/search`, {
+      const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +88,7 @@ export function Drivers() {
 
       const data = await DriversResponse.json();
       setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
+      setLimit(limitValue) 
       setDrivers(data);
   
     } catch (error) {
@@ -177,17 +176,14 @@ export function Drivers() {
   
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_alarme: true,
-    name_alarme: true,
-    id_type_alarme: true,
-    type_alarme: true,
-    groupe_alarme: true,
-    id_groupe_alarme: true,
-    date_creation: true,
-    id_user: true,
-    username_user: true,
-    seuil: true,
-    val_seuil: true,
+    id_conducteur:true,
+    code_conducteur:true,
+    nom_conducteur:true,
+    prenom_conducteur:true,
+    date_naissance_conducteur:true,
+    email_conducteur:true,
+    telephone_conducteur:true,
+    id_parc:true
   });
 
   const handleColumnChange = (column: string) => {
@@ -204,20 +200,26 @@ export function Drivers() {
     const selectedValue = event.target.textContent;
    
     switch (selectedValue) {
-      case translate("Alarm ID"):
+      case translate("ID Driver"):
           setType(0);
         break;
-      case translate("Name"):
+      case translate("Last & First Name"):
        setType(1);
        
         break;
-      case translate("Type"):
+      case translate("Date Of Birth"):
      setType(2);
  
         break;
-      case translate("User"):
+      case translate("Email"):
          setType(3);
         break;
+        case translate("Phone"):
+          setType(4);
+         break;
+         case translate("Park"):
+          setType(4);
+         break;
       default:
         console.log('Unknown selection');
         break;
@@ -276,10 +278,12 @@ export function Drivers() {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("Alarm ID")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Name")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
-                <Dropdown.Item>{translate("User")}</Dropdown.Item>
+                <Dropdown.Item>{translate("ID Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Last & First Name")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Date Of Birth")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Email")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Phone")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Park")}</Dropdown.Item> 
               </Dropdown.Menu>
             </Dropdown>
             <input type="text" placeholder={` By ${typeSeach}` } onChange={handleAdvancedSearch} className="form-control" />
@@ -321,11 +325,11 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_alarme}
-                  onChange={() => handleColumnChange("id_alarme")}
+                  checked={selectedColumns.id_conducteur}
+                  onChange={() => handleColumnChange("id_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Alarm ID")}
+                  {translate("ID")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -335,8 +339,22 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.name_alarme}
-                  onChange={() => handleColumnChange("name_alarme")}
+                  checked={selectedColumns.code_conducteur}
+                  onChange={() => handleColumnChange("code_conducteur")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Code")}
+                </span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.nom_conducteur}
+                  onChange={() => handleColumnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Name")}
@@ -349,11 +367,11 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.type_alarme}
-                  onChange={() => handleColumnChange("type_alarme")}
+                  checked={selectedColumns.date_naissance_conducteur}
+                  onChange={() => handleColumnChange("date_naissance_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Type")}
+                  {translate("Date de naissance")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -363,11 +381,11 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.date_creation}
-                  onChange={() => handleColumnChange("date_creation")}
+                  checked={selectedColumns.telephone_conducteur}
+                  onChange={() => handleColumnChange("telephone_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Date created ")}
+                  {translate("Phone ")}
                 </span>
               </Dropdown.Item>
 
@@ -378,10 +396,10 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.username_user} 
-                  onChange={() => handleColumnChange("username_user")}
+                  checked={selectedColumns.email_conducteur} 
+                  onChange={() => handleColumnChange("email_conducteur")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("User")}</span>
+                <span style={{ marginLeft: "10px" }}>{translate("Email")}</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -398,12 +416,13 @@ export function Drivers() {
                 </div>
               </th> 
 
-              {selectedColumns.id_alarme && <th className="sorting" onClick={() => handleSortingColum("id_alarme")}>{translate("Code")}</th>}
-              {selectedColumns.name_alarme && (<th className="sorting"  onClick={() => handleSortingColum("name_alarme")}>{translate("Last & First Name")}</th>)}
-              {selectedColumns.type_alarme && (<th className="sorting"  onClick={() => handleSortingColum("id_type_alarme")}>{translate("Date of birth")}</th>)}
-              {selectedColumns.username_user && (<th className="sorting"  onClick={() => handleSortingColum("id_user")}>{translate("Email")}</th>)}
-              {selectedColumns.date_creation && (<th className="sorting"  onClick={() => handleSortingColum("date_creation")}>{translate("Phone")}</th>)}
-              {selectedColumns.date_creation && (<th className="sorting"  onClick={() => handleSortingColum("date_creation")}>{translate("Park")}</th>)}
+              {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
+              {selectedColumns.code_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
+              {selectedColumns.nom_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & First Name")}</th>)}
+              {selectedColumns.date_naissance_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
+              {selectedColumns.email_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
+              {selectedColumns.telephone_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
+              {selectedColumns.id_parc && (<th className="sorting"  onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -416,18 +435,19 @@ export function Drivers() {
             (
               list_Drivers.length > 0 ? (
                 list_Drivers.map((driver) => (
-                  <tr key={driver.id_driver}>
+                  <tr key={driver.id_conducteur}>
                     <td>
                       <div className="form-check form-check-inline">
                         <input type="checkbox" className="form-check-input" />
                       </div>
                     </td>
-                    {selectedColumns.id_alarme && <td>{driver.code}</td>}
-                    {selectedColumns.name_alarme && (<td>{driver.first_Name+" " + driver.last_name}</td>)}
-                    {selectedColumns.date_creation && (<td>{formatToTimestamp(driver.Date_of_birth)}</td>)}
-                    {selectedColumns.type_alarme && (<td>{driver.email}</td>)}
-                    {selectedColumns.username_user && (<td>{driver.phone}</td>)}
-                    {selectedColumns.username_user && (<td>{driver.park}</td>)}
+                    {selectedColumns.id_conducteur && <td>{driver.id_conducteur }</td>}
+                    {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}  
+                    {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur+" " + driver.prenom_conducteur}</td>)}
+                    {selectedColumns.date_naissance_conducteur && <td>{formatToTimestamp(driver.date_naissance_conducteur)}</td>}
+                    {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
+                    {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
+                    {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
                  
                     <td>
                       <div className="d-flex align-items-center list-action">
