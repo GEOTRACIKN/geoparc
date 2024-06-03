@@ -28,35 +28,37 @@ const Vehicle = {
 
       if (id_user == 1) {
         sql = ` SELECT 
-        gv.id_vhc,
-        gv.type_vhc,
-        gv.model_vhc,
-        gv.license_vhc,
-        gv.color_vhc,
-        gv.cond_vhc,
-        gv.id_driver,
-        gd.first_name AS driver_first_name,
-        gd.last_name AS driver_last_name
+        gv.id_vehicule,
+        gv.vehicule_type,
+        gv.modele_vehicule,
+        gv.immatriculation_vehicule,
+        gv.couleur_vehicule,
+        gv.etat_vehicule,
+        gv.id_conducteur_vehicule,
+        gd.nom_conducteur AS driver_first_name,
+        gd.prenom_conducteur AS driver_last_name,
+        gd.service_conducteur AS affectation
     FROM 
-        gp_vehicles gv
+        vehicule gv
     LEFT JOIN 
-        gp_driver gd ON gv.id_driver = gd.id_driver
+        conducteur gd ON gv.id_conducteur_vehicule = gd.id_conducteur
           WHERE 1=1`;
       } else {
         sql = ` SELECT 
-        gv.id_vhc,
-        gv.type_vhc,
-        gv.model_vhc,
-        gv.license_vhc,
-        gv.color_vhc,
-        gv.cond_vhc,
-        gv.id_driver,
-        gd.first_name AS driver_first_name,
-        gd.last_name AS driver_last_name
+        gv.id_vehicule,
+        gv.vehicule_type,
+        gv.modele_vehicule,
+        gv.immatriculation_vehicule,
+        gv.couleur_vehicule,
+        gv.etat_vehicule,
+        gv.id_conducteur_vehicule,
+        gd.nom_conducteur AS driver_first_name,
+        gd.prenom_conducteur AS driver_last_name,
+        gd.service_conducteur AS affectation
     FROM 
-        gp_vehicles gv
+        vehicule gv
     LEFT JOIN 
-        gp_driver gd ON gv.id_driver = gd.id_driver
+        conducteur gd ON gv.id_conducteur_vehicule = gd.id_conducteur
         WHERE 
         gv.id_user = ?`;
           params.push(id_user);
@@ -106,9 +108,9 @@ const Vehicle = {
       const params = [];
 
       if (id_user == 1) {
-        sql = `SELECT COUNT(*) as total FROM gp_vehicles WHERE 1=1`;
+        sql = `SELECT COUNT(*) as total FROM vehicule WHERE 1=1`;
       } else {
-        sql = `SELECT COUNT(*) as total FROM gp_vehicles WHERE id_user = ?`;
+        sql = `SELECT COUNT(*) as total FROM vehicule WHERE id_user = ?`;
         params.push(id_user);
       }
 

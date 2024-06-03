@@ -4,10 +4,14 @@ const router = require("express").Router();
 
 
 //GET ALL Vehiclecheck
-router.post("/vehicules/:id_user/:page/:limit", async (req, res) => {
-  const {id_user,  page, limit } = req.params;
-  const { sortColumn, sortOrder, searchColumn, searchValue } = req.body;
-
+router.post("/vehicles", async (req, res) => {
+  // const {id_user,  page, limit } = req.params;
+  const { id_user,  page, limit ,sortColumn, sortOrder, searchColumn, searchValue } = req.body;
+  if (!id_user && !page && !limit) {
+    return res.json({
+      message: 'Not Parameter'
+    });
+  }
   try {
     const results = await getAllUserId(
       id_user,
@@ -26,7 +30,7 @@ router.post("/vehicules/:id_user/:page/:limit", async (req, res) => {
   }
 });
 // Route pour récupérer le nombre total de véhicules vérifiés
-router.post('/vehicules/count/:id_user', async (req, res) => {
+router.post('/vehicles/count/:id_user', async (req, res) => {
   const { id_user } = req.params;
   const { searchTerm, searchType } = req.body;
 
