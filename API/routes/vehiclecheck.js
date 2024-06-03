@@ -11,7 +11,7 @@ router.get("/vehiclecheck/:id_user/:page/:limit", async (req, res) => {
 
     
   try {
-    const results = await Vehiclecheck.getAllUserId(
+    const results = await Vehiclecheck.getAllGeopUserID(
       id_user,
       page,  
       limit,
@@ -46,10 +46,10 @@ router.get("/vehiclecheck/totalpage/:id_user", async (req, res) => {
 // Delete route 
 router.put("/delete/:idverif_vehicle", async (req, res) => {
   const idverif_vehicle = req.params.idverif_vehicle;
-  const loggedInUserID = req.body.loggedInUserID;
+  const loggedInGeopUserID = req.body.loggedInGeopUserID;
 
   try {
-    await Vehiclecheck.deleteDriver(idverif_vehicle, loggedInUserID);
+    await Vehiclecheck.deleteDriver(idverif_vehicle, loggedInGeopUserID);
     res.status(200).json({ message: "Suppression réussie." });
   } catch (err) {
     res.status(500).json({

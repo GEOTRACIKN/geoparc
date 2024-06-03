@@ -5,7 +5,7 @@ const Vehicle = {
  * Récupère une liste de véhicules avec des informations sur le conducteur.
  * 
  * @async
- * @function getAllUserId
+ * @function getAllGeopUserID
  * @param {number} id_user - L'ID de l'utilisateur effectuant la requête. Si id_user est 1, tous les véhicules sont retournés.
  * @param {number} page - Le numéro de la page pour la pagination.
  * @param {number} limit - Le nombre maximum de résultats par page.
@@ -17,10 +17,10 @@ const Vehicle = {
  * @throws {Error} Si une erreur se produit lors de l'exécution de la requête SQL.
  * 
  * @example
- * const results = await getAllUserId(1, 1, 10, 'type_vhc', 'ASC', 'model_vhc', 'Sedan');
+ * const results = await getAllGeopUserID(1, 1, 10, 'type_vhc', 'ASC', 'model_vhc', 'Sedan');
  * console.log(results);
  */
-  getAllUserId: async (id_user, page, limit, sortColumn, sortOrder, searchColumn, searchValue) => {
+  getAllGeopUserID: async (id_user, page, limit, sortColumn, sortOrder, searchColumn, searchValue) => {
     try {
       let sql;
       const offset = (page - 1) * limit;

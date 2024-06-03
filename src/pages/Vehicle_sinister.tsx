@@ -20,7 +20,7 @@ type Sinister = {
 
 export function VehicleSinister() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const userID = 21;
+  const GeopUserID = 21;
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);

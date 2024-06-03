@@ -16,7 +16,7 @@ type Permissions = {
 
 export function Permission() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const userID = localStorage.getItem("userID");
+  const GeopUserID = localStorage.getItem("GeopUserID");
 
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);

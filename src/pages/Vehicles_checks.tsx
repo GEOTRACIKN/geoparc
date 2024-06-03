@@ -19,7 +19,7 @@ type Vehicles = {
 
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const userID = localStorage.getItem("userID");
+  const GeopUserID = localStorage.getItem("GeopUserID");
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
@@ -114,14 +114,14 @@ export function Vehicleschecks() {
   //------- Partie Delete -------
   const handleConfirmDelete = async () => {
     try {
-      const loggedInUserID = 1;
+      const loggedInGeopUserID = 1;
 
       const response = await fetch(`${backendUrl}/api/delete/${selectedvehiclecheckID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ loggedInUserID: loggedInUserID }),
+        body: JSON.stringify({ loggedInGeopUserID: loggedInGeopUserID }),
 
       });
 

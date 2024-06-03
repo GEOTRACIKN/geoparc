@@ -2,7 +2,7 @@ const db = require("../database");
 
 const Role = {
   // Retrieve all Role User Id
-  getAllUserId: (id_user, page, limit) => {
+  getAllGeopUserID: (id_user, page, limit) => {
     return new Promise((resolve, reject) => {
       let sql;
       const offset = (page - 1) * limit;

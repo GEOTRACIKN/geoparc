@@ -24,8 +24,8 @@ validateUserByIdUser : async (id_user, callback) => {
           // Utilisateur authentifié avec intrash à 0, générer un jeton JWT
           const id_user = user.id_user;
           const token = jwt.sign({ id_user }, process.env.JWT_SECRET);
-          const username = user.username_user;
-          callback(null, { id_user, token, username });
+          const Geopusername = user.Geopusername_user;
+          callback(null, { id_user, token, Geopusername });
         }
       }
     } catch (err) {

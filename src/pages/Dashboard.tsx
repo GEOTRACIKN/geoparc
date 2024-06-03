@@ -20,13 +20,14 @@ interface VehicleData {
 
 export function Dashboard() {
   const { translate } = useTranslate();
-  const userID = localStorage.getItem("userID");
+  const GeopUserID = localStorage.getItem("GeopUserID");
+  const Geopusername = localStorage.getItem("Geopusername");
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
-  const [userName, setUserName] = useState("");
+ 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
@@ -66,7 +67,7 @@ export function Dashboard() {
       try {
         // Fetch total number of drivers
         const responseDrivers = await fetch(
-          `${backendUrl}/api/dash/driver/${userID}`,
+          `${backendUrl}/api/dash/driver/${GeopUserID}`,
           { mode: "cors" }
         );
         if (responseDrivers.ok) {
@@ -80,7 +81,7 @@ export function Dashboard() {
 
         // Fetch total number of vehicle
         const responseVehicles = await fetch(
-          `${backendUrl}/api/vehicle/totalpage/${userID}`,
+          `${backendUrl}/api/vehicle/totalpage/${GeopUserID}`,
           { mode: "cors" }
         );
         if (responseVehicles.ok) {
@@ -93,7 +94,7 @@ export function Dashboard() {
 
         // Fetch total number of repport
         const responseReports = await fetch(
-          `${backendUrl}/api/rapport/totalpage/${userID}`,
+          `${backendUrl}/api/rapport/totalpage/${GeopUserID}`,
           { mode: "cors" }
         );
         if (responseVehicles.ok) {
@@ -106,7 +107,7 @@ export function Dashboard() {
 
         // Fetch total number of users
         const responseUsers = await fetch(
-          `${backendUrl}/api/user/totalpage/${userID}`,
+          `${backendUrl}/api/user/totalpage/${GeopUserID}`,
           { mode: "cors" }
         );
         if (responseUsers.ok) {
@@ -124,7 +125,7 @@ export function Dashboard() {
 
       try {
         const responseimmatriculation = await fetch(
-          `${backendUrl}/api/immatriculation/${userID}`
+          `${backendUrl}/api/immatriculation/${GeopUserID}`
         );
         if (responseimmatriculation.ok) {
           const data = await responseimmatriculation.json();
@@ -139,36 +140,16 @@ export function Dashboard() {
     };
 
     fetchData();
-  }, [userID]);
+  }, []);
 
 
-
-  const fetchUserName = async (userID: any) => {
-    try {
-      const response = await fetch(`${backendUrl}/api/getUserName/${userID}`);
-      if (response.ok) {
-        const userData = await response.json();
-        // Concatenate nom_user and username_user to form the userName
-        const userName = `${userData.nom_user} ${userData.prenom_user}`;
-        setUserName(userName);
-      } else {
-        console.error("Failed to fetch user data");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserName(userID); // Add this line to fetch the user's name
-  }, [userID]);
 
   useEffect(() => {
     const fetchdashData = async () => {
       setRefreshing(true);
 
       try {
-        const response = await fetch(`${backendUrl}/api/dash-data/${userID}`);
+        const response = await fetch(`${backendUrl}/api/dash-data/${GeopUserID}`);
         if (response.ok) {
           const data = await response.json();
           setDashData(data);
@@ -184,7 +165,7 @@ export function Dashboard() {
     };
 
     fetchdashData();
-  }, [userID]);
+  }, []);
 
   interface Vehicle {
     id_vehicule: number;
@@ -386,7 +367,7 @@ export function Dashboard() {
   useEffect(() => {
     const getMarkers = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/map/find/${userID}`);
+        const response = await fetch(`${backendUrl}/api/map/find/${GeopUserID}`);
         if (response.ok) {
           const data = await response.json();
           setMarkers(data);
@@ -425,7 +406,7 @@ export function Dashboard() {
     };
 
     getMarkers();
-  }, [userID]);
+  }, []);
 
   const clearInputs = () => {
     setSearchTerm("");
@@ -450,7 +431,7 @@ export function Dashboard() {
           <div className="card card-transparent card-block card-stretch card-height border-none">
             <div className="card-body p-0 mt-lg-2 mt-0">
               <h3 className="mb-3">
-                {translate("Hello")}, {userName}{" "}{" "}{currentDate}{" "}
+                {translate("Hello")}, {Geopusername}{" "}{" "}{currentDate}{" "} 
               </h3>
 
               <p

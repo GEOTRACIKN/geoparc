@@ -25,7 +25,7 @@ export function Drivers() {
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
-  const id_user = localStorage.getItem("userID");
+  const id_user = localStorage.getItem("GeopUserID");
   const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
   const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
   const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
@@ -248,19 +248,19 @@ export function Drivers() {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-            <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></span>
+           <i className="las la-user-nurse"></i> 
             {translate("Drivers")} ({total})
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Button variant="primary" className="mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>Create Alarm
+          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+            <i className="las la-plus mr-3"></i>Add Driver
           </Button>
-          <Button variant="primary" className="mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>Add group
+          <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+            <i className="las la-cubes mr-3"></i>Validate employees' salaries
           </Button>
-          <Button variant="primary" className="mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>Alarm groups
+          <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+            <i className="las la-file-excel mr-3"></i>Import Conductors
           </Button>
         </div>
       </div>
