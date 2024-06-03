@@ -15,9 +15,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const { translate } = useTranslate();
-
   const [isOpen, setIsOpen] = useState("");
-  const [activeSubmenu, setactiveSubmenu] = useState("");
   const [activeCollapsed, setactiveCollapsed] = useState("collapsed");
   const [activeLogo, setactiveLogo] = useState("header-logo-show");
   const [activeMenuText, setactiveMenuText] = useState("");
@@ -27,66 +25,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
 
 
-  const location = useLocation();
-
-  // Extraction du paramètre apikey de l'URL
-  const getApiKeyFromURL = () => {
-    const searchParams = new URLSearchParams(location.search);
-    return searchParams.get('apikey');
-  };
-
-  const apiKey = getApiKeyFromURL();
 
 
-  const handleLogin = async () => {
-    try {
-   
-      const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {  
-        
-      });
-
-    //  onLogin(response.data);
-      localStorage.setItem("authToken", response.data.token);
-      console.log(response.data.username);
-      const loginTime = new Date().getTime(); // Store current time
-      localStorage.setItem("loginTime", loginTime.toString());
-      localStorage.setItem("userID", response.data.id_user);
-      localStorage.setItem("username", response.data.username);
-      localStorage.setItem("api_key", response.data.api_key); 
-
-      // Fetch permissions for the user
-      const permissionsResponse = await axios.get(
-        `${backendUrl}/api/permission/all/${response.data.id_user}`
-      );
-      localStorage.setItem(
-        "userPermissions",
-        JSON.stringify(permissionsResponse.data)
-      );
-
-      navigate("/");
-    } catch (error) {
-      console.error("Login error", error);
-    } finally {
-      
-      // Set loading to false on login completion (success or failure)
-    }
-  };
-
-  useEffect(() => { 
-    handleLogin()
-    const savedToken = localStorage.getItem("authToken");
-    const savedUserID = localStorage.getItem("userID");
-    if (savedToken && savedUserID === "1") {
-      navigate("/"); // Rediriger directement vers la page principale si l'userID est égal à 1
-    }
-  }, []);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("authToken");
-    if (savedToken) {
-      navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
-    }
-  }, [location.pathname]);
+  // useEffect(() => {
+  //   const savedToken = localStorage.getItem("authToken");
+  //   if (savedToken) {
+  //     //  navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
+  //   }
+  // }, [location.pathname]);
 
 
 
@@ -149,17 +95,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    localStorage.removeItem("userID");
+    localStorage.removeItem("GeopUserID");
     const cookies = new Cookies();
     cookies.remove("jwtToken");
     localStorage.removeItem("userPermissions");
     navigate("/login");
   };
-  console.log(apiKey) 
   return (
     <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
-        
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
           <Image
             className="img-fluid rounded-normal light-logo"
@@ -171,8 +115,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           className={`iq-menu-bt-sidebar ml-0 ${menuBtsidebar}`}
           onClick={() => {
             handlesetIsOpen();
-            // Utilisez une fonction spécifique si nécessaire
-            // Ajoutez ici le code pour le changement de la barre latérale si nécessaire
             onToggleSidebar();
           }}
         >
@@ -196,6 +138,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 className="iq-menu"
                 style={{ padding: 0 }}
               >
+                
+                <li>
+                  <Nav.Link to="/" className="svg-icon" as={NavLink}>
+                    <svg style={{ minWidth: "fit-content" }} className="svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>{" "} <polyline points="9 22 9 12 15 12 15 22"></polyline>{" "} </svg>
+                    <span className={`ml-4 ${activeMenuText}`}>
+                      {translate("Dashboard")}
+                    </span>
+                  </Nav.Link>
+                </li>
+
                 <li>
                   <Nav.Link
                     to="/Vehicles"
@@ -229,11 +181,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                   <ul
                     id="Vehicles"
-                    className={`iq-submenu ${
-                      openSubmenus.includes("Vehicles")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
-                    }`}
+                    className={`iq-submenu ${openSubmenus.includes("Vehicles")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
                     data-parent="#iq-sidebar-toggle"
                   >
                     <li>
@@ -320,11 +271,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                   <ul
                     id="Vehicles"
-                    className={`iq-submenu ${
-                      openSubmenus.includes("Drivers")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
-                    }`}
+                    className={`iq-submenu ${openSubmenus.includes("Drivers")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
                     data-parent="#iq-sidebar-toggle"
                   >
                     <li>
@@ -339,10 +289,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
-                    
+
                   </ul>
                 </li>
-                
+
 
                 <li className="divider"></li>
                 <li>

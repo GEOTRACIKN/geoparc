@@ -33,7 +33,8 @@ const initialColumns = {
 };
 
 export function VehicleSinister() {
-  const userID = 21;
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const GeopUserID = 21;
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
@@ -43,13 +44,12 @@ export function VehicleSinister() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("sinister_type"); // Default search type
   const [showModal, setShowModal] = useState(false);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   // API call to get total count of sinisters
   const getTotalCount = async (searchTerm: string, searchType: string) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/sinister/count/${21}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/sinister/count/${GeopUserID}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setTotal(data[0].total_count);
@@ -71,7 +71,7 @@ export function VehicleSinister() {
   ) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/sinister/${21}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/sinister/${GeopUserID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setSinisters(data);
@@ -83,7 +83,7 @@ export function VehicleSinister() {
    // Fonction pour supprimer un sinistre
    const handleDeleteSinister = async (idSinistre: number) => {
     try {
-      const res = await fetch(`${backendUrl}/api/delete_sinister/${userID}/${idSinistre}`, {
+      const res = await fetch(`${backendUrl}/api/delete_sinister/${GeopUserID}/${idSinistre}`, {
         method: "DELETE",
       });
       if (res.ok) {

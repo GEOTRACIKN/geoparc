@@ -2,7 +2,7 @@ const pool = require("../database");
 
 const Vehiclecheck = {
   // Retrieve all Vehiclecheck User Id
-  getAllUserId: async (id_user, page, limit, searchTerm, searchType) => {
+  getAllGeopUserID: async (id_user, page, limit, searchTerm, searchType) => {
     try {
       let sql;
       const offset = (page - 1) * limit;

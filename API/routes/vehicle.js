@@ -1,4 +1,4 @@
-const {getAllUserId, getAll} = require("../models/Vehicle");
+const {getAllGeopUserID, getAll} = require("../models/Vehicle");
 const router = require("express").Router(); 
 
 
@@ -13,7 +13,7 @@ router.post("/vehicles", async (req, res) => {
     });
   }
   try {
-    const results = await getAllUserId(
+    const results = await getAllGeopUserID(
       id_user,
       page,
       limit,

@@ -7,7 +7,7 @@ const router = require("express").Router();
 router.get("/role/:id_user/:page/:limit", async (req, res) => {
   const { page, limit, id_user } = req.params;
   try {
-    const results = await Role.getAllUserId(id_user, page, limit);
+    const results = await Role.getAllGeopUserID(id_user, page, limit);
     res.json(results);
   } catch (err) {
     res.status(500).json({
