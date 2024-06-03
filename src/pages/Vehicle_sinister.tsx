@@ -1,11 +1,10 @@
-import { Dropdown, Table,Modal, Button } from "react-bootstrap";
+import { Dropdown, Table, Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
 import NewSinisterModal from "../components/NewSinisterModal";
-
 
 type Sinister = {
   id_sinistre: number;
@@ -18,6 +17,7 @@ type Sinister = {
   sinister_location: string;
   sinister_report: string;
   driver_name: string;
+  driver_firstname: string;
   // Add other properties as needed
 };
 const initialColumns = {
@@ -28,12 +28,11 @@ const initialColumns = {
   sinister_detail: true,
   sinister_datetime: true,
   sinister_location: true,
-  sinister_report:true,
-  driver_name:true,
+  sinister_report: true,
+  driver_name: true,
 };
 
 export function VehicleSinister() {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const userID = 21;
   let currentPage = 1;
   const { translate } = useTranslate();
@@ -44,8 +43,7 @@ export function VehicleSinister() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("sinister_type"); // Default search type
   const [showModal, setShowModal] = useState(false);
-
- 
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   // API call to get total count of sinisters
   const getTotalCount = async (searchTerm: string, searchType: string) => {
@@ -79,6 +77,26 @@ export function VehicleSinister() {
       setSinisters(data);
     } catch (error) {
       console.error("Erreur lors du chargement des sinistres :", error);
+    }
+  };
+
+   // Fonction pour supprimer un sinistre
+   const handleDeleteSinister = async (idSinistre: number) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/delete_sinister/${userID}/${idSinistre}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        // Suppression réussie, mettez à jour l'état ou rechargez les données si nécessaire
+        // Par exemple, rechargez la liste des sinistres
+        getSinisters(currentPage, limit, searchTerm, searchType);
+      } else {
+        console.error("Erreur lors de la suppression du sinistre :", res.statusText);
+        // Affichez un message d'erreur ou gérez l'erreur de manière appropriée
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du sinistre :", error);
+      // Affichez un message d'erreur ou gérez l'erreur de manière appropriée
     }
   };
 
@@ -128,7 +146,7 @@ export function VehicleSinister() {
     "sinister_type",
     "license_vhc",
     "sinister_location",
-    "driver_name"
+    "driver_name",
   ];
   return (
     <>
@@ -144,11 +162,11 @@ export function VehicleSinister() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-  <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
-    <i className="las la-plus mr-3"></i>
-    {translate("Add sinister")}
-  </Button>
-</div>
+          <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
+            <i className="las la-plus mr-3"></i>
+            {translate("Add sinister")}
+          </Button>
+        </div>
       </div>
       <div className="row">
         <div
@@ -316,7 +334,7 @@ export function VehicleSinister() {
         </div>
       </div>
       <div className="row m-1">
-        <Table>
+        <Table responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
               <th>
@@ -325,15 +343,29 @@ export function VehicleSinister() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_sinistre &&<th>N°</th>}
-             {selectedColumns.sinister_type &&<th>{translate("Type")}</th>}
-              {selectedColumns.sinister_datetime &&<th>{translate("Date")}</th>}
-             {selectedColumns.sinister_location &&<th>{translate("Location")}</th>}
-              {selectedColumns.vehicle_license &&<th>{translate("Vehicle 1")}</th>}
-              {selectedColumns.driver_name &&<th>{translate("Driver Name")}</th>}
-            {selectedColumns.sinister_detail &&<th>{translate("Sinister Detail")}</th>}
-              {selectedColumns.sinister_cost &&<th>{translate("Sinister Cost")}</th>}
-              {selectedColumns.sinister_report &&<th>{translate("sinister report")}</th>}
+              {selectedColumns.id_sinistre && <th>N°</th>}
+              {selectedColumns.sinister_type && <th>{translate("Type")}</th>}
+              {selectedColumns.sinister_datetime && (
+                <th>{translate("Date")}</th>
+              )}
+              {selectedColumns.sinister_location && (
+                <th>{translate("Location")}</th>
+              )}
+              {selectedColumns.vehicle_license && (
+                <th>{translate("Vehicle 1")}</th>
+              )}
+              {selectedColumns.driver_name && (
+                <th>{translate("Driver Name")}</th>
+              )}
+              {selectedColumns.sinister_detail && (
+                <th>{translate("Sinister Detail")}</th>
+              )}
+              {selectedColumns.sinister_cost && (
+                <th>{translate("Sinister Cost")}</th>
+              )}
+              {selectedColumns.sinister_report && (
+                <th>{translate("sinister report")}</th>
+              )}
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
@@ -346,17 +378,37 @@ export function VehicleSinister() {
                       <input type="checkbox" className="form-check-input" />
                     </div>
                   </td>
-                  {selectedColumns.id_sinistre &&<td>{sinister.id_sinistre}</td>}
-                  {selectedColumns.sinister_type &&<td>{sinister.sinister_type}</td>}
-                { selectedColumns.sinister_datetime &&<td>
-                    {new Date(sinister.sinister_datetime).toLocaleString()}
-                  </td>}
-                  {selectedColumns.sinister_location &&<td>{sinister.sinister_location}</td>}
-                  {selectedColumns.vehicle_license &&<td>{sinister.vehicle_license}</td>}
-                  {selectedColumns.driver_name &&<td>{sinister.driver_name}</td>}
-                  {selectedColumns.sinister_detail &&<td>{sinister.sinister_detail}</td>}
-                  {selectedColumns.sinister_cost && <td>{sinister.sinister_cost}</td>}
-                  {selectedColumns.sinister_report && <td>{sinister.sinister_report}</td>}
+                  {selectedColumns.id_sinistre && (
+                    <td>{sinister.id_sinistre}</td>
+                  )}
+                  {selectedColumns.sinister_type && (
+                    <td>{sinister.sinister_type}</td>
+                  )}
+                  {selectedColumns.sinister_datetime && (
+                    <td>
+                      {new Date(sinister.sinister_datetime).toLocaleString()}
+                    </td>
+                  )}
+                  {selectedColumns.sinister_location && (
+                    <td>{sinister.sinister_location}</td>
+                  )}
+                  {selectedColumns.vehicle_license && (
+                    <td>{sinister.vehicle_license}</td>
+                  )}
+                  {selectedColumns.driver_name && (
+                    <td>
+                      {sinister.driver_name} {sinister.driver_firstname}
+                    </td>
+                  )}
+                  {selectedColumns.sinister_detail && (
+                    <td>{sinister.sinister_detail}</td>
+                  )}
+                  {selectedColumns.sinister_cost && (
+                    <td>{sinister.sinister_cost}</td>
+                  )}
+                  {selectedColumns.sinister_report && (
+                    <td>{sinister.sinister_report}</td>
+                  )}
                   <td>
                     <div className="d-flex align-items-center list-action">
                       <Link
@@ -371,18 +423,7 @@ export function VehicleSinister() {
                           style={{ fontSize: "1.2em" }}
                         ></i>
                       </Link>
-                      <a
-                        className="badge bg-warning mr-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Delete"
-                        data-original-title="Delete"
-                      >
-                        <i
-                          className="ri-delete-bin-line mr-0"
-                          style={{ fontSize: "1.2em" }}
-                        ></i>
-                      </a>
+
                       <a
                         className="badge bg-primary mr-2"
                         data-toggle="tooltip"
@@ -391,10 +432,20 @@ export function VehicleSinister() {
                         data-original-title="download"
                       >
                         <i
-                          className="las la-download"
+                          className="las la-edit"
                           style={{ fontSize: "1.2em" }}
                         ></i>
                       </a>
+                      <a
+              className="badge bg-warning mr-2"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Delete"
+              onClick={() => handleDeleteSinister(sinister.id_sinistre)} // Appel de la fonction de suppression
+            >
+              <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+            </a>
+                     
                     </div>
                   </td>
                 </tr>
@@ -436,10 +487,11 @@ export function VehicleSinister() {
             activeClassName={"active"}
           />
         </div>
-        <NewSinisterModal show={showModal} onClose={handleClose}></NewSinisterModal>
+        <NewSinisterModal
+          show={showModal}
+          onClose={handleClose}
+        ></NewSinisterModal>
       </div>
-    
     </>
-    
   );
 }
