@@ -72,6 +72,44 @@ router.get('/vehicles_sinister/:id_user', async (req, res) => {
     }
 });
 
+// Update an existing sinister
+router.put('/update_sinister/:id', async (req, res) => {
+    const sinister = {
+        id: req.params.id,
+        id_vehicule: req.body.id_vehicule,
+        id_groupe: req.body.id_groupe,
+        driver_name: req.body.driver_name,
+        sinister_cost: req.body.sinister_cost,
+        sinister_type: req.body.sinister_type,
+        sinister_detail: req.body.sinister_detail,
+        sinister_datetime: req.body.sinister_datetime,
+        sinister_location: req.body.sinister_location,
+        sinister_report: req.body.sinister_report,
+        circumstances: req.body.circumstances,
+        damage_caused: req.body.damage_caused,
+        driver_name_2: req.body.driver_name_2,
+        vehicle_registration_2: req.body.vehicle_registration_2,
+        expertise_date: req.body.expertise_date,
+        expertise_cost: req.body.expertise_cost,
+        proforma_number: req.body.proforma_number,
+        expert_name: req.body.expert_name,
+        doc_transmitted: req.body.doc_transmitted,
+        amortization_time: req.body.amortization_time
+    };
+
+    try {
+        const result = await Vehiclesinister.updateSinister(sinister);
+        if (result.affectedRows === 0) {
+            res.status(404).json({ message: 'Sinister not found' });
+        } else {
+            res.status(200).json({ message: 'Sinister updated successfully' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Error updating the sinister. " + err.message });
+    }
+});
+
+
 // Delete (soft delete) a sinister by ID
 router.delete('/delete_sinister/:id_user/:id_sinistre', async (req, res) => {
     const { id_user, id_sinistre } = req.params;
