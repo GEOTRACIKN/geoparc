@@ -16,22 +16,22 @@
  
  const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => {
    const [showConfirmation, setShowConfirmation] = useState(false);
-   const idUser = localStorage.getItem("userID");
+   const idUser = localStorage.getItem("GeopUserID");
    const navigate = useNavigate();
    const cookies = new Cookies();
 
 
    const handleLogout = async () => {
-    const loginTime = localStorage.getItem("loginTime");
+    const GeoploginTime = localStorage.getItem("GeoploginTime");
   
-    if (loginTime !== null) {
-      const formattedDateTime = new Date(parseInt(loginTime));
+    if (GeoploginTime !== null) {
+      const formattedDateTime = new Date(parseInt(GeoploginTime));
       formattedDateTime.setHours(formattedDateTime.getHours() + 1); // Adding one hour
       const last_auth = formattedDateTime.toISOString().slice(0, 19).replace('T', ' ');
       console.log(last_auth);
   
       const logoutTime = new Date().getTime(); // Get current time
-      const duration = logoutTime - parseInt(loginTime, 10); // Calculate duration
+      const duration = logoutTime - parseInt(GeoploginTime, 10); // Calculate duration
   
       // Convert duration to hours, minutes, and seconds
       const hours = Math.floor(duration / (1000 * 60 * 60));
@@ -55,8 +55,8 @@
   
     // Proceed with logout actions
     localStorage.removeItem("authToken");
-    localStorage.removeItem("loginTime");
-    localStorage.removeItem("userID");
+    localStorage.removeItem("GeoploginTime");
+    localStorage.removeItem("GeopUserID");
     localStorage.removeItem("userPermissions");
   
     const cookies = new Cookies();

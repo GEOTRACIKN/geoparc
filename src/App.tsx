@@ -1,4 +1,4 @@
-import {  Route, Routes, useNavigate} from "react-router-dom";
+import {  Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import {  useEffect } from "react";
 import "./assets/css/backend-plugin.min.css";
 import "./assets/vendor/remixicon/fonts/remixicon.css";
@@ -18,8 +18,9 @@ import {VehicleSinister} from "./pages/Vehicle_sinister"
 import { Role } from "./pages/Role";
 import { Permission } from "./pages/Permission";
 import { Drivers } from "./pages/Drivers";
+import axios from "axios";
 
-
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
 
@@ -27,16 +28,56 @@ function App() {
   const navigate = useNavigate();
 
 
-  const handleLogin = (newToken: string) => {
 
-    navigate("/");
+  const location = useLocation(); 
+
+  // Extraction du paramètre apikey de l'URL
+  const getApiKeyFromURL = () => {
+    const searchParams = new URLSearchParams(location.search);
+    return searchParams.get('apikey');
   };
 
+  const apiKey = getApiKeyFromURL();
+
+
+  const handleLogin = async () => {
+    try {
+
+      const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {
+
+      });
+
+      localStorage.setItem("authToken", response.data.token);
+      const GeoploginTime = new Date().getTime(); // Store current time
+      localStorage.setItem("GeoploginTime", GeoploginTime.toString());
+      localStorage.setItem("GeopUserID", response.data.id_user);
+      localStorage.setItem("Geopusername", response.data.username);
+      localStorage.setItem("api_key", response.data.api_key); 
+
+      // Fetch permissions for the user
+      const permissionsResponse = await axios.get(
+        `${backendUrl}/api/permission/all/${response.data.id_user}`
+      );
+      localStorage.setItem(
+        "userPermissions",
+        JSON.stringify(permissionsResponse.data)
+      );
+
+      //navigate("/");
+    } catch (error) {
+      console.error("Login error", error);
+    } finally {
+
+      // Set loading to false on login completion (success or failure)
+    }
+  };
+
+   handleLogin()   
+
   useEffect(() => {
-
+    console.log()
+    handleLogin()   
   }, []);
-
-
 
 
   return (
@@ -53,8 +94,7 @@ function App() {
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
           <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
-
-          
+     
         </Routes>
       </div>
       <ToastContainer
@@ -68,9 +108,9 @@ function App() {
         draggable
         pauseOnHover
         theme="light"
-      />
+      /> 
     </LanguageProvider>
   );
 }
-
+ 
 export default App;

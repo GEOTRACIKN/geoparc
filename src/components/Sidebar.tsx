@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Nav, Image } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import "./Sidebar.css";
 import { useTranslate } from "./LanguageProvider";
 import Cookies from "universal-cookie";
 import Logout from "./Logout";
+import axios from "axios";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface SidebarProps {
@@ -14,9 +15,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const { translate } = useTranslate();
-
   const [isOpen, setIsOpen] = useState("");
-  const [activeSubmenu, setactiveSubmenu] = useState("");
   const [activeCollapsed, setactiveCollapsed] = useState("collapsed");
   const [activeLogo, setactiveLogo] = useState("header-logo-show");
   const [activeMenuText, setactiveMenuText] = useState("");
@@ -24,6 +23,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-open");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
+
+
+
+
+  // useEffect(() => {
+  //   const savedToken = localStorage.getItem("authToken");
+  //   if (savedToken) {
+  //     //  navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
+  //   }
+  // }, [location.pathname]);
+
+
 
   interface Permission {
     id_rel: number;
@@ -84,13 +95,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    localStorage.removeItem("userID");
+    localStorage.removeItem("GeopUserID");
     const cookies = new Cookies();
     cookies.remove("jwtToken");
     localStorage.removeItem("userPermissions");
     navigate("/login");
   };
- 
   return (
     <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
@@ -105,8 +115,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           className={`iq-menu-bt-sidebar ml-0 ${menuBtsidebar}`}
           onClick={() => {
             handlesetIsOpen();
-            // Utilisez une fonction spécifique si nécessaire
-            // Ajoutez ici le code pour le changement de la barre latérale si nécessaire
             onToggleSidebar();
           }}
         >
@@ -130,6 +138,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 className="iq-menu"
                 style={{ padding: 0 }}
               >
+                
+                <li>
+                  <Nav.Link to="/" className="svg-icon" as={NavLink}>
+                    <svg style={{ minWidth: "fit-content" }} className="svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>{" "} <polyline points="9 22 9 12 15 12 15 22"></polyline>{" "} </svg>
+                    <span className={`ml-4 ${activeMenuText}`}>
+                      {translate("Dashboard")}
+                    </span>
+                  </Nav.Link>
+                </li>
+
                 <li>
                   <Nav.Link
                     to="/Vehicles"
@@ -163,11 +181,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                   <ul
                     id="Vehicles"
-                    className={`iq-submenu ${
-                      openSubmenus.includes("Vehicles")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
-                    }`}
+                    className={`iq-submenu ${openSubmenus.includes("Vehicles")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
                     data-parent="#iq-sidebar-toggle"
                   >
                     <li>
@@ -254,11 +271,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                   <ul
                     id="Vehicles"
-                    className={`iq-submenu ${
-                      openSubmenus.includes("Drivers")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
-                    }`}
+                    className={`iq-submenu ${openSubmenus.includes("Drivers")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
                     data-parent="#iq-sidebar-toggle"
                   >
                     <li>
@@ -273,10 +289,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
-                    
+
                   </ul>
                 </li>
-                
+
 
                 <li className="divider"></li>
                 <li>

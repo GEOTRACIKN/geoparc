@@ -23,7 +23,7 @@ interface SidebarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar }) => {
 
-  const userName = localStorage.getItem("username");
+  const Geopusername = localStorage.getItem("Geopusername");
   const [isOpen, setIsOpen] = useState("");
   const [activeLogo, setactiveLogo] = useState("header-logo-show");
   const [activeMenuText, setactiveMenuText] = useState("");
@@ -31,8 +31,6 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
   const [sidebar, setSidebar] = useState("sidebar-open");
 
   const [shownenu, setShownenu] = useState("");
-
-
 
   const { lang, setLang } = useTranslate();
   const navigate = useNavigate();
@@ -53,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
   const handleLogout = () => {
 
     localStorage.removeItem("authToken"); // Supprimer le token du localStorage
-    localStorage.removeItem("userID"); // Supprimer le token du localStorage
+    localStorage.removeItem("GeopUserID"); // Supprimer le token du localStorage
     const cookies = new Cookies();
     // cookies.remove('jwtToken');
     navigate("/login"); // Rediriger l'utilisateur vers la page de connexion
@@ -140,14 +138,15 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
     setShownenu(shownenu === "" ? "show" : "");
   };
 
+
   return (
     <div className={`iq-top-navbar  ${changNavbar ? "navbar-push" : "navbar-pool"}`} >
       <div className="iq-navbar-custom">
-        <nav className="navbar navbar-expand-lg navbar-light p-0">
+        <nav className="navbar navbar-expand-lg navbar-light p-0"  style={{float: "right"}}>
           <div className="iq-navbar-logo d-flex align-items-center justify-content-between">
             <i className={` wrapper-menu `}
               onClick={() => {
-                handlesetIsOpen();
+                handlesetIsOpen(); 
                 onToggleSidebarinNavbar();
               }}
             >  </i>
@@ -164,7 +163,6 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
 
             <div className={`navbar-collapse collapse ${shownenu}`} id="navbarSupportedContent">
               <ul className="navbar-nav ml-auto navbar-list align-items-center">
-
                 <li className="nav-item nav-icon dropdown" style={{ margin: "0 5px" }}>
                   <NavDropdown
                     title={
@@ -271,7 +269,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
                             <img src="asset/images/user/blank.png" alt="profile-img" className="rounded profile-img img-fluid avatar-70" />
                           </div>
                           <div className="p-3">
-                            <h5 className="mb-1">{userName}</h5>
+                            <h5 className="mb-1">{Geopusername}</h5>
                             <p className="mb-0"></p>
                             <div className="d-flex align-items-center justify-content-center mt-3">
                               <Button variant="outline-secondary" className="mr-2" onClick={() => navigate(`/profile`)} style={{ minWidth: "max-content", border: "1px solid #ddd", borderRadius: "5px" }}>

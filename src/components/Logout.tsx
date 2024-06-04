@@ -4,7 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import Cookies from 'universal-cookie';
 import axios from "axios";
 import { useTranslate } from "../components/LanguageProvider";
-import { useNavigate , useLocation} from "react-router-dom";
+import { useNavigate , useLocation, redirect} from "react-router-dom";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface LogoutButtonProps {
@@ -20,19 +20,19 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   const { translate } = useTranslate();
   const cookies = new Cookies();
 
- const idUser = localStorage.getItem("userID");
+ const idUser = localStorage.getItem("GeopUserID");
 
  const handleLogout = async () => {
-  const loginTime = localStorage.getItem("loginTime");
+  const GeoploginTime = localStorage.getItem("GeoploginTime");
 
-  if (loginTime !== null) {
-    const formattedDateTime = new Date(parseInt(loginTime));
+  if (GeoploginTime !== null) {
+    const formattedDateTime = new Date(parseInt(GeoploginTime));
     formattedDateTime.setHours(formattedDateTime.getHours() + 1); // Adding one hour
     const last_auth = formattedDateTime.toISOString().slice(0, 19).replace('T', ' ');
     console.log(last_auth);
 
     const logoutTime = new Date().getTime(); // Get current time
-    const duration = logoutTime - parseInt(loginTime, 10); // Calculate duration
+    const duration = logoutTime - parseInt(GeoploginTime, 10); // Calculate duration
 
     // Convert duration to hours, minutes, and seconds
     const hours = Math.floor(duration / (1000 * 60 * 60));
@@ -56,11 +56,11 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
 
   // Proceed with logout actions
   localStorage.removeItem("authToken");
-  localStorage.removeItem("loginTime");
-  localStorage.removeItem("userID");
+  localStorage.removeItem("GeoploginTime");
+  localStorage.removeItem("GeopUserID");
   localStorage.removeItem("userPermissions");
   cookies.remove("jwtToken");
-  navigate("/login");
+  window.location.href ="http://localhost:3000/login";
 };
 
   

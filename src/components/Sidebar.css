@@ -827,23 +827,16 @@
         }
     
         .sidebar-close{  width: 0px;}  
-        .sidebar-open{   width: 221px;}
-    
-    
-        
+        .sidebar-open{   width: 221px;}   
     }
-    
     
     .navbar-list li>.dropdown .dropdown-menu {
     top: 60px !important; 
     } 
     
-    
-    
     .navbar-list li>a {
         line-height: 40px !important;   
     }
-    
     
     .navbar-list li>.dropdown { 
         line-height: 51px !important; 
