@@ -147,6 +147,8 @@ getVehiclesByUser: async (id_user) => {
     }
 },
 
+
+
 deleteSinister: async (id_sinistre, id_user) => {
     try {
         const query = `

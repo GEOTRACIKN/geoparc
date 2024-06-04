@@ -5,6 +5,7 @@ import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
 import NewSinisterModal from "../components/NewSinisterModal";
+import EditSinisterModal from "../components/EditSinisterModal";
 
 type Sinister = {
   id_sinistre: number;
@@ -33,7 +34,6 @@ const initialColumns = {
 };
 
 export function VehicleSinister() {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const GeopUserID = 21;
   let currentPage = 1;
   const { translate } = useTranslate();
@@ -44,12 +44,23 @@ export function VehicleSinister() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("sinister_type"); // Default search type
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // State to control delete modal visibility
+const [showEditModal, setShowEditModal] = useState(false);
+const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
+  null
+);
+
+  const [sinisterToDelete, setSinisterToDelete] = useState<Sinister | null>(
+    null
+  );
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   // API call to get total count of sinisters
   const getTotalCount = async (searchTerm: string, searchType: string) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/sinister/count/${GeopUserID}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/geop/sinister/count/${21}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setTotal(data[0].total_count);
@@ -71,7 +82,7 @@ export function VehicleSinister() {
   ) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/sinister/${GeopUserID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/geop/sinister/${21}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setSinisters(data);
@@ -80,18 +91,24 @@ export function VehicleSinister() {
     }
   };
 
-   // Fonction pour supprimer un sinistre
-   const handleDeleteSinister = async (idSinistre: number) => {
+  // Fonction pour supprimer un sinistre
+  const handleDeleteSinister = async (idSinistre: number) => {
     try {
-      const res = await fetch(`${backendUrl}/api/delete_sinister/${GeopUserID}/${idSinistre}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${backendUrl}/api/geop/delete_sinister/${21}/${idSinistre}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (res.ok) {
         // Suppression réussie, mettez à jour l'état ou rechargez les données si nécessaire
         // Par exemple, rechargez la liste des sinistres
         getSinisters(currentPage, limit, searchTerm, searchType);
       } else {
-        console.error("Erreur lors de la suppression du sinistre :", res.statusText);
+        console.error(
+          "Erreur lors de la suppression du sinistre :",
+          res.statusText
+        );
         // Affichez un message d'erreur ou gérez l'erreur de manière appropriée
       }
     } catch (error) {
@@ -148,6 +165,56 @@ export function VehicleSinister() {
     "sinister_location",
     "driver_name",
   ];
+  const handleConfirmDelete = () => {
+    if (sinisterToDelete) {
+      handleDeleteSinister(sinisterToDelete.id_sinistre); // Call your delete function with the ID
+      setShowDeleteModal(false); // Close the modal
+    }
+  };
+
+  const handleEditSinisterClick = (sinister: any) => {
+    setSinisterToEdit(sinister);
+    setShowEditModal(true);
+  };
+  
+  
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+  };
+
+  const handleDeleteSinisterClick = (sinister: any) => {
+    setSinisterToDelete(sinister);
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+  const DeleteSinisterModal = () => {
+    return (
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this sinister?
+          <br />
+          Sinister ID: {sinisterToDelete?.id_sinistre}
+          <br />
+          Sinister Type: {sinisterToDelete?.sinister_type}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+
   return (
     <>
       <div className="row">
@@ -411,8 +478,8 @@ export function VehicleSinister() {
                   )}
                   <td>
                     <div className="d-flex align-items-center list-action">
-                      <Link
-                        to={`#`}
+                      <a
+                     
                         className="badge badge-success mr-2"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -420,32 +487,36 @@ export function VehicleSinister() {
                       >
                         <i
                           className="fa fa-eye"
-                          style={{ fontSize: "1.2em" }}
+                          style={{ fontSize: "1.2em", cursor:"pointer"  }}   
                         ></i>
-                      </Link>
+                      </a>
 
                       <a
                         className="badge bg-primary mr-2"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="download"
-                        data-original-title="download"
+                        title="edit"
+                        data-original-title="edit"
+                        onClick={() => handleEditSinisterClick(sinister)}
                       >
                         <i
                           className="las la-edit"
-                          style={{ fontSize: "1.2em" }}
-                        ></i>
+                          style={{ fontSize: "1.2em", cursor:"pointer"  }}                        ></i>
                       </a>
                       <a
-              className="badge bg-warning mr-2"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Delete"
-              onClick={() => handleDeleteSinister(sinister.id_sinistre)} // Appel de la fonction de suppression
-            >
-              <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
-            </a>
-                     
+                        className="badge bg-warning mr-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Delete"
+                        onClick={() => handleDeleteSinisterClick(sinister)} // Call delete click function
+                        style={{ cursor: "pointer" }}
+                      >
+                        {" "}
+                        <i
+                          className="ri-delete-bin-line mr-0"
+                          style={{ fontSize: "1.2em", cursor: "pointer" }}
+                        ></i>{" "}
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -463,7 +534,7 @@ export function VehicleSinister() {
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            Affichage 1 à {limit} sur {total}{" "}
+            Affichage {currentPage} à {limit} sur {total}{" "}
           </span>
         </div>
         <div className="col-md-6">
@@ -491,6 +562,12 @@ export function VehicleSinister() {
           show={showModal}
           onClose={handleClose}
         ></NewSinisterModal>
+        <DeleteSinisterModal />
+<EditSinisterModal
+  show={showEditModal}
+  onClose={handleEditModalClose}
+  sinisterToEdit={sinisterToEdit}
+/>
       </div>
     </>
   );
