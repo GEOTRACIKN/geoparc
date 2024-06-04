@@ -5,11 +5,12 @@ import {  FaPlus,  FaRedo,  FaCar,  FaShieldAlt,  FaStickyNote,  FaTachometerAlt
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
+import AdvancedSearch from "../components/AdvancedSearch";
 
 
 
-const backendUrl = 'http://localhost:5000';
-
+const backendUrl = 'http://localhost:5000/api/geop';
+const options = [10, 20, 40, 60, 80, 100, 200, 500]; 
 interface VehiculeListInterface {
   id_vehicule: number,
   vehicule_type: string,
@@ -23,11 +24,13 @@ interface VehiculeListInterface {
   affectation?: string,
 }
 
-let currentPage = 1;
+// let currentPage = 1;
 
 export function Vehicles() {
+  const searchOptions = ['vehicule_type', 'immatriculation_vehicule', 'modele_vehicule',"etat_vehicule"];
   const { translate } = useTranslate();
   // const userID = localStorage.getItem("userID");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const userID = 1;
   const [total, setTotal] = useState<number>(0);
   const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
@@ -50,7 +53,17 @@ export function Vehicles() {
     trailer: true,
     actions: true,
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState(searchOptions[0]);
 
+  const handleSearch = (term: string, type: string) => {
+    setSearchTerm(term);
+    setSearchType(type);
+};
+
+const clearSearchTerm = () => {
+    setSearchTerm("");
+};
 
   const handleSort = (type: string) => {
     let sortOrder = sortDirection === "asc" ? "desc" : "asc";
@@ -152,7 +165,7 @@ export function Vehicles() {
     try {
       setLoading(true); 
       const [ countData, viheculeData ] = await Promise.all([
-        fetch(`${backendUrl}/api/vehicles/count/${userID}`,{
+        fetch(`${backendUrl}/vehicles/count/${userID}`,{
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -162,7 +175,7 @@ export function Vehicles() {
               searchType: searchColumn
           })
         }).then((res) =>res.json()),
-        fetch(`${backendUrl}/api/vehicles`,{
+        fetch(`${backendUrl}/vehicles`,{
           method: 'POST',
           headers: {
             'Content-Type':'application/json'
@@ -193,15 +206,15 @@ export function Vehicles() {
     }
 
   const refreshVehiculeData = async () => {
-    fetchVehiculeData(currentPage, limit,sortColumn,sortDirection,searchColumn,searchValue);
+    fetchVehiculeData(currentPage, limit,sortColumn,sortDirection,searchType,searchTerm);
   }
 
-  useLayoutEffect(()=> {
+  useEffect(()=> {
     refreshVehiculeData()
-  }, [userID, limit, sortColumn, sortDirection, searchColumn,searchValue])
+  }, [userID, limit, sortColumn, sortDirection,searchType,searchTerm])
 
   const handlePageClick = async (data: { selected: number }) => {
-    currentPage = data.selected + 1;   
+    setCurrentPage(data.selected + 1);   
     refreshVehiculeData();
   };
 
@@ -245,24 +258,12 @@ export function Vehicles() {
               <i className="las la-car mr-2"></i>
               {translate("Vehicles")} ({total})
             </h4>
-            <div className="input-group">
-              <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <i className="fas fa-chevron-down" style={{ color: 'black' }}></i>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item >Model</Dropdown.Item>
-                  <Dropdown.Item >Immatriculation</Dropdown.Item>
-                  <Dropdown.Item >Conducteur</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-              <input
-                type="text"
-                placeholder="test"
-                className="form-control"
-              />
-
-            </div>
+            <AdvancedSearch
+                searchOptions={searchOptions}
+                onSearch={handleSearch}
+                clearSearchTerm={clearSearchTerm}
+                placeholderText={translate(`Entre your search with`) + ' ' + translate(searchType)}
+            />
           </div>
           <div className="col-sm-12 col-md-7">
             <div>
@@ -317,29 +318,23 @@ export function Vehicles() {
               </div>
             </div>
             <div className="row justify-content-end">
-              <div className="col-md-auto">
-                <label>
-                  {translate("Show")}
-                  <select
-                    name="DataTables_Table_0_length"
-                    aria-controls="DataTables_Table_0"
-                    className="custom-select custom-select-sm form-control form-control-sm"
-                    style={{ width: "64px",lineHeight: "18px",height: "28px",margin:"4px" }}
-                  >
-                    <option value="15">15</option>
-                    <option value="30">30</option>
-                    <option value="60">60</option>
-                    <option value="90">90</option>
-                    <option value="120">120</option>
-                  </select>
-                  {translate("entries")}
-                </label>
-              </div>
-              <div className="col-md-auto">
-              <div>
+            <div className="col-md-8 d-flex justify-content-end align-items-center">
+                 {/* Dropdown Pour le Show du tableau */}
+                  <Dropdown>
+                    <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
+                      <i className="fas fa-list-alt"></i>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {options.map((option) => (
+                        <Dropdown.Item key={option} onClick={() => setLimit(option)}>
+                          {option}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
                   <Dropdown>
                     <Dropdown.Toggle variant="link" id="dropdown-basic">
-                      Filtre
+                    <i className="fas fa-eye"></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {/* <Dropdown.Item as="div">
@@ -406,7 +401,6 @@ export function Vehicles() {
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
-                </div>
               </div>
             </div>
           </div>
@@ -459,7 +453,7 @@ export function Vehicles() {
                     <td>
                       <div className="d-flex align-items-center list-action">
                         <a
-                          className="badge badge-info mr-2 btn"
+                          className="badge badge-info mr-2 nav-link"
                           data-toggle="tooltip"
                           title="Duplicate"
                         >
@@ -469,14 +463,14 @@ export function Vehicles() {
                           ></i>
                         </a>
                         <a
-                          className="badge badge-success mr-2 btn"
+                          className="badge badge-success mr-2 nav-link"
                           data-toggle="tooltip"
                           title="Update"
                         >
                           <i className="ri-pencil-line mr-0"></i>
                         </a>
                         <a
-                          className="badge bg-warning mr-2 btn"
+                          className="badge bg-warning mr-2 nav-link"
                           data-toggle="tooltip"
                           title="Delete"
                         >
