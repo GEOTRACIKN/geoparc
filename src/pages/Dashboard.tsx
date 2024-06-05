@@ -31,9 +31,7 @@ export function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
-  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<
-    ImmatriSuggestion[]
-  >([]);
+  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<ImmatriSuggestion[]>([]);
   const [selectedPsn, setSelectedPsn] = useState<string | null>(null); // État pour stocker le PSN sélectionné
   const [refreshing, setRefreshing] = useState(false);
 
@@ -454,15 +452,7 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-
-
-
-
-
-
         <br />
-
-
         {/* <div className="col-lg-8">
           <h3>Alertes en cours</h3>
           <Table>

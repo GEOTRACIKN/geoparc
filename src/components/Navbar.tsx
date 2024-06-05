@@ -50,8 +50,12 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
 
   const handleLogout = () => {
 
-    localStorage.removeItem("authToken"); // Supprimer le token du localStorage
-    localStorage.removeItem("GeopUserID"); // Supprimer le token du localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("GeopUserID");
+    localStorage.removeItem("GeopUserID"); 
+    localStorage.removeItem("Geopusername");
+    localStorage.removeItem("api_key"); 
+
     const cookies = new Cookies();
     // cookies.remove('jwtToken');
     navigate("/login"); // Rediriger l'utilisateur vers la page de connexion
