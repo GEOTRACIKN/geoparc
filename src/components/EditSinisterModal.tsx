@@ -9,6 +9,7 @@ type EditSinisterModalProps = ModalProps & {
     show: boolean;
     onClose: () => void;
     sinisterToEdit: any | null; // Assuming Sinister is the type for your sinister data
+    refreshSinisters?: () => void; // Optional prop
   };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -18,7 +19,7 @@ type Vehicle = {
   immatriculation_vehicule: string;
 }
 
-const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, sinisterToEdit }) => {
+const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, sinisterToEdit,refreshSinisters }) => {
     const [formData, setFormData] = useState({
     sinister_type: '',
     lieu: '',
@@ -30,6 +31,7 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
     numPV: '',
     circonstances: '',
     degat: '',
+    sinister_cost: 0.00,
     etatsinistre: '',
     expertise_date: '',
     expertise_cost: 0.00,
@@ -37,28 +39,41 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
     expert_name: '',
   });
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const geopuserID = localStorage.getItem("GeopUserID");
 
   useEffect(() => {
     if (show && sinisterToEdit) {
+      // Function to format date and time
+      const formatDateTime = (dateString: string) => {
+        const date = new Date(dateString);
+        return dateString ? date.toISOString().slice(0, 16) : '';
+      };
+
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return dateString ? date.toISOString().split('T')[0] : '';
+      };
+
       setFormData({
         sinister_type: sinisterToEdit.sinister_type || '',
         lieu: sinisterToEdit.sinister_location || '',
-        dateHeure: sinisterToEdit.sinister_datetime || '',
+        dateHeure: formatDateTime(sinisterToEdit.sinister_datetime) || '',
         vehiculeA: sinisterToEdit.id_vehicule || 0,
         conducteurA: sinisterToEdit.driver_name || '',
         vehiculeB: sinisterToEdit.vehicle_registration_2 || '',
         conducteurB: sinisterToEdit.driver_name_2 || '',
         numPV: sinisterToEdit.sinister_report || '',
         circonstances: sinisterToEdit.circumstances || '',
+        sinister_cost: sinisterToEdit.sinister_cost  || '',
         degat: sinisterToEdit.damage_caused || '',
         etatsinistre: sinisterToEdit.sinister_detail || '',
-        expertise_date: sinisterToEdit.expertise_date || '',
+        expertise_date: formatDate(sinisterToEdit.expertise_date) || '',
         expertise_cost: sinisterToEdit.expertise_cost || 0.00,
         proforma_number: sinisterToEdit.proforma_number || '',
         expert_name: sinisterToEdit.expert_name || '',
       });
 
-      fetch(`${backendUrl}/api/geop/vehicles_sinister/21`)
+      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`)
         .then(response => response.json())
         .then(data => setVehicles(data))
         .catch(error => console.error('Error fetching vehicles:', error));
@@ -96,13 +111,13 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
           id_groupe: vehicleOptions.find(option => option.value === formData.vehiculeA)?.id_groupe || 0,
           driver_name: formData.conducteurA,
           sinister_type: formData.sinister_type,
-          sinister_cost: 0.00,
           sinister_detail: formData.etatsinistre,
           sinister_datetime: formData.dateHeure,
           sinister_location: formData.lieu,
           sinister_report: formData.numPV,
           circumstances: formData.circonstances,
           damage_caused: formData.degat,
+          sinister_cost: formData.sinister_cost,
           driver_name_2: formData.conducteurB,
           vehicle_registration_2: formData.vehiculeB,
           expertise_date: formData.expertise_date,
@@ -115,10 +130,12 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
       if (response.ok) {
         const data = await response.json();
         console.log('Sinister updated successfully:', data);
+        if (refreshSinisters) {
+          refreshSinisters();
+        }
         onClose();
-        
       } else {
-        console.error('Failed to update sinister:', response.statusText);
+        console.error("Failed to update sinister:", response.statusText);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -134,7 +151,6 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
     label: vehicle.immatriculation_vehicule,
     id_groupe: vehicle.id_groupe,
   }));
-
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -237,6 +253,16 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
             onChange={handleInputChange}
           />
         </Form.Group>
+        <Form.Group controlId="sinister_cost">
+          <Form.Label>Coût</Form.Label>
+          <Form.Control
+            type="number"
+            step="0.00"
+            name="sinister_cost"
+            value={formData.sinister_cost}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
         <Form.Group controlId="etatsinistre">
           <Form.Label>Sinister State</Form.Label>
           <Select
@@ -266,7 +292,7 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
           <Form.Label>Expertise Cost</Form.Label>
           <Form.Control
             type="number"
-            step="0.01"
+            step="0.00"
             name="expertise_cost"
             value={formData.expertise_cost}
             onChange={handleInputChange}

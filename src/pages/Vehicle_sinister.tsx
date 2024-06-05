@@ -11,7 +11,7 @@ type Sinister = {
   id_sinistre: number;
   sinister_type: string;
   vehicle_license: string;
-  sinister_cost: string;
+  sinister_cost: number;
   sinister_detail: string;
   sinister_datetime: string;
   vehicle_registration_2: string;
@@ -34,7 +34,6 @@ const initialColumns = {
 };
 
 export function VehicleSinister() {
-  const GeopUserID = 21;
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
@@ -55,12 +54,15 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
   );
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const geopuserID = localStorage.getItem("GeopUserID");
+  console.log(geopuserID);
+  
 
   // API call to get total count of sinisters
   const getTotalCount = async (searchTerm: string, searchType: string) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/geop/sinister/count/${21}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/geop/sinister/count/${geopuserID}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setTotal(data[0].total_count);
@@ -82,7 +84,7 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
   ) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/geop/sinister/${21}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/geop/sinister/${geopuserID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
       );
       const data = await res.json();
       setSinisters(data);
@@ -90,12 +92,17 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
       console.error("Erreur lors du chargement des sinistres :", error);
     }
   };
+  const refreshSinisters = () => {
+    getTotalCount(searchTerm, searchType);
+    getSinisters(currentPage, limit, searchTerm, searchType);
+  };
+  
 
   // Fonction pour supprimer un sinistre
   const handleDeleteSinister = async (idSinistre: number) => {
     try {
       const res = await fetch(
-        `${backendUrl}/api/geop/delete_sinister/${21}/${idSinistre}`,
+        `${backendUrl}/api/geop/delete_sinister/${geopuserID}/${idSinistre}`,
         {
           method: "DELETE",
         }
@@ -558,16 +565,12 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
             activeClassName={"active"}
           />
         </div>
-        <NewSinisterModal
-          show={showModal}
-          onClose={handleClose}
-        ></NewSinisterModal>
+        <NewSinisterModal show={showModal} onClose={handleClose} refreshSinisters={refreshSinisters} />
+        <EditSinisterModal show={showEditModal} onClose={handleEditModalClose} sinisterToEdit={sinisterToEdit} refreshSinisters={refreshSinisters} />
+
         <DeleteSinisterModal />
-<EditSinisterModal
-  show={showEditModal}
-  onClose={handleEditModalClose}
-  sinisterToEdit={sinisterToEdit}
-/>
+        
+
       </div>
     </>
   );
