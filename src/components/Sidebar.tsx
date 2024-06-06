@@ -289,6 +289,42 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
+                    <li>
+                      <Nav.Link
+                        to="/Drivers"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-file-contract"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("Contracts")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/Drivers"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-exclamation-triangle"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("Warnings")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/Drivers"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-ban"></i>
+                        <span className={`ml-4 ${activeMenuText}`}>
+                          {translate("Violations")}
+                        </span>
+                      </Nav.Link>
+                    </li>
 
                   </ul>
                 </li>
