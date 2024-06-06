@@ -54,6 +54,7 @@ function App() {
       localStorage.setItem("Geopusername", response.data.username);
       localStorage.setItem("api_key", response.data.api_key); 
 
+
       // Fetch permissions for the user
       const permissionsResponse = await axios.get(
         `${backendUrl}/api/permission/all/${response.data.id_user}`
