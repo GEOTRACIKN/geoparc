@@ -29,9 +29,8 @@ interface VehiculeListInterface {
 export function Vehicles() {
   const searchOptions = ['vehicule_type', 'immatriculation_vehicule', 'modele_vehicule',"etat_vehicule"];
   const { translate } = useTranslate();
-  // const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const userID = 1;
   const [total, setTotal] = useState<number>(0);
   const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
@@ -41,8 +40,6 @@ export function Vehicles() {
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [searchValue, setSearchValue] = useState<null | string>("");
-  const [searchColumn, setSearchColumn] = useState('immatriculation_vehicule')
   const [visibleColumns, setVisibleColumns] = useState({
     id_vehicule: true,
     model: true,
@@ -107,50 +104,50 @@ const clearSearchTerm = () => {
           )}
           {model && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("model")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("vehicule_type")} style={{ color: "#140A57" }}>
                 Modèle
-                {sortColumn === "model" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "vehicule_type" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {imatriculation && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("imatriculation")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("immatriculation_vehicule")} style={{ color: "#140A57" }}>
                 Immatriculation
-                {sortColumn === "imatriculation" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "immatriculation_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {state && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("state")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
                 État
-                {sortColumn === "state" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {assignment && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("assignment")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("affectation")} style={{ color: "#140A57" }}>
                 Affectation
-                {sortColumn === "assignment" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "affectation" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {conducteur && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}>
+              {/* <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}> */}
                 Conducteur
-                {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
+                {/* {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
+              </span> */}
             </th>
           )}
           {trailer && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}>
+              {/* <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}> */}
                 Remorque
-                {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
+                {/* {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
+              </span> */}
             </th>
           )}
          
