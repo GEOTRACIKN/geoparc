@@ -29,9 +29,9 @@ interface VehiculeListInterface {
 export function Vehicles() {
   const searchOptions = ['vehicule_type', 'immatriculation_vehicule', 'modele_vehicule',"etat_vehicule"];
   const { translate } = useTranslate();
-  // const userID = localStorage.getItem("userID");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // const userID = localStorage.getItem("GeopUserID");
   const userID = 1;
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
@@ -41,8 +41,6 @@ export function Vehicles() {
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [searchValue, setSearchValue] = useState<null | string>("");
-  const [searchColumn, setSearchColumn] = useState('immatriculation_vehicule')
   const [visibleColumns, setVisibleColumns] = useState({
     id_vehicule: true,
     model: true,
@@ -107,50 +105,50 @@ const clearSearchTerm = () => {
           )}
           {model && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("model")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("vehicule_type")} style={{ color: "#140A57" }}>
                 Modèle
-                {sortColumn === "model" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "vehicule_type" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {imatriculation && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("imatriculation")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("immatriculation_vehicule")} style={{ color: "#140A57" }}>
                 Immatriculation
-                {sortColumn === "imatriculation" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "immatriculation_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {state && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("state")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
                 État
-                {sortColumn === "state" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {assignment && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("assignment")} style={{ color: "#140A57" }}>
+              <span onClick={() => handleSort("affectation")} style={{ color: "#140A57" }}>
                 Affectation
-                {sortColumn === "assignment" && (sortDirection === "asc" ? " ▲" : " ▼")}
+                {sortColumn === "affectation" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
           )}
           {conducteur && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}>
+              {/* <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}> */}
                 Conducteur
-                {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
+                {/* {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
+              </span> */}
             </th>
           )}
           {trailer && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}>
+              {/* <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}> */}
                 Remorque
-                {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
+                {/* {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
+              </span> */}
             </th>
           )}
          
@@ -209,40 +207,77 @@ const clearSearchTerm = () => {
     fetchVehiculeData(currentPage, limit,sortColumn,sortDirection,searchType,searchTerm);
   }
 
-  useEffect(()=> {
+  useLayoutEffect(()=> {
     refreshVehiculeData()
-  }, [userID, limit, sortColumn, sortDirection,searchType,searchTerm])
+  }, [userID, limit, sortColumn, sortDirection,searchType,searchTerm,currentPage])
 
   const handlePageClick = async (data: { selected: number }) => {
-    setCurrentPage(data.selected + 1);   
-    refreshVehiculeData();
-  };
+    const pageSelect = data.selected + 1;
+    await setCurrentPage(pageSelect); // Attendez la mise à jour de l'état
+};
+
+
 
 
   return (
     <>
     <style>
         {`
-          .my-button {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            padding: 10px;
-          }
-
-          .button-text {
-            display: none; /* Initially hidden */
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            margin-left: 10px; /* Space between icon and text */
-            transform: translateY(-10px); /* Initial offset for animation */
-          }
-
-          .my-button:hover .button-text {
-            display: inline; /* Show the text */
-            opacity: 1;
-            transform: translateY(0); /* Move text to initial position */
-          }
+      
+      
+      .text-right {
+        text-align: right;
+      }
+      
+      .button {
+        background : black;
+        height:40px;
+        border-radius: 50px;
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        overflow: hidden;
+        transition: padding 1000ms cubic-bezier(0.4, 0, 0.2, 1), width 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .button span {
+        color: white;
+        font-size: 0;
+        padding: 10px 30px;
+        white-space: nowrap;
+        transition: font-size 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      
+      
+      .button:hover span {
+        font-size: 1.0em;
+      }
+      
+      .ico {
+        transition: margin-left 500ms, transform 500ms;
+        color: white;
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+        position: absolute;
+      }
+      
+      .button:hover .ico {
+        margin-left: 0px;
+        transform: rotate(360deg);
+      }
+      
+      .ico::before {
+        transition: content 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .button:hover .ico::before {
+        transition: content 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+        
+        
         `}
       </style>
       <div
@@ -266,57 +301,36 @@ const clearSearchTerm = () => {
             />
           </div>
           <div className="col-sm-12 col-md-7">
-            <div>
-              <div className=" text-right">
-          
-                <button 
-                  className='btn btn-outline-primary mt-2 mr-1 my-button' 
-                >
-                  <FaPlus />
-                  <span className='button-text' >
-                    {translate("Ajouter un Vehicule")}
-                  </span>
-                </button>
-                <button 
-                  className='btn btn-outline-dark mt-2 mr-1 my-button' 
-                >
-                  <FaRedo />
-                  <span className='button-text' >
-                    {translate("Initialisation des Affectations")}
-                  </span>
-                </button>
-                <button className="btn btn-outline-dark mt-2 mr-1 my-button">
-                  <FaCar />
-                  <span className="button-text">
-                    {translate("Affectations Vehicule")}
-                  </span>
-                </button>
-                <button className="btn btn-outline-dark mt-2 mr-1 my-button">
-                  <FaShieldAlt />
-                  <span className="button-text">
-                    {translate("Maj Assurance")}
-                  </span>
-                </button>
-                <button className="btn btn-outline-dark mt-2 mr-1 my-button">
-                  <FaStickyNote />
-                  <span className="button-text">
-                    {translate("Maj Vignette")}
-                  </span>
-                </button>
-                <button className="btn btn-outline-dark mt-2 mr-1 my-button">
-                  <FaTachometerAlt />
-                  <span className="button-text">
-                    {translate("Maj Kilometrage")}
-                  </span>
-                </button>
-                <button className="btn btn-outline-dark mt-2 mr-1 my-button">
-                  <FaWrench />
-                  <span className="button-text">
-                    {translate("Maj Controle Thechnique")}
-                  </span>
-                </button>
-              </div>
-            </div>
+          <div className="text-right">
+    <div className="button my-button">
+      <span>{translate("Ajouter un Vehicule")}</span>
+      <i className="ico"><FaPlus /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Initialisation des Affectations")}</span>
+      <i className="ico"><FaRedo /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Affectations Vehicule")}</span>
+      <i className="ico"><FaCar /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Maj Assurance")}</span>
+      <i className="ico"><FaShieldAlt /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Maj Vignette")}</span>
+      <i className="ico"><FaStickyNote /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Maj Kilometrage")}</span>
+      <i className="ico"><FaTachometerAlt /></i>
+    </div>
+    <div className="button my-button">
+      <span>{translate("Maj Controle Thechnique")}</span>
+      <i className="ico"><FaWrench /></i>
+    </div>
+  </div>
             <div className="row justify-content-end">
             <div className="col-md-8 d-flex justify-content-end align-items-center">
                  {/* Dropdown Pour le Show du tableau */}
@@ -326,7 +340,11 @@ const clearSearchTerm = () => {
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {options.map((option) => (
-                        <Dropdown.Item key={option} onClick={() => setLimit(option)}>
+                        <Dropdown.Item key={option} 
+                        onClick={() => {
+                          setLimit(option);
+                          setCurrentPage(1)
+                          }}>
                           {option}
                         </Dropdown.Item>
                       ))}
@@ -409,7 +427,7 @@ const clearSearchTerm = () => {
       <div>
        
         <div className="row m-2">
-          <Table className="table-fixed">
+          <Table striped responsive className="table-fixed">
             <TableHeader />
             <tbody className="ligth-body">
               {vehiculeListList.map((item) => (
@@ -484,21 +502,26 @@ const clearSearchTerm = () => {
             </tbody>
             <tfoot
               style={{
-                position: "sticky",
+                // position: "sticky",
                 bottom: 0,
-                backgroundColor: "#f0f0f0",
-                zIndex: 1,
+                // backgroundColor: "#f0f0f0",
+                // zIndex: 1,
               }}
             >
               <tr>
-                <td colSpan={6}>
-                  <ReactPaginate 
+                <td colSpan={6} align="left" >
+                  <div className="text-nowrap">
+                    <span>Affichage 1 à {limit} sur {total} </span>
+                  </div>
+                </td>
+                <td colSpan={3} align="right" >
+                  <ReactPaginate
                     previousLabel={translate("previous")}
                     nextLabel={translate("next")}
                     breakLabel="..."
                     pageCount={pageCount}
                     marginPagesDisplayed={1}
-                    pageRangeDisplayed={3}
+                    // pageRangeDisplayed={3}
                     onPageChange={handlePageClick}
                     containerClassName={"pagination justify-content-center"}
                     pageClassName={"page-item"}
@@ -510,6 +533,7 @@ const clearSearchTerm = () => {
                     breakClassName={"page-item"}
                     breakLinkClassName={"page-link"}
                     activeClassName={"active"}
+                    forcePage={currentPage -1} // Rendre la page actuelle active visuellement
                   />
                 </td>
               </tr>
