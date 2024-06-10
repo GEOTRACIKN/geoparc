@@ -223,61 +223,88 @@ const clearSearchTerm = () => {
     <>
     <style>
         {`
-      
-      
       .text-right {
         text-align: right;
       }
-      
+    
       .button {
-        background : black;
-        height:40px;
-        border-radius: 50px;
+        background: black;
+        height: 30px;
+        border-radius: 8px;
         position: relative;
-        display: inline-block;
+        display: inline-flex;
+        align-items: end;
+        justify-content: flex-end;
         cursor: pointer;
         overflow: hidden;
-        transition: padding 1000ms cubic-bezier(0.4, 0, 0.2, 1), width 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 750ms;
+        margin-left: 4px;
       }
-      
+    
       .button span {
         color: white;
-        font-size: 0;
-        padding: 10px 30px;
-        white-space: nowrap;
-        transition: font-size 1000ms cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      
-      
-      
-      .button:hover span {
         font-size: 1.0em;
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: max-width 650ms,opacity 700ms;
       }
-      
+    
+      .button:hover span {
+        padding: 0px 16px;
+        opacity: 1;
+        max-width: 100%;
+      }
+    
       .ico {
-        transition: margin-left 500ms, transform 500ms;
+        padding-bottom: 30px;
+        padding-right: 4px;
         color: white;
-        width: 40px;
-        height: 40px;
-        padding: 5px;
-        position: absolute;
+        width: 24px;  /* Adjust the width */
+        height: 24px; /* Adjust the height */
       }
-      
+    
       .button:hover .ico {
         margin-left: 0px;
-        transform: rotate(360deg);
       }
-      
-      .ico::before {
-        transition: content 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+      /* Media Query for Mobile Devices */
+      @media (max-width: 600px) {
+        .text-right {
+          text-align: center; /* Center align for mobile */
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+    
+        .button {
+          width: auto;
+          margin: auto;
+          justify-content: flex-start; /* Align text to the left inside the button */
+          padding-left: 16px; /* Add some padding to the left for aesthetics */
+        }
+    
+        .button span {
+          font-size: 1.0em; /* Ensure the text is visible */
+          opacity: 1; /* Ensure the text is visible */
+          transition: none; /* Disable transitions on mobile for instant visibility */
+        }
+    
+        .ico {
+          margin-bottom: 0;
+          padding-right: 8px;
+          margin-left: 10px;
+        }
+    
+        .button:hover span {
+          padding: 1; /* Remove padding on hover */
+        }
+    
+        .button:hover .ico {
+          margin-left: 1; /* Ensure no margin left on hover */
+        }
       }
-      
-      .button:hover .ico::before {
-        transition: content 300ms cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      
-        
-        
         `}
       </style>
       <div
@@ -286,10 +313,10 @@ const clearSearchTerm = () => {
       >
         <div className="row">
           <div
-            className="col-sm-12 col-md-5 dataTables_length"
+            className="col-sm-12 col-md-4 dataTables_length"
             id="DataTables_Table_0_length"
           >
-            <h4 className="mb-3">
+            <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
               {translate("Vehicles")} ({total})
             </h4>
@@ -300,37 +327,38 @@ const clearSearchTerm = () => {
                 placeholderText={translate(`Entre your search with`) + ' ' + translate(searchType)}
             />
           </div>
-          <div className="col-sm-12 col-md-7">
+          <div className="col-sm-12 col-md-8">
           <div className="text-right">
-    <div className="button my-button">
-      <span>{translate("Ajouter un Vehicule")}</span>
-      <i className="ico"><FaPlus /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Initialisation des Affectations")}</span>
-      <i className="ico"><FaRedo /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Affectations Vehicule")}</span>
-      <i className="ico"><FaCar /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Maj Assurance")}</span>
-      <i className="ico"><FaShieldAlt /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Maj Vignette")}</span>
-      <i className="ico"><FaStickyNote /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Maj Kilometrage")}</span>
-      <i className="ico"><FaTachometerAlt /></i>
-    </div>
-    <div className="button my-button">
-      <span>{translate("Maj Controle Thechnique")}</span>
-      <i className="ico"><FaWrench /></i>
-    </div>
-  </div>
+            <div className="button my-button bg-info">
+              <span>{translate("Ajouter un Vehicule")}</span>
+              <i className="ico"><FaPlus /></i>
+            </div>
+            <div className="button my-button bg-secondary">
+              <span>{translate("Initialisation des Affectations")}</span>
+              <i className="ico"><FaRedo /></i>
+            </div>
+            <div className="button my-button bg-success">
+              <span>{translate("Affectations Vehicule")}</span>
+              <i className="ico"><FaCar /></i>
+            </div>
+            <div className="button my-button bg-danger">
+              <span>{translate("Maj Assurance")}</span>
+              <i className="ico"><FaShieldAlt /></i>
+            </div>
+            <div className="button my-button bg-danger">
+              <span>{translate("Maj Vignette")}</span>
+              <i className="ico"><FaStickyNote /></i>
+            </div>
+            <div className="button my-button bg-danger">
+              <span>{translate("Maj Kilometrage")}</span>
+              <i className="ico"><FaTachometerAlt /></i>
+            </div>
+            <div className="button my-button bg-danger">
+              <span>{translate("Maj Controle Thechnique")}</span>
+              <i className="ico"><FaWrench /></i>
+            </div>
+          </div>
+
             <div className="row justify-content-end">
             <div className="col-md-8 d-flex justify-content-end align-items-center">
                  {/* Dropdown Pour le Show du tableau */}
