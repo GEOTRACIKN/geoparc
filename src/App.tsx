@@ -18,6 +18,9 @@ import {VehicleSinister} from "./pages/Vehicle_sinister"
 import { Role } from "./pages/Role";
 import { Permission } from "./pages/Permission";
 import { Drivers } from "./pages/Drivers";
+import { Contrat } from "./pages/Contrat";
+import { Warnings } from "./pages/Warnings";
+import { Violations } from "./pages/Violations";
 import axios from "axios";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -95,6 +98,9 @@ function App() {
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
           <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
+          <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
+          <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
+          <Route path="/violations" element={<DashboardLayout>{<Violations />}</DashboardLayout>} />
      
         </Routes>
       </div>
