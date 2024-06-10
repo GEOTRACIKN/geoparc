@@ -4,6 +4,7 @@ import "./assets/css/backend-plugin.min.css";
 import "./assets/vendor/remixicon/fonts/remixicon.css";
 import "./assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import "./assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 import { Vehicles } from "./pages/Vehicles";

@@ -79,6 +79,11 @@ export function Vehicleschecks() {
     getVehicleschecks(currentPage, limit);
   }, [searchTerm, limit]);
 
+  const refreshVehicleschecksData = async () => {
+    getVehicleschecks(currentPage, limit);
+  };
+
+
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     const commentsFormServer = await fetchVehicleschecks(currentPage, limit);
@@ -116,7 +121,7 @@ export function Vehicleschecks() {
     try {
       const loggedInuserID = 1;
 
-      const response = await fetch(`${backendUrl}/api/delete/${selectedvehiclecheckID}`, {
+      const response = await fetch(`${backendUrl}/api/geop/delete/${selectedvehiclecheckID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +140,7 @@ export function Vehicleschecks() {
       setShowDeleteModal(false);
 
       if (response.ok) {
-       
+
         toast.success("Vehcile check Deleted successfully !", {
           position: "bottom-right",
           autoClose: 2400,
@@ -147,7 +152,7 @@ export function Vehicleschecks() {
           theme: "light",
           transition: Bounce,
         });
-        //refreshUserData();
+        refreshVehicleschecksData();
       }
 
     } catch (error) {
@@ -163,16 +168,15 @@ export function Vehicleschecks() {
         theme: "light",
         transition: Bounce,
       });
-      
+
     }
   };
 
-  const handleDeleteClick = async (idverif: string) => {
-    // Affichez le modal de confirmation avant la suppression
-    setSelectedvehiclecheckID(idverif);
+  const handleDeleteClick = (id_verif: any) => {
+    setSelectedvehiclecheckID(id_verif);
     setShowDeleteModal(true);
   };
-  
+
 
   return (
     <>
@@ -207,11 +211,23 @@ export function Vehicleschecks() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {options.map((option) => (
-                <Dropdown.Item key={option} onClick={() => setLimit(option)}>
-                  {option}
+                <Dropdown.Item key={option}>
+                  <div className="form-check">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id={`checkbox-${option}`}
+                      checked={limit === option}
+                      onChange={() => setLimit(option)}
+                    />
+                    <label className="form-check-label" htmlFor={`checkbox-${option}`}>
+                      {option}
+                    </label>
+                  </div>
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
+
           </Dropdown>
           {/* Dropdown Pour le filtrage du tableau */}
           <Dropdown>
@@ -337,49 +353,57 @@ export function Vehicleschecks() {
                       data-toggle="tooltip"
                       data-placement="top"
                       title="Delete"
-                      data-original-title="Delete"
+                      onClick={() => handleDeleteClick(data.id_verif)}
                     >
                       <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
                     </a>
                     <a
                       className="badge bg-primary mr-2"
-                      onClick={() => handleDeleteClick(data['id_verif'])}
                       data-toggle="tooltip"
                       data-placement="top"
                       title="download"
-                      data-original-title="download"
                     >
-                      <i className="las la-download" style={{ fontSize: "1.2em" }}></i>
+                      <i className="las la-download mr-0" style={{ fontSize: "1.2em" }}></i>
+
                     </a>
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
-          <Modal
-              show={showDeleteModal}
-              onHide={() => setShowDeleteModal(false)}
-              dialogClassName="modal-90w"
-              aria-labelledby=""
-              centered
-              >
-              <Modal.Header closeButton>
-                <Modal.Title style={{ fontWeight: 'bold', color: 'grey' }}>{translate('Trash')}</Modal.Title>
-              </Modal.Header>
-              <Modal.Body className="text-center">
-              {translate('Do you really want to remove this check vehicle?')}
-              </Modal.Body>
-              <Modal.Footer className="d-flex">
-              <button className="btn btn-outline-danger mt-2 mx-auto" onClick={() => setShowDeleteModal(false)}>
-              {translate('Cancel')}  
-              </button>
-              <button className="btn btn-outline-success mt-2 mx-auto" onClick={handleConfirmDelete}>
-              {translate('Confirm')} 
-              </button>
-              </Modal.Footer>
-            </Modal>
         </Table>
       </div>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        dialogClassName="modal-90w"
+        aria-labelledby=""
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontWeight: 'bold', color: 'grey' }}>
+            {translate('Trash')}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          {translate('Do you really want to remove this check vehicle?')}
+        </Modal.Body>
+        <Modal.Footer className="d-flex">
+          <button
+            className="btn btn-outline-danger mt-2 mx-auto"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            {translate('Cancel')}
+          </button>
+          <button
+            className="btn btn-outline-success mt-2 mx-auto"
+            onClick={handleConfirmDelete}
+          >
+            {translate('Confirm')}
+          </button>
+        </Modal.Footer>
+      </Modal>
+
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>Affichage 1 à {limit} sur {total} </span>
