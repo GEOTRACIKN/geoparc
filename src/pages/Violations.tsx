@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from 'react-spinners'; 
+import ModalNewVilation from "../components/NewViolation"
 
 interface Drivers {
   id_conducteur:number;
@@ -26,9 +27,6 @@ export function Violations() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
-  const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
-  const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
-  const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);   
@@ -176,14 +174,13 @@ export function Violations() {
   
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_conducteur:true,
-    code_conducteur:true,
-    nom_conducteur:true,
-    prenom_conducteur:true,
-    date_naissance_conducteur:true,
-    email_conducteur:true,
-    telephone_conducteur:true,
-    id_parc:true
+    id_violation:true,
+    driver:true,
+    type:true,
+    description:true,
+    date:true,
+    vehicule:true,
+    cost:true,
   });
 
   const handleColumnChange = (column: string) => {
@@ -200,26 +197,20 @@ export function Violations() {
     const selectedValue = event.target.textContent;
    
     switch (selectedValue) {
-      case translate("ID Driver"):
+      case translate("ID"):
           setType(0);
         break;
-      case translate("Last & First Name"):
+      case translate("Type"):
        setType(1);
        
         break;
-      case translate("Date Of Birth"):
+      case translate("Driver"):
      setType(2);
  
         break;
-      case translate("Email"):
+      case translate("Vehicule"):
          setType(3);
         break;
-        case translate("Phone"):
-          setType(4);
-         break;
-         case translate("Park"):
-          setType(4);
-         break;
       default:
         console.log('Unknown selection');
         break;
@@ -249,18 +240,18 @@ export function Violations() {
         <div className="col-md-6 col-sm-12">
           <h4>
            <i className="las la-ban"></i> 
-            {translate("violations")} ({total})
+            {translate("Violations")} ({total})
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>Add Driver
+          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShow}>
+            <i className="las la-plus mr-3"></i>Add Violation 
           </Button>
-          <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+          {/* <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
             <i className="las la-cubes mr-3"></i>Validate employees' salaries
-          </Button>
-          <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-file-excel mr-3"></i>Import Conductors
+          </Button> */}
+          <Button variant="" className="btn btn-outline-info mt-2 mr-1">
+            <i className="las la-file-excel mr-3"></i>Import Violation 
           </Button>
         </div>
       </div>
@@ -278,12 +269,11 @@ export function Violations() {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Last & First Name")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date Of Birth")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Email")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Phone")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Park")}</Dropdown.Item> 
+                <Dropdown.Item>{translate("ID")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Cost ")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             <input type="text" placeholder={` By ${typeSeach}` } onChange={handleAdvancedSearch} className="form-control" />
@@ -325,8 +315,8 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_conducteur}
-                  onChange={() => handleColumnChange("id_conducteur")}
+                  checked={selectedColumns.id_violation}
+                  onChange={() => handleColumnChange("id_violation")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("ID")}
@@ -339,11 +329,11 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.code_conducteur}
-                  onChange={() => handleColumnChange("code_conducteur")}
+                  checked={selectedColumns.type}
+                  onChange={() => handleColumnChange("type")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Code")}
+                  {translate("Type Violation")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -353,11 +343,11 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.nom_conducteur}
-                  onChange={() => handleColumnChange("nom_conducteur")}
+                  checked={selectedColumns.vehicule}
+                  onChange={() => handleColumnChange("vehicule")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Name")}
+                  {translate("Vehicule")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -367,11 +357,11 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.date_naissance_conducteur}
-                  onChange={() => handleColumnChange("date_naissance_conducteur")}
+                  checked={selectedColumns.driver}
+                  onChange={() => handleColumnChange("driver")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Date de naissance")}
+                  {translate("Driver")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -381,14 +371,13 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.telephone_conducteur}
-                  onChange={() => handleColumnChange("telephone_conducteur")}
+                  checked={selectedColumns.description}
+                  onChange={() => handleColumnChange("description")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Phone ")}
+                  {translate("Description")}
                 </span>
               </Dropdown.Item>
-
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -396,10 +385,12 @@ export function Violations() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.email_conducteur} 
-                  onChange={() => handleColumnChange("email_conducteur")}
+                  checked={selectedColumns.date}
+                  onChange={() => handleColumnChange("date")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Email")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Date")}
+                </span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -416,13 +407,13 @@ export function Violations() {
                 </div>
               </th> 
 
-              {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumns.code_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & First Name")}</th>)}
-              {selectedColumns.date_naissance_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
-              {selectedColumns.email_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumns.telephone_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumns.id_parc && (<th className="sorting"  onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.id_violation && <th className="sorting" onClick={() => handleSortingColum("id_violation")}>{translate("ID")}</th>}
+              {selectedColumns.type && (<th className="sorting"  onClick={() => handleSortingColum("type")}>{translate("Type Violation")}</th>)}
+              {selectedColumns.driver && (<th className="sorting"  onClick={() => handleSortingColum("driver")}>{translate("Driver")}</th>)}
+              {selectedColumns.vehicule && (<th className="sorting"  onClick={() => handleSortingColum("vehicule")}>{translate("Vehicule")}</th>)}
+              {selectedColumns.date && (<th className="sorting"  onClick={() => handleSortingColum("date")}>{translate("Date")}</th>)}
+              {selectedColumns.cost && (<th className="sorting"  onClick={() => handleSortingColum("cost")}>{translate("Cost")}</th>)}
+              {selectedColumns.description && (<th className="sorting"  onClick={() => handleSortingColum("description")}>{translate("Description")}</th>)}
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -441,59 +432,59 @@ export function Violations() {
                         <input type="checkbox" className="form-check-input" />
                       </div>
                     </td>
-                    {selectedColumns.id_conducteur && <td>{driver.id_conducteur }</td>}
-                    {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}  
-                    {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur+" " + driver.prenom_conducteur}</td>)}
-                    {selectedColumns.date_naissance_conducteur && <td>{formatToTimestamp(driver.date_naissance_conducteur)}</td>}
-                    {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
-                    {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                    {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
+                    {selectedColumns.id_violation && <td>{driver.id_conducteur }</td>}
+                    {selectedColumns.type && (<td>{driver.code_conducteur}</td>)}  
+                    {selectedColumns.vehicule && (<td>{driver.code_conducteur}</td>)}  
+                    {selectedColumns.driver && (<td>{driver.nom_conducteur+" " + driver.prenom_conducteur}</td>)}
+                    {selectedColumns.date && <td>{formatToTimestamp(driver.date_naissance_conducteur)}</td>}
+                    {selectedColumns.cost && (<td>{driver.email_conducteur}</td>)}
                  
                     <td>
                       <div className="d-flex align-items-center list-action">
-                        <Link
-                          to={`#`}
-                          className="badge badge-success mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Editer alarme"
-                        >
-                          <i
-                            className="las la-cog"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </Link>
-                        <a
-                          className="badge bg-warning mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Méthodes de notification"
-                          data-original-title="Delete"
-                        >
-                          <i
-                            className="las la-exclamation-circle"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </a>
-                        <a
-                          className="badge bg-primary mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Attaché à"
-                          data-original-title="download"
-                        >
-                          <i
-                            className="las la-magnet"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </a>
+                      <a
+                     
+                     className="badge badge-success mr-2"
+                     data-toggle="tooltip"
+                     data-placement="top"
+                     title="Détail"
+                   >
+                     <i
+                       className="fa fa-eye"
+                       style={{ fontSize: "1.2em", cursor:"pointer"  }}   
+                     ></i>
+                   </a>
+
+                   <a
+                     className="badge bg-primary mr-2"
+                     data-toggle="tooltip"
+                     data-placement="top"
+                     title="edit"
+                     data-original-title="edit"
+                   >
+                     <i
+                       className="las la-edit"
+                       style={{ fontSize: "1.2em", cursor:"pointer"  }}                        ></i>
+                   </a>
+                   <a
+                     className="badge bg-warning mr-2"
+                     data-toggle="tooltip"
+                     data-placement="top"
+                     title="Delete"
+                     style={{ cursor: "pointer" }}
+                   >
+                     {" "}
+                     <i
+                       className="ri-delete-bin-line mr-0"
+                       style={{ fontSize: "1.2em", cursor: "pointer" }}
+                     ></i>{" "}
+                   </a>
                       </div>
                     </td>
                   </tr>
                 ))) : (
 
                 <tr>
-                  <td colSpan={7}>No drivers available</td>
+                  <td colSpan={7}>No Warning available</td>
                 </tr>
               )
               )}
@@ -528,6 +519,7 @@ export function Violations() {
               activeClassName={"active"}
           />
         </div>
+        <ModalNewVilation show={show} handleClose={handleClose}></ModalNewVilation>
       </div>
     </>
   );

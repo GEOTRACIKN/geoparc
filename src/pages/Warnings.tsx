@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from 'react-spinners'; 
+import ModalNewWaring from "../components/NewWarning"
 
 interface Drivers {
   id_conducteur:number;
@@ -26,9 +27,6 @@ export function Warnings() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
-  const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
-  const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
-  const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);   
@@ -247,13 +245,13 @@ export function Warnings() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShow}>
             <i className="las la-plus mr-3"></i>Add Warnings 
           </Button>
           {/* <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
             <i className="las la-cubes mr-3"></i>Validate employees' salaries
           </Button> */}
-          <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+          <Button variant="" className="btn btn-outline-info mt-2 mr-1">
             <i className="las la-file-excel mr-3"></i>Import Warnings 
           </Button>
         </div>
@@ -471,7 +469,7 @@ export function Warnings() {
                 ))) : (
 
                 <tr>
-                  <td colSpan={7}>No drivers available</td>
+                  <td colSpan={7}>No Warning available</td>
                 </tr>
               )
               )}
@@ -506,6 +504,7 @@ export function Warnings() {
               activeClassName={"active"}
           />
         </div>
+        <ModalNewWaring show={show} handleClose={handleClose}></ModalNewWaring>
       </div>
     </>
   );

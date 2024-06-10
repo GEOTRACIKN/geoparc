@@ -153,10 +153,10 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Fermer
+            Close
           </Button>
           <Button variant="primary" type="submit">
-            Ajouter
+            Add
           </Button>
         </Modal.Footer>
       </Form>
