@@ -291,7 +291,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/Drivers"
+                        to="/contrat"
                         className="svg-icon"
                         as={NavLink}
                       >
@@ -303,7 +303,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/Drivers"
+                        to="/warnings"
                         className="svg-icon"
                         as={NavLink}
                       >
@@ -315,7 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/Drivers"
+                        to="/violations"
                         className="svg-icon"
                         as={NavLink}
                       >
