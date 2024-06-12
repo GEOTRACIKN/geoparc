@@ -51,8 +51,8 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         <Modal.Title>Add Violation</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
-          <Form.Group controlId="type">
+      <Modal.Body style={{ maxHeight: 'calc(80vh - 200px)', overflowY: 'auto' }}>
+      <Form.Group controlId="type">
             <Form.Label>Type Violation</Form.Label>
             <Form.Control
               type="text"

@@ -122,8 +122,8 @@ const NewSinisterModal: React.FC<ModalProps> = ({ onClose, show,refreshSinisters
       <Modal.Header closeButton>
         <Modal.Title>Nouveau sinistre</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Form.Group controlId="sinister_type">
+      <Modal.Body style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+      <Form.Group controlId="sinister_type">
           <Form.Label>Type sinistre</Form.Label>
           <Select
             options={[
