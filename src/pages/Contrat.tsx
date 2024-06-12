@@ -28,7 +28,7 @@ export function Contrat() {
   let [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("ID");
+  const [typeSearch, setTypeSearch] = useState("id_contrat");
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = () => setShowModal(false);
@@ -42,8 +42,12 @@ export function Contrat() {
       setContrat(data);
       const countResponse = await fetch(`${backendUrl}/api/geop/contrat/count/${id_user}?searchTerm=${searchTerm}&searchType=${searchType}`);
       const countData = await countResponse.json();
-      setTotal(countData.total_count);
-      setPageCount(Math.ceil(countData.total_count / limit));
+      console.log(countData[0]);
+      
+      setTotal(countData[0].total_count);
+      console.log(countData[0].total_count);
+      
+      setPageCount(Math.ceil(countData[0].total_count / limit));
     } catch (error) {
       console.error(error);
     } finally {
@@ -129,12 +133,10 @@ export function Contrat() {
                 <i className="fas fa-chevron-down" style={{ fontSize: "20" }}></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID Contrat")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("contract start date")}</Dropdown.Item>
-                <Dropdown.Item>{translate("contract end date")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
-                <Dropdown.Item>{translate("HR reference")}</Dropdown.Item>
+                <Dropdown.Item>{translate("id_contrat")}</Dropdown.Item>
+                <Dropdown.Item>{translate("conducteur_nom")}</Dropdown.Item>
+                <Dropdown.Item>{translate("type_contrat")}</Dropdown.Item>
+                <Dropdown.Item>{translate("ref_rh")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             <input type="text" placeholder={`By ${typeSearch}`} onChange={handleAdvancedSearch} className="form-control" />
@@ -261,7 +263,7 @@ export function Contrat() {
         </div>
       </div>
       <div className="row m-1">
-        <Table className="dataTable">
+        <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="light light-data">
               <th>
@@ -319,7 +321,7 @@ export function Contrat() {
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
-          <span>{translate("Displaying")} {list_Contrat.length} {translate("out of")} {total}</span>
+          <span>{translate("Displaying")} {currentPage} {translate("out of")} {pageCount}</span>
         </div>
         <div className="col-md-6">
         <ReactPaginate
