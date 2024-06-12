@@ -6,7 +6,7 @@ import { PropagateLoader } from 'react-spinners';
 import ModalNewContrat from "../components/NewContart";
 
 interface Contrats {
-  id_conducteur: number;
+  id_contrat: number;
   date_debut_contrat: string;
   date_fin_contrat: string;
   conducteur_prenom: string;
@@ -77,6 +77,31 @@ export function Contrat() {
     const newValue = event.target.value;
     setSearch(newValue);
   };
+  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
+  const initialColumns = {
+    id_contrat: true,
+    conducteur: true,
+    date_debut_contrat: true,
+    date_fin_contrat: true,
+    type_contrat: true,
+    ref_rh: true,
+  };
+
+   // Load selected columns from localStorage or use initial state
+   const loadSelectedColumns = () => {
+    const savedColumns = localStorage.getItem("selectedColumns");
+    return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+  };
+  const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+
+  const handleColumnChange = (column: string) => {
+    const updatedColumns = {
+      ...selectedColumns,
+      [column]: !selectedColumns[column],
+    };
+    setSelectedColumns(updatedColumns);
+    localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
+  };
 
   return (
     <>
@@ -116,8 +141,23 @@ export function Contrat() {
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length">
-            <label>
+          <Dropdown>
+            <Dropdown.Toggle
+              variant=""
+              id="dropdown-basic"
+              title="Résultats d'affichage"
+            >
+              <i className="fas fa-list-alt"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {options.map((option) => (
+                <Dropdown.Item key={option} onClick={() => setLimit(option)}>
+                  {option}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+            {/* <label>
               {translate("Show")}
               <select className="custom-select custom-select-sm form-control form-control-sm ml-2" style={{ width: "66px" }} onChange={handleSelectChange}>
                 <option value="10">10</option>
@@ -125,8 +165,99 @@ export function Contrat() {
                 <option value="50">50</option>
                 <option value="100">100</option>
               </select>
-            </label>
-          </div>
+            </label> */}
+ <Dropdown>
+            <Dropdown.Toggle
+              variant=""
+              id="dropdown-basic"
+              title="Colonnes dʼaffichage"
+            >
+              <i className="fas fa-eye"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.id_contrat}
+                  onChange={() => handleColumnChange("id_contrat")}
+                />
+                <span style={{ marginLeft: "10px" }}>ID</span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.date_debut_contrat}
+                  onChange={() => handleColumnChange("date_debut_contrat")}
+                />
+                <span style={{ marginLeft: "10px" }}>{translate("CONTRACT START DATE")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.date_fin_contrat}
+                  onChange={() => handleColumnChange("date_fin_contrat")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("CONTRACT END DATE")}
+                </span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.conducteur}
+                  onChange={() => handleColumnChange("conducteur")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Driver")}
+                </span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.type_contrat}
+                  onChange={() => handleColumnChange("type_contrat")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("TYPE")}
+                </span>
+              </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.ref_rh}
+                  onChange={() => handleColumnChange("ref_rh")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("HR REFERENCE")}
+                </span>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+
         </div>
       </div>
       <div className="row m-1">
@@ -139,12 +270,12 @@ export function Contrat() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              <th>{translate("N° contrat")}</th>
-              <th>{translate("Driver")}</th>
-              <th>{translate("contract start date")}</th>
-              <th>{translate("contract end date")}</th>
-              <th>{translate("Type")}</th>
-              <th>{translate("HR reference")}</th>
+            {selectedColumns.id_contrat &&<th>{translate("N° contrat")}</th>}
+            {selectedColumns.conducteur &&  <th>{translate("Driver")}</th>}
+            {selectedColumns.date_debut_contrat &&  <th>{translate("contract start date")}</th>}
+              {selectedColumns.date_fin_contrat &&<th>{translate("contract end date")}</th>}
+              {selectedColumns.type_contrat &&<th>{translate("Type")}</th>}
+              {selectedColumns.ref_rh &&<th>{translate("HR reference")}</th>}
               <th>{translate("Action")}</th>
             </tr>
           </thead>
@@ -156,18 +287,18 @@ export function Contrat() {
             ) : (
               list_Contrat.length > 0 ? (
                 list_Contrat.map((contrat) => (
-                  <tr key={contrat.id_conducteur}>
+                  <tr key={contrat.id_contrat}>
                     <td>
                       <div className="form-check form-check-inline">
                         <input type="checkbox" className="form-check-input" />
                       </div>
                     </td>
-                    <td>{contrat.id_conducteur}</td>
-                   <td>{contrat.conducteur_nom} {contrat.conducteur_prenom}</td>
-                    <td>{contrat.date_debut_contrat}</td>
-                    <td>{contrat.date_fin_contrat}</td>
-                    <td>{contrat.type_contrat}</td>
-                    <td>{contrat.ref_rh}</td>
+                   {selectedColumns.id_contrat && <td>{contrat.id_contrat}</td>}
+                   {selectedColumns.conducteur &&<td>{contrat.conducteur_nom} {contrat.conducteur_prenom}</td>}
+                   {selectedColumns.date_debut_contrat && <td>{new Date(contrat.date_debut_contrat).toLocaleDateString()}</td>}
+                    {selectedColumns.date_fin_contrat &&<td>{new Date(contrat.date_fin_contrat).toLocaleDateString()}</td>}
+                    {selectedColumns.type_contrat && <td>{contrat.type_contrat}</td>}
+                    {selectedColumns.ref_rh &&<td>{contrat.ref_rh}</td>}
                     <td>
                       <div className="d-flex align-items-center list-action">
                         <a className="badge badge-success mr-2" title="Détail"><i className="fa fa-eye" style={{ fontSize: "1.2em", cursor: "pointer" }}></i></a>

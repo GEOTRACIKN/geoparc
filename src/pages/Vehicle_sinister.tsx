@@ -44,10 +44,8 @@ export function VehicleSinister() {
   const [searchType, setSearchType] = useState("sinister_type"); // Default search type
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State to control delete modal visibility
-const [showEditModal, setShowEditModal] = useState(false);
-const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
-  null
-);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [sinisterToEdit, setSinisterToEdit] = useState<Sinister | null>(null);
 
   const [sinisterToDelete, setSinisterToDelete] = useState<Sinister | null>(
     null
@@ -56,7 +54,6 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const geopuserID = localStorage.getItem("GeopUserID");
   console.log(geopuserID);
-  
 
   // API call to get total count of sinisters
   const getTotalCount = async (searchTerm: string, searchType: string) => {
@@ -96,7 +93,6 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
     getTotalCount(searchTerm, searchType);
     getSinisters(currentPage, limit, searchTerm, searchType);
   };
-  
 
   // Fonction pour supprimer un sinistre
   const handleDeleteSinister = async (idSinistre: number) => {
@@ -183,8 +179,7 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
     setSinisterToEdit(sinister);
     setShowEditModal(true);
   };
-  
-  
+
   const handleEditModalClose = () => {
     setShowEditModal(false);
   };
@@ -486,7 +481,6 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
                   <td>
                     <div className="d-flex align-items-center list-action">
                       <a
-                     
                         className="badge badge-success mr-2"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -494,7 +488,7 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
                       >
                         <i
                           className="fa fa-eye"
-                          style={{ fontSize: "1.2em", cursor:"pointer"  }}   
+                          style={{ fontSize: "1.2em", cursor: "pointer" }}
                         ></i>
                       </a>
 
@@ -508,7 +502,8 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
                       >
                         <i
                           className="las la-edit"
-                          style={{ fontSize: "1.2em", cursor:"pointer"  }}                        ></i>
+                          style={{ fontSize: "1.2em", cursor: "pointer" }}
+                        ></i>
                       </a>
                       <a
                         className="badge bg-warning mr-2"
@@ -565,12 +560,19 @@ const [sinisterToEdit, setSinisterToEdit] =useState<Sinister | null>(
             activeClassName={"active"}
           />
         </div>
-        <NewSinisterModal show={showModal} onClose={handleClose} refreshSinisters={refreshSinisters} />
-        <EditSinisterModal show={showEditModal} onClose={handleEditModalClose} sinisterToEdit={sinisterToEdit} refreshSinisters={refreshSinisters} />
+        <NewSinisterModal
+          show={showModal}
+          onClose={handleClose}
+          refreshSinisters={refreshSinisters}
+        />
+        <EditSinisterModal
+          show={showEditModal}
+          onClose={handleEditModalClose}
+          sinisterToEdit={sinisterToEdit}
+          refreshSinisters={refreshSinisters}
+        />
 
         <DeleteSinisterModal />
-        
-
       </div>
     </>
   );
