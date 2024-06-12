@@ -331,17 +331,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 {/* fuels section */}
                 <li>
                   <Nav.Link
-                    to="/fuels"
+                    to="/fuel"
                     className={activeCollapsed}
                     onClick={(e) => {
                       e.preventDefault();
-                      handleSubmenuClick("fuels");
+                      handleSubmenuClick("fuel");
                     }}
                     as={NavLink}
                   >
                     <i className="las la-gas-pump"></i>
                     <span className={`ml-2 ${activeMenuText}`}>
-                      {translate("fuels")}
+                      {translate("fuel")}
                     </span>
                     <svg
                       style={{ minWidth: "fit-content" }}
@@ -362,7 +362,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                   <ul
                     id="Vehicles"
-                    className={`iq-submenu ${openSubmenus.includes("fuels")
+                    className={`iq-submenu ${openSubmenus.includes("fuel")
                       ? "submenu-enter-active"
                       : "submenu-enter"
                       }`}
@@ -370,11 +370,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   >
                     <li>
                       <Nav.Link
-                        to="/fuels_consumption"
+                        to="/fuel_consumption"
                         className="svg-icon"
                         as={NavLink}
                       >
-                        <i className="las la-list-alt"></i>
+                        <i className="las la-gas-pump"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Fuel consumption")}
                         </span>
@@ -386,7 +386,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         className="svg-icon"
                         as={NavLink}
                       >
-                        <i className="las la-file-contract"></i>
+                        <i className="las fa-id-card"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Card management")}
                         </span>
@@ -398,7 +398,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         className="svg-icon"
                         as={NavLink}
                       >
-                        <i className="las la-exclamation-triangle"></i>
+                        <i className="las fa-truck-moving"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Tank management")}
                         </span>
@@ -410,7 +410,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         className="svg-icon"
                         as={NavLink}
                       >
-                        <i className="las la-ban"></i>
+                        <i className="las fa-money-bill-wave"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("cash management")}
                         </span>
