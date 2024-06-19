@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 import { Vehicles } from "./pages/Vehicles";
+import { VehiclesForms } from "./pages/Vehicles_forms";
 import { Vehicleschecks } from "./pages/Vehicles_checks";
 import { Vehiclecheck } from "./pages/Vehicle_check";
 import { LanguageProvider } from './components/LanguageProvider';
@@ -96,6 +97,7 @@ function App() {
 
           <Route path="/" element={<DashboardLayout>{<Dashboard />}</DashboardLayout>} />
           <Route path="/vehicles" element={<DashboardLayout>{<Vehicles />}</DashboardLayout>} />
+          <Route path="/vehicles-forms" element={<DashboardLayout>{<VehiclesForms />}</DashboardLayout>} />
           <Route path="/Vehicle_checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
           <Route path="/Vehicle_check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
           <Route path="/Vehicle_cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
