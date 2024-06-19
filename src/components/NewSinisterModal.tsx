@@ -38,7 +38,7 @@ const NewSinisterModal: React.FC<ModalProps> = ({ onClose, show,refreshSinisters
 
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/vehicles_sinister/21`) // Remplacez '1' par l'ID de l'utilisateur
+      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
         .then((response) => response.json())
         .then((data) => setVehicles(data))
         .catch((error) => console.error("Error fetching vehicles:", error));
