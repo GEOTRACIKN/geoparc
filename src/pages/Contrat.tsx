@@ -22,7 +22,7 @@ export function Contrat() {
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Contrat, setContrat] = useState<Contrats[]>([]);
-  const id_user = localStorage.getItem("GeopUserID");
+  const geopuserID = localStorage.getItem("GeopUserID");
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
   let [total, setTotal] = useState(0);
@@ -30,17 +30,26 @@ export function Contrat() {
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("id_contrat");
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [contratToDelete, setContratToDelete] = useState<number | null>(null);
+
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
+  const handleDeleteClose = () => setShowDeleteModal(false);
+  const handleDeleteShow = (id_contrat: number) => {
+    setContratToDelete(id_contrat);
+    setShowDeleteModal(true);
+  };
+
   const fetchData = async (page: number, limit: number, searchTerm: string, searchType: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`${backendUrl}/api/geop/contrat/${id_user}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`);
+      const response = await fetch(`${backendUrl}/api/geop/contrat/${geopuserID}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`);
       const data = await response.json();
       setContrat(data);
-      const countResponse = await fetch(`${backendUrl}/api/geop/contrat/count/${id_user}?searchTerm=${searchTerm}&searchType=${searchType}`);
+      const countResponse = await fetch(`${backendUrl}/api/geop/contrat/count/${geopuserID}?searchTerm=${searchTerm}&searchType=${searchType}`);
       const countData = await countResponse.json();
       console.log(countData[0]);
       
@@ -52,6 +61,36 @@ export function Contrat() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fonction pour supprimer un sinistre
+ const handleDeleteContrat = async () => {
+    try {
+      if (contratToDelete !== null) {
+        const res = await fetch(
+          `${backendUrl}/api/geop/delete_Contrat/${geopuserID}/${contratToDelete}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (res.ok) {
+          // Suppression réussie, mettez à jour l'état ou rechargez les données si nécessaire
+          // Par exemple, rechargez la liste des sinistres
+          fetchData(currentPage, limit, search, typeSearch);
+        } else {
+          console.error(
+            "Erreur lors de la suppression du sinistre :",
+            res.statusText
+          );
+          // Affichez un message d'erreur ou gérez l'erreur de manière appropriée
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du sinistre :", error);
+      // Affichez un message d'erreur ou gérez l'erreur de manière appropriée
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -305,7 +344,7 @@ export function Contrat() {
                       <div className="d-flex align-items-center list-action">
                         <a className="badge badge-success mr-2" title="Détail"><i className="fa fa-eye" style={{ fontSize: "1.2em", cursor: "pointer" }}></i></a>
                         <a className="badge bg-primary mr-2" title="Edit"><i className="las la-edit" style={{ fontSize: "1.2em", cursor: "pointer" }}></i></a>
-                        <a className="badge bg-warning mr-2" title="Delete" style={{ cursor: "pointer" }}><i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i></a>
+                        <a className="badge bg-warning mr-2" title="Delete" style={{ cursor: "pointer" }} onClick={() => handleDeleteShow(contrat.id_contrat)}><i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i></a>
                       </div>
                     </td>
                   </tr>
@@ -346,6 +385,23 @@ export function Contrat() {
         </div>
       </div>
       <ModalNewContrat show={showModal} handleClose={handleClose} />
+      
+      <Modal show={showDeleteModal} onHide={handleDeleteClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{translate("Confirmation de suppression")}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {translate("Êtes-vous sûr de vouloir supprimer ce contrat ?")}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleDeleteClose}>
+            {translate("Annuler")}
+          </Button>
+          <Button variant="danger" onClick={handleDeleteContrat}>
+            {translate("Supprimer")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

@@ -143,7 +143,7 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
         <Modal.Title>Add Contrat</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
           <Form.Group>
             <Form.Label>Driver</Form.Label>
             <Select
