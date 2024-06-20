@@ -4,11 +4,13 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-interface ModalNewContratProps {
+interface ModalEditContratProps {
   show: boolean;
   handleClose: () => void;
   refreshContrat?: () => void; // Optional prop
+  contratId: number | null; // ID du contrat à modifier
 }
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
@@ -38,10 +40,11 @@ const categorieOptions = [
   // Ajoutez les autres options ici
 ];
 
-const ModalNewContrat: React.FC<ModalNewContratProps> = ({
+const ModalEditContrat: React.FC<ModalEditContratProps> = ({
   show,
   handleClose,
   refreshContrat,
+  contratId,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -61,35 +64,67 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return dateString ? date.toISOString().slice(0, 16) : '';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return dateString ? date.toISOString().split('T')[0] : '';
+  };
+
+
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
         .then((response) => response.json())
-        .then((data) => setdrivers(data))
+        .then((data) => setDrivers(data))
         .catch((error) => console.error("Error fetching Drivers:", error));
-    }
-  }, [show]);
 
-  // Fonction pour mettre à jour les valeurs sélectionnées dans les Select
+      if (contratId) {
+        fetch(`${backendUrl}/api/geop/Contrat_form/${contratId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            setFormData({
+              conducteur: data.id_conducteur,
+              date_debut: formatDate(data.date_debut_contrat),
+              rh_refererence: data.ref_rh,
+              date_fin: formatDate(data.date_fin_contrat),
+              type_contrat: data.type_contrat,
+              category: data.categorie_c,
+              basesalary: data.salaire_base_c,
+              insurance: data.assurance_c,
+              tax_income: data.irg_c,
+              salary_bonus: data.prime_salariale_c,
+              rate_bonus: data.prime_forf_c,
+            });
+          })
+          .catch((error) => console.error("Error fetching Contrat:", error));
+      }
+    }
+  }, [show, contratId]);
+
   const handleSelectChange2 = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
-    const value = selectedOption ? selectedOption.value : ""; // Assurez-vous de récupérer la valeur sélectionnée correctement
+    const value = selectedOption ? selectedOption.value : "";
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
-    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
+    const value = selectedOption ? Number(selectedOption.value) : 0;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `${backendUrl}/api/geop/add_contrat/${geopuserID}`,
+        `${backendUrl}/api/geop/update_contrat/${contratId}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -111,17 +146,17 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Contrat added successfully:", data);
+        console.log("Contrat updated successfully:", data);
         if (refreshContrat) {
           refreshContrat();
         }
         handleClose();
       } else {
-        console.error("Failed to add Contrat:", response.statusText);
+        console.error("Failed to update Contrat:", response.statusText);
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Error adding sinister:", error.message);
+        console.error("Error updating contrat:", error.message);
       } else {
         console.error("Unexpected error:", error);
       }
@@ -130,14 +165,13 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
 
   const conducteursOptions = drivers.map((driver) => ({
     value: driver.id_conducteur,
-    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
+    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
   }));
-  // console.log(formData.conducteur);
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Add Contrat</Modal.Title>
+        <Modal.Title>Edit Contrat</Modal.Title>
       </Modal.Header>
       <Form>
         <Modal.Body
@@ -180,6 +214,9 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
               options={typeContratOptions}
               onChange={handleSelectChange2}
               name="type_contrat"
+              value={typeContratOptions.find(
+                (option) => option.value === formData.type_contrat
+              )}
               isClearable
             />
           </Form.Group>
@@ -199,6 +236,9 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
               options={categorieOptions}
               onChange={handleSelectChange2}
               name="category"
+              value={categorieOptions.find(
+                (option) => option.value === formData.category
+              )}
               isClearable
             />
           </Form.Group>
@@ -253,7 +293,7 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
             Close
           </Button>
           <Button variant="primary" onClick={handleSubmit}>
-            Add
+            Save Changes
           </Button>
         </Modal.Footer>
       </Form>
@@ -261,4 +301,4 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
   );
 };
 
-export default ModalNewContrat;
+export default ModalEditContrat;
