@@ -366,7 +366,8 @@ export function Warnings() {
           />
         </div>
       </div>
-      <ModalNewWaring show={show} handleClose={handleClose}></ModalNewWaring>
+      <ModalNewWaring show={show} handleClose={handleClose} refreshwarning={() => getWarnings()}
+      ></ModalNewWaring>
     </>
   );
 }

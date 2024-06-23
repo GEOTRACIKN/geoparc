@@ -42,6 +42,7 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
   show,
   handleClose,
   refreshContrat,
+  
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,

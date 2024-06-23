@@ -6,7 +6,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 interface ModalNewWArningProps {
   show: boolean;
   handleClose: () => void;
-}
+  refreshwarning?: () => void; // Optional prop
+
+};
+type Driver = {
+  id_conducteur: number;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+};
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
 
 const conducteursOptions = [
   { value: "1381", label: "BENMILOUD MOSSA" },
@@ -19,17 +28,72 @@ const conducteursOptions = [
 const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   show,
   handleClose,
+  refreshwarning
 }) => {
   const [formData, setFormData] = useState({
-    conducteur: "",
+    conducteur: 0,
     type: "",
     date: "",
     description: "",
   });
+  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+  useEffect(() => {
+    if (show) {
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+        .then((response) => response.json())
+        .then((data) => setdrivers(data))
+        .catch((error) => console.error("Error fetching Drivers:", error));
+    }
+  }, [show]);
 
-  const handleSelectChange = (selectedOption: any) => {
-    console.log("Selected option:", selectedOption);
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/geop/Add_warning/${geopuserID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_driver: formData.conducteur,
+            type_warning: formData.type,
+            description: formData.description,
+            date: formData.date,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Warning added successfully:", data);
+        if (refreshwarning) {
+          refreshwarning();
+        }
+        handleClose();
+      } else {
+        console.error("Failed to add Warning:", response.statusText);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error adding Warning:", error.message);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
   };
+
+  const conducteursOptions = drivers.map((driver) => ({
+    value: driver.id_conducteur,
+    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
+  }));
+
+  const handleSelectChange = (selectedOption: any, actionMeta: any) => {
+    const { name } = actionMeta;
+    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
+    setFormData({ ...formData, [name]: value });
+  };
+
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,8 +123,10 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
               options={conducteursOptions}
               onChange={handleSelectChange}
               name="conducteur"
+              value={conducteursOptions.find(
+                (option) => option.value === formData.conducteur
+              )}
               isClearable
-              placeholder="Enter Driver here"
             />
           </Form.Group>
           <Form.Group controlId="date">
@@ -89,7 +155,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" onClick={handleSubmit}>
             Add
           </Button>
         </Modal.Footer>

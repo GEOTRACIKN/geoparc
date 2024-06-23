@@ -460,7 +460,8 @@ export function Contrat() {
           />
         </div>
       </div>
-      <ModalNewContrat show={showModal} handleClose={handleClose} />
+      <ModalNewContrat show={showModal} handleClose={handleClose} refreshContrat={() => fetchData(currentPage, limit, search, typeSearch)}
+      />
       <ModalEditContrat
         show={showEditModal}
         handleClose={handleEditClose}
