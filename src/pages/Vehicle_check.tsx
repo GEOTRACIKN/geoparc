@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, ProgressBar } from 'react-bootstrap';
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 import img1 from '../assets/images/small/img-1.jpg';
@@ -43,7 +43,7 @@ const initialImageData: StepData = {
         { title: 'Coffre', image: img1, status: '' },
     ],
     step5: [
-        { title: 'Pare-chocs avant', image: img1 , status: '' },
+        { title: 'Pare-chocs avant', image: img1, status: '' },
         { title: 'Pare-chocs arrière', image: img1, status: '' },
         { title: 'Portière avant gauche', image: img1, status: '' },
         { title: 'Portière avant droit', image: img1, status: '' },
@@ -61,12 +61,18 @@ const initialImageData: StepData = {
 };
 
 export function Vehiclecheck() {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         name: '',
         date: '',
-        vehicle: '',
-        driver: '',
+        incomingDriver: '',
+        matriculetrac: '',
+        km: '',
+        outgoingDriver: '',
+        matriculerem: '',
+        Heures: '',
     });
     const navigate = useNavigate();
 
@@ -77,13 +83,6 @@ export function Vehiclecheck() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-    };
-
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>, stepNumber: number, index: number) => {
-        const { value } = e.target;
-        const newImageData = { ...imageData };
-        newImageData[`step${stepNumber}`][index].title = value;
-        setImageData(newImageData);
     };
 
     const handleStatusChange = (status: string, stepNumber: number, index: number) => {
@@ -107,6 +106,43 @@ export function Vehiclecheck() {
     const goToVehicleChecks = () => {
         navigate('/vehicles_checks'); // Naviguer vers la page Vehicle_checks
     };
+
+    const handleSubmit = async () => {
+        // Extraire les statuts de imageData avec leur titre correspondant
+        const statuses: { title: string, status: string }[] = [];
+        Object.keys(imageData).forEach(step => {
+            imageData[step].forEach(item => {
+                if (item.status) {
+                    statuses.push({ title: item.title, status: item.status });
+                }
+            });
+        });
+
+        // Ajouter les statuts à formData
+        const data = {
+            ...formData,
+            status: statuses
+        };
+
+        try {
+            const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck/${1}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                console.log("Données envoyées avec succès!");
+                setStep(1); // Réinitialiser le formulaire ou naviguer ailleurs
+            } else {
+                console.error("Erreur lors de l'envoi des données.");
+            }
+        } catch (error) {
+            console.error("Erreur lors de la requête:", error);
+        }
+    };
+
+
 
     return (
         <Container>
@@ -137,20 +173,20 @@ export function Vehiclecheck() {
                                     <Form.Control
                                         type="text"
                                         name="incomingDriver"
-                                        value={formData.driver}
+                                        value={formData.incomingDriver}
                                         onChange={handleChange}
                                         placeholder="Entrez le chauffeur entrant"
                                     />
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formTractorPlate" className="mb-3">
+                            <Form.Group as={Row} controlId="formmatriculetrac" className="mb-3">
                                 <Form.Label column sm={10}>Immatriculation tracteur</Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
-                                        name="tractorPlate"
-                                        value={formData.name}
+                                        name="matriculetrac"
+                                        value={formData.matriculetrac}
                                         onChange={handleChange}
                                         placeholder="Entrez l'immatriculation du tracteur"
                                     />
@@ -163,7 +199,7 @@ export function Vehiclecheck() {
                                     <Form.Control
                                         type="text"
                                         name="km"
-                                        value={formData.date}
+                                        value={formData.km}
                                         onChange={handleChange}
                                         placeholder="Entrez le nombre de kilomètres"
                                     />
@@ -190,33 +226,33 @@ export function Vehiclecheck() {
                                     <Form.Control
                                         type="text"
                                         name="outgoingDriver"
-                                        value={formData.name}
+                                        value={formData.outgoingDriver}
                                         onChange={handleChange}
                                         placeholder="Entrez le chauffeur sortant"
                                     />
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formTrailerPlate" className="mb-3">
+                            <Form.Group as={Row} controlId="formmatriculerem" className="mb-3">
                                 <Form.Label column sm={10}>Immatriculation remorque</Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
-                                        name="trailerPlate"
-                                        value={formData.vehicle}
+                                        name="matriculerem"
+                                        value={formData.matriculerem}
                                         onChange={handleChange}
                                         placeholder="Entrez l'immatriculation de la remorque"
                                     />
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formOperatingHours" className="mb-3">
+                            <Form.Group as={Row} controlId="formHeures" className="mb-3">
                                 <Form.Label column sm={10}>Heures de fonctionnement</Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="time"
-                                        name="operatingHours"
-                                        value={formData.date}
+                                        name="Heures"
+                                        value={formData.Heures}
                                         onChange={handleChange}
                                     />
                                 </Col>
@@ -274,7 +310,7 @@ export function Vehiclecheck() {
                     {step < 6 ? (
                         <Button variant="primary" onClick={nextStep}>Suivant</Button>
                     ) : (
-                        <Button variant="primary" onClick={() => setStep(step + 1)}>Enregistré</Button>
+                        <Button variant="primary" onClick={handleSubmit}>Enregistrer</Button>
                     )}
                 </div>
             )}
@@ -282,7 +318,7 @@ export function Vehiclecheck() {
                 <div>
                     <h5>Vérification terminée</h5>
                     <p>Merci d'avoir complété la vérification.</p>
-                    <Button variant="primary" className="mr-2"  onClick={() => setStep(1)}>Recommencer</Button>
+                    <Button variant="primary" className="mr-2" onClick={() => setStep(1)}>Recommencer</Button>
                     <Button variant="danger" onClick={goToVehicleChecks}>Quitter</Button>
                 </div>
             )}
