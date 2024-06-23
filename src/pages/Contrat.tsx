@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
-import { PropagateLoader } from 'react-spinners';
+import { PropagateLoader } from "react-spinners";
 import ModalNewContrat from "../components/NewContart";
+import ModalEditContrat from "../components/EditContratModal";
 
 interface Contrats {
   id_contrat: number;
@@ -27,11 +28,13 @@ export function Contrat() {
   const [pageCount, setPageCount] = useState(0);
   let [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-  const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("id_contrat");
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const [contratToDelete, setContratToDelete] = useState<number | null>(null);
+  const [contratToEdit, setContratToEdit] = useState<Contrats | null>(null);
 
 
   const handleClose = () => setShowModal(false);
@@ -42,20 +45,35 @@ export function Contrat() {
     setContratToDelete(id_contrat);
     setShowDeleteModal(true);
   };
+  const handleEditClose = () => setShowEditModal(false);
+  const handleEditShow = (contrat: Contrats) => {
+    setContratToEdit(contrat);
+    setShowEditModal(true);
+  };
 
-  const fetchData = async (page: number, limit: number, searchTerm: string, searchType: string) => {
+
+  const fetchData = async (
+    page: number,
+    limit: number,
+    searchTerm: string,
+    searchType: string
+  ) => {
     try {
       setLoading(true);
-      const response = await fetch(`${backendUrl}/api/geop/contrat/${geopuserID}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`);
+      const response = await fetch(
+        `${backendUrl}/api/geop/contrat/${geopuserID}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
+      );
       const data = await response.json();
       setContrat(data);
-      const countResponse = await fetch(`${backendUrl}/api/geop/contrat/count/${geopuserID}?searchTerm=${searchTerm}&searchType=${searchType}`);
+      const countResponse = await fetch(
+        `${backendUrl}/api/geop/contrat/count/${geopuserID}?searchTerm=${searchTerm}&searchType=${searchType}`
+      );
       const countData = await countResponse.json();
       console.log(countData[0]);
-      
+
       setTotal(countData[0].total_count);
       console.log(countData[0].total_count);
-      
+
       setPageCount(Math.ceil(countData[0].total_count / limit));
     } catch (error) {
       console.error(error);
@@ -65,7 +83,7 @@ export function Contrat() {
   };
 
   // Fonction pour supprimer un sinistre
- const handleDeleteContrat = async () => {
+  const handleDeleteContrat = async () => {
     try {
       if (contratToDelete !== null) {
         const res = await fetch(
@@ -130,8 +148,8 @@ export function Contrat() {
     ref_rh: true,
   };
 
-   // Load selected columns from localStorage or use initial state
-   const loadSelectedColumns = () => {
+  // Load selected columns from localStorage or use initial state
+  const loadSelectedColumns = () => {
     const savedColumns = localStorage.getItem("selectedColumns");
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
@@ -165,11 +183,17 @@ export function Contrat() {
         </div>
       </div>
       <div className="row">
-        <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
+        <div
+          className="col-md-4"
+          style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+        >
           <div className="input-group">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <i className="fas fa-chevron-down" style={{ fontSize: "20" }}></i>
+                <i
+                  className="fas fa-chevron-down"
+                  style={{ fontSize: "20" }}
+                ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
                 <Dropdown.Item>{translate("id_contrat")}</Dropdown.Item>
@@ -178,7 +202,12 @@ export function Contrat() {
                 <Dropdown.Item>{translate("ref_rh")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={`By ${typeSearch}`} onChange={handleAdvancedSearch} className="form-control" />
+            <input
+              type="text"
+              placeholder={`By ${typeSearch}`}
+              onChange={handleAdvancedSearch}
+              className="form-control"
+            />
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
@@ -198,7 +227,7 @@ export function Contrat() {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-            {/* <label>
+          {/* <label>
               {translate("Show")}
               <select className="custom-select custom-select-sm form-control form-control-sm ml-2" style={{ width: "66px" }} onChange={handleSelectChange}>
                 <option value="10">10</option>
@@ -207,7 +236,7 @@ export function Contrat() {
                 <option value="100">100</option>
               </select>
             </label> */}
- <Dropdown>
+          <Dropdown>
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
@@ -238,7 +267,9 @@ export function Contrat() {
                   checked={selectedColumns.date_debut_contrat}
                   onChange={() => handleColumnChange("date_debut_contrat")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("CONTRACT START DATE")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("CONTRACT START DATE")}
+                </span>
               </Dropdown.Item>
               <Dropdown.Item
                 as="button"
@@ -278,9 +309,7 @@ export function Contrat() {
                   checked={selectedColumns.type_contrat}
                   onChange={() => handleColumnChange("type_contrat")}
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("TYPE")}
-                </span>
+                <span style={{ marginLeft: "10px" }}>{translate("TYPE")}</span>
               </Dropdown.Item>
               <Dropdown.Item
                 as="button"
@@ -298,7 +327,6 @@ export function Contrat() {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-
         </div>
       </div>
       <div className="row m-1">
@@ -311,81 +339,134 @@ export function Contrat() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-            {selectedColumns.id_contrat &&<th>{translate("N° contrat")}</th>}
-            {selectedColumns.conducteur &&  <th>{translate("Driver")}</th>}
-            {selectedColumns.date_debut_contrat &&  <th>{translate("contract start date")}</th>}
-              {selectedColumns.date_fin_contrat &&<th>{translate("contract end date")}</th>}
-              {selectedColumns.type_contrat &&<th>{translate("Type")}</th>}
-              {selectedColumns.ref_rh &&<th>{translate("HR reference")}</th>}
+              {selectedColumns.id_contrat && <th>{translate("N° contrat")}</th>}
+              {selectedColumns.conducteur && <th>{translate("Driver")}</th>}
+              {selectedColumns.date_debut_contrat && (
+                <th>{translate("contract start date")}</th>
+              )}
+              {selectedColumns.date_fin_contrat && (
+                <th>{translate("contract end date")}</th>
+              )}
+              {selectedColumns.type_contrat && <th>{translate("Type")}</th>}
+              {selectedColumns.ref_rh && <th>{translate("HR reference")}</th>}
               <th>{translate("Action")}</th>
             </tr>
           </thead>
           <tbody className="light-body">
             {loading ? (
               <tr>
-                <td className="text-center" colSpan={8}><PropagateLoader color={'#123abc'} loading={loading} size={20} /></td>
+                <td className="text-center" colSpan={8}>
+                  <PropagateLoader
+                    color={"#123abc"}
+                    loading={loading}
+                    size={20}
+                  />
+                </td>
               </tr>
-            ) : (
-              list_Contrat.length > 0 ? (
-                list_Contrat.map((contrat) => (
-                  <tr key={contrat.id_contrat}>
+            ) : list_Contrat.length > 0 ? (
+              list_Contrat.map((contrat) => (
+                <tr key={contrat.id_contrat}>
+                  <td>
+                    <div className="form-check form-check-inline">
+                      <input type="checkbox" className="form-check-input" />
+                    </div>
+                  </td>
+                  {selectedColumns.id_contrat && <td>{contrat.id_contrat}</td>}
+                  {selectedColumns.conducteur && (
                     <td>
-                      <div className="form-check form-check-inline">
-                        <input type="checkbox" className="form-check-input" />
-                      </div>
+                      {contrat.conducteur_nom} {contrat.conducteur_prenom}
                     </td>
-                   {selectedColumns.id_contrat && <td>{contrat.id_contrat}</td>}
-                   {selectedColumns.conducteur &&<td>{contrat.conducteur_nom} {contrat.conducteur_prenom}</td>}
-                   {selectedColumns.date_debut_contrat && <td>{new Date(contrat.date_debut_contrat).toLocaleDateString()}</td>}
-                    {selectedColumns.date_fin_contrat &&<td>{new Date(contrat.date_fin_contrat).toLocaleDateString()}</td>}
-                    {selectedColumns.type_contrat && <td>{contrat.type_contrat}</td>}
-                    {selectedColumns.ref_rh &&<td>{contrat.ref_rh}</td>}
+                  )}
+                  {selectedColumns.date_debut_contrat && (
                     <td>
-                      <div className="d-flex align-items-center list-action">
-                        <a className="badge badge-success mr-2" title="Détail"><i className="fa fa-eye" style={{ fontSize: "1.2em", cursor: "pointer" }}></i></a>
-                        <a className="badge bg-primary mr-2" title="Edit"><i className="las la-edit" style={{ fontSize: "1.2em", cursor: "pointer" }}></i></a>
-                        <a className="badge bg-warning mr-2" title="Delete" style={{ cursor: "pointer" }} onClick={() => handleDeleteShow(contrat.id_contrat)}><i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i></a>
-                      </div>
+                      {new Date(
+                        contrat.date_debut_contrat
+                      ).toLocaleDateString()}
                     </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={8}>No drivers available</td>
+                  )}
+                  {selectedColumns.date_fin_contrat && (
+                    <td>
+                      {new Date(contrat.date_fin_contrat).toLocaleDateString()}
+                    </td>
+                  )}
+                  {selectedColumns.type_contrat && (
+                    <td>{contrat.type_contrat}</td>
+                  )}
+                  {selectedColumns.ref_rh && <td>{contrat.ref_rh}</td>}
+                  <td>
+                    <div className="d-flex align-items-center list-action">
+                      <a className="badge badge-success mr-2" title="Détail">
+                        <i
+                          className="fa fa-eye"
+                          style={{ fontSize: "1.2em", cursor: "pointer" }}
+                        ></i>
+                      </a>
+                      <a className="badge bg-primary mr-2" title="Edit"onClick={() => handleEditShow(contrat)}
+                      >
+                        <i
+                          className="las la-edit"
+                          style={{ fontSize: "1.2em", cursor: "pointer" }}
+                        ></i>
+                      </a>
+                      <a
+                        className="badge bg-warning mr-2"
+                        title="Delete"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleDeleteShow(contrat.id_contrat)}
+                      >
+                        <i
+                          className="ri-delete-bin-line mr-0"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
+                    </div>
+                  </td>
                 </tr>
-              )
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8}>No contrat available</td>
+              </tr>
             )}
           </tbody>
         </Table>
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
-          <span>{translate("Displaying")} {currentPage} {translate("out of")} {pageCount}</span>
+          <span>
+            {translate("Displaying")} {currentPage} {translate("out of")}{" "}
+            {pageCount}
+          </span>
         </div>
         <div className="col-md-6">
-        <ReactPaginate
-              previousLabel={translate("previous")}
-              nextLabel={translate("next")}
-              breakLabel={"..."}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination justify-content-center"}
-              pageClassName={"page-item"}
-              pageLinkClassName={"page-link"}
-              previousClassName={"page-item"}
-              previousLinkClassName={"page-link"}
-              nextClassName={"page-item"}
-              nextLinkClassName={"page-link"}
-              breakClassName={"page-item"}
-              breakLinkClassName={"page-link"}
-              activeClassName={"active"}
+          <ReactPaginate
+            previousLabel={translate("previous")}
+            nextLabel={translate("next")}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-center"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
           />
         </div>
       </div>
       <ModalNewContrat show={showModal} handleClose={handleClose} />
-      
+      <ModalEditContrat
+        show={showEditModal}
+        handleClose={handleEditClose}
+        refreshContrat={() => fetchData(currentPage, limit, search, typeSearch)}
+        contratId={contratToEdit?.id_contrat || null}
+      />
       <Modal show={showDeleteModal} onHide={handleDeleteClose}>
         <Modal.Header closeButton>
           <Modal.Title>{translate("Confirmation de suppression")}</Modal.Title>
