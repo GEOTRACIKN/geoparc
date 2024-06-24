@@ -1,34 +1,30 @@
-import React from "react";
-import { ProgressBar } from "react-bootstrap";
+import React from 'react';
+import './MultiStepProgressBar.css'
 
-const MultiStepProgressBar = (props:any) => {
-  let stepPercentage = 0;
+export interface Step {
+  index: number;
+  statusClass: string;
+  stepTitle: string;
+}
 
-  switch (props.currentStep) {
-    case 1:
-      stepPercentage = 0;
-      break;
-    case 2:
-      stepPercentage = 20;
-      break;
-    case 3:
-      stepPercentage = 40;
-      break;
-    case 4:
-      stepPercentage = 60;
-      break;
-    case 5:
-      stepPercentage = 80;
-      break;
-    case 6:
-      stepPercentage = 100;
-      break;
-    default:
-      stepPercentage = 0;
-  }
+interface PropsStep {
+  params: Step[];
+}
 
+const MultiStepProgressBar: React.FC<PropsStep> = ({ params }) => {
+  console.log('MultiStepProgressBar', params);
+  
   return (
-    <ProgressBar now={stepPercentage} label={`${stepPercentage}%`} />
+    <ul className="steps">
+      {params.map((item) => (
+        <li key={item.index} className={`step ${item.statusClass}`}>
+          <div className="step-content">
+            <span className="step-circle">{item.index}</span>
+            <span className="step-text">{item.stepTitle}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 };
 

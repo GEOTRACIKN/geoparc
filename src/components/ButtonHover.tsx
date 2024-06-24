@@ -25,56 +25,56 @@ export const Button = ({ text, icon, ClasStyle }: Buttons) => {
     <>
       <style>
         {`
-      .custom-button {
-  display: inline-block;
-  padding: 10px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  margin: 5px;
-  position: relative;
-  cursor: pointer;
-}
+          .custom-button {
+          display: inline-block;
+          padding: 10px;
+          border: 1px solid transparent;
+          border-radius: 5px;
+          margin: 5px;
+          position: relative;
+          cursor: pointer;
+        }
 
-.custom-button:hover {
-  border-color: #333;
-}
+        .custom-button:hover {
+          border-color: #333;
+        }
 
-.custom-button span {
-  display: none;
-  position: absolute;
-  top: -30px; /* Place le texte au-dessus de l'icône */
-  left: -80%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 5px;
-  white-space: nowrap;
-  z-index: 2;
-}
+        .custom-button span {
+          display: none;
+          position: absolute;
+          top: -30px; /* Place le texte au-dessus de l'icône */
+          left: -80%;
+          transform: translateX(-50%);
+          background-color: #333;
+          color: #fff;
+          padding: 5px;
+          border-radius: 5px;
+          white-space: nowrap;
+          z-index: 2;
+        }
 
-.custom-button:hover span {
-  display: block;
-}
+        .custom-button:hover span {
+          display: block;
+        }
 
-.my-custom-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
+        .my-custom-button {
+          background-color: #f0f0f0;
+          color: #333;
+        }
 
 
-@media screen and (max-width: 768px) {
-  .custom-button {
-    padding: 8px;
-    margin: 3px;
-  }
+        @media screen and (max-width: 768px) {
+          .custom-button {
+            padding: 8px;
+            margin: 3px;
+          }
 
-  .custom-button span {
-    top: -25px;
-    padding: 4px;
-  }
-}
-}
+          .custom-button span {
+            top: -25px;
+            padding: 4px;
+          }
+        }
+        }
 
       `}
       </style>
