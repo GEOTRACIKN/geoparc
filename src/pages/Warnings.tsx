@@ -4,6 +4,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewWaring from "../components/NewWarning";
+import ModalEditWarning from "../components/EditWarning";
 
 interface Warning {
   id_warning: number;
@@ -35,6 +36,10 @@ export function Warnings() {
   const [typeSearch, setTypeSearch] = useState("ID");
 const [showDeleteModal, setShowDeleteModal] = useState(false);
 const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
+const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
+const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
+
+
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -172,6 +177,15 @@ const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
 const handleShowDeleteModal = (id_warning :number) => {
   setWarningToDelete(id_warning);
   setShowDeleteModal(true);
+};
+const handleEditWarning = (id_warning: number) => {
+  setWarningToEdit(id_warning);
+  setShowEditModal(true); // Ouvre le modal d'édition
+};
+// Gestion de la fermeture du modal d'édition
+const handleCloseEditModal = () => {
+  setShowEditModal(false);
+  setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
 };
 
   return (
@@ -348,12 +362,14 @@ const handleShowDeleteModal = (id_warning :number) => {
                         style={{ fontSize: "1.2em", cursor: "pointer" }}
                       ></i>
                     </a>
-                    <a className="badge bg-primary mr-2" title="Edit">
-                      <i
-                        className="las la-edit"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a>
+                    <a
+  className="badge bg-primary mr-2"
+  title="Edit"
+  onClick={() => handleEditWarning(warning.id_warning)}
+>
+  <i className="las la-edit" style={{ fontSize: "1.2em", cursor: "pointer" }}></i>
+</a>
+
                     <a
       className="badge bg-warning mr-2"
       title="Delete"
@@ -400,6 +416,12 @@ const handleShowDeleteModal = (id_warning :number) => {
       </div>
       <ModalNewWaring show={show} handleClose={handleClose} refreshwarning={() => getWarnings()}
       ></ModalNewWaring>
+      <ModalEditWarning
+  show={showEditModal}
+  handleClose={handleCloseEditModal}
+  warningId={warningToEdit}
+  refreshWarning={getWarnings} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
+/>
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
   <Modal.Header closeButton>
     <Modal.Title>Confirmer la suppression</Modal.Title>
