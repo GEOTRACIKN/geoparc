@@ -201,7 +201,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/Vehicle_checks"
+                        to="/Vehicles_checks"
                         className="svg-icon"
                         as={NavLink}
                       >
