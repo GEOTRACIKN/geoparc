@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
+
 
 
 import img1 from '../assets/images/small/img-1.jpg';
@@ -19,63 +21,110 @@ type StepData = {
 
 const initialImageData: StepData = {
     step2: [
-        { title: 'Pneu avant gauche', image: img1, status: '' },
-        { title: 'Pneu avant droit', image: img1, status: '' },
-        { title: 'Pneu arrière gauche', image: img1, status: '' },
-        { title: 'Pneu arrière droit', image: img1, status: '' },
-        { title: 'Pare-brise', image: img1, status: '' },
-        { title: 'Pare-brise', image: img1, status: '' },
+        { title: 'Marche pied', image: img1, status: '' },
+        { title: 'Triangles/cales', image: img1, status: '' },
+        { title: 'Batterie', image: img1, status: '' },
+        { title: 'Extincteur date dexpiration ', image: img1, status: '' },
+        { title: 'Pneu tracteur', image: img1, status: '' },
+        { title: 'Pneu Remorque', image: img1, status: '' },
     ],
     step3: [
-        { title: 'Phare avant gauche', image: img1, status: '' },
-        { title: 'Phare avant droit', image: img1, status: '' },
-        { title: 'Phare arrière gauche', image: img1, status: '' },
-        { title: 'Phare arrière droit', image: img1, status: '' },
-        { title: 'Rétroviseur gauche', image: img1, status: '' },
-        { title: 'Rétroviseur gauche', image: img1, status: '' },
+        { title: 'Crique', image: img1, status: '' },
+        { title: 'Trousse outils', image: img1, status: '' },
+        { title: 'Mannon de pression', image: img1, status: '' },
+        { title: 'Réservoir(fissure, bouchon)', image: img1, status: '' },
+        { title: 'Boite pharmacie', image: img1, status: '' },
+        { title: 'Pipe dadmission', image: img1, status: '' },
     ],
     step4: [
-        { title: 'Rétroviseur droit', image: img1, status: '' },
-        { title: 'Vitres latérales', image: img1, status: '' },
-        { title: 'Toit', image: img1, status: '' },
-        { title: 'Capot', image: img1, status: '' },
-        { title: 'Coffre', image: img1, status: '' },
-        { title: 'Coffre', image: img1, status: '' },
+        { title: 'Sangle (03), câble scellé', image: img1, status: '' },
+        { title: 'étiquette géolocalisation', image: img1, status: '' },
+        { title: 'Pied parc', image: img1, status: '' },
+        { title: 'Butoir remorque', image: img1, status: '' },
+        { title: 'Twis lock squelette', image: img1, status: '' },
+        { title: 'Bâche remorque', image: img1, status: '' },
     ],
     step5: [
-        { title: 'Pare-chocs avant', image: img1, status: '' },
-        { title: 'Pare-chocs arrière', image: img1, status: '' },
-        { title: 'Portière avant gauche', image: img1, status: '' },
-        { title: 'Portière avant droit', image: img1, status: '' },
-        { title: 'Portière arrière gauche', image: img1, status: '' },
-        { title: 'Portière arrière gauche', image: img1, status: '' },
+        { title: 'Lattes', image: img1, status: '' },
+        { title: 'Moteur cellule frigo', image: img1, status: '' },
+        { title: 'Rétroviseur vitres', image: img1, status: '' },
+        { title: 'Pare-brise + essuie glasses', image: img1, status: '' },
+        { title: 'Feux + clignotants', image: img1, status: '' },
+        { title: 'Loquet', image: img1, status: '' },
     ],
     step6: [
-        { title: 'Portière arrière droit', image: img1, status: '' },
-        { title: 'Plaque d’immatriculation', image: img1, status: '' },
-        { title: 'Échappement', image: img1, status: '' },
-        { title: 'Châssis', image: img1, status: '' },
-        { title: 'Essuie-glaces', image: img1, status: '' },
-        { title: 'Essuie-glaces', image: img1, status: '' },
+        { title: 'Feux de stop, clignotants, garde boue', image: img1, status: '' },
+        { title: 'Cataphote feux de gabarit', image: img1, status: '' },
+        { title: 'Feux de stop + clignotants maraicher', image: img1, status: '' },
+        { title: 'Roue de secours et 2 cannes de sécurité', image: img1, status: '' },
+        { title: 'Pression Pneu (tracteur)', image: img1, status: '' },
+        { title: 'Pression Pneu (Remorque)', image: img1, status: '' },
     ],
+    step7: [
+        { title: 'Propreté (tracteur + remorque)', image: img1, status: '' },
+        { title: 'Maintenence ?', image: img1, status: '' },
+       
+    ],
+};
+
+type FormData = {
+    checker: string;
+    date: string;
+    incomingDriver: string;
+    matriculetrac: string;
+    km: string;
+    outgoingDriver: string;
+    matriculerem: string;
+    operating_hours: string;
+    papierStatus: string; // Ajouté pour gérer l'état des papiers
+};
+
+// Définition des règles de validation par champ
+const initialValidationState = {
+    checker: false,
+    date: false,
+    incomingDriver: true, // Ce champ n'est pas obligatoire selon votre description
+    matriculetrac: false,
+    km: false,
+    outgoingDriver: true, // Ce champ n'est pas obligatoire selon votre description
+    matriculerem: false,
+    operating_hours: false,
+    papierStatus: false,
 };
 
 export function Vehiclecheck() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({
-        name: '',
+    const [formData, setFormData] = useState<FormData>({
+        checker: '',
         date: '',
         incomingDriver: '',
         matriculetrac: '',
         km: '',
         outgoingDriver: '',
         matriculerem: '',
-        Heures: '',
+        operating_hours: '',
+        papierStatus: '', // Ajouté pour gérer l'état des papiers
     });
+    const [formValidation, setFormValidation] = useState(initialValidationState); // État de validation du formulaire
     const navigate = useNavigate();
-
+    
+    const validateForm = () => {
+        const { checker, date, matriculetrac, km, matriculerem, operating_hours, papierStatus } = formData;
+        const isValid = checker !== '' && date !== '' && matriculetrac !== '' && km !== '' && matriculerem !== '' && operating_hours !== '' && papierStatus !== '';
+        setFormValidation({
+            ...formValidation,
+            checker: checker !== '',
+            date: date !== '',
+            matriculetrac: matriculetrac !== '',
+            km: km !== '',
+            matriculerem: matriculerem !== '',
+            operating_hours: operating_hours !== '',
+            papierStatus: papierStatus !== '',
+        });
+        return isValid;
+    };
 
 
     const [imageData, setImageData] = useState<StepData>(initialImageData);
@@ -84,6 +133,7 @@ export function Vehiclecheck() {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
 
     const handleStatusChange = (status: string, stepNumber: number, index: number) => {
         const newImageData = { ...imageData };
@@ -96,7 +146,21 @@ export function Vehiclecheck() {
     };
 
     const nextStep = () => {
-        setStep(step + 1);
+        if (validateForm()) {
+            setStep(step + 1);
+        } else {
+            toast.error("Veuillez remplir tous les champs obligatoires. ", {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+              });
+        }
     };
 
     const prevStep = () => {
@@ -108,20 +172,20 @@ export function Vehiclecheck() {
     };
 
     const handleSubmit = async () => {
-        // Extraire les statuts de imageData avec leur titre correspondant
-        const statuses: { title: string, status: string }[] = [];
-        Object.keys(imageData).forEach(step => {
-            imageData[step].forEach(item => {
-                if (item.status) {
-                    statuses.push({ title: item.title, status: item.status });
-                }
-            });
-        });
+        // // Extraire les statuts de imageData avec leur titre correspondant
+        // const statuses: { title: string, status: string }[] = [];
+        // Object.keys(imageData).forEach(step => {
+        //     imageData[step].forEach(item => {
+        //         if (item.status) {
+        //             statuses.push({ title: item.title, status: item.status });
+        //         }
+        //     });
+        // });
 
         // Ajouter les statuts à formData
         const data = {
             ...formData,
-            status: statuses
+            // status: statuses
         };
 
         try {
@@ -132,13 +196,47 @@ export function Vehiclecheck() {
             });
 
             if (response.ok) {
-                console.log("Données envoyées avec succès!");
+                toast.success("Données envoyées avec succès!", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                  });
                 setStep(1); // Réinitialiser le formulaire ou naviguer ailleurs
             } else {
                 console.error("Erreur lors de l'envoi des données.");
+                toast.error("Erreur lors de l'envoi des données.", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                  });
+            
             }
-        } catch (error) {
-            console.error("Erreur lors de la requête:", error);
+        } catch (err) {
+            console.error("Erreur lors de la requête:", err);
+            toast.error("Erreur lors de la requête:", {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+              });
+        
         }
     };
 
@@ -147,10 +245,10 @@ export function Vehiclecheck() {
     return (
         <Container>
             <h3 className="text-center mb-4">Vérification véhicule</h3>
-            <ProgressBar now={(step / 6) * 100} label={`Étape ${step}`} className="mb-4" />
+            <ProgressBar now={(step / 7) * 100} label={`Étape ${step}`} className="mb-4" />
             {step === 1 && (
 
-                <Form>
+                <Form className="p-3 shadow-sm">
                     <h4>Informations générales</h4>
                     <Row>
                         <Col sm={6}>
@@ -159,8 +257,8 @@ export function Vehiclecheck() {
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
-                                        name="name"
-                                        value={formData.name}
+                                        name="checker"
+                                        value={formData.checker}
                                         onChange={handleChange}
                                         placeholder="Nom du vérificateur"
                                     />
@@ -194,7 +292,7 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} controlId="formKm" className="mb-3">
-                                <Form.Label column sm={10}>KM</Form.Label>
+                                <Form.Label column sm={10}>Km</Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -205,6 +303,32 @@ export function Vehiclecheck() {
                                     />
                                 </Col>
                             </Form.Group>
+                            <Form.Group as={Row} controlId="formpapier" className="mb-3">
+                                <Form.Label column sm={10}>Papiers *</Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="radio"
+                                            label="Conforme"
+                                            name="papierStatus"
+                                            value="Conforme"
+                                            onChange={handleChange}
+                                            inline
+                                            className="mr-4" // Ajout d'un espace à droite
+                                        />
+                                        <Form.Check
+                                            type="radio"
+                                            label="Non Conforme"
+                                            name="papierStatus"
+                                            value="Non Conforme"
+                                            onChange={handleChange}
+                                            inline
+                                            className="ml-4" // Ajout d'un espace à gauche
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+
                         </Col>
 
                         <Col sm={6}>
@@ -247,12 +371,12 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} controlId="formHeures" className="mb-3">
-                                <Form.Label column sm={10}>Heures de fonctionnement</Form.Label>
+                                <Form.Label column sm={10}>Heure de fonctionnement</Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="time"
-                                        name="Heures"
-                                        value={formData.Heures}
+                                        name="operating_hours"
+                                        value={formData.operating_hours}
                                         onChange={handleChange}
                                     />
                                 </Col>
@@ -260,17 +384,20 @@ export function Vehiclecheck() {
                         </Col>
                     </Row>
 
-                    <Button variant="primary" onClick={nextStep} >Suivant</Button>
+                    <div className="d-flex justify-content-center">
+                        <Button variant="danger" className="mr-2" onClick={goToVehicleChecks}>Quitter</Button>
+                        <Button variant="primary"   onClick={nextStep}>Suivant</Button>
+                    </div>
                 </Form>
-            )}
+            )}  
 
-            {step > 1 && step <= 6 && (
+            {step > 1 && step <= 7 && (
                 <div>
                     <h5>Vérification du composant {step - 1}</h5>
                     <Row>
                         {imageData[`step${step}`].map((data, index) => (
                             <Col sm={4} key={index} className="mb-3">
-                                <Form>
+                                <Form className="p-3 shadow-sm">
                                     <Form.Group controlId={`formTitle${step}-${index}`} className="mb-2">
                                         <Form.Label>{data.title}</Form.Label>
                                     </Form.Group>
@@ -305,16 +432,18 @@ export function Vehiclecheck() {
                             </Col>
                         ))}
                     </Row>
-
+                    <div className="d-flex justify-content-center">
                     <Button variant="secondary" onClick={prevStep} className="mr-2">Précédent</Button>
-                    {step < 6 ? (
+                    {step < 7 ? (
                         <Button variant="primary" onClick={nextStep}>Suivant</Button>
                     ) : (
                         <Button variant="primary" onClick={handleSubmit}>Enregistrer</Button>
                     )}
+                                        </div>
+
                 </div>
             )}
-            {step > 6 && (
+            {step > 7 && (
                 <div>
                     <h5>Vérification terminée</h5>
                     <p>Merci d'avoir complété la vérification.</p>
