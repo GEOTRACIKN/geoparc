@@ -33,6 +33,8 @@ export function Warnings() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("ID");
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -68,6 +70,30 @@ export function Warnings() {
       setLoading(false);
     }
   };
+  const deleteWarning = async () => {
+    if (warningToDelete !== null) {
+      try {
+        const response = await fetch(`${backendUrl}/api/geop/delete_warning/${id_user}/${warningToDelete}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          getWarnings();
+          getCountWarning();
+
+
+          setWarnings((prevWarnings) =>
+            prevWarnings.filter((warning) => warning.id_warning !== warningToDelete)
+          );
+          handleCloseDeleteModal();
+        } else {
+          console.error("Erreur lors de la suppression de l'avertissement");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'avertissement", error);
+      }
+    }
+  };
+  
 
   useEffect(() => {
     getCountWarning();
@@ -142,6 +168,11 @@ export function Warnings() {
     setSelectedColumns(updatedColumns);
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
   };
+  const handleCloseDeleteModal = () => setShowDeleteModal(false);
+const handleShowDeleteModal = (id_warning :number) => {
+  setWarningToDelete(id_warning);
+  setShowDeleteModal(true);
+};
 
   return (
     <>
@@ -324,15 +355,16 @@ export function Warnings() {
                       ></i>
                     </a>
                     <a
-                      className="badge bg-warning mr-2"
-                      title="Delete"
-                      style={{ cursor: "pointer" }}
-                    >
-                      <i
-                        className="ri-delete-bin-line mr-0"
-                        style={{ fontSize: "1.2em" }}
-                      ></i>
-                    </a>
+      className="badge bg-warning mr-2"
+      title="Delete"
+      style={{ cursor: "pointer" }}
+      onClick={() => handleShowDeleteModal(warning.id_warning)}
+    >
+      <i
+        className="ri-delete-bin-line mr-0"
+        style={{ fontSize: "1.2em" }}
+      ></i>
+    </a>
                   </div>
                 </td>
               </tr>
@@ -368,6 +400,23 @@ export function Warnings() {
       </div>
       <ModalNewWaring show={show} handleClose={handleClose} refreshwarning={() => getWarnings()}
       ></ModalNewWaring>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+  <Modal.Header closeButton>
+    <Modal.Title>Confirmer la suppression</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    Êtes-vous sûr de vouloir supprimer cet avertissement ?
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseDeleteModal}>
+      Annuler
+    </Button>
+    <Button variant="danger" onClick={deleteWarning}>
+      Supprimer
+    </Button>
+  </Modal.Footer>
+</Modal>
+
     </>
   );
 }

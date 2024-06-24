@@ -16,15 +16,6 @@ type Driver = {
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
-
-const conducteursOptions = [
-  { value: "1381", label: "BENMILOUD MOSSA" },
-  { value: "1380", label: "ATHAMNA HAKIM" },
-  { value: "1379", label: "MEHABA CHERIF" },
-  { value: "1378", label: "ABID YAYA" },
-  // Ajoutez les autres options ici
-];
-
 const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   show,
   handleClose,
