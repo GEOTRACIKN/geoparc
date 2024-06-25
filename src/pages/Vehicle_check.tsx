@@ -63,7 +63,7 @@ const initialImageData: StepData = {
     step7: [
         { title: 'Propreté (tracteur + remorque)', image: img1, status: '' },
         { title: 'Maintenence ?', image: img1, status: '' },
-       
+
     ],
 };
 
@@ -109,7 +109,7 @@ export function Vehiclecheck() {
     });
     const [formValidation, setFormValidation] = useState(initialValidationState); // État de validation du formulaire
     const navigate = useNavigate();
-    
+
     const validateForm = () => {
         const { checker, date, matriculetrac, km, matriculerem, operating_hours, papierStatus } = formData;
         const isValid = checker !== '' && date !== '' && matriculetrac !== '' && km !== '' && matriculerem !== '' && operating_hours !== '' && papierStatus !== '';
@@ -159,7 +159,7 @@ export function Vehiclecheck() {
                 progress: undefined,
                 theme: "light",
                 transition: Bounce,
-              });
+            });
         }
     };
 
@@ -182,14 +182,42 @@ export function Vehiclecheck() {
         //     });
         // });
 
-        // Ajouter les statuts à formData
+
+        // Convertir le papierStatus en entier
+        let paperStatusInt;
+        if (formData.papierStatus === 'Conforme') {
+            paperStatusInt = 1;
+        } else if (formData.papierStatus === 'Non Conforme') {
+            paperStatusInt = 2;
+        }
+
+        // Créer un nouvel objet data sans le champ papierStatus
+        const {
+            checker,
+            date,
+            incomingDriver,
+            matriculetrac,
+            km,
+            outgoingDriver,
+            matriculerem,
+            operating_hours
+        } = formData;
+
         const data = {
-            ...formData,
-            // status: statuses
+            checker: checker,
+            date,
+            incomingDriver,
+            matriculetrac,
+            km,
+            outgoingDriver,
+            matriculerem,
+            operating_hours: operating_hours,
+            papers: paperStatusInt,
+            //status: statuses
         };
 
         try {
-            const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck/${1}`, {
+            const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -206,10 +234,12 @@ export function Vehiclecheck() {
                     progress: undefined,
                     theme: "light",
                     transition: Bounce,
-                  });
+                });
                 setStep(1); // Réinitialiser le formulaire ou naviguer ailleurs
             } else {
-                console.error("Erreur lors de l'envoi des données.");
+                const errorData = await response.json();
+
+                console.error("Erreur lors de l'envoi des données.", errorData);
                 toast.error("Erreur lors de l'envoi des données.", {
                     position: "bottom-right",
                     autoClose: 3000,
@@ -220,8 +250,8 @@ export function Vehiclecheck() {
                     progress: undefined,
                     theme: "light",
                     transition: Bounce,
-                  });
-            
+                });
+
             }
         } catch (err) {
             console.error("Erreur lors de la requête:", err);
@@ -235,8 +265,8 @@ export function Vehiclecheck() {
                 progress: undefined,
                 theme: "light",
                 transition: Bounce,
-              });
-        
+            });
+
         }
     };
 
@@ -308,26 +338,29 @@ export function Vehiclecheck() {
                                 <Col sm={10}>
                                     <div>
                                         <Form.Check
-                                            type="radio"
+                                            type="checkbox"
                                             label="Conforme"
+                                            checked={formData.papierStatus === 'Conforme'}
+                                            onChange={handleChange}
                                             name="papierStatus"
                                             value="Conforme"
-                                            onChange={handleChange}
                                             inline
-                                            className="mr-4" // Ajout d'un espace à droite
+                                            className="mr-4"
                                         />
                                         <Form.Check
-                                            type="radio"
+                                            type="checkbox"
                                             label="Non Conforme"
+                                            checked={formData.papierStatus === 'Non Conforme'}
+                                            onChange={handleChange}
                                             name="papierStatus"
                                             value="Non Conforme"
-                                            onChange={handleChange}
                                             inline
-                                            className="ml-4" // Ajout d'un espace à gauche
+                                            className="ml-4"
                                         />
                                     </div>
                                 </Col>
                             </Form.Group>
+
 
                         </Col>
 
@@ -386,10 +419,10 @@ export function Vehiclecheck() {
 
                     <div className="d-flex justify-content-center">
                         <Button variant="danger" className="mr-2" onClick={goToVehicleChecks}>Quitter</Button>
-                        <Button variant="primary"   onClick={nextStep}>Suivant</Button>
+                        <Button variant="primary" onClick={nextStep}>Suivant</Button>
                     </div>
                 </Form>
-            )}  
+            )}
 
             {step > 1 && step <= 7 && (
                 <div>
@@ -433,13 +466,13 @@ export function Vehiclecheck() {
                         ))}
                     </Row>
                     <div className="d-flex justify-content-center">
-                    <Button variant="secondary" onClick={prevStep} className="mr-2">Précédent</Button>
-                    {step < 7 ? (
-                        <Button variant="primary" onClick={nextStep}>Suivant</Button>
-                    ) : (
-                        <Button variant="primary" onClick={handleSubmit}>Enregistrer</Button>
-                    )}
-                                        </div>
+                        <Button variant="secondary" onClick={prevStep} className="mr-2">Précédent</Button>
+                        {step < 7 ? (
+                            <Button variant="primary" onClick={nextStep}>Suivant</Button>
+                        ) : (
+                            <Button variant="primary" onClick={handleSubmit}>Enregistrer</Button>
+                        )}
+                    </div>
 
                 </div>
             )}
