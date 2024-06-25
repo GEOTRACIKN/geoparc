@@ -61,18 +61,19 @@ export function Warnings() {
 
   const getWarnings = async () => {
     try {
-      setLoading(true);
-      const response = await fetch(
-        `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}`
-      );
-      const data = await response.json();
-      setWarnings(data);
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+        );
+        const data = await response.json();
+        setWarnings(data);
     } catch (error) {
-      console.error(error);
+        console.error(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
   const deleteWarning = async () => {
     if (warningToDelete !== null) {
       try {
@@ -150,9 +151,12 @@ export function Warnings() {
   };
 
   const handleSortingColumn = (currentColumn: string) => {
+    const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
     setSortColumn(currentColumn);
-    setSort(sort === "ASC" ? "DESC" : "ASC");
-  };
+    setSort(newSortOrder);
+    getWarnings();
+};
+
 
   const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
   const initialColumns = {
@@ -306,8 +310,6 @@ export function Warnings() {
               )}
               {selectedColumns.driver && (
                 <th
-                  className="sorting"
-                  onClick={() => handleSortingColumn("driver")}
                 >
                   {translate("Driver")}
                 </th>
@@ -315,7 +317,7 @@ export function Warnings() {
               {selectedColumns.type && (
                 <th
                   className="sorting"
-                  onClick={() => handleSortingColumn("type")}
+                  onClick={() => handleSortingColumn("Type_Warning")}
                 >
                   {translate("Type Warning")}
                 </th>
