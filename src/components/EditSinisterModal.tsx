@@ -153,7 +153,7 @@ const EditSinisterModal: React.FC<EditSinisterModalProps> = ({ show, onClose, si
   }));
 
   return (
-    <Modal show={show} onHide={onClose}>
+    <Modal show={show} onHide={onClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Edit Sinister</Modal.Title>
       </Modal.Header>

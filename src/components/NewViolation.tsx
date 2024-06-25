@@ -46,7 +46,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Add Violation</Modal.Title>
       </Modal.Header>

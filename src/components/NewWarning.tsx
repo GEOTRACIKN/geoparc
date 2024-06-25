@@ -92,7 +92,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Add warning</Modal.Title>
       </Modal.Header>
