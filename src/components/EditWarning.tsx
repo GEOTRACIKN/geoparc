@@ -3,23 +3,27 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-interface ModalNewWArningProps {
+interface ModalEditWarningProps {
   show: boolean;
   handleClose: () => void;
-  refreshwarning?: () => void; // Optional prop
+  warningId: number | null;
+  refreshWarning?: () => void; // Prop optionnelle
+}
 
-};
 type Driver = {
   id_conducteur: number;
   nom_conducteur: string;
   prenom_conducteur: string;
 };
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
-const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
+
+const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
   show,
   handleClose,
-  refreshwarning
+  warningId,
+  refreshWarning
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -27,22 +31,45 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     date: "",
     description: "",
   });
-  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+
   useEffect(() => {
-    if (show) {
-      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+    if (show && warningId) {
+        
+        const formatDateTime = (dateString: string) => {
+            const date = new Date(dateString);
+            return dateString ? date.toISOString().slice(0, 16) : '';
+          };
+    
+          const formatDate = (dateString: string) => {
+            const date = new Date(dateString);
+            return dateString ? date.toISOString().split('T')[0] : '';
+          };
+      fetch(`${backendUrl}/api/geop/warnin_form/${warningId}`)
         .then((response) => response.json())
-        .then((data) => setdrivers(data))
-        .catch((error) => console.error("Error fetching Drivers:", error));
+        .then((data) => {
+          setFormData({
+            conducteur: data.id_driver,
+            type: data.Type_Warning,
+            date: formatDate(data.Date),
+            description: data.Description,
+          });
+        })
+        .catch((error) => console.error("Error fetching warning:", error));
+      
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
+        .then((response) => response.json())
+        .then((data) => setDrivers(data))
+        .catch((error) => console.error("Error fetching drivers:", error));
     }
-  }, [show]);
+  }, [show, warningId]);
 
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `${backendUrl}/api/geop/Add_warning/${geopuserID}`,
+        `${backendUrl}/api/geop/update_warning/${warningId}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -57,17 +84,17 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Warning added successfully:", data);
-        if (refreshwarning) {
-          refreshwarning();
+        console.log("Warning updated successfully:", data);
+        if (refreshWarning) {
+          refreshWarning();
         }
         handleClose();
       } else {
-        console.error("Failed to add Warning:", response.statusText);
+        console.error("Failed to update warning:", response.statusText);
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Error adding Warning:", error.message);
+        console.error("Error updating warning:", error.message);
       } else {
         console.error("Unexpected error:", error);
       }
@@ -81,10 +108,9 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
-    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
+    const value = selectedOption ? Number(selectedOption.value) : 0;
     setFormData({ ...formData, [name]: value });
   };
-
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,22 +120,22 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Add warning</Modal.Title>
+        <Modal.Title>Modifier Avertissement</Modal.Title>
       </Modal.Header>
       <Form>
         <Modal.Body>
           <Form.Group controlId="type">
-            <Form.Label>Type Warning</Form.Label>
+            <Form.Label>Type d'avertissement</Form.Label>
             <Form.Control
               type="text"
               name="type"
               value={formData.type}
               onChange={handleInputChange}
-              placeholder="Enter Type here"
+              placeholder="Entrer le type ici"
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Driver</Form.Label>
+            <Form.Label>Conducteur</Form.Label>
             <Select
               options={conducteursOptions}
               onChange={handleSelectChange}
@@ -121,13 +147,13 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="date">
-            <Form.Label>Date Warning</Form.Label>
+            <Form.Label>Date d'avertissement</Form.Label>
             <Form.Control
               type="date"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
-              placeholder="Enter Date here"
+              placeholder="Entrer la date ici"
             />
           </Form.Group>
           <Form.Group controlId="description">
@@ -135,23 +161,24 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             <Form.Control
               as="textarea"
               name="description"
-              rows={4} // Set the number of rows for the textarea
+              rows={4}
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter description here"
+              placeholder="Entrer la description ici"
             />
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
+            Fermer
           </Button>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
-            Add
+          <Button variant="primary" type="button" onClick={handleSubmit}>
+            Modifier
           </Button>
         </Modal.Footer>
       </Form>
     </Modal>
   );
 };
-export default ModalNewWaring;
+
+export default ModalEditWarning;

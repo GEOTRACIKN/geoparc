@@ -28,6 +28,8 @@ export function Contrat() {
   const [pageCount, setPageCount] = useState(0);
   let [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
+  const [column, setSortColumn] = useState("id_contrat");
+  const [sort, setSort] = useState("ASC");
   const [typeSearch, setTypeSearch] = useState("id_contrat");
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -35,7 +37,6 @@ export function Contrat() {
 
   const [contratToDelete, setContratToDelete] = useState<number | null>(null);
   const [contratToEdit, setContratToEdit] = useState<Contrats | null>(null);
-
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
@@ -50,7 +51,6 @@ export function Contrat() {
     setContratToEdit(contrat);
     setShowEditModal(true);
   };
-
 
   const fetchData = async (
     page: number,
@@ -163,7 +163,10 @@ export function Contrat() {
     setSelectedColumns(updatedColumns);
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
   };
-
+  const handleSortingColumn = (currentColumn: string) => {
+    setSortColumn(currentColumn);
+    setSort(sort === "ASC" ? "DESC" : "ASC");
+  };
   return (
     <>
       <div className="row">
@@ -332,24 +335,26 @@ export function Contrat() {
       <div className="row m-1">
         <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
-            <tr className="light light-data">
+            <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
                   <input className="form-check-input" type="checkbox" />
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_contrat && <th>{translate("N° contrat")}</th>}
-              {selectedColumns.conducteur && <th>{translate("Driver")}</th>}
+              {selectedColumns.id_contrat && (
+                <th className="sorting">{translate("N° contrat")}</th>
+              )}
+              {selectedColumns.conducteur && <th className="sorting">{translate("Driver")}</th>}
               {selectedColumns.date_debut_contrat && (
                 <th>{translate("contract start date")}</th>
               )}
               {selectedColumns.date_fin_contrat && (
-                <th>{translate("contract end date")}</th>
+                <th className="sorting">{translate("contract end date")}</th>
               )}
-              {selectedColumns.type_contrat && <th>{translate("Type")}</th>}
-              {selectedColumns.ref_rh && <th>{translate("HR reference")}</th>}
-              <th>{translate("Action")}</th>
+              {selectedColumns.type_contrat && <th className="sorting">{translate("Type")}</th>}
+              {selectedColumns.ref_rh && <th className="sorting">{translate("HR reference")}</th>}
+              <th >{translate("Action")}</th>
             </tr>
           </thead>
           <tbody className="light-body">
@@ -401,7 +406,10 @@ export function Contrat() {
                           style={{ fontSize: "1.2em", cursor: "pointer" }}
                         ></i>
                       </a>
-                      <a className="badge bg-primary mr-2" title="Edit"onClick={() => handleEditShow(contrat)}
+                      <a
+                        className="badge bg-primary mr-2"
+                        title="Edit"
+                        onClick={() => handleEditShow(contrat)}
                       >
                         <i
                           className="las la-edit"
@@ -460,7 +468,11 @@ export function Contrat() {
           />
         </div>
       </div>
-      <ModalNewContrat show={showModal} handleClose={handleClose} />
+      <ModalNewContrat
+        show={showModal}
+        handleClose={handleClose}
+        refreshContrat={() => fetchData(currentPage, limit, search, typeSearch)}
+      />
       <ModalEditContrat
         show={showEditModal}
         handleClose={handleEditClose}

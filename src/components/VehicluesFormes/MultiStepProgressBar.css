@@ -1,15 +1,30 @@
-.indexedStep {
-  color: white;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  background-color: rgba(211, 211, 211, 0.8);
-  border-radius: 50%;
+.steps {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-.indexedStep.accomplished {
-  background-color: rgba(0, 116, 217, 1);
+@media (max-width: 1018px) {
+  .steps {
+    flex-direction: column;
+  }
+
+  .step {
+    margin: 10px 0;
+  }
 }

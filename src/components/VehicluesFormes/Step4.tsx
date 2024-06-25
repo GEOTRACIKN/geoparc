@@ -1,26 +1,72 @@
-import React from "react";
-import { Form, Button } from "react-bootstrap";
+import React, { useState } from 'react';
+import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from 'react-bootstrap';
+import ActionButtons from './ActionButtons'; // Ajustez le chemin selon la structure de votre projet
 
-const Step4 = (props:any) => {
-  if (props.currentStep !== 4) {
-    return null;
-  }
+interface Step2Props {
+  nextStep: () => void;
+  userCallback: (info: any) => void;
+  user: any;
+  currentStep: number;
+  totalSteps: number;
+  previousStep: () => void;
+  lastStep: () => void;
+}
+
+const Step4: React.FC<Step2Props> = (props) => {
+  const [info2, setInfo2] = useState<{ [key: string]: string }>({});
+  const [error, setError] = useState<string>("");
+
+  const onInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
+    setInfo2((info2) => ({
+      ...info2,
+      [name]: value
+    }));
+  };
+
+  const validate2 = () => {
+    if (!info2.age) {
+      setError("ยังไม่ได้ป้อนจำนวนแปลงที่ดิน");
+    } else {
+      setError("");
+      props.userCallback(info2);
+      props.nextStep();
+    }
+  };
 
   return (
-    <>
-      <p>Step4</p>
-      <Form.Group>
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Enter your Password"
-          value={props.password} // Prop: The password input data
-          onChange={props.handleChange} // Prop: Puts data into the state
-        />
-      </Form.Group>
-    </>
+    <div>
+      <span style={{ color: "red" }}>{error}</span>
+      <h1>
+         Informations complémentaires
+      </h1>
+      <Form>
+        <FormGroup>
+          <FormLabel>
+            ยินดีต้อนรับโครงการ <b>{props.user.name || ""}</b>
+          </FormLabel>
+        </FormGroup>
+        <FormGroup>
+          <FormLabel>แปลงที่ดิน: </FormLabel>
+          <FormControl
+            type="text"
+            name="age"
+            placeholder="จำนวนแปลงที่ดิน"
+            onChange={onInputChanged}
+            className="input input-bordered"
+          />
+        </FormGroup>
+      </Form>
+      <br />
+      <ActionButtons
+        currentStep={props.currentStep}
+        totalSteps={props.totalSteps}
+        previousStep={props.previousStep}
+        nextStep={validate2}
+        lastStep={props.lastStep}
+      />
+    </div>
   );
 };
 
