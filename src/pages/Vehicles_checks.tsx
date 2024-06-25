@@ -9,11 +9,12 @@ import { Bounce, toast } from "react-toastify";
 
 type Vehicles = {
   id_verif: string;
-  Creation_date: string;
+  creation_date: string;
   checker: string;
-  Driver_out: string;
-  Driver_in: string;
-  license_vhc: string;
+  driver_out: string;
+  driver_in: string;
+  tractor_number: string;
+  trailer_number: string;
   maintenance: number;
 };
 
@@ -34,11 +35,12 @@ export function Vehicleschecks() {
 
   const initialColumns = {
     id_verif: true,
-    Creation_date: true,
+    creation_date: true,
     Checker: true,
     Driver_out: true,
     Driver_in: true,
-    license_vhc: true,
+    tractor_number: true,
+    trailer_number: true,
     maintenance: true,
   };
   // Load selected columns from localStorage or use initial state
@@ -107,7 +109,7 @@ export function Vehicleschecks() {
   };
 
   // Function to handle search
-  const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'license_vhc'];
+  const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'tractor_number'];
   const handleSearch = (term: string, type: string) => {
     setSearchTerm(term);
     setSearchType(type);
@@ -248,10 +250,10 @@ export function Vehicleschecks() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.Creation_date}
-                  onChange={() => handleColumnChange("Creation_date")}
+                  checked={selectedColumns.creation_date}
+                  onChange={() => handleColumnChange("creation_date")}
                 />
-                <span style={{ marginLeft: '10px' }}>{translate("Creation Date")}</span>
+                <span style={{ marginLeft: '10px' }}>{translate("creation Date")}</span>
               </Dropdown.Item>
               <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
@@ -284,10 +286,19 @@ export function Vehicleschecks() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.license_vhc}
-                  onChange={() => handleColumnChange("license_vhc")}
+                  checked={selectedColumns.tractor_number}
+                  onChange={() => handleColumnChange("tractor_number")}
                 />
                 <span style={{ marginLeft: '10px' }}>{translate("Tractor Registration")}</span>
+              </Dropdown.Item>
+              <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.trailer_number}
+                  onChange={() => handleColumnChange("trailer_number")}
+                />
+                <span style={{ marginLeft: '10px' }}>{translate("Remorque Registration")}</span>
               </Dropdown.Item>
               <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
@@ -313,11 +324,12 @@ export function Vehicleschecks() {
                 </div>
               </th>
               {selectedColumns.id_verif && <th>N°</th>}
-              {selectedColumns.Creation_date && <th>{translate("Creation Date")}</th>}
+              {selectedColumns.creation_date && <th>{translate("creation Date")}</th>}
               {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
               {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}
-              {selectedColumns.license_vhc && <th>{translate("Tractor Registration")}</th>}
+              {selectedColumns.tractor_number && <th>{translate("Tractor Registration")}</th>}
+              {selectedColumns.trailer_number && <th>{translate("Remorque Registration")}</th>}
               {selectedColumns.maintenance && <th>{translate("Maintenance")}</th>}
               <th>{translate("Actions")}</th>
             </tr>
@@ -331,11 +343,12 @@ export function Vehicleschecks() {
                   </div>
                 </td>
                 {selectedColumns.id_verif && <td>{data.id_verif}</td>}
-                {selectedColumns.Creation_date && <td>{toTimestamp(data.Creation_date).split(' ')[0]}</td>}
+                {selectedColumns.creation_date && <td>{toTimestamp(data.creation_date).split(' ')[0]}</td>}
                 {selectedColumns.Checker && <td>{data.checker}</td>}
-                {selectedColumns.Driver_out && <td>{data.Driver_out}</td>}
-                {selectedColumns.Driver_in && <td>{data.Driver_in}</td>}
-                {selectedColumns.license_vhc && <td>{data.license_vhc}</td>}
+                {selectedColumns.Driver_out && <td>{data.driver_out}</td>}
+                {selectedColumns.Driver_in && <td>{data.driver_in}</td>}
+                {selectedColumns.tractor_number && <td>{data.tractor_number}</td>}
+                {selectedColumns.trailer_number && <td>{data.trailer_number}</td>}
                 {selectedColumns.maintenance && <td>{data.maintenance}</td>}
                 <td>
                   <div className="d-flex align-items-center list-action">
