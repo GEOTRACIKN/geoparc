@@ -1,237 +1,204 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
-import { Form, Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
-import { formatToTimestamp } from "../utilities/functions";
-import { PropagateLoader } from 'react-spinners'; 
+import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
+import ModalEditWarning from "../components/EditWarning";
 
-interface Drivers {
-  id_conducteur:number;
-  code_conducteur:number;
-  nom_conducteur:string;
-  prenom_conducteur:string;
-  date_naissance_conducteur:string;
-  email_conducteur:string;	
-  telephone_conducteur:string;
-  id_parc:number; 
+interface Violations{
+  id_violation: number;
+  id_driver: number;
+  id_user: number;
+  type_violation: string;
+  vehicule: string;
+  cost: string;
+  description: string;
+  date_violation: string;
+  draft: number;
+  user_name: string;
+  conducteur_prenom: string;
+  conducteur_nom: string;
 }
-
 
 
 export function Violations() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { translate } = useTranslate();
-  let [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
+  const [list_violation, setviolation] = useState<Violations[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [pageCount, setpageCount] = useState(0);
-  let [total, settotal] = useState(0);   
-  const [colum, setSortColum] = useState("id_conducteur");
+  const [loading, setLoading] = useState(true);
+  const [pageCount, setPageCount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [column, setSortColumn] = useState("id_violation");
   const [sort, setSort] = useState("ASC");
-  const [search, setSearch] = useState(""); 
-  const [type, setType] = useState(0); 
-  const [typeSeach, setTypeSeach] = useState("ID");
-  
+  const [search, setSearch] = useState("");
+  const [type, setType] = useState(0);
+  const [typeSearch, setTypeSearch] = useState("id_violation");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
+  const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);  
+  const handleShow = () => setShow(true);
 
-  const handleSubmit = () => {
-    // Votre logique de soumission ici
-  };
-
-  const getAlarm = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
+  const getCountViolation = async () => {
     try {
       setLoading(true);
-
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum,
-        sort
-      });
-
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/driver/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total); 
-
-      // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const data = await DriversResponse.json();
-      setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue) 
-      setDrivers(data);
-  
+      const response = await fetch(
+        `${backendUrl}/api/geop/violation/count/${id_user}?searchTerm=${search}&searchType=${typeSearch}`
+      );
+      const result = await response.json();
+      setTotal(result.count);
+      setPageCount(Math.ceil(result.count / limit));
     } catch (error) {
       console.error(error);
- 
     } finally {
       setLoading(false);
     }
   };
 
-
-
-  const getAlarmlimitValue = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
+  const getViolation = async () => {
     try {
-      setLoading(true);
-
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum,
-        sort
-      });
-
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/alarm/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
-
-      // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/alarm/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const data = await DriversResponse.json();
-      setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-    
-      return data;
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/violation/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+        );
+        const data = await response.json();
+        setviolation(data);
     } catch (error) {
-      console.error(error);
-      return [];
+        console.error(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
-  const handlePageClick = async (data: any) => {
-    let currentPage = data.selected + 1;
-    const commentsFormServer = await getAlarm(limit, currentPage, search, type, colum, sort);
-    // setDrivers(commentsFormServer);
-    window.scrollTo(0, 0);
+  const deleteViolation = async () => {
+    if (violationToDelete !== null) {
+      try {
+        const response = await fetch(
+          `${backendUrl}/api/geop/delete_violation/${id_user}/${violationToDelete}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          getViolation();
+          getCountViolation();
+
+          setviolation((prevViolation) =>
+            prevViolation.filter(
+              (violation) => violation.id_violation !== violationToDelete
+            )
+          );
+          handleCloseDeleteModal();
+        } else {
+          console.error("Erreur lors de la suppression de l'avertissement");
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la suppression de l'avertissement",
+          error
+        );
+      }
+    }
   };
 
   useEffect(() => {
-    getAlarm(limit, currentPage, search, type, colum, sort);
-  }, []);
+    getCountViolation();
+    getViolation();
+  }, [currentPage, limit, search, type, column, sort]);
 
+  const handlePageClick = (data: any) => {
+    setCurrentPage(data.selected + 1);
+  };
 
-  const handleSelectChange = async (event: any) => {
+  const handleSelectChange = (event: any) => {
     const newValue = event.target.value;
-    setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
-    setLimit(newValue);
-    const commentsFormServer = await getAlarmlimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
-    setDrivers(commentsFormServer);
-    window.scrollTo(0, 0); 
-  };
-  
-
-  const [selectedColumns, setSelectedColumns] = useState({
-    id_violation:true,
-    driver:true,
-    type:true,
-    description:true,
-    date:true,
-    vehicule:true,
-    cost:true,
-  });
-
-  const handleColumnChange = (column: string) => {
-    setSelectedColumns((prevState: any) => ({
-      ...prevState,
-      [column]: !prevState[column],
-    }));
+    setLimit(parseInt(newValue));
+    setCurrentPage(1);
   };
 
-
-
-  
-  const handleTypeSearch = (event:any) => {
+  const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
-   
     switch (selectedValue) {
-      case translate("ID"):
-          setType(0);
-        break;
-      case translate("Type"):
-       setType(1);
-       
+      case translate("ID Warning"):
+        setTypeSearch("id_violation");
         break;
       case translate("Driver"):
-     setType(2);
- 
+        setTypeSearch("driver");
         break;
-      case translate("Vehicule"):
-         setType(3);
+      case translate("Type Violation"):
+        setTypeSearch("Violation");
+        break;
+      case translate("Description"):
+        setTypeSearch("Description");
+        break;
+      case translate("Date"):
+        setTypeSearch("Date");
         break;
       default:
-        console.log('Unknown selection');
+        console.log("Unknown selection");
         break;
     }
-    setTypeSeach(selectedValue);
-    console.log('Selected value:', selectedValue); 
+    setTypeSearch(selectedValue);
   };
 
-  const handleAdvancedSearch = async (event:any) => {
-
-    const newValue = event.target.value; 
-    setSearch(newValue)
-    await getAlarm(limit, currentPage, search, type, colum, sort);
+  const handleAdvancedSearch = (event: any) => {
+    setSearch(event.target.value);
+    setCurrentPage(1);
   };
 
+  const handleSortingColumn = (currentColumn: string) => {
+    const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
+    setSortColumn(currentColumn);
+    setSort(newSortOrder);
+    getViolation();
+};
 
-  const handleSortingColum =  (curentColum:string) => {
 
-    setSortColum(curentColum) 
-    sort=="ASC" ? setSort("DESC") :  setSort("ASC") ; 
-     getAlarm(limit, currentPage, search, type, colum, sort);
+  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
+  const initialColumns = {
+    id_violation: true,
+    vehicule : true,
+    cost: true,
+    type_violation: true,
+    description: true,
+    date_violation: true,
+    driver: true,
+  };
+  // Load selected columns from localStorage or use initial state
+  const loadSelectedColumns = () => {
+    const savedColumns = localStorage.getItem("selectedColumns");
+    return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+  };
+  const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+
+  const handleColumnChange = (column: string) => {
+    const updatedColumns = {
+      ...selectedColumns,
+      [column]: !selectedColumns[column],
+    };
+    setSelectedColumns(updatedColumns);
+    localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
+  };
+  const handleCloseDeleteModal = () => setShowDeleteModal(false);
+  const handleShowDeleteModal = (id_violation: number) => {
+    setViolationToDelete(id_violation);
+    setShowDeleteModal(true);
+  };
+  const handleEditWarning = (id_violation: number) => {
+    setWarningToEdit(id_violation);
+    setShowEditModal(true); // Ouvre le modal d'édition
+  };
+  // Gestion de la fermeture du modal d'édition
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
   };
 
   return (
@@ -239,19 +206,16 @@ export function Violations() {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-           <i className="las la-ban"></i> 
+            <i className="las la-ban"></i>
             {translate("Violations")} ({total})
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShow}>
-            <i className="las la-plus mr-3"></i>Add Violation 
+          <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
+            <i className="las la-plus mr-3"></i>Add violation
           </Button>
-          {/* <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-cubes mr-3"></i>Validate employees' salaries
-          </Button> */}
-          <Button variant="" className="btn btn-outline-info mt-2 mr-1">
-            <i className="las la-file-excel mr-3"></i>Import Violation 
+          <Button variant="outline-info" className="mt-2 mr-1">
+            <i className="las la-file-excel mr-3"></i>Import violation
           </Button>
         </div>
       </div>
@@ -262,30 +226,34 @@ export function Violations() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic" >
+              <Dropdown.Toggle variant="link" id="dropdown-basic">
                 <i
                   className="fas fa-chevron-down"
-                  style={{ fontSize: "20" }}
+                  style={{ fontSize: "20px" }}
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Cost ")}</Dropdown.Item>
+                <Dropdown.Item>{translate("id_violation")}</Dropdown.Item>
+                <Dropdown.Item>{translate("driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("vehicule")}</Dropdown.Item>
+                <Dropdown.Item>{translate("type_violation")}</Dropdown.Item>
+                <Dropdown.Item>{translate("description")}</Dropdown.Item>
+                <Dropdown.Item>{translate("date_violation")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` By ${typeSeach}` } onChange={handleAdvancedSearch} className="form-control" />
+            <input
+              type="text"
+              placeholder={` By ${typeSearch}`}
+              onChange={handleAdvancedSearch}
+              className="form-control"
+            />
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
+          <div className="dataTables_length">
             <label style={{ marginBottom: "0" }}>
               {translate("Show")}
               <select
-                name="DataTables_Table_0_length"
-                aria-controls="DataTables_Table_0"
                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                 style={{ width: "66px" }}
                 onChange={handleSelectChange}
@@ -301,226 +269,211 @@ export function Violations() {
           </div>
           <Dropdown>
             <Dropdown.Toggle
-              variant=""
+              variant="link"
               id="dropdown-basic"
-              title="Colonnes dʼaffichage"
+              title="Display Columns"
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.id_violation}
-                  onChange={() => handleColumnChange("id_violation")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("ID")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.type}
-                  onChange={() => handleColumnChange("type")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Type Violation")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.vehicule}
-                  onChange={() => handleColumnChange("vehicule")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Vehicule")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.driver}
-                  onChange={() => handleColumnChange("driver")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Driver")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.description}
-                  onChange={() => handleColumnChange("description")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Description")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.date}
-                  onChange={() => handleColumnChange("date")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Date")}
-                </span>
-              </Dropdown.Item>
+              {["ID", "driver","vehicule", "type", "description","cost", "date"].map(
+                (col, idx) => (
+                  <Dropdown.Item
+                    key={idx}
+                    as="button"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={selectedColumns[col]}
+                      onChange={() => handleColumnChange(col)}
+                    />
+                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                  </Dropdown.Item>
+                )
+              )}
             </Dropdown.Menu>
           </Dropdown>
         </div>
       </div>
       <div className="row m-1">
-        <Table className="dataTable">
+        <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
                   <input className="form-check-input" type="checkbox" />
-                  <label className="form-check-label"></label>
                 </div>
-              </th> 
-
-              {selectedColumns.id_violation && <th className="sorting" onClick={() => handleSortingColum("id_violation")}>{translate("ID")}</th>}
-              {selectedColumns.type && (<th className="sorting"  onClick={() => handleSortingColum("type")}>{translate("Type Violation")}</th>)}
-              {selectedColumns.driver && (<th className="sorting"  onClick={() => handleSortingColum("driver")}>{translate("Driver")}</th>)}
-              {selectedColumns.vehicule && (<th className="sorting"  onClick={() => handleSortingColum("vehicule")}>{translate("Vehicule")}</th>)}
-              {selectedColumns.date && (<th className="sorting"  onClick={() => handleSortingColum("date")}>{translate("Date")}</th>)}
-              {selectedColumns.cost && (<th className="sorting"  onClick={() => handleSortingColum("cost")}>{translate("Cost")}</th>)}
-              {selectedColumns.description && (<th className="sorting"  onClick={() => handleSortingColum("description")}>{translate("Description")}</th>)}
-              {<th>{translate("Action")}</th>}
+              </th>
+              {selectedColumns.ID && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("id_violation")}
+                >
+                  {translate("ID Violation")}
+                </th>
+              )}
+              {selectedColumns.driver && (
+                <th
+                >
+                  {translate("Driver")}
+                </th>
+              )}
+               {selectedColumns.vehicule && (
+                <th
+                >
+                  {translate("Vehicule")}
+                </th>
+              )}
+              {selectedColumns.type && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("type_violation")}
+                >
+                  {translate("Type violation")}
+                </th>
+              )}
+              {selectedColumns.description && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("description")}
+                >
+                  {translate("Description")}
+                </th>
+              )}
+               {selectedColumns.cost && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("cost")}
+                >
+                  {translate("Cost")}
+                </th>
+              )}
+              {selectedColumns.date && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("date_violation")}
+                >
+                  {translate("Date")}
+                </th>
+              )}
+              <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody key="#" className="ligth-body">
-            {loading ? (
-              <tr > 
-                <td className="text-center" colSpan={7}> <PropagateLoader color={'#123abc'} loading={loading} size={20} /></td>
+          <tbody className="ligth-body" >
+            {list_violation.map((violation, idx) => (
+              <tr key={idx}>
+                <td>
+                  <div className="form-check form-check-inline">
+                    <input className="form-check-input" type="checkbox" />
+                  </div>
+                </td>
+                {selectedColumns.id_violation && <td>{violation.id_violation}</td>}
+                {selectedColumns.driver && (
+                  <td>
+                    {violation.conducteur_nom} {violation.conducteur_prenom}
+                  </td>
+                )}
+                {selectedColumns.vehicule && (
+                  <td>
+                    {violation.vehicule}
+                
+                  </td>
+                )}
+                {selectedColumns.type && <td>{violation.type_violation}</td>}
+                {selectedColumns.description && <td>{violation.description}</td>}
+                {selectedColumns.cost && <td>{violation.cost}</td>}
+                {selectedColumns.date && (
+                  <td>{new Date(violation.date_violation).toLocaleDateString()}</td>
+                )}
+                <td>
+                  <div className="d-flex align-items-center list-action">
+                    <a className="badge badge-success mr-2" title="Détail">
+                      <i
+                        className="fa fa-eye"
+                        style={{ fontSize: "1.2em", cursor: "pointer" }}
+                      ></i>
+                    </a>
+                    <a
+                      className="badge bg-primary mr-2"
+                      title="Edit"
+                      onClick={() => handleEditWarning(violation.id_violation)}
+                    >
+                      <i
+                        className="las la-edit"
+                        style={{ fontSize: "1.2em", cursor: "pointer" }}
+                      ></i>
+                    </a>
+
+                    <a
+                      className="badge bg-warning mr-2"
+                      title="Delete"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleShowDeleteModal(violation.id_violation)}
+                    >
+                      <i
+                        className="ri-delete-bin-line mr-0"
+                        style={{ fontSize: "1.2em" }}
+                      ></i>
+                    </a>
+                  </div>
+                </td>
               </tr>
-            ) : 
-            (
-              list_Drivers.length > 0 ? (
-                list_Drivers.map((driver) => (
-                  <tr key={driver.id_conducteur}>
-                    <td>
-                      <div className="form-check form-check-inline">
-                        <input type="checkbox" className="form-check-input" />
-                      </div>
-                    </td>
-                    {selectedColumns.id_violation && <td>{driver.id_conducteur }</td>}
-                    {selectedColumns.type && (<td>{driver.code_conducteur}</td>)}  
-                    {selectedColumns.vehicule && (<td>{driver.code_conducteur}</td>)}  
-                    {selectedColumns.driver && (<td>{driver.nom_conducteur+" " + driver.prenom_conducteur}</td>)}
-                    {selectedColumns.date && <td>{formatToTimestamp(driver.date_naissance_conducteur)}</td>}
-                    {selectedColumns.cost && (<td>{driver.email_conducteur}</td>)}
-                 
-                    <td>
-                      <div className="d-flex align-items-center list-action">
-                      <a
-                     
-                     className="badge badge-success mr-2"
-                     data-toggle="tooltip"
-                     data-placement="top"
-                     title="Détail"
-                   >
-                     <i
-                       className="fa fa-eye"
-                       style={{ fontSize: "1.2em", cursor:"pointer"  }}   
-                     ></i>
-                   </a>
-
-                   <a
-                     className="badge bg-primary mr-2"
-                     data-toggle="tooltip"
-                     data-placement="top"
-                     title="edit"
-                     data-original-title="edit"
-                   >
-                     <i
-                       className="las la-edit"
-                       style={{ fontSize: "1.2em", cursor:"pointer"  }}                        ></i>
-                   </a>
-                   <a
-                     className="badge bg-warning mr-2"
-                     data-toggle="tooltip"
-                     data-placement="top"
-                     title="Delete"
-                     style={{ cursor: "pointer" }}
-                   >
-                     {" "}
-                     <i
-                       className="ri-delete-bin-line mr-0"
-                       style={{ fontSize: "1.2em", cursor: "pointer" }}
-                     ></i>{" "}
-                   </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))) : (
-
-                <tr>
-                  <td colSpan={7}>No Warning available</td>
-                </tr>
-              )
-              )}
+            ))}
           </tbody>
         </Table>
       </div>
-      <div className="row">
-        <div className="col-md-6 d-flex align-items-center">
-          <span>
-            {translate("Displaying")} {list_Drivers.length} {translate("out of")}{" "}
-            {total}
-          </span>
+      <div className="row justify-content-between">
+        <div className="col-md-4 d-flex align-items-center">
+          {loading && <PropagateLoader color="#000" size={15} />}
         </div>
-        <div className="col-md-6">
+        <div className="col-md-8">
           <ReactPaginate
-              previousLabel={translate("previous")}
-              nextLabel={translate("next")}
-              breakLabel={"..."}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination justify-content-center"}
-              pageClassName={"page-item"}
-              pageLinkClassName={"page-link"}
-              previousClassName={"page-item"}
-              previousLinkClassName={"page-link"}
-              nextClassName={"page-item"}
-              nextLinkClassName={"page-link"}
-              breakClassName={"page-item"}
-              breakLinkClassName={"page-link"}
-              activeClassName={"active"}
+            previousLabel={"<"}
+            nextLabel={">"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-end"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
           />
         </div>
-        <ModalNewVilation show={show} handleClose={handleClose}></ModalNewVilation>
       </div>
+      <ModalNewVilation show={show} handleClose={handleClose}  refreshviolation={() =>{getViolation()}}></ModalNewVilation>
+
+      {/* <ModalEditWarning
+        show={showEditModal}
+        handleClose={handleCloseEditModal}
+        warningId={warningToEdit}
+        refreshWarning={getViolation} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
+      /> */}
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Êtes-vous sûr de vouloir supprimer cet avertissement ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Annuler
+          </Button>
+          <Button variant="danger" onClick={deleteViolation}>
+            Supprimer
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

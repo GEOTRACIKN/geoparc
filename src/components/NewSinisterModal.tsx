@@ -13,7 +13,11 @@ type Vehicle = {
   id_groupe: number;
   immatriculation_vehicule: string;
 };
-
+type Driver = {
+  id_conducteur: number;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+};
 const NewSinisterModal: React.FC<ModalProps> = ({ onClose, show,refreshSinisters  }) => {
   const [formData, setFormData] = useState({
     sinister_type: "",
@@ -111,11 +115,31 @@ const NewSinisterModal: React.FC<ModalProps> = ({ onClose, show,refreshSinisters
     }
   };
 
+
   const vehicleOptions = vehicles.map((vehicle) => ({
     value: vehicle.id_vehicule,
     label: vehicle.immatriculation_vehicule,
     id_groupe: vehicle.id_groupe,
   }));
+
+  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+  useEffect(() => {
+    if (show) {
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+        .then((response) => response.json())
+        .then((data) => setdrivers(data))
+        .catch((error) => console.error("Error fetching Drivers:", error));
+    }
+  }, [show]);
+  const conducteursOptions = drivers.map((driver) => ({
+    value:driver.nom_conducteur + " " + driver.prenom_conducteur,
+    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
+  }));
+  const handleDriverSelectChange = (selectedOption: any, actionMeta: any) => {
+    const { name } = actionMeta;
+    const value = selectedOption ? selectedOption.value : "";
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -172,16 +196,18 @@ const NewSinisterModal: React.FC<ModalProps> = ({ onClose, show,refreshSinisters
             onChange={handleSelectChange}
           />
         </Form.Group>
-
         <Form.Group controlId="conducteurA">
-          <Form.Label>conducteur A</Form.Label>
-          <Form.Control
-            type="text"
-            name="conducteurA"
-            value={formData.conducteurA}
-            onChange={handleInputChange}
-          />
-        </Form.Group>
+            <Form.Label>conducteur A</Form.Label>
+            <Select
+              options={conducteursOptions}
+              onChange={handleDriverSelectChange}
+              name="conducteurA"
+              value={conducteursOptions.find(
+                (option) => option.value === formData.conducteurA
+              )}
+              isClearable
+            />
+          </Form.Group>
         <Form.Group controlId="vehiculeB">
           <Form.Label>vehicule B</Form.Label>
           <Form.Control
