@@ -61,7 +61,7 @@ export function Contrat() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/contrat/${geopuserID}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`
+        `${backendUrl}/api/geop/contrat/${geopuserID}/${page}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}&sortColumn=${column}&sortOrder=${sort}`
       );
       const data = await response.json();
       setContrat(data);
@@ -120,7 +120,7 @@ export function Contrat() {
 
   useEffect(() => {
     fetchData(currentPage, limit, search, typeSearch);
-  }, [currentPage, limit, search, typeSearch]);
+  }, [currentPage, limit, search, typeSearch,column,sort]);
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -164,9 +164,12 @@ export function Contrat() {
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
   };
   const handleSortingColumn = (currentColumn: string) => {
+    const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
     setSortColumn(currentColumn);
-    setSort(sort === "ASC" ? "DESC" : "ASC");
-  };
+    setSort(newSortOrder);
+    fetchData(currentPage, limit, search, typeSearch);
+};
+
   return (
     <>
       <div className="row">
@@ -343,17 +346,17 @@ export function Contrat() {
                 </div>
               </th>
               {selectedColumns.id_contrat && (
-                <th className="sorting">{translate("N° contrat")}</th>
+                <th className="sorting"  onClick={() => handleSortingColumn("id_contrat")}>{translate("N° contrat")}</th>
               )}
-              {selectedColumns.conducteur && <th className="sorting">{translate("Driver")}</th>}
+              {selectedColumns.conducteur && <th>{translate("Driver")}</th>}
               {selectedColumns.date_debut_contrat && (
-                <th>{translate("contract start date")}</th>
+                <th className="sorting" onClick={() => handleSortingColumn("date_debut_contrat")}>{translate("contract start date")}</th>
               )}
               {selectedColumns.date_fin_contrat && (
-                <th className="sorting">{translate("contract end date")}</th>
+                <th className="sorting" onClick={() => handleSortingColumn("date_fin_contrat")}>{translate("contract end date")}</th>
               )}
-              {selectedColumns.type_contrat && <th className="sorting">{translate("Type")}</th>}
-              {selectedColumns.ref_rh && <th className="sorting">{translate("HR reference")}</th>}
+              {selectedColumns.type_contrat && <th className="sorting" onClick={() => handleSortingColumn("type_contrat")}>{translate("Type")}</th>}
+              {selectedColumns.ref_rh && <th className="sorting" onClick={() => handleSortingColumn("ref_rh")}>{translate("HR reference")}</th>}
               <th >{translate("Action")}</th>
             </tr>
           </thead>

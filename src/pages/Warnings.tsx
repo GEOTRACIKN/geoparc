@@ -33,13 +33,11 @@ export function Warnings() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("ID");
-const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
-const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
-const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
-
-
+  const [typeSearch, setTypeSearch] = useState("id_warning");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
+  const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -49,7 +47,7 @@ const [showEditModal, setShowEditModal] = useState(false); // État pour gérer 
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/warning/count/${id_user}?searchTerm=${search}&searchType=${type}`
+        `${backendUrl}/api/geop/warning/count/${id_user}?searchTerm=${search}&searchType=${typeSearch}`
       );
       const result = await response.json();
       setTotal(result.count);
@@ -63,42 +61,49 @@ const [showEditModal, setShowEditModal] = useState(false); // État pour gérer 
 
   const getWarnings = async () => {
     try {
-      setLoading(true);
-      const response = await fetch(
-        `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}`
-      );
-      const data = await response.json();
-      setWarnings(data);
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+        );
+        const data = await response.json();
+        setWarnings(data);
     } catch (error) {
-      console.error(error);
+        console.error(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
   const deleteWarning = async () => {
     if (warningToDelete !== null) {
       try {
-        const response = await fetch(`${backendUrl}/api/geop/delete_warning/${id_user}/${warningToDelete}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `${backendUrl}/api/geop/delete_warning/${id_user}/${warningToDelete}`,
+          {
+            method: "DELETE",
+          }
+        );
         if (response.ok) {
           getWarnings();
           getCountWarning();
 
-
           setWarnings((prevWarnings) =>
-            prevWarnings.filter((warning) => warning.id_warning !== warningToDelete)
+            prevWarnings.filter(
+              (warning) => warning.id_warning !== warningToDelete
+            )
           );
           handleCloseDeleteModal();
         } else {
           console.error("Erreur lors de la suppression de l'avertissement");
         }
       } catch (error) {
-        console.error("Erreur lors de la suppression de l'avertissement", error);
+        console.error(
+          "Erreur lors de la suppression de l'avertissement",
+          error
+        );
       }
     }
   };
-  
 
   useEffect(() => {
     getCountWarning();
@@ -119,19 +124,19 @@ const [showEditModal, setShowEditModal] = useState(false); // État pour gérer 
     const selectedValue = event.target.textContent;
     switch (selectedValue) {
       case translate("ID Warning"):
-        setType(0);
+        setTypeSearch("id_warning");
         break;
       case translate("Driver"):
-        setType(1);
+        setTypeSearch("driver");
         break;
       case translate("Type Warning"):
-        setType(2);
+        setTypeSearch("Type_Warning");
         break;
       case translate("Description"):
-        setType(3);
+        setTypeSearch("Description");
         break;
       case translate("Date"):
-        setType(4);
+        setTypeSearch("Date");
         break;
       default:
         console.log("Unknown selection");
@@ -146,9 +151,12 @@ const [showEditModal, setShowEditModal] = useState(false); // État pour gérer 
   };
 
   const handleSortingColumn = (currentColumn: string) => {
+    const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
     setSortColumn(currentColumn);
-    setSort(sort === "ASC" ? "DESC" : "ASC");
-  };
+    setSort(newSortOrder);
+    getWarnings();
+};
+
 
   const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
   const initialColumns = {
@@ -174,19 +182,19 @@ const [showEditModal, setShowEditModal] = useState(false); // État pour gérer 
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
   };
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
-const handleShowDeleteModal = (id_warning :number) => {
-  setWarningToDelete(id_warning);
-  setShowDeleteModal(true);
-};
-const handleEditWarning = (id_warning: number) => {
-  setWarningToEdit(id_warning);
-  setShowEditModal(true); // Ouvre le modal d'édition
-};
-// Gestion de la fermeture du modal d'édition
-const handleCloseEditModal = () => {
-  setShowEditModal(false);
-  setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
-};
+  const handleShowDeleteModal = (id_warning: number) => {
+    setWarningToDelete(id_warning);
+    setShowDeleteModal(true);
+  };
+  const handleEditWarning = (id_warning: number) => {
+    setWarningToEdit(id_warning);
+    setShowEditModal(true); // Ouvre le modal d'édition
+  };
+  // Gestion de la fermeture du modal d'édition
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
+  };
 
   return (
     <>
@@ -220,9 +228,9 @@ const handleCloseEditModal = () => {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID Warning")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Type Warning")}</Dropdown.Item>
+                <Dropdown.Item>{translate("id_warning")}</Dropdown.Item>
+                <Dropdown.Item>{translate("driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Type_Warning")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Description")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
               </Dropdown.Menu>
@@ -262,7 +270,7 @@ const handleCloseEditModal = () => {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {["id_warning", "driver", "type", "description", "date"].map(
+              {["ID", "driver", "type", "description", "date"].map(
                 (col, idx) => (
                   <Dropdown.Item
                     key={idx}
@@ -302,8 +310,6 @@ const handleCloseEditModal = () => {
               )}
               {selectedColumns.driver && (
                 <th
-                  className="sorting"
-                  onClick={() => handleSortingColumn("driver")}
                 >
                   {translate("Driver")}
                 </th>
@@ -311,7 +317,7 @@ const handleCloseEditModal = () => {
               {selectedColumns.type && (
                 <th
                   className="sorting"
-                  onClick={() => handleSortingColumn("type")}
+                  onClick={() => handleSortingColumn("Type_Warning")}
                 >
                   {translate("Type Warning")}
                 </th>
@@ -363,24 +369,27 @@ const handleCloseEditModal = () => {
                       ></i>
                     </a>
                     <a
-  className="badge bg-primary mr-2"
-  title="Edit"
-  onClick={() => handleEditWarning(warning.id_warning)}
->
-  <i className="las la-edit" style={{ fontSize: "1.2em", cursor: "pointer" }}></i>
-</a>
+                      className="badge bg-primary mr-2"
+                      title="Edit"
+                      onClick={() => handleEditWarning(warning.id_warning)}
+                    >
+                      <i
+                        className="las la-edit"
+                        style={{ fontSize: "1.2em", cursor: "pointer" }}
+                      ></i>
+                    </a>
 
                     <a
-      className="badge bg-warning mr-2"
-      title="Delete"
-      style={{ cursor: "pointer" }}
-      onClick={() => handleShowDeleteModal(warning.id_warning)}
-    >
-      <i
-        className="ri-delete-bin-line mr-0"
-        style={{ fontSize: "1.2em" }}
-      ></i>
-    </a>
+                      className="badge bg-warning mr-2"
+                      title="Delete"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleShowDeleteModal(warning.id_warning)}
+                    >
+                      <i
+                        className="ri-delete-bin-line mr-0"
+                        style={{ fontSize: "1.2em" }}
+                      ></i>
+                    </a>
                   </div>
                 </td>
               </tr>
@@ -414,31 +423,33 @@ const handleCloseEditModal = () => {
           />
         </div>
       </div>
-      <ModalNewWaring show={show} handleClose={handleClose} refreshwarning={() => getWarnings()}
+      <ModalNewWaring
+        show={show}
+        handleClose={handleClose}
+        refreshwarning={() => getWarnings()}
       ></ModalNewWaring>
       <ModalEditWarning
-  show={showEditModal}
-  handleClose={handleCloseEditModal}
-  warningId={warningToEdit}
-  refreshWarning={getWarnings} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
-/>
+        show={showEditModal}
+        handleClose={handleCloseEditModal}
+        warningId={warningToEdit}
+        refreshWarning={getWarnings} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
+      />
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
-  <Modal.Header closeButton>
-    <Modal.Title>Confirmer la suppression</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    Êtes-vous sûr de vouloir supprimer cet avertissement ?
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={handleCloseDeleteModal}>
-      Annuler
-    </Button>
-    <Button variant="danger" onClick={deleteWarning}>
-      Supprimer
-    </Button>
-  </Modal.Footer>
-</Modal>
-
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Êtes-vous sûr de vouloir supprimer cet avertissement ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Annuler
+          </Button>
+          <Button variant="danger" onClick={deleteWarning}>
+            Supprimer
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
