@@ -42,6 +42,7 @@ export function Violations() {
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
 
+
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -77,36 +78,6 @@ export function Violations() {
     }
 };
 
-  const deleteViolation = async () => {
-    if (violationToDelete !== null) {
-      try {
-        const response = await fetch(
-          `${backendUrl}/api/geop/delete_violation/${id_user}/${violationToDelete}`,
-          {
-            method: "DELETE",
-          }
-        );
-        if (response.ok) {
-          getViolation();
-          getCountViolation();
-
-          setviolation((prevViolation) =>
-            prevViolation.filter(
-              (violation) => violation.id_violation !== violationToDelete
-            )
-          );
-          handleCloseDeleteModal();
-        } else {
-          console.error("Erreur lors de la suppression de l'avertissement");
-        }
-      } catch (error) {
-        console.error(
-          "Erreur lors de la suppression de l'avertissement",
-          error
-        );
-      }
-    }
-  };
 
   useEffect(() => {
     getCountViolation();
@@ -199,6 +170,37 @@ export function Violations() {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
+  };
+
+  const deleteViolation = async () => {
+    if (violationToDelete !== null) {
+      try {
+        const response = await fetch(
+          `${backendUrl}/api/geop/delete_violation/${id_user}/${violationToDelete}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          getViolation();
+          getCountViolation();
+
+          setviolation((prevViolation) =>
+            prevViolation.filter(
+              (violation) => violation.id_violation !== violationToDelete
+            )
+          );
+          handleCloseDeleteModal();
+        } else {
+          console.error("Erreur lors de la suppression de l'avertissement");
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la suppression de l'avertissement",
+          error
+        );
+      }
+    }
   };
 
   return (
@@ -463,7 +465,7 @@ export function Violations() {
           <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Êtes-vous sûr de vouloir supprimer cet avertissement ?
+          Êtes-vous sûr de vouloir supprimer cet violation ?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
