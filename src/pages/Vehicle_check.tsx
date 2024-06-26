@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, ProgressBar } from 'react-bootstrap';
+import React, { useState } from "react";
+import {
+    Container,
+    Row,
+    Col,
+    Form,
+    Button,
+    ProgressBar,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 
-
-
-import img1 from '../assets/images/small/img-1.jpg';
-
+import img1 from "../assets/images/small/img-1.jpg";
 
 type ImageData = {
     title: string;
@@ -18,52 +22,54 @@ type StepData = {
     [key: string]: ImageData[];
 };
 
-
 const initialImageData: StepData = {
     step2: [
-        { title: 'Marche pied', image: img1, status: '' },
-        { title: 'Triangles/cales', image: img1, status: '' },
-        { title: 'Batterie', image: img1, status: '' },
-        { title: 'Extincteur date dexpiration ', image: img1, status: '' },
-        { title: 'Pneu tracteur', image: img1, status: '' },
-        { title: 'Pneu Remorque', image: img1, status: '' },
+        { title: "Marche pied", image: img1, status: "" },
+        { title: "Triangles cales", image: img1, status: "" },
+        { title: "Batterie", image: img1, status: "" },
+        { title: "Extincteur date dexpiration ", image: img1, status: "" },
+        { title: "Pneu tracteur", image: img1, status: "" },
+        { title: "Pneu Remorque", image: img1, status: "" },
     ],
     step3: [
-        { title: 'Crique', image: img1, status: '' },
-        { title: 'Trousse outils', image: img1, status: '' },
-        { title: 'Mannon de pression', image: img1, status: '' },
-        { title: 'Réservoir(fissure, bouchon)', image: img1, status: '' },
-        { title: 'Boite pharmacie', image: img1, status: '' },
-        { title: 'Pipe dadmission', image: img1, status: '' },
+        { title: "Crique", image: img1, status: "" },
+        { title: "Trousse outils", image: img1, status: "" },
+        { title: "Mannon de pression", image: img1, status: "" },
+        { title: "Réservoir(fissure, bouchon)", image: img1, status: "" },
+        { title: "Boite pharmacie", image: img1, status: "" },
+        { title: "Pipe dadmission", image: img1, status: "" },
     ],
     step4: [
-        { title: 'Sangle (03), câble scellé', image: img1, status: '' },
-        { title: 'étiquette géolocalisation', image: img1, status: '' },
-        { title: 'Pied parc', image: img1, status: '' },
-        { title: 'Butoir remorque', image: img1, status: '' },
-        { title: 'Twis lock squelette', image: img1, status: '' },
-        { title: 'Bâche remorque', image: img1, status: '' },
+        { title: "Sangle (03), câble scellé", image: img1, status: "" },
+        { title: "étiquette géolocalisation", image: img1, status: "" },
+        { title: "Pied parc", image: img1, status: "" },
+        { title: "Butoir remorque", image: img1, status: "" },
+        { title: "Twis lock squelette", image: img1, status: "" },
+        { title: "Bâche remorque", image: img1, status: "" },
     ],
     step5: [
-        { title: 'Lattes', image: img1, status: '' },
-        { title: 'Moteur cellule frigo', image: img1, status: '' },
-        { title: 'Rétroviseur vitres', image: img1, status: '' },
-        { title: 'Pare-brise + essuie glasses', image: img1, status: '' },
-        { title: 'Feux + clignotants', image: img1, status: '' },
-        { title: 'Loquet', image: img1, status: '' },
+        { title: "Lattes", image: img1, status: "" },
+        { title: "Moteur cellule frigo", image: img1, status: "" },
+        { title: "Rétroviseur vitres", image: img1, status: "" },
+        { title: "Pare-brise + essuie glasses", image: img1, status: "" },
+        { title: "Feux + clignotants", image: img1, status: "" },
+        { title: "Loquet", image: img1, status: "" },
     ],
     step6: [
-        { title: 'Feux de stop, clignotants, garde boue', image: img1, status: '' },
-        { title: 'Cataphote feux de gabarit', image: img1, status: '' },
-        { title: 'Feux de stop + clignotants maraicher', image: img1, status: '' },
-        { title: 'Roue de secours et 2 cannes de sécurité', image: img1, status: '' },
-        { title: 'Pression Pneu (tracteur)', image: img1, status: '' },
-        { title: 'Pression Pneu (Remorque)', image: img1, status: '' },
+        { title: "Feux de stop, clignotants, garde boue", image: img1, status: "" },
+        { title: "Cataphote feux de gabarit", image: img1, status: "" },
+        { title: "Feux de stop + clignotants maraicher", image: img1, status: "" },
+        {
+            title: "Roue de secours et 2 cannes de sécurité",
+            image: img1,
+            status: "",
+        },
+        { title: "Pression Pneu (tracteur)", image: img1, status: "" },
+        { title: "Pression Pneu (Remorque)", image: img1, status: "" },
     ],
     step7: [
-        { title: 'Propreté (tracteur + remorque)', image: img1, status: '' },
-        { title: 'Maintenence ?', image: img1, status: '' },
-
+        { title: "Propreté (tracteur + remorque)", image: img1, status: "" },
+        { title: "Maintenence ?", image: img1, status: "" },
     ],
 };
 
@@ -91,41 +97,90 @@ const initialValidationState = {
     operating_hours: false,
     papierStatus: false,
 };
+const fieldMapping = {
+    "Marche pied": "truck_step_right",
+    "Triangles cales": "triangles_wedges",
+    "Batterie": "battery",
+    "Extincteur date dexpiration": "fire_extinguisher",
+    "Pneu tracteur": "tractor_tire",
+    "Pneu Remorque": "trailer_tire",
+    "Crique": "jack_truck",
+    "Trousse outils": "tool_kit",
+    "Mannon de pression": "pressure_gauge",
+    "Réservoir(fissure, bouchon)": "tank",
+    "Boite pharmacie": "first_aid_kit",
+    "Pipe dadmission": "intake_pipe",
+    "Sangle (03), câble scellé": "sealed_cable",
+    "étiquette géolocalisation": "Geolocation_tag",
+    "Pied parc": "parking_stand",
+    "Butoir remorque": "bumper_trailer",
+    "Twis lock squelette": "twist_lock_skeleton",
+    "Bâche remorque": "tarpaulin_trailer",
+    "Lattes": "slats",
+    "Moteur cellule frigo": "refrigerator_motor",
+    "Rétroviseur vitres": "window_mirrors",
+    "Pare-brise + essuie glasses": "windshield_wipers",
+    "Feux + clignotants": "lights_turn_signals",
+    "Loquet": "latch",
+    "Feux de stop, clignotants, garde boue": "tbl_truck",
+    "Cataphote feux de gabarit": "reflector_lights",
+    "Feux de stop + clignotants maraicher": "stop_Lights",
+    "Roue de secours et 2 cannes de sécurité": "spare_wheel",
+    "Pression Pneu (tracteur)": "tire_pressure_Tractor",
+    "Pression Pneu (Remorque)": "tire_pressure_trailer",
+    "Propreté (tracteur + remorque)": "cleanliness",
+    "Maintenence ?": "maintenance"
+};
+
 
 export function Vehiclecheck() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
-        checker: '',
-        date: '',
-        incomingDriver: '',
-        matriculetrac: '',
-        km: '',
-        outgoingDriver: '',
-        matriculerem: '',
-        operating_hours: '',
-        papierStatus: '', // Ajouté pour gérer l'état des papiers
+        checker: "",
+        date: "",
+        incomingDriver: "",
+        matriculetrac: "",
+        km: "",
+        outgoingDriver: "",
+        matriculerem: "",
+        operating_hours: "",
+        papierStatus: "", // Ajouté pour gérer l'état des papiers
     });
     const [formValidation, setFormValidation] = useState(initialValidationState); // État de validation du formulaire
     const navigate = useNavigate();
 
     const validateForm = () => {
-        const { checker, date, matriculetrac, km, matriculerem, operating_hours, papierStatus } = formData;
-        const isValid = checker !== '' && date !== '' && matriculetrac !== '' && km !== '' && matriculerem !== '' && operating_hours !== '' && papierStatus !== '';
+        const {
+            checker,
+            date,
+            matriculetrac,
+            km,
+            matriculerem,
+            operating_hours,
+            papierStatus,
+        } = formData;
+        const isValid =
+            checker !== "" &&
+            date !== "" &&
+            matriculetrac !== "" &&
+            km !== "" &&
+            matriculerem !== "" &&
+            operating_hours !== "" &&
+            papierStatus !== "";
         setFormValidation({
             ...formValidation,
-            checker: checker !== '',
-            date: date !== '',
-            matriculetrac: matriculetrac !== '',
-            km: km !== '',
-            matriculerem: matriculerem !== '',
-            operating_hours: operating_hours !== '',
-            papierStatus: papierStatus !== '',
+            checker: checker !== "",
+            date: date !== "",
+            matriculetrac: matriculetrac !== "",
+            km: km !== "",
+            matriculerem: matriculerem !== "",
+            operating_hours: operating_hours !== "",
+            papierStatus: papierStatus !== "",
         });
         return isValid;
     };
-
 
     const [imageData, setImageData] = useState<StepData>(initialImageData);
 
@@ -134,11 +189,14 @@ export function Vehiclecheck() {
         setFormData({ ...formData, [name]: value });
     };
 
-
-    const handleStatusChange = (status: string, stepNumber: number, index: number) => {
+    const handleStatusChange = (
+        status: string,
+        stepNumber: number,
+        index: number
+    ) => {
         const newImageData = { ...imageData };
         if (newImageData[`step${stepNumber}`][index].status === status) {
-            newImageData[`step${stepNumber}`][index].status = '';
+            newImageData[`step${stepNumber}`][index].status = "";
         } else {
             newImageData[`step${stepNumber}`][index].status = status;
         }
@@ -168,58 +226,85 @@ export function Vehiclecheck() {
     };
 
     const goToVehicleChecks = () => {
-        navigate('/vehicles_checks'); // Naviguer vers la page Vehicle_checks
+        navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
     };
 
     const handleSubmit = async () => {
-        // // Extraire les statuts de imageData avec leur titre correspondant
-        // const statuses: { title: string, status: string }[] = [];
-        // Object.keys(imageData).forEach(step => {
-        //     imageData[step].forEach(item => {
-        //         if (item.status) {
-        //             statuses.push({ title: item.title, status: item.status });
-        //         }
-        //     });
-        // });
 
+        const fieldMapping: { [key: string]: string } = {
+            "Marche pied": "truck_step_right",
+            "Triangles cales": "triangles_wedges",
+            Batterie: "battery",
+            "Extincteur date dexpiration": "fire_extinguisher",
+            "Pneu tracteur": "tractor_tire",
+            "Pneu Remorque": "trailer_tire",
+            Crique: "jack_truck",
+            "Trousse outils": "tool_kit",
+            "Mannon de pression": "pressure_gauge",
+            "Réservoir(fissure, bouchon)": "tank",
+            "Boite pharmacie": "first_aid_kit",
+            "Pipe dadmission": "intake_pipe",
+            "Sangle (03), câble scellé": "sealed_cable",
+            "étiquette géolocalisation": "Geolocation_tag",
+            "Pied parc": "parking_stand",
+            "Butoir remorque": "bumper_trailer",
+            "Twis lock squelette": "twist_lock_skeleton",
+            "Bâche remorque": "tarpaulin_trailer",
+            Lattes: "slats",
+            "Moteur cellule frigo": "refrigerator_motor",
+            "Rétroviseur vitres": "window_mirrors",
+            "Pare-brise + essuie glasses": "windshield_wipers",
+            "Feux + clignotants": "lights_turn_signals",
+            Loquet: "latch",
+            "Feux de stop, clignotants, garde boue": "tbl_truck",
+            "Cataphote feux de gabarit": "reflector_lights",
+            "Feux de stop + clignotants maraicher": "stop_Lights",
+            "Roue de secours et 2 cannes de sécurité": "spare_wheel",
+            "Pression Pneu (tracteur)": "tire_pressure_Tractor",
+            "Pression Pneu (Remorque)": "tire_pressure_trailer",
+            "Propreté (tracteur + remorque)": "cleanliness",
+            "Maintenence ?": "maintenance",
+        };
+        // Utilisation de fieldMapping avec une assertion de type
+        const statuses: { [key: string]: number } = {};
+        Object.keys(imageData).forEach((step) => {
+            imageData[step].forEach((item) => {
+                // Assurez-vous que les statuts sont définis
+                const mappedField = fieldMapping[item.title as keyof typeof fieldMapping];
+                if (mappedField) {
+                    if (item.status === "Conforme") {
+                        statuses[mappedField] = 1;
+                    } else if (item.status === "Non Conforme") {
+                        statuses[mappedField] = 2;
+                    }
+                }
+            });
+        });
 
-        // Convertir le papierStatus en entier
         let paperStatusInt;
-        if (formData.papierStatus === 'Conforme') {
+        if (formData.papierStatus === "Conforme") {
             paperStatusInt = 1;
-        } else if (formData.papierStatus === 'Non Conforme') {
+        } else if (formData.papierStatus === "Non Conforme") {
             paperStatusInt = 2;
         }
 
-        // Créer un nouvel objet data sans le champ papierStatus
-        const {
-            checker,
-            date,
-            incomingDriver,
-            matriculetrac,
-            km,
-            outgoingDriver,
-            matriculerem,
-            operating_hours
-        } = formData;
-
         const data = {
-            checker: checker,
-            date,
-            incomingDriver,
-            matriculetrac,
-            km,
-            outgoingDriver,
-            matriculerem,
-            operating_hours: operating_hours,
+            checker: formData.checker,
+            date: formData.date,
+            incomingDriver: formData.incomingDriver,
+            matriculetrac: formData.matriculetrac,
+            km: formData.km,
+            outgoingDriver: formData.outgoingDriver,
+            matriculerem: formData.matriculerem,
+            operating_hours: formData.operating_hours,
             papers: paperStatusInt,
-            //status: statuses
+            ...statuses
         };
 
         try {
             const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
 
@@ -235,10 +320,9 @@ export function Vehiclecheck() {
                     theme: "light",
                     transition: Bounce,
                 });
-                setStep(1); // Réinitialiser le formulaire ou naviguer ailleurs
+                navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
             } else {
                 const errorData = await response.json();
-
                 console.error("Erreur lors de l'envoi des données.", errorData);
                 toast.error("Erreur lors de l'envoi des données.", {
                     position: "bottom-right",
@@ -251,7 +335,6 @@ export function Vehiclecheck() {
                     theme: "light",
                     transition: Bounce,
                 });
-
             }
         } catch (err) {
             console.error("Erreur lors de la requête:", err);
@@ -266,24 +349,26 @@ export function Vehiclecheck() {
                 theme: "light",
                 transition: Bounce,
             });
-
         }
     };
-
-
 
     return (
         <Container>
             <h3 className="text-center mb-4">Vérification véhicule</h3>
-            <ProgressBar now={(step / 7) * 100} label={`Étape ${step}`} className="mb-4" />
+            <ProgressBar
+                now={(step / 7) * 100}
+                label={`Étape ${step}`}
+                className="mb-4"
+            />
             {step === 1 && (
-
                 <Form className="p-3 shadow-sm">
                     <h4>Informations générales</h4>
                     <Row>
                         <Col sm={6}>
                             <Form.Group as={Row} controlId="formVerifier" className="mb-3">
-                                <Form.Label column sm={10}>Vérifié par*</Form.Label>
+                                <Form.Label column sm={10}>
+                                    Vérifié par*
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -295,8 +380,14 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formIncomingDriver" className="mb-3">
-                                <Form.Label column sm={10}>Chauffeur entrant</Form.Label>
+                            <Form.Group
+                                as={Row}
+                                controlId="formIncomingDriver"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Chauffeur entrant
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -308,8 +399,14 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formmatriculetrac" className="mb-3">
-                                <Form.Label column sm={10}>Immatriculation tracteur</Form.Label>
+                            <Form.Group
+                                as={Row}
+                                controlId="formmatriculetrac"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Immatriculation tracteur
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -322,7 +419,9 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} controlId="formKm" className="mb-3">
-                                <Form.Label column sm={10}>Km</Form.Label>
+                                <Form.Label column sm={10}>
+                                    Km
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -334,13 +433,15 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row} controlId="formpapier" className="mb-3">
-                                <Form.Label column sm={10}>Papiers *</Form.Label>
+                                <Form.Label column sm={10}>
+                                    Papiers *
+                                </Form.Label>
                                 <Col sm={10}>
                                     <div>
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
-                                            checked={formData.papierStatus === 'Conforme'}
+                                            checked={formData.papierStatus === "Conforme"}
                                             onChange={handleChange}
                                             name="papierStatus"
                                             value="Conforme"
@@ -350,7 +451,7 @@ export function Vehiclecheck() {
                                         <Form.Check
                                             type="checkbox"
                                             label="Non Conforme"
-                                            checked={formData.papierStatus === 'Non Conforme'}
+                                            checked={formData.papierStatus === "Non Conforme"}
                                             onChange={handleChange}
                                             name="papierStatus"
                                             value="Non Conforme"
@@ -360,13 +461,13 @@ export function Vehiclecheck() {
                                     </div>
                                 </Col>
                             </Form.Group>
-
-
                         </Col>
 
                         <Col sm={6}>
                             <Form.Group as={Row} controlId="formDate" className="mb-3">
-                                <Form.Label column sm={10}>Date*</Form.Label>
+                                <Form.Label column sm={10}>
+                                    Date*
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="date"
@@ -377,8 +478,14 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formOutgoingDriver" className="mb-3">
-                                <Form.Label column sm={10}>Chauffeur sortant</Form.Label>
+                            <Form.Group
+                                as={Row}
+                                controlId="formOutgoingDriver"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Chauffeur sortant
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -390,8 +497,14 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="formmatriculerem" className="mb-3">
-                                <Form.Label column sm={10}>Immatriculation remorque</Form.Label>
+                            <Form.Group
+                                as={Row}
+                                controlId="formmatriculerem"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Immatriculation remorque
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="text"
@@ -404,7 +517,9 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} controlId="formHeures" className="mb-3">
-                                <Form.Label column sm={10}>Heure de fonctionnement</Form.Label>
+                                <Form.Label column sm={10}>
+                                    Heure de fonctionnement
+                                </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
                                         type="time"
@@ -418,8 +533,16 @@ export function Vehiclecheck() {
                     </Row>
 
                     <div className="d-flex justify-content-center">
-                        <Button variant="danger" className="mr-2" onClick={goToVehicleChecks}>Quitter</Button>
-                        <Button variant="primary" onClick={nextStep}>Suivant</Button>
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={goToVehicleChecks}
+                        >
+                            Quitter
+                        </Button>
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
                     </div>
                 </Form>
             )}
@@ -431,7 +554,10 @@ export function Vehiclecheck() {
                         {imageData[`step${step}`].map((data, index) => (
                             <Col sm={4} key={index} className="mb-3">
                                 <Form className="p-3 shadow-sm">
-                                    <Form.Group controlId={`formTitle${step}-${index}`} className="mb-2">
+                                    <Form.Group
+                                        controlId={`formTitle${step}-${index}`}
+                                        className="mb-2"
+                                    >
                                         <Form.Label>{data.title}</Form.Label>
                                     </Form.Group>
 
@@ -440,7 +566,11 @@ export function Vehiclecheck() {
                                             <img
                                                 src={data.image}
                                                 alt={`Image ${index + 1}`}
-                                                style={{ width: '100%', maxHeight: '150px', objectFit: 'cover' }}
+                                                style={{
+                                                    width: "100%",
+                                                    maxHeight: "150px",
+                                                    objectFit: "cover",
+                                                }}
                                             />
                                         </div>
                                     )}
@@ -449,15 +579,19 @@ export function Vehiclecheck() {
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
-                                            checked={data.status === 'Conforme'}
-                                            onChange={() => handleStatusChange('Conforme', step, index)}
+                                            checked={data.status === "Conforme"}
+                                            onChange={() =>
+                                                handleStatusChange("Conforme", step, index)
+                                            }
                                             inline
                                         />
                                         <Form.Check
                                             type="checkbox"
                                             label="Non Conforme"
-                                            checked={data.status === 'Non Conforme'}
-                                            onChange={() => handleStatusChange('Non Conforme', step, index)}
+                                            checked={data.status === "Non Conforme"}
+                                            onChange={() =>
+                                                handleStatusChange("Non Conforme", step, index)
+                                            }
                                             inline
                                         />
                                     </div>
@@ -466,22 +600,31 @@ export function Vehiclecheck() {
                         ))}
                     </Row>
                     <div className="d-flex justify-content-center">
-                        <Button variant="secondary" onClick={prevStep} className="mr-2">Précédent</Button>
+                        <Button variant="secondary" onClick={prevStep} className="mr-2">
+                            Précédent
+                        </Button>
                         {step < 7 ? (
-                            <Button variant="primary" onClick={nextStep}>Suivant</Button>
+                            <Button variant="primary" onClick={nextStep}>
+                                Suivant
+                            </Button>
                         ) : (
-                            <Button variant="primary" onClick={handleSubmit}>Enregistrer</Button>
+                            <Button variant="primary" onClick={handleSubmit}>
+                                Enregistrer
+                            </Button>
                         )}
                     </div>
-
                 </div>
             )}
             {step > 7 && (
                 <div>
                     <h5>Vérification terminée</h5>
                     <p>Merci d'avoir complété la vérification.</p>
-                    <Button variant="primary" className="mr-2" onClick={() => setStep(1)}>Recommencer</Button>
-                    <Button variant="danger" onClick={goToVehicleChecks}>Quitter</Button>
+                    <Button variant="primary" className="mr-2" onClick={() => setStep(1)}>
+                        Recommencer
+                    </Button>
+                    <Button variant="danger" onClick={goToVehicleChecks}>
+                        Quitter
+                    </Button>
                 </div>
             )}
         </Container>
