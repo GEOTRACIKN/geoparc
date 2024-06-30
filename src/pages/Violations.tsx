@@ -4,7 +4,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
-import ModalEditWarning from "../components/EditWarning";
+import ModalEditVilation from "../components/EditViolations";
 
 interface Violations{
   id_violation: number;
@@ -39,7 +39,7 @@ export function Violations() {
   const [typeSearch, setTypeSearch] = useState("id_violation");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
-  const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
+  const [ViolationToEdit, setViolationToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
 
 
@@ -162,14 +162,14 @@ export function Violations() {
     setViolationToDelete(id_violation);
     setShowDeleteModal(true);
   };
-  const handleEditWarning = (id_violation: number) => {
-    setWarningToEdit(id_violation);
+  const handleEditViolation = (id_violation: number) => {
+    setViolationToEdit(id_violation);
     setShowEditModal(true); // Ouvre le modal d'édition
   };
   // Gestion de la fermeture du modal d'édition
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
+    setViolationToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
   };
 
   const deleteViolation = async () => {
@@ -400,7 +400,7 @@ export function Violations() {
                     <a
                       className="badge bg-primary mr-2"
                       title="Edit"
-                      onClick={() => handleEditWarning(violation.id_violation)}
+                      onClick={() => handleEditViolation(violation.id_violation)}
                     >
                       <i
                         className="las la-edit"
@@ -454,12 +454,12 @@ export function Violations() {
       </div>
       <ModalNewVilation show={show} handleClose={handleClose}  refreshviolation={() =>{getViolation()}}></ModalNewVilation>
 
-      {/* <ModalEditWarning
+      <ModalEditVilation
         show={showEditModal}
         handleClose={handleCloseEditModal}
-        warningId={warningToEdit}
-        refreshWarning={getViolation} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
-      /> */}
+        violationId={ViolationToEdit}
+        refreshviolation={getViolation} // Propagez la fonction de rafraîchissement si nécessaire
+      />
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
