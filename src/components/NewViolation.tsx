@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -6,47 +6,108 @@ import "bootstrap/dist/css/bootstrap.min.css";
 interface ModalNewViolationProps {
   show: boolean;
   handleClose: () => void;
+  refreshviolation?: () => void; // Optional prop
+
 }
-
-const conducteursOptions = [
-  { value: "1381", label: "BENMILOUD MOSSA" },
-  { value: "1380", label: "ATHAMNA HAKIM" },
-  { value: "1379", label: "MEHABA CHERIF" },
-  { value: "1378", label: "ABID YAYA" },
-  // Ajoutez les autres options ici
-];
-const vehiculeOptions = [
-    { value: "1381", label: "FIAT 500" },
-    { value: "1380", label: "Doblo" },
-    { value: "1379", label: "Clio" },
-    { value: "1378", label: "Volvo" },
-    // Ajoutez les autres options ici
-  ];
-
+type Driver = {
+  id_conducteur: number;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+};
+type Vehicle = {
+  id_vehicule: number;
+  id_groupe: number;
+  immatriculation_vehicule: string;
+};
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const geopuserID = localStorage.getItem("GeopUserID");
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
   handleClose,
+  refreshviolation,
 }) => {
   const [formData, setFormData] = useState({
-    conducteur: "",
+    conducteur: 0,
     type: "",
+    vehicule:"",
     date: "",
     cost:0,
     description: "",
-    Vehicule:"",
   });
 
-  const handleSelectChange = (selectedOption: any) => {
-    console.log("Selected option:", selectedOption);
-  };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+  useEffect(() => {
+    if (show) {
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+        .then((response) => response.json())
+        .then((data) => setdrivers(data))
+        .catch((error) => console.error("Error fetching Drivers:", error));
+    }
+  }, [show]);
+
+  const handleSelectChange = (selectedOption: any, actionMeta: any) => {
+    const { name } = actionMeta;
+    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
+    setFormData({ ...formData, [name]: value });
+  };
+  const conducteursOptions = drivers.map((driver) => ({
+    value: driver.id_conducteur,
+    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
+  }));
+
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Préciser le type ici
+
+  useEffect(() => {
+    if (show) {
+      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+        .then((response) => response.json())
+        .then((data) => setVehicles(data))
+        .catch((error) => console.error("Error fetching vehicles:", error));
+    }
+  }, [show]);
+  const vehicleOptions = vehicles.map((vehicle) => ({
+    value: vehicle.immatriculation_vehicule,
+    label: vehicle.immatriculation_vehicule,
+  }));
+  const handleVehiculeSelectChange = (selectedOption: any, actionMeta: any) => {
+    const { name } = actionMeta;
+    const value = selectedOption ? selectedOption.value : "";
+    setFormData({ ...formData, [name]: value });
+  };
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+  
+    
+    fetch(`${backendUrl}/api/geop/add_violation/${geopuserID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_driver: formData.conducteur,
+        type_violation: formData.type,
+        vehicule: formData.vehicule,
+        date_violation: formData.date,
+        cost: formData.cost,
+        description: formData.description,
+      }),    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Violation added successfully:", data);
+        if (refreshviolation) refreshviolation();
+        handleClose();
+      })
+      .catch((error) => console.error("Error adding violation:", error));
+  };
+
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Add Violation</Modal.Title>
       </Modal.Header>
@@ -68,20 +129,23 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               options={conducteursOptions}
               onChange={handleSelectChange}
               name="conducteur"
+              value={conducteursOptions.find(
+                (option) => option.value === formData.conducteur
+              )}
               isClearable
-              placeholder="Enter Driver here"
             />
           </Form.Group>
-          <Form.Group>
-            <Form.Label>Vehicule</Form.Label>
-            <Select
-              options={vehiculeOptions}
-              onChange={handleSelectChange}
-              name="Vehicule"
-              isClearable
-              placeholder="Enter Vehicule here"
-            />
-          </Form.Group>
+          <Form.Group controlId="vehicule">
+          <Form.Label>Vehicule </Form.Label>
+          <Select
+            options={vehicleOptions}
+            name="vehicule"
+            value={vehicleOptions.find(
+              (option) => option.value === formData.vehicule
+            )}
+            onChange={handleVehiculeSelectChange}
+          />
+        </Form.Group>
           <Form.Group controlId="date">
             <Form.Label>Date Violation</Form.Label>
             <Form.Control
@@ -118,7 +182,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit"  onClick={handleSubmit}>
             Add
           </Button>
         </Modal.Footer>

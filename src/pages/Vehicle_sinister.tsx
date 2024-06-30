@@ -194,7 +194,7 @@ export function VehicleSinister() {
   };
   const DeleteSinisterModal = () => {
     return (
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} responsive>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>

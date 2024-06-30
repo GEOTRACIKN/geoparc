@@ -118,7 +118,7 @@ const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Modifier Avertissement</Modal.Title>
       </Modal.Header>

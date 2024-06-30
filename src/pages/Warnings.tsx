@@ -292,7 +292,7 @@ export function Warnings() {
         </div>
       </div>
       <div className="row m-1">
-        <Table className="dataTable">
+        <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
               <th>
@@ -341,7 +341,7 @@ export function Warnings() {
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody className="ligth-body">
+          <tbody className="ligth-body" >
             {list_Warnings.map((warning, idx) => (
               <tr key={idx}>
                 <td>

@@ -169,7 +169,7 @@ const ModalEditContrat: React.FC<ModalEditContratProps> = ({
   }));
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Edit Contrat</Modal.Title>
       </Modal.Header>

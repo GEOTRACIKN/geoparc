@@ -136,7 +136,7 @@ const ModalNewContrat: React.FC<ModalNewContratProps> = ({
   // console.log(formData.conducteur);
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>Add Contrat</Modal.Title>
       </Modal.Header>
