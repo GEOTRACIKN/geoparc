@@ -371,7 +371,7 @@ export function Violations() {
                     <input className="form-check-input" type="checkbox" />
                   </div>
                 </td>
-                {selectedColumns.id_violation && <td>{violation.id_violation}</td>}
+                {selectedColumns.ID && <td>{violation.id_violation}</td>}
                 {selectedColumns.driver && (
                   <td>
                     {violation.conducteur_nom} {violation.conducteur_prenom}
