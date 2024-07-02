@@ -143,11 +143,11 @@ export function DetailVehicleCheck() {
                       <h5 className="card-title">Informations Générales</h5>
                       <ul className="list-group list-group-flush">
                         <li className="list-group-item">Date de création: {vehicleDetails.creation_date}</li>
-                        <li className="list-group-item">Checker: {vehicleDetails.checker}</li>
-                        <li className="list-group-item">Driver Out: {vehicleDetails.driver_out}</li>
-                        <li className="list-group-item">Driver In: {vehicleDetails.driver_in}</li>
+                        <li className="list-group-item">Vérificateur: {vehicleDetails.checker}</li>
+                        <li className="list-group-item">Nom Chauffeur sortant: {vehicleDetails.driver_out}</li>
+                        <li className="list-group-item">Nom Chauffeur sortant: {vehicleDetails.driver_in}</li>
                         <li className="list-group-item">Km: {vehicleDetails.km}</li>
-                        <li className="list-group-item">operating_hours: {vehicleDetails.operating_hours}</li>
+                        <li className="list-group-item">Heur de Fonctionnement: {vehicleDetails.operating_hours}</li>
                       </ul>
                     </div>
                   </div>
@@ -159,9 +159,9 @@ export function DetailVehicleCheck() {
                     <div className="card-body">
                       <h5 className="card-title">Pneus du Tracteur</h5>
                       <ul className="list-group list-group-flush">
-                        <li className="list-group-item">Tractor Number: {vehicleDetails.tractor_number}</li>
-                        <li className="list-group-item">Tractor Tire: {renderCheckIcon(vehicleDetails.tractor_tire)}</li>
-                        <li className="list-group-item">Truck Step Right: {renderCheckIcon(vehicleDetails.truck_step_right)}</li>
+                        <li className="list-group-item">Matricule tracteur: {vehicleDetails.tractor_number}</li>
+                        <li className="list-group-item">Pneu tracteur: {renderCheckIcon(vehicleDetails.tractor_tire)}</li>
+                        <li className="list-group-item">Marche pied: {renderCheckIcon(vehicleDetails.truck_step_right)}</li>
 
                         {/* Ajoutez d'autres détails spécifiques aux pneus du tracteur ici */}
                       </ul>
@@ -175,8 +175,8 @@ export function DetailVehicleCheck() {
                     <div className="card-body">
                       <h5 className="card-title">Pneus de la Remorque</h5>
                       <ul className="list-group list-group-flush">
-                        <li className="list-group-item">Trailer Number: {vehicleDetails.trailer_number}</li>
-                        <li className="list-group-item">Trailer Tire: {renderCheckIcon(vehicleDetails.trailer_tire)}</li>
+                        <li className="list-group-item">Matricule remorque: {vehicleDetails.trailer_number}</li>
+                        <li className="list-group-item">Pneu remorque: {renderCheckIcon(vehicleDetails.trailer_tire)}</li>
                         {/* Ajoutez d'autres détails spécifiques aux pneus de la remorque ici */}
                       </ul>
                     </div>

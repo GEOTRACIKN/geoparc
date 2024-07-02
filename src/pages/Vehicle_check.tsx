@@ -89,7 +89,7 @@ type FormData = {
 const initialValidationState = {
     checker: false,
     date: false,
-    incomingDriver: true, // Ce champ n'est pas obligatoire selon votre description
+    incomingDriver: true, 
     matriculetrac: false,
     km: false,
     outgoingDriver: true, // Ce champ n'est pas obligatoire selon votre description
