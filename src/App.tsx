@@ -27,6 +27,9 @@ import { Fuel_consumption } from "./pages/Fuel_consumption";
 import { Card_management } from "./pages/Card_management";
 import { Tank_management } from "./pages/Tank_management";
 import { Cash_management } from "./pages/Cash_management";
+import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
+
+
 import axios from "axios";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -112,6 +115,8 @@ function App() {
           <Route path="/card_management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
           <Route path="/tank_management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
           <Route path="/cash_management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
+          <Route path="/detail_vehicle_check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
+
      
         </Routes>
       </div>

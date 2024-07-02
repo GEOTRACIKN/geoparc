@@ -353,7 +353,7 @@ export function Vehicleschecks() {
                 <td>
                   <div className="d-flex align-items-center list-action">
                     <Link
-                      to={`#`}
+                      to={`/Detail_vehicle_check/${data.id_verif}`}
                       className="badge badge-success mr-2"
                       data-toggle="tooltip"
                       data-placement="top"
@@ -361,6 +361,8 @@ export function Vehicleschecks() {
                     >
                       <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
                     </Link>
+
+
                     <a
                       className="badge bg-warning mr-2"
                       data-toggle="tooltip"
