@@ -64,7 +64,15 @@ export const VehicleValidateFormsStep2 = {
     Year: "",
     Power: "",
     MaximumAllowedTotal: "",
-    CreateDate: '',
+    CirculationDate: '',
+    Longueur: '',
+    NumChassis: '',
+    Largeur: '',
+    NbrePorte: '',
+    Hauteur: '',
+    NbrePlace: '',
+    Weight: '',
+    co2: '',
 
   },
   validations: {
@@ -72,7 +80,15 @@ export const VehicleValidateFormsStep2 = {
     Year: false,
     Power: false,
     MaximumAllowedTotal: false,
-    CreateDate: false,
+    CirculationDate: false,
+    Longueur: false,
+    NumChassis: false,
+    Largeur: false,
+    NbrePorte: false,
+    Hauteur: false,
+    NbrePlace: false,
+    Weight: false,
+    co2: false,
 
   },
 }
