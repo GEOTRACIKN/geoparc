@@ -58,6 +58,16 @@ export const VehicleValidateFormsStep1 = {
   },
 }
 
+export interface StepsProps {
+  nextStep: () => void;
+  userCallback: (info: any) => void;
+  user: any;
+  currentStep: number;
+  totalSteps: number;
+  previousStep: () => void;
+  lastStep: () => void;
+}
+
 export const VehicleValidateFormsStep2 = {
   values: {
     Psn: "",
@@ -89,6 +99,50 @@ export const VehicleValidateFormsStep2 = {
     NbrePlace: false,
     Weight: false,
     co2: false,
+
+  },
+}
+
+export const VehicleValidateFormsStep3 = {
+  values: {
+    Fournisseur: "",
+    Echeance: "",
+    NumContrat: "",
+    EcheanceRestante: "",
+    Duree: "",
+    PayeAcejour: "",
+    Apport: "",
+    DernierPaiment: "",
+    DatePremiereEcheance: "",
+    ProchaineEcheance: "",
+    TotalLeasing: "",
+    NumContratL: "",
+    TotalLocation: "",
+    FournisseurL: "",
+    DernierVersement: "",
+    CoutLocation: "",
+    DateDebutLocation: "",
+    
+
+  },
+  validations: {
+    Fournisseur: false,
+    Echeance: false,
+    NumContrat: false,
+    EcheanceRestante: false,
+    Duree: false,
+    PayeAcejour: false,
+    Apport: false,
+    DernierPaiment: false,
+    DatePremiereEcheance: false,
+    ProchaineEcheance: false,
+    TotalLeasing: false,
+    NumContratL: false,
+    TotalLocation: false,
+    FournisseurL: false,
+    DernierVersement: false,
+    CoutLocation: false,
+    DateDebutLocation: false,
 
   },
 }

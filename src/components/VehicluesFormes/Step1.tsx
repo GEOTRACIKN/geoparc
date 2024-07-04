@@ -354,9 +354,11 @@ const Step1: React.FC<VehicleFormProps> = ({
           
         </Row>
   
-        <Button variant="primary" onClick={validate}>
-          Soumettre
-        </Button>
+        <div className='d-flex align-items-end flex-column'>
+          <Button variant="primary" onClick={validate}>
+            Suivent
+          </Button>
+        </div>
       </Form>
     </div>
   );
