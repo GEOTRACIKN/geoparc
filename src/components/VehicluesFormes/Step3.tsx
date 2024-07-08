@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from 'react-bootstrap';
-import ActionButtons from './ActionButtons'; // Ajustez le chemin selon la structure de votre projet
+import ActionButtons from './ActionButtons'; 
 
-interface Step2Props {
-  nextStep: () => void;
-  userCallback: (info: any) => void;
-  user: any;
-  currentStep: number;
-  totalSteps: number;
-  previousStep: () => void;
-  lastStep: () => void;
-}
+import { 
+  VehicleFormProps,
+  VehicleSelectOption,
+  StepsProps,
+} from '../../utilities/interfaces';
+import { Tab, TabContent, TabPanel, Tabs } from './Tabs';
+import './Tabs.css'
 
-const Step3: React.FC<Step2Props> = (props) => {
+import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
+import RentCar from './RentCar';
+import Leasing from './Leasing';
+import Purchase from './Purchase';
+
+
+
+
+const Step3: React.FC<StepsProps> = (props) => {
+  const [activeTab, setActiveTab] = useState<string>('Tab1');
   const [info2, setInfo2] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState<string>("");
 
@@ -26,38 +33,60 @@ const Step3: React.FC<Step2Props> = (props) => {
   };
 
   const validate2 = () => {
-    if (!info2.age) {
-      setError("ยังไม่ได้ป้อนจำนวนแปลงที่ดิน");
-    } else {
+  
       setError("");
-      props.userCallback(info2);
+      props.userCallback(formState.values);
       props.nextStep();
-    }
+    
   };
+
+  const [formState, setFormState] = useState<VehicleFormState>(VehicleValidateFormsStep2);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      values: {
+        ...prevState.values,
+        [name]: value,
+      },
+      validations: {
+        ...prevState.validations,
+        [name]: value.trim() !== "",
+      }
+    }))
+  }
 
   return (
     <div>
       <span style={{ color: "red" }}>{error}</span>
-      <h1>
-         Informations complémentaires
-      </h1>
-      <Form>
-        <FormGroup>
-          <FormLabel>
-            ยินดีต้อนรับโครงการ <b>{props.user.name || ""}</b>
-          </FormLabel>
-        </FormGroup>
-        <FormGroup>
-          <FormLabel>แปลงที่ดิน: </FormLabel>
-          <FormControl
-            type="text"
-            name="age"
-            placeholder="จำนวนแปลงที่ดิน"
-            onChange={onInputChanged}
-            className="input input-bordered"
-          />
-        </FormGroup>
-      </Form>
+      <h2>
+      Acquisition
+      </h2>
+     {/* 
+     Leasing === Tab1,
+     Location === Tab2,
+     Achat === Tab3
+     */}
+
+      <Tabs>
+        <Tab label="Leasing" isActive={activeTab === 'Tab1'} onClick={() => setActiveTab('Tab1')} />
+        <Tab label="Location" isActive={activeTab === 'Tab2'} onClick={() => setActiveTab('Tab2')} />
+        <Tab label="Achat" isActive={activeTab === 'Tab3'} onClick={() => setActiveTab('Tab3')} />
+      </Tabs>
+      {/* <TabContent activeTab={activeTab} /> */}
+      <TabPanel activeTab={activeTab} id="Tab1">
+      <Leasing formState={formState} handleChange={handleChange} />
+      </TabPanel>
+
+      <TabPanel activeTab={activeTab} id="Tab2">
+      <RentCar formState={formState} handleChange={handleChange} />
+
+      </TabPanel>
+      <TabPanel activeTab={activeTab} id="Tab3">
+      <Purchase formState={formState} handleChange={handleChange} />
+
+      </TabPanel>
+   
       <br />
       <ActionButtons
         currentStep={props.currentStep}
@@ -69,5 +98,7 @@ const Step3: React.FC<Step2Props> = (props) => {
     </div>
   );
 };
+
+
 
 export default Step3;

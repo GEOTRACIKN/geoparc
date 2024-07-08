@@ -25,12 +25,12 @@ export const VehiclesForms = () => {
   }>({});
 
   const [steps, setSteps] = useState<Step[]>([
-    { index: 1, statusClass: 'step-active', stepTitle: 'Step 1' },
-    { index: 2, statusClass: '', stepTitle: 'Step 2' },
-    { index: 3, statusClass: '', stepTitle: 'Step 3' },
-    { index: 4, statusClass: '', stepTitle: 'Step 4' },
-    { index: 5, statusClass: '', stepTitle: 'Step 5' },
-    { index: 6, statusClass: '', stepTitle: 'Step 6' },
+    { index: 1, statusClass: 'step-active', stepTitle: '' },
+    { index: 2, statusClass: '', stepTitle: '' },
+    { index: 3, statusClass: '', stepTitle: '' },
+    { index: 4, statusClass: '', stepTitle: '' },
+    { index: 5, statusClass: '', stepTitle: '' },
+    { index: 6, statusClass: '', stepTitle: '' },
   ]);
 
   const assignStepWizard = (instance: any) => {
@@ -117,181 +117,74 @@ export const VehiclesForms = () => {
 
 
   return (
-    <div className="container">
+    <div className="w-100">
       <h1>My Multi-Step Progress Bar</h1>
-      {/* <button
-        onClick={() => {
-          setDataSteps((prevState) => {
-            const newState = [...prevState];
-            if (newState[1].statusClass !== 'step-success') {
-              newState[1].statusClass = 'step-success';
-            } else {
-              newState[1].statusClass = 'step-active';
+        <div className='mainWizard'>
+  
+        <MultiStepProgressBar params={steps} />
+        <StepWizard instance={assignStepWizard} onStepChange={handleStepChange}  className='w-100'>
+          <Step1
+            userCallback={assignUser}
+            nextStep={nextStep}
+            actionButtons={
+              <ActionButtons
+                currentStep={activeStep + 1}
+                totalSteps={steps.length}
+                previousStep={previousStep}
+                nextStep={nextStep}
+                lastStep={lastStep}
+              />
             }
-            return newState;
-          });
-        }}
-        >
-        Click
-      </button> */}
-
-      {/* <WizardForm /> */}
-
-      <MultiStepProgressBar params={steps} />
-      <StepWizard instance={assignStepWizard} onStepChange={handleStepChange}>
-        <Step1 
-          userCallback={assignUser} 
-          nextStep={nextStep} 
-          actionButtons={
-            <ActionButtons
-              currentStep={activeStep + 1}
-              totalSteps={steps.length}
-              previousStep={previousStep}
-              nextStep={nextStep}
-              lastStep={lastStep}
-            />
-          } 
-        />
-        <Step2
-          user={user}
-          userCallback={assignUser}
-          currentStep={activeStep + 1}
-          totalSteps={steps.length}
-          previousStep={previousStep}
-          nextStep={nextStep}
-          lastStep={lastStep}
-        />
-        <Step3
-          user={user}
-          userCallback={assignUser}
-          currentStep={activeStep + 1}
-          totalSteps={steps.length}
-          previousStep={previousStep}
-          nextStep={nextStep}
-          lastStep={lastStep}
-        />
-        <Step4
-          user={user}
-          userCallback={assignUser}
-          currentStep={activeStep + 1}
-          totalSteps={steps.length}
-          previousStep={previousStep}
-          nextStep={nextStep}
-          lastStep={lastStep}
-        />
-        <Step5
-          user={user}
-          userCallback={assignUser}
-          currentStep={activeStep + 1}
-          totalSteps={steps.length}
-          previousStep={previousStep}
-          nextStep={nextStep}
-          lastStep={lastStep}
-        />
-        <Step6
-          user={user}
-          completeCallback={handleComplete}
-          currentStep={activeStep + 1}
-          totalSteps={steps.length}
-          previousStep={previousStep}
-          nextStep={nextStep}
-          lastStep={lastStep}
-
-        />
-      </StepWizard>
-      {/* <div className="row">
-        <Form
-          onSubmit={handleSubmit}
-          className="overflow-auto"
-          style={{ maxHeight: "300px" }}
-        >
-          <div className="row">
-            <div className="col">
-              <div className="row mr-2">
-                <div className="text-center text-nowrap">
-                  Informations Générales
-                </div>
-                <ProgressBar
-                  now={step >= 1 ? 100 : 0}
-                  className="px-0 mt-6"
-                  style={{ marginTop: "6px" }}
-                />
-              </div>
-            </div>
-
-            <div className="col">
-              <div className="row mr-2">
-                <div className="text-center text-nowrap">
-                  Informations complémentaires
-                </div>
-                <ProgressBar
-                  now={step >= 2 ? 100 : 0}
-                  className=" px-0 mt-6"
-                  style={{ marginTop: "6px" }}
-                />
-              </div>
-            </div>
-
-            <div className="col">
-              <div className="row mr-2">
-                <div className="text-center text-nowrap">Acquisition</div>
-                <ProgressBar
-                  now={step >= 3 ? 100 : 0}
-                  className="px-0 mt-6"
-                  style={{ marginTop: "6px" }}
-                />
-              </div>
-            </div>
-
-            <div className="col">
-              <div className="row mr-2">
-                <div className="text-center text-nowrap">Assurance</div>
-                <ProgressBar
-                  now={step >= 4 ? 100 : 0}
-                  className="px-0 mt-6"
-                  style={{ marginTop: "6px" }}
-                />
-              </div>
-            </div>
-
-            <div className="col">
-              <div className="row mr-2">
-                <div className="text-center text-nowrap">
-                  Contrôle technique
-                </div>
-                <ProgressBar
-                  now={step >= 5 ? 100 : 0}
-                  className="px-0 mt-6"
-                  style={{ marginTop: "6px" }}
-                />
-              </div>
-            </div>
-          </div> */}
-          {/* {step === 0 && <Step1 currentStep={1} />} */}
-          {/* {step === 1 && <Step2 currentStep={2} />}
-
-          {step === 2 && <Step3 currentStep={3} />}
-          {step === 3 && <Step4 currentStep={4} />}
-          {step === 4 && <Step5 currentStep={5} />}
-          {step === 5 && <Step6 currentStep={6} />}
-          <div className="d-flex justify-content-between">
-            {step > 0 && (
-              <Button variant="secondary" onClick={handlePrevious}>
-                Previous
-              </Button>
-            )}
-            {step < 5 ? (
-              <Button variant="primary" onClick={handleNext}>
-                Next
-              </Button>
-            ) : (
-              <Button variant="primary" type="submit">
-                Submit
-              </Button>
-            )}
-          </div>
-        </Form>
-      </div> */}
+          />
+          <Step2
+            user={user}
+            userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
+          />
+          <Step3
+            user={user}
+            userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
+          />
+          <Step4
+            user={user}
+            userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
+          />
+          <Step5
+            user={user}
+            userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
+          />
+          <Step6
+            user={user}
+            completeCallback={handleComplete}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
+  
+          />
+        </StepWizard>
+  
+      </div>
     </div>
   );
 };

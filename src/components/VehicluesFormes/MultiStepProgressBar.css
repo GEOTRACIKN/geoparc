@@ -1,3 +1,7 @@
+.mainWizard {
+  display: flex;
+  flex-direction: column;
+}
 .steps {
   display: flex;
   flex-direction: row;
@@ -19,12 +23,41 @@
   align-items: center;
 }
 
+
 @media (max-width: 1018px) {
+  .mainWizard {
+    flex-direction: row;
+  }
   .steps {
     flex-direction: column;
+    width: 63px;
+    overflow-x: hidden !important;
+    justify-content: center;
+  }
+  
+  .step-content {
+    padding-top: 2.5rem !important;
   }
 
   .step {
     margin: 10px 0;
   }
+
+  .step-circle::before {
+    top: -2px !important;
+    left: 50% !important;
+    width: 2px !important;
+    height: calc(6rem + 1rem - 3.5rem) !important;
+    transform: translate(-50%, -100%) !important;
+  }
+
+  .steps > .step:first-child,
+  .steps > .step:last-child {
+    min-width: 1rem !important;
+    max-width: 3rem !important;
+  }
+  .steps > .step:first-child{
+    margin-right: 8px !important;
+  }
+
 }
