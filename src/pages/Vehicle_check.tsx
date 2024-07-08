@@ -97,41 +97,6 @@ const initialValidationState = {
     operating_hours: false,
     papierStatus: false,
 };
-const fieldMapping = {
-    "Marche pied": "truck_step_right",
-    "Triangles cales": "triangles_wedges",
-    "Batterie": "battery",
-    "Extincteur date dexpiration": "fire_extinguisher",
-    "Pneu tracteur": "tractor_tire",
-    "Pneu Remorque": "trailer_tire",
-    "Crique": "jack_truck",
-    "Trousse outils": "tool_kit",
-    "Mannon de pression": "pressure_gauge",
-    "Réservoir(fissure, bouchon)": "tank",
-    "Boite pharmacie": "first_aid_kit",
-    "Pipe dadmission": "intake_pipe",
-    "Sangle (03), câble scellé": "sealed_cable",
-    "étiquette géolocalisation": "Geolocation_tag",
-    "Pied parc": "parking_stand",
-    "Butoir remorque": "bumper_trailer",
-    "Twis lock squelette": "twist_lock_skeleton",
-    "Bâche remorque": "tarpaulin_trailer",
-    "Lattes": "slats",
-    "Moteur cellule frigo": "refrigerator_motor",
-    "Rétroviseur vitres": "window_mirrors",
-    "Pare-brise + essuie glasses": "windshield_wipers",
-    "Feux + clignotants": "lights_turn_signals",
-    "Loquet": "latch",
-    "Feux de stop, clignotants, garde boue": "tbl_truck",
-    "Cataphote feux de gabarit": "reflector_lights",
-    "Feux de stop + clignotants maraicher": "stop_Lights",
-    "Roue de secours et 2 cannes de sécurité": "spare_wheel",
-    "Pression Pneu (tracteur)": "tire_pressure_Tractor",
-    "Pression Pneu (Remorque)": "tire_pressure_trailer",
-    "Propreté (tracteur + remorque)": "cleanliness",
-    "Maintenence ?": "maintenance"
-};
-
 
 export function Vehiclecheck() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
