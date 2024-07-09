@@ -1,77 +1,13 @@
 import React, { useState } from "react";
-import {
-    Container,
-    Row,
-    Col,
-    Form,
-    Button,
-    ProgressBar,
-} from "react-bootstrap";
+import {Container,Row,Col,Form,Button,ProgressBar,} 
+from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 
-import img1 from "../assets/images/small/img-1.jpg";
+import marchePiedImg from '../assets/images/checklist/1MZL5_AS01.jpg';
+import batterie from '../assets/images/checklist/2720003_3quart_900px_1.jpg';
+import triangle from '../assets/images/checklist/triangle.jpg';
 
-type ImageData = {
-    title: string;
-    image: string | null;
-    status: string;
-};
-
-type StepData = {
-    [key: string]: ImageData[];
-};
-
-const initialImageData: StepData = {
-    step2: [
-        { title: "Marche pied", image: img1, status: "" },
-        { title: "Triangles cales", image: img1, status: "" },
-        { title: "Batterie", image: img1, status: "" },
-        { title: "Extincteur date dexpiration ", image: img1, status: "" },
-        { title: "Pneu tracteur", image: img1, status: "" },
-        { title: "Pneu Remorque", image: img1, status: "" },
-    ],
-    step3: [
-        { title: "Crique", image: img1, status: "" },
-        { title: "Trousse outils", image: img1, status: "" },
-        { title: "Mannon de pression", image: img1, status: "" },
-        { title: "Réservoir(fissure, bouchon)", image: img1, status: "" },
-        { title: "Boite pharmacie", image: img1, status: "" },
-        { title: "Pipe dadmission", image: img1, status: "" },
-    ],
-    step4: [
-        { title: "Sangle (03), câble scellé", image: img1, status: "" },
-        { title: "étiquette géolocalisation", image: img1, status: "" },
-        { title: "Pied parc", image: img1, status: "" },
-        { title: "Butoir remorque", image: img1, status: "" },
-        { title: "Twis lock squelette", image: img1, status: "" },
-        { title: "Bâche remorque", image: img1, status: "" },
-    ],
-    step5: [
-        { title: "Lattes", image: img1, status: "" },
-        { title: "Moteur cellule frigo", image: img1, status: "" },
-        { title: "Rétroviseur vitres", image: img1, status: "" },
-        { title: "Pare-brise + essuie glasses", image: img1, status: "" },
-        { title: "Feux + clignotants", image: img1, status: "" },
-        { title: "Loquet", image: img1, status: "" },
-    ],
-    step6: [
-        { title: "Feux de stop, clignotants, garde boue", image: img1, status: "" },
-        { title: "Cataphote feux de gabarit", image: img1, status: "" },
-        { title: "Feux de stop + clignotants maraicher", image: img1, status: "" },
-        {
-            title: "Roue de secours et 2 cannes de sécurité",
-            image: img1,
-            status: "",
-        },
-        { title: "Pression Pneu (tracteur)", image: img1, status: "" },
-        { title: "Pression Pneu (Remorque)", image: img1, status: "" },
-    ],
-    step7: [
-        { title: "Propreté (tracteur + remorque)", image: img1, status: "" },
-        { title: "Maintenence ?", image: img1, status: "" },
-    ],
-};
 
 type FormData = {
     checker: string;
@@ -82,24 +18,23 @@ type FormData = {
     outgoingDriver: string;
     matriculerem: string;
     operating_hours: string;
-    papierStatus: string; // Ajouté pour gérer l'état des papiers
+    papierStatus: string;
 };
 
 // Définition des règles de validation par champ
 const initialValidationState = {
     checker: false,
     date: false,
-    incomingDriver: true, 
+    incomingDriver: true,
     matriculetrac: false,
     km: false,
-    outgoingDriver: true, // Ce champ n'est pas obligatoire selon votre description
+    outgoingDriver: true,
     matriculerem: false,
     operating_hours: false,
     papierStatus: false,
 };
 
 export function Vehiclecheck() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
@@ -111,9 +46,9 @@ export function Vehiclecheck() {
         outgoingDriver: "",
         matriculerem: "",
         operating_hours: "",
-        papierStatus: "", // Ajouté pour gérer l'état des papiers
+        papierStatus: "",
     });
-    const [formValidation, setFormValidation] = useState(initialValidationState); // État de validation du formulaire
+    const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
 
     const validateForm = () => {
@@ -147,43 +82,30 @@ export function Vehiclecheck() {
         return isValid;
     };
 
-    const [imageData, setImageData] = useState<StepData>(initialImageData);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleStatusChange = (
-        status: string,
-        stepNumber: number,
-        index: number
-    ) => {
-        const newImageData = { ...imageData };
-        if (newImageData[`step${stepNumber}`][index].status === status) {
-            newImageData[`step${stepNumber}`][index].status = "";
-        } else {
-            newImageData[`step${stepNumber}`][index].status = status;
-        }
-        setImageData(newImageData);
-    };
 
     const nextStep = () => {
-        if (validateForm()) {
-            setStep(step + 1);
-        } else {
-            toast.error("Veuillez remplir tous les champs obligatoires. ", {
-                position: "bottom-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
-        }
+        setStep(step + 1);
+        // if (validateForm()) { //vérifie les permiers champ si ils ont remplie ou pas 
+           
+        // } else {
+        //     toast.error("Veuillez remplir tous les champs obligatoires. ", {
+        //         position: "bottom-right",
+        //         autoClose: 3000,
+        //         hideProgressBar: false,
+        //         closeOnClick: true,
+        //         pauseOnHover: true,
+        //         draggable: true,
+        //         progress: undefined,
+        //         theme: "light",
+        //         transition: Bounce,
+        //     });
+        // }
     };
 
     const prevStep = () => {
@@ -194,128 +116,6 @@ export function Vehiclecheck() {
         navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
     };
 
-    const handleSubmit = async () => {
-
-        const fieldMapping: { [key: string]: string } = {
-            "Marche pied": "truck_step_right",
-            "Triangles cales": "triangles_wedges",
-            Batterie: "battery",
-            "Extincteur date dexpiration": "fire_extinguisher",
-            "Pneu tracteur": "tractor_tire",
-            "Pneu Remorque": "trailer_tire",
-            Crique: "jack_truck",
-            "Trousse outils": "tool_kit",
-            "Mannon de pression": "pressure_gauge",
-            "Réservoir(fissure, bouchon)": "tank",
-            "Boite pharmacie": "first_aid_kit",
-            "Pipe dadmission": "intake_pipe",
-            "Sangle (03), câble scellé": "sealed_cable",
-            "étiquette géolocalisation": "Geolocation_tag",
-            "Pied parc": "parking_stand",
-            "Butoir remorque": "bumper_trailer",
-            "Twis lock squelette": "twist_lock_skeleton",
-            "Bâche remorque": "tarpaulin_trailer",
-            Lattes: "slats",
-            "Moteur cellule frigo": "refrigerator_motor",
-            "Rétroviseur vitres": "window_mirrors",
-            "Pare-brise + essuie glasses": "windshield_wipers",
-            "Feux + clignotants": "lights_turn_signals",
-            Loquet: "latch",
-            "Feux de stop, clignotants, garde boue": "tbl_truck",
-            "Cataphote feux de gabarit": "reflector_lights",
-            "Feux de stop + clignotants maraicher": "stop_Lights",
-            "Roue de secours et 2 cannes de sécurité": "spare_wheel",
-            "Pression Pneu (tracteur)": "tire_pressure_Tractor",
-            "Pression Pneu (Remorque)": "tire_pressure_trailer",
-            "Propreté (tracteur + remorque)": "cleanliness",
-            "Maintenence ?": "maintenance",
-        };
-        // Utilisation de fieldMapping avec une assertion de type
-        const statuses: { [key: string]: number } = {};
-        Object.keys(imageData).forEach((step) => {
-            imageData[step].forEach((item) => {
-                // Assurez-vous que les statuts sont définis
-                const mappedField = fieldMapping[item.title as keyof typeof fieldMapping];
-                if (mappedField) {
-                    if (item.status === "Conforme") {
-                        statuses[mappedField] = 1;
-                    } else if (item.status === "Non Conforme") {
-                        statuses[mappedField] = 2;
-                    }
-                }
-            });
-        });
-
-        let paperStatusInt;
-        if (formData.papierStatus === "Conforme") {
-            paperStatusInt = 1;
-        } else if (formData.papierStatus === "Non Conforme") {
-            paperStatusInt = 2;
-        }
-
-        const data = {
-            checker: formData.checker,
-            date: formData.date,
-            incomingDriver: formData.incomingDriver,
-            matriculetrac: formData.matriculetrac,
-            km: formData.km,
-            outgoingDriver: formData.outgoingDriver,
-            matriculerem: formData.matriculerem,
-            operating_hours: formData.operating_hours,
-            papers: paperStatusInt,
-            ...statuses
-        };
-
-        try {
-            const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                toast.success("Données envoyées avec succès!", {
-                    position: "bottom-right",
-                    autoClose: 2400,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Bounce,
-                });
-                navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
-            } else {
-                const errorData = await response.json();
-                console.error("Erreur lors de l'envoi des données.", errorData);
-                toast.error("Erreur lors de l'envoi des données.", {
-                    position: "bottom-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Bounce,
-                });
-            }
-        } catch (err) {
-            console.error("Erreur lors de la requête:", err);
-            toast.error("Erreur lors de la requête:", {
-                position: "bottom-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
-        }
-    };
 
     return (
         <Container>
@@ -363,7 +163,6 @@ export function Vehiclecheck() {
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Form.Group
                                 as={Row}
                                 controlId="formmatriculetrac"
@@ -511,76 +310,1102 @@ export function Vehiclecheck() {
                     </div>
                 </Form>
             )}
-
-            {step > 1 && step <= 7 && (
-                <div>
-                    <h5>Vérification du composant {step - 1}</h5>
+            {step === 2 && (
+                <Form className="p-3 shadow-sm">
+                    <h4>Information véhicule</h4>
                     <Row>
-                        {imageData[`step${step}`].map((data, index) => (
-                            <Col sm={4} key={index} className="mb-3">
-                                <Form className="p-3 shadow-sm">
-                                    <Form.Group
-                                        controlId={`formTitle${step}-${index}`}
-                                        className="mb-2"
-                                    >
-                                        <Form.Label>{data.title}</Form.Label>
-                                    </Form.Group>
-
-                                    {data.image && (
-                                        <div className="mb-2">
-                                            <img
-                                                src={data.image}
-                                                alt={`Image ${index + 1}`}
-                                                style={{
-                                                    width: "100%",
-                                                    maxHeight: "150px",
-                                                    objectFit: "cover",
-                                                }}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className="d-flex justify-content-between">
+                        <Col sm={6}>
+                            {/* Marche pied form */}
+                            <Form.Group as={Row} controlId="marchePied" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Marche pied
+                                </Form.Label>
+                                <img className="check_item_img" src={marchePiedImg} alt="" />
+                                <Form.Label column sm={10}>
+                                    Droite
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
-                                            checked={data.status === "Conforme"}
-                                            onChange={() =>
-                                                handleStatusChange("Conforme", step, index)
-                                            }
+                                            name="Droite"
+                                            value="Conforme"
                                             inline
+                                            className="mr-4"
                                         />
                                         <Form.Check
                                             type="checkbox"
                                             label="Non Conforme"
-                                            checked={data.status === "Non Conforme"}
-                                            onChange={() =>
-                                                handleStatusChange("Non Conforme", step, index)
-                                            }
+                                            name="Droite"
+                                            value="Non Conforme"
                                             inline
+                                            className="ml-4"
                                         />
                                     </div>
-                                </Form>
-                            </Col>
-                        ))}
+                                </Col>
+                                <Form.Label column sm={10}>
+                                    Gauche
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Gauche"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Gauche"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Batterie */}
+                            <Form.Group
+                                as={Row}
+                                controlId=" "
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Batterie
+                                </Form.Label>
+                                <img className="check_item_img" src={batterie} alt="" />
+
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Batterie"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Batterie"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Pneu (tracteur) */}
+                            <Form.Group as={Row} controlId="Pneutracteur" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pneu (tracteur)
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                {['g_av_tr', 'd_av_tr', 'g_ar_tr_int', 'd_ar_tr_int', 'g_ar_tr_ext', 'd_ar_tr_ext'].map(position => (
+                                    <Form.Group as={Row} key={position} className="mb-2">
+                                        <Form.Label column sm={10}>
+                                            {position.replace('_', ' ').toUpperCase()} :
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <div>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    label="Conforme"
+                                                    name="Pneutracteur"
+                                                    value="Conforme"
+                                                    inline
+                                                    className="mr-4"
+                                                />
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    label="Non Conforme"
+                                                    name="Pneutracteur"
+                                                    value="Non Conforme"
+                                                    inline
+                                                    className="ml-4"
+                                                />
+                                            </div>
+                                        </Col>
+                                    </Form.Group>
+                                ))}
+
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            {/* Triangles cales */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Triangles"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Triangles/cales
+                                </Form.Label>
+                                <img className="check_item_img" src={triangle} alt="" />
+
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Triangles"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Triangles"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Extincteur (date d'expiration) */}
+                            <Form.Group as={Row} controlId="extincteurDate" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Extincteur (date d'expiration)
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        type="date"
+                                        name="extincteur_date"
+                                    />
+                                </Col>
+                            </Form.Group>
+                            {/* Pneu (Remorque) */}
+                            <Form.Group as={Row} controlId="PneuRemorque" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pneu (Remorque)
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                {['g_issue1_rm', 'd_issue1_rm', 'g_issue2_rm', 'd_issue2_rm', 'g_issue3_rm', 'd_issue3_rm'].map(position => (
+                                    <Form.Group as={Row} key={position} className="mb-2">
+                                        <Form.Label column lg={6}>
+                                            {position.replace('_', ' ').toUpperCase()} :
+                                        </Form.Label>
+                                        <Col sm={10}>
+                                            <div>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    label="Conforme"
+                                                    name="PneuRemorque"
+                                                    value="Conforme"
+                                                    inline
+                                                    className="mr-4"
+                                                />
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    label="Non Conforme"
+                                                    name="PneuRemorque"
+                                                    value="Non Conforme"
+                                                    inline
+                                                    className="ml-4"
+                                                />
+                                            </div>
+                                        </Col>
+                                    </Form.Group>
+                                ))}
+
+                            </Form.Group>
+                        </Col>
                     </Row>
+
                     <div className="d-flex justify-content-center">
-                        <Button variant="secondary" onClick={prevStep} className="mr-2">
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={prevStep}
+                        >
                             Précédent
                         </Button>
-                        {step < 7 ? (
-                            <Button variant="primary" onClick={nextStep}>
-                                Suivant
-                            </Button>
-                        ) : (
-                            <Button variant="primary" onClick={handleSubmit}>
-                                Enregistrer
-                            </Button>
-                        )}
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
                     </div>
-                </div>
+                </Form>
             )}
-            {step > 7 && (
+            {step === 3 && (
+                <Form className="p-3 shadow-sm">
+                    <h4>Information véhicule</h4>
+                    <Row>
+                        <Col sm={6}>
+                            {/* Crique form */}
+                            <Form.Group as={Row} controlId="Crique" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Crique
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Crique"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Crique"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/*Trousse outils */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Trousse"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Trousse outils
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Trousse"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Trousse"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Mannon de pression */}
+                            <Form.Group as={Row} controlId="Mannon" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Mannon de pression
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Mannon"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Mannon"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* étiquette géolocalisation */}
+                            <Form.Group as={Row} controlId="étiquette" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    étiquette géolocalisation
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="étiquette"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="étiquette"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            {/* Réservoir (fissure, bouchon) */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Réservoir"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Réservoir (fissure, bouchon)
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Réservoir"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Réservoir"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Boite pharmacie */}
+                            <Form.Group as={Row} controlId="pharmacie" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Boite pharmacie
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="pharmacie"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="pharmacie"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Pipe d'admission */}
+                            <Form.Group as={Row} controlId="Pipe" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pipe d'admission
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Pipe"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Pipe"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Sangle (03), câble scellé */}
+                            <Form.Group as={Row} controlId="Sangle" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Sangle (03), câble scellé
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Sangle"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Sangle"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+
+                        </Col>
+                    </Row>
+
+                    <div className="d-flex justify-content-center">
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={prevStep}
+                        >
+                            Précédent
+                        </Button>
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
+                    </div>
+                </Form>
+            )}
+            {step === 4 && (
+                <Form className="p-3 shadow-sm">
+                    <h4>Information véhicule</h4>
+                    <Row>
+                        <Col sm={6}>
+                            {/* Pied parc */}
+                            <Form.Group as={Row} controlId="Piedparc" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pied parc
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Piedparc"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Piedparc"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/*Butoir remorque */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Butoirremorque"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Butoir remorque
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Butoirremorque"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Butoirremorque"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/*Twis lock squelette */}
+                            <Form.Group as={Row} controlId="Twis" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Twis lock squelette
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Twis"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Twis"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Bâche remorque*/}
+                            <Form.Group as={Row} controlId="Bâche" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Bâche remorque
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Bâche"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Bâche"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            {/* Lattes */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Lattes"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Lattes
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Nombre de lattes :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="nbr_lattes" /></div>
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Moteur cellule frigo */}
+                            <Form.Group as={Row} controlId="Moteurcellule" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Moteur cellule frigo
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Fonctionnel"
+                                            name="Moteurcellule"
+                                            value="Fonctionnel"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Alerte"
+                                            name="Moteurcellule"
+                                            value="Alerte"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                    <Col sm={10}>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Niveau gasoile :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="niv_gasoile" /></div>
+                                        </div>
+                                    </Col>
+                                </Col>
+                            </Form.Group>
+                            {/* Rétroviseur vitres */}
+                            <Form.Group as={Row} controlId="Rétroviseur" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Rétroviseur vitres
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Rétroviseur"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Rétroviseur"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Pare-brise + essuie glasses */}
+                            <Form.Group as={Row} controlId="Pare-brise" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pare-brise + essuie glasses
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Pare-brise"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Pare-brise"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    <div className="d-flex justify-content-center">
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={prevStep}
+                        >
+                            Précédent
+                        </Button>
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
+                    </div>
+                </Form>
+            )}
+            {step === 5 && (
+                <Form className="p-3 shadow-sm">
+                    <h4>Information véhicule</h4>
+                    <Row>
+                        <Col sm={6}>
+                            {/* Feux + clignotants */}
+                            <Form.Group as={Row} controlId="Feuxclignotants" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Feux + clignotants
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Feuxclignotants"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Feuxclignotants"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/*Loquet */}
+                            <Form.Group
+                                as={Row}
+                                controlId="Loquet"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Loquet
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Loquet"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Loquet"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/*Feux de stop, clignotants, garde boue*/}
+                            <Form.Group as={Row} controlId="Feuxclignotants" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Feux de stop, clignotants, garde boue
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Feux"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Feux"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Cataphote feux de gabarit*/}
+                            <Form.Group as={Row} controlId="Cataphote" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Cataphote feux de gabarit
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="Cataphote"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="Cataphote"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Pression Pneu (Remorque) */}
+                            <Form.Group as={Row} controlId="PressionPneuRemorque" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pression Pneu (Remorque)
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche avant :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuGaucheavant" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite avant :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuDroiteavant" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche arrière (int) :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuGauchearrière" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite arrière (int) :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuDroitearrière" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche arrière(ext) :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuGauchearrière" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite arrière (ext) :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="PneuDroitearrière" /></div>
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            {/* Feux de stop + clignotants maraicher */}
+                            <Form.Group
+                                as={Row}
+                                controlId="feuxS_clign_maraicher"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Feux de stop + clignotants maraicher
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="feuxS_clign_maraicher"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="feuxS_clign_maraicher"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Roue de secours et 2 cannes de sécurité */}
+                            <Form.Group as={Row} controlId="secours_tracteur" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Roue de secours et 2 cannes de sécurité
+                                </Form.Label>
+                                <Form.Label column sm={10}>
+                                    Tracteur
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="secours_tracteur"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="secours_tracteur"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                                <Form.Label column sm={10}>
+                                    Tractée
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="secours_tractee"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="secours_tractee"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                            {/* Pression Pneu (tracteur) */}
+                            <Form.Group as={Row} controlId="" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Pression Pneu (tracteur)
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Col sm={10}>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche 1ère issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="g_av_tr_pression" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite 1ère issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="d_av_tr_pression" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche 2ème issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="g_ar_tr_int_pression" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite 2ème issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="d_ar_tr_int_pression" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Gauche 3ème issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="g_ar_tr_ext_pression" /></div>
+                                    </div>
+                                    <div className="col-lg-12">
+                                        <div className="col-lg-6"><span>Droite 3ème issue :</span></div>
+                                        <div className="col-lg-6"><input type="number" name="d_ar_tr_ext_pression" /></div>
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    <div className="d-flex justify-content-center">
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={prevStep}
+                        >
+                            Précédent
+                        </Button>
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
+                    </div>
+                </Form>
+            )}
+            {step === 6 && (
+                <Form className="p-3 shadow-sm">
+                    <h4>Confirmation !</h4>
+                    <Row>
+                        <Col sm={6}>
+                            {/* Propreté (tracteur + remorque) */}
+                            <Form.Group as={Row} controlId="proprete_int" className="mb-3">
+                                <Form.Label column sm={10}>
+                                    Propreté (tracteur + remorque)
+                                </Form.Label>
+                                <img className="check_item_img" src="../assets/images/checklist/1MZL5_AS01.jpg" alt="" />
+                                <Form.Label column sm={10}>
+                                    intérieur
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="proprete_int"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="proprete_int"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                                <Form.Label column sm={10}>
+                                    Extérieur
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Conforme"
+                                            name="proprete_ext"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non Conforme"
+                                            name="proprete_ext"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={6}>
+                            {/*Maintenence */}
+                            <Form.Group
+                                as={Row}
+                                controlId="maintenance"
+                                className="mb-3"
+                            >
+                                <Form.Label column sm={10}>
+                                    Maintenence ?
+                                </Form.Label>
+                                <Col sm={10}>
+                                    <div>
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Oui"
+                                            name="maintenance"
+                                            value="Conforme"
+                                            inline
+                                            className="mr-4"
+                                        />
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Non"
+                                            name="maintenance"
+                                            value="Non Conforme"
+                                            inline
+                                            className="ml-4"
+                                        />
+                                    </div>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <div className="d-flex justify-content-center">
+                        <Button
+                            variant="danger"
+                            className="mr-2"
+                            onClick={prevStep}
+                        >
+                            Précédent
+                        </Button>
+                        <Button variant="primary" onClick={nextStep}>
+                            Suivant
+                        </Button>
+                    </div>
+                </Form>
+            )}
+            {step > 6 && (
                 <div>
                     <h5>Vérification terminée</h5>
                     <p>Merci d'avoir complété la vérification.</p>
