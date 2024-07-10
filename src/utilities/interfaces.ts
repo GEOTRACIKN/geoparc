@@ -122,6 +122,10 @@ export const VehicleValidateFormsStep3 = {
     DernierVersement: "",
     CoutLocation: "",
     DateDebutLocation: "",
+    NbreMoisLocation: "",
+    DateAcquis: "",
+    Taxe: "",
+    TotalAchat: "",
     
 
   },
@@ -143,6 +147,10 @@ export const VehicleValidateFormsStep3 = {
     DernierVersement: false,
     CoutLocation: false,
     DateDebutLocation: false,
+    NbreMoisLocation: false,
+    DateAcquis: false,
+    Taxe: false,
+    TotalAchat: false,
 
   },
 }
