@@ -10,7 +10,7 @@ import {
 import { Tab, TabContent, TabPanel, Tabs } from './Tabs';
 import './Tabs.css'
 
-import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
+import { VehicleFormState, VehicleValidateFormsStep3 } from '../../utilities/interfaces';
 import RentCar from './RentCar';
 import Leasing from './Leasing';
 import Purchase from './Purchase';
@@ -40,7 +40,7 @@ const Step3: React.FC<StepsProps> = (props) => {
     
   };
 
-  const [formState, setFormState] = useState<VehicleFormState>(VehicleValidateFormsStep2);
+  const [formState, setFormState] = useState<VehicleFormState>(VehicleValidateFormsStep3);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
