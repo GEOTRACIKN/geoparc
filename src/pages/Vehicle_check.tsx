@@ -103,6 +103,13 @@ export function Vehiclecheck() {
         //     });
         // }
     };
+    const handleNext = () => {
+        // Rediriger vers le haut de la fenêtre
+        window.scrollTo(0, 0);
+
+        // Appeler la fonction nextStep pour avancer au prochain étape
+        nextStep();
+    };
 
     const prevStep = () => {
         setStep(step - 1);
@@ -418,7 +425,7 @@ export function Vehiclecheck() {
                         <Button variant="danger" className="mr-2" onClick={prevStep}>
                             Précédent
                         </Button>
-                        <Button variant="primary" onClick={nextStep}>
+                        <Button variant="primary" onClick={handleNext}>
                             Suivant
                         </Button>
                     </div>
@@ -541,7 +548,7 @@ export function Vehiclecheck() {
                         <Button variant="danger" className="mr-2" onClick={prevStep}>
                             Précédent
                         </Button>
-                        <Button variant="primary" onClick={nextStep}>
+                        <Button variant="primary"onClick={handleNext}>
                             Suivant
                         </Button>
                     </div>
@@ -671,7 +678,7 @@ export function Vehiclecheck() {
                         <Button variant="danger" className="mr-2" onClick={prevStep}>
                             Précédent
                         </Button>
-                        <Button variant="primary" onClick={nextStep}>
+                        <Button variant="primary" onClick={handleNext}>
                             Suivant
                         </Button>
                     </div>
@@ -682,14 +689,11 @@ export function Vehiclecheck() {
                     <h4>Information véhicule</h4>
                     <Row>
                         <Col sm={6}>
-                            {/* Feux + clignotants */}
-                            <Form.Group as={Row} controlId="Feuxclignotants" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Feux + clignotants
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/feux_clignotant.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                            <Card className="mb-3">
+                                <Card.Header>Feux + clignotants</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/feux_clignotant.jpg'} />
+                                    <Form.Group controlId="Feuxclignotants" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -706,17 +710,15 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Feux de stop, clignotants, garde boue */}
-                            <Form.Group as={Row} controlId="Feuxstop" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Feux de stop, clignotants, garde boue
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/garde_bouet.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Feux de stop, clignotants, garde boue</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/garde_bouet.jpg'} />
+                                    <Form.Group controlId="Feuxstop" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -733,17 +735,15 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Cataphote feux de gabarit */}
-                            <Form.Group as={Row} controlId="Cataphote" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Cataphote feux de gabarit
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/cataphote.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Cataphote feux de gabarit</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/cataphote.jpg'} />
+                                    <Form.Group controlId="Cataphote" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -760,52 +760,50 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Pression Pneu (Remorque) */}
-                            <Form.Group as={Row} controlId="PressionPneuRemorque" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Pression Pneu (Remorque)
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/pneu_remorque.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche avant :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuGaucheavant" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite avant :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuDroiteavant" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche arrière (int) :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite arrière (int) :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche arrière (ext) :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite arrière (ext) :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt" /></div>
-                                    </div>
-                                </Col>
-                            </Form.Group>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Pression Pneu (Remorque)</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/pneu_remorque.jpg'} />
+                                    <Form.Group controlId="PressionPneuRemorque" className="mb-3">
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche avant :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGaucheavant" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite avant :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroiteavant" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche arrière (int) :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite arrière (int) :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche arrière (ext) :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite arrière (ext) :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt" /></div>
+                                        </div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
                         </Col>
+
                         <Col sm={6}>
-                            {/* Loquet */}
-                            <Form.Group as={Row} controlId="Loquet" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Loquet
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/loquet.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                            <Card className="mb-3">
+                                <Card.Header>Loquet</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/loquet.jpg'} />
+                                    <Form.Group controlId="Loquet" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -822,17 +820,15 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Feux de stop + clignotants maraicher */}
-                            <Form.Group as={Row} controlId="feuxS_clign_maraicher" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Feux de stop + clignotants maraicher
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/feux_stop_maricher.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Feux de stop + clignotants maraicher</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/feux_stop_maricher.jpg'} />
+                                    <Form.Group controlId="feuxS_clign_maraicher" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -849,20 +845,16 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Roue de secours et 2 cannes de sécurité */}
-                            <Form.Group as={Row} controlId="secours_tracteur" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Roue de secours et 2 cannes de sécurité
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/roue_de_secours.jpg'} alt="" />
-                                <Form.Label column sm={10}>
-                                    Tracteur
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Roue de secours et 2 cannes de sécurité</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/roue_de_secours.jpg'} />
+                                    <Card.Title>Tracteur</Card.Title>
+                                    <Form.Group controlId="secours_tracteur" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -879,13 +871,9 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                                <Form.Label column sm={10}>
-                                    Tractée
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                    <Card.Title>Tractée</Card.Title>
+                                    <Form.Group controlId="secours_tractee" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -902,42 +890,42 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
-                            {/* Pression Pneu (tracteur) */}
-                            <Form.Group as={Row} controlId="PressionPneuTracteur" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Pression Pneu (tracteur)
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/pneumatique_tracteur.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche 1ère issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="g_av_tr_pression" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite 1ère issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="d_av_tr_pression" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche 2ème issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="g_ar_tr_int_pression" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite 2ème issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="d_ar_tr_int_pression" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Gauche 3ème issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="g_ar_tr_ext_pression" /></div>
-                                    </div>
-                                    <div className="col-lg-12">
-                                        <div className="col-lg-6"><span>Droite 3ème issue :</span></div>
-                                        <div className="col-lg-6"><input type="number" name="d_ar_tr_ext_pression" /></div>
-                                    </div>
-                                </Col>
-                            </Form.Group>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mb-3">
+                                <Card.Header>Pression Pneu (tracteur)</Card.Header>
+                                <Card.Body>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/pneumatique_tracteur.jpg'} />
+                                    <Form.Group controlId="PressionPneuTracteur" className="mb-3">
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche 1ère issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="g_av_tr_pression" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite 1ère issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="d_av_tr_pression" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche 2ème issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_int_pression" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite 2ème issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_int_pression" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Gauche 3ème issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_ext_pression" /></div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="col-lg-6"><span>Droite 3ème issue :</span></div>
+                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_ext_pression" /></div>
+                                        </div>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
                         </Col>
                     </Row>
 
@@ -949,7 +937,7 @@ export function Vehiclecheck() {
                         >
                             Précédent
                         </Button>
-                        <Button variant="primary" onClick={nextStep}>
+                        <Button variant="primary" onClick={handleNext}>
                             Suivant
                         </Button>
                     </div>
@@ -960,17 +948,12 @@ export function Vehiclecheck() {
                     <h4>Confirmation !</h4>
                     <Row>
                         <Col sm={6}>
-                            {/* Propreté (tracteur + remorque) */}
-                            <Form.Group as={Row} controlId="proprete_int" className="mb-3">
-                                <Form.Label column sm={10}>
-                                    Propreté (tracteur + remorque)
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/4434898_5 mercedes Axor.jpg'} alt="" />
-                                <Form.Label column sm={10}>
-                                    intérieur
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <div>
+                            <Card className="mb-3">
+                                <Card.Header>Propreté (tracteur + remorque)</Card.Header>
+                                <Card.Body>
+                                    <Card.Title>Intérieur</Card.Title>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/4434898_5 mercedes Axor.jpg'} />
+                                    <Form.Group controlId="proprete_int" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -987,13 +970,9 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                                <Form.Label column sm={10}>
-                                    Extérieur
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <div>
+                                    </Form.Group>
+                                    <Card.Title>Extérieur</Card.Title>
+                                    <Form.Group controlId="proprete_ext" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Conforme"
@@ -1010,28 +989,22 @@ export function Vehiclecheck() {
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
                         </Col>
                         <Col sm={6}>
-                            {/*Maintenence */}
-                            <Form.Group
-                                as={Row}
-                                controlId="maintenance"
-                                className="mb-3"
-                            >
-                                <Form.Label column sm={10}>
-                                    Maintenence ?
-                                </Form.Label>
-                                <img className="check_item_img" src={'../asset/images/checklist/4434898_5 mercedes Axor.jpg'} alt="" />
-                                <Col sm={10}>
-                                    <div>
+                            <Card className="mb-3">
+                                <Card.Header>Maintenance</Card.Header>
+                                <Card.Body>
+                                    <Card.Title>Maintenance ?</Card.Title>
+                                    <Card.Img variant="top" src={'../asset/images/checklist/4434898_5 mercedes Axor.jpg'} />
+                                    <Form.Group controlId="maintenance" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
                                             label="Oui"
                                             name="maintenance"
-                                            value="Conforme"
+                                            value="Oui"
                                             inline
                                             className="mr-4"
                                         />
@@ -1039,13 +1012,13 @@ export function Vehiclecheck() {
                                             type="checkbox"
                                             label="Non"
                                             name="maintenance"
-                                            value="Non Conforme"
+                                            value="Non"
                                             inline
                                             className="ml-4"
                                         />
-                                    </div>
-                                </Col>
-                            </Form.Group>
+                                    </Form.Group>
+                                </Card.Body>
+                            </Card>
                         </Col>
                     </Row>
                     <div className="d-flex justify-content-center">
