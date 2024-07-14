@@ -21,7 +21,7 @@ const Leasing = ({
   handleChange
 }: LeasingProps) => {
   return (
-    <div>
+    <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
           <Form.Group controlId='formBasicInput-Fournisseur' className='mt-2 col-md-6'>
@@ -179,7 +179,7 @@ const Leasing = ({
 
         </Form>
       
-    </div>
+    </>
   )
 }
 

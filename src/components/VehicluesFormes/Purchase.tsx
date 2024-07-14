@@ -21,7 +21,7 @@ const Purchase = ({
   handleChange
 }: PurchaseProps) => {
   return (
-    <div>
+    <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
           <Form.Group controlId='formBasicInput-DateAcquis' className='mt-2 col-md-6'>
@@ -62,13 +62,10 @@ const Purchase = ({
             />
           </FloatingLabel>
           </Form.Group>
-        
-        </Row>       
-
-
+        </Row>
         </Form>
       
-    </div>
+    </>
   )
 }
 

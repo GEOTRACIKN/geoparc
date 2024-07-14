@@ -23,14 +23,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = (props) => {
   };
 
   return (
-    <div>
+    <div className='w-100'>
       <Row>
         {props.currentStep > 1 && (
           <Col>
             <Button onClick={handleBack}>Preview</Button>
           </Col>
         )}
-        <Col>
+        <Col className="d-flex justify-content-center">
           {props.currentStep < props.totalSteps && (
             <Button onClick={handleNext}>Next</Button>
           )}

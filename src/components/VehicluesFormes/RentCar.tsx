@@ -21,7 +21,7 @@ const RentCar = ({
   handleChange
 }: RentCarProps) => {
   return (
-    <div>
+    <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
           <Form.Group controlId='formBasicInput-NumContratL' className='mt-2 col-md-6'>
@@ -123,7 +123,7 @@ const RentCar = ({
 
         </Form>
       
-    </div>
+    </>
   )
 }
 
