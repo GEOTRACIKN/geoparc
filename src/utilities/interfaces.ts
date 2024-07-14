@@ -154,3 +154,27 @@ export const VehicleValidateFormsStep3 = {
 
   },
 }
+
+export const VehicleValidateFormsStep4 = {
+  values: {
+    AgenceAssurance: "",
+    CoutAss: "",
+    TypeAssurance: "",
+    DelaiAssurance: "",
+    DateDebutAssurance: "",
+    ReferenceAssurance: "",
+    DateExpAssurance: "",
+
+  },
+  validations: {
+    AgenceAssurance: false,
+    CoutAss: false,
+    TypeAssurance: false,
+    DelaiAssurance: false,
+    DateDebutAssurance: false,
+    ReferenceAssurance: false,
+    DateExpAssurance: false,
+    
+
+  },
+}
