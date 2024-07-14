@@ -178,3 +178,23 @@ export const VehicleValidateFormsStep4 = {
 
   },
 }
+
+export const VehicleValidateFormsStep5 = {
+  values: {
+    EtabControle: "",
+    CoutControle: "",
+    ReferenceControle: "",
+    DateControle: "",
+    DateFinControle: "",
+
+  },
+  validations: {
+    EtabControle: false,
+    CoutControle: false,
+    ReferenceControle: false,
+    DateControle: false,
+    DateFinControle: false,
+    
+
+  },
+}
