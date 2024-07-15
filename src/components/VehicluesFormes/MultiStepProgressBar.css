@@ -24,40 +24,44 @@
 }
 
 
-@media (max-width: 1018px) {
-  .mainWizard {
-    flex-direction: row;
-  }
+@media (max-width: 915px) {
   .steps {
-    flex-direction: column;
-    width: 63px;
     overflow-x: hidden !important;
-    justify-content: center;
   }
-  
   .step-content {
-    padding-top: 2.5rem !important;
+    width: 5rem !important ;
+    max-width: initial !important;
+    min-width: inherit !important;
   }
-
-  .step {
-    margin: 10px 0;
-  }
-
   .step-circle::before {
-    top: -2px !important;
-    left: 50% !important;
-    width: 2px !important;
-    height: calc(6rem + 1rem - 3.5rem) !important;
-    transform: translate(-50%, -100%) !important;
+    width: calc(6rem + 1rem - 3.5rem) !important;
   }
+}
 
-  .steps > .step:first-child,
-  .steps > .step:last-child {
-    min-width: 1rem !important;
-    max-width: 3rem !important;
-  }
-  .steps > .step:first-child{
-    margin-right: 8px !important;
-  }
 
+@media (max-width: 710px) {
+  .step-content {
+    width: 3rem !important ;
+  }
+  .step-circle::before {
+    width: calc(4rem + 1rem - 3.5rem) !important;
+  }
+}
+
+@media (max-width: 530px) {
+  .step-content {
+    width: 1.5rem !important ;
+  }
+  .step-circle::before {
+    width: calc(3.5rem + 1rem - 3.5rem) !important;
+  }
+}
+@media (max-width: 405px) {
+  .step-content {
+    width: 1rem !important ;
+  }
+ 
+  .step-circle::before {
+    width: 0.5rem!important;
+  }
 }
