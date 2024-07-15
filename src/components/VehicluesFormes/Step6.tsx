@@ -1,66 +1,99 @@
-import React from 'react';
-import { Form, FormGroup, FormLabel, FormControl, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Form, FormGroup, FormLabel, FormControl, Button, FloatingLabel, Row } from 'react-bootstrap';
 import ActionButtons from './ActionButtons'; // Ajustez le chemin selon la structure de votre projet
+import { StepsProps, VehicleFormState, VehicleValidateFormsStep6 } from '../../utilities/interfaces';
 
-interface Step3Props {
-  user: any;
-  completeCallback: () => void;
-  currentStep: number;
-  totalSteps: number;
-  previousStep: () => void;
-  nextStep: () => void;
-  lastStep: () => void;
-}
 
-const Step6: React.FC<Step3Props> = (props) => {
-  const handleSubmit = () => {
-    // Logique de soumission finale ou validation finale
-    props.completeCallback();
+const Step6: React.FC<StepsProps> = (props) => {
+  const [error, setError] = useState<string>("");
+  const [formState, setFormState] = useState<VehicleFormState>(
+    VehicleValidateFormsStep6
+  );
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      values: {
+        ...prevState.values,
+        [name]: value,
+      },
+      validations: {
+        ...prevState.validations,
+        [name]: value.trim() !== "",
+      },
+    }));
   };
+
+  const validate = () => {
+    setError("");
+    props.nextStep();
+    props.userCallback(formState.values);
+  };
+
+
 
   return (
     <div>
-      <h1>Final Step: Review and Complete</h1>
-      <Form>
-        <FormGroup>
-          <FormLabel>Name:</FormLabel>
-          <FormControl
-            type="text"
-            readOnly
-            defaultValue={props.user.name}
-            className="input input-bordered"
-          />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel>Username:</FormLabel>
-          <FormControl
-            type="text"
-            readOnly
-            defaultValue={props.user.staff}
-            className="input input-bordered"
-          />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel>Email:</FormLabel>
-          <FormControl
-            type="text"
-            readOnly
-            defaultValue={props.user.address}
-            className="input input-bordered"
-          />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel>Land Plots:</FormLabel>
-          <FormControl
-            type="text"
-            readOnly
-            defaultValue={props.user.age}
-            className="input input-bordered"
-          />
-        </FormGroup>
-        <Button variant="primary" onClick={handleSubmit}>
-          Complete
-        </Button>
+       <span style={{ color: "red" }}>{error}</span>
+       <h2>Vignette</h2>
+      <Form onSubmit={(e) => e.preventDefault()}>
+        <Row>
+          <Form.Group
+            controlId="formBasicInput-NumVignette"
+            className="mt-2 col-md-6"
+          >
+            <FloatingLabel controlId="floatingSelect" label="N° Vignette">
+              <Form.Control
+                placeholder=" "
+                type="text"
+                name="NumVignette"
+                value={formState.values.NumVignette}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange(e)
+                }
+                className={formState.validations.NumVignette ? "is-valid" : ""}
+              />
+            </FloatingLabel>
+          </Form.Group>
+          <Form.Group controlId="formBasicInput-DateVignette" className="mt-2 col-md-6">
+            <FloatingLabel
+              controlId="floatingSelect"
+              label="Date vignette"
+            >
+              <Form.Control
+                placeholder=" "
+                type="date"
+                name="DateVignette"
+                value={formState.values.DateVignette}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange(e)
+                }
+                className={formState.validations.DateVignette ? "is-valid" : ""}
+              />
+            </FloatingLabel>
+          </Form.Group>
+        </Row>
+        <Row>
+          <Form.Group
+            controlId="formBasicInput-CoutVignette"
+            className="mt-2 col-md-6"
+          >
+            <FloatingLabel controlId="floatingSelect" label="Coût Vignette">
+              <Form.Control
+                placeholder=" "
+                type="text"
+                name="CoutVignette"
+                value={formState.values.CoutVignette}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleChange(e)
+                }
+                className={formState.validations.CoutVignette ? "is-valid" : ""}
+              />
+            </FloatingLabel>
+          </Form.Group>
+        </Row>
       </Form>
       <br />
       <ActionButtons
@@ -68,7 +101,7 @@ const Step6: React.FC<Step3Props> = (props) => {
         totalSteps={props.totalSteps}
         previousStep={props.previousStep}
         nextStep={props.nextStep}
-        lastStep={props.completeCallback}
+        lastStep={props.lastStep}
       />
     </div>
   );

@@ -173,13 +173,13 @@ export const VehiclesForms = () => {
             lastStep={lastStep}
           />
           <Step6
-            user={user}
-            completeCallback={handleComplete}
-            currentStep={activeStep + 1}
-            totalSteps={steps.length}
-            previousStep={previousStep}
-            nextStep={nextStep}
-            lastStep={lastStep}
+           user={user}
+           userCallback={assignUser}
+           currentStep={activeStep + 1}
+           totalSteps={steps.length}
+           previousStep={previousStep}
+           nextStep={nextStep}
+           lastStep={lastStep}
   
           />
         </StepWizard>
