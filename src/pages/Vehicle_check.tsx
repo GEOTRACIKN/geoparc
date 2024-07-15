@@ -87,21 +87,21 @@ export function Vehiclecheck() {
 
     const nextStep = () => {
         setStep(step + 1);
-        // if (validateForm()) { //vérifie les permiers champ si ils ont remplie ou pas 
+        if (validateForm()) { //vérifie les permiers champ si ils ont remplie ou pas 
 
-        // } else {
-        //     toast.error("Veuillez remplir tous les champs obligatoires. ", {
-        //         position: "bottom-right",
-        //         autoClose: 3000,
-        //         hideProgressBar: false,
-        //         closeOnClick: true,
-        //         pauseOnHover: true,
-        //         draggable: true,
-        //         progress: undefined,
-        //         theme: "light",
-        //         transition: Bounce,
-        //     });
-        // }
+        } else {
+            toast.error("Veuillez remplir tous les champs obligatoires. ", {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
+        }
     };
     const handleNext = () => {
         // Rediriger vers le haut de la fenêtre
@@ -548,7 +548,7 @@ export function Vehiclecheck() {
                         <Button variant="danger" className="mr-2" onClick={prevStep}>
                             Précédent
                         </Button>
-                        <Button variant="primary"onClick={handleNext}>
+                        <Button variant="primary" onClick={handleNext}>
                             Suivant
                         </Button>
                     </div>
