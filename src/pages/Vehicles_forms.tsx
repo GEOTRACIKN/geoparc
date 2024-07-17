@@ -118,7 +118,7 @@ export const VehiclesForms = () => {
 
   return (
     <div className="w-100">
-      <h1>My Multi-Step Progress Bar</h1>
+      <h1>Ajouter véhicule</h1>
         <div className='mainWizard'>
   
         <MultiStepProgressBar params={steps} />
