@@ -24,7 +24,7 @@ const Leasing = ({
     <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
-          <Form.Group controlId='formBasicInput-Fournisseur' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-Fournisseur' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Fournisseur'>
             <Form.Control
             placeholder=' '
@@ -36,7 +36,7 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-Echeance' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-Echeance' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Echéance'>
             <Form.Control
             placeholder=' '
@@ -48,9 +48,8 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group controlId='formBasicInput-NumContrat' className='mt-2 col-md-6'>
+       
+          <Form.Group controlId='formBasicInput-NumContrat' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Numéro du contrat'>
             <Form.Control
             placeholder='N° du contrat'
@@ -62,7 +61,7 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-EcheanceRestante' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-EcheanceRestante' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Echéance restantes'>
             <Form.Control
             placeholder='Echéance restantes (Mois)'
@@ -76,7 +75,7 @@ const Leasing = ({
           </Form.Group>
         </Row>       
         <Row>
-          <Form.Group controlId='formBasicInput-Duree' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-Duree' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Durée'>
             <Form.Select
             as="select"
@@ -93,7 +92,7 @@ const Leasing = ({
           </Form.Select>
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-PayeAcejour' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-PayeAcejour' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Payé à ce jour'>
             <Form.Control
             placeholder=' '
@@ -105,9 +104,8 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-        </Row>       
-        <Row>
-          <Form.Group controlId='formBasicInput-Apport' className='mt-2 col-md-6'>
+      
+          <Form.Group controlId='formBasicInput-Apport' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Apport'>
             <Form.Control
             placeholder=' '
@@ -119,7 +117,7 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-DernierPaiment' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-DernierPaiment' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Dernier paiement'>
             <Form.Control
             placeholder=' '
@@ -133,7 +131,7 @@ const Leasing = ({
           </Form.Group>
         </Row> 
         <Row className='w-full'>
-          <Form.Group controlId='formBasicInput-DatePremiereEcheance' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-DatePremiereEcheance' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Date 1ere échéance'>
               <Form.Control
               placeholder=' '
@@ -146,7 +144,7 @@ const Leasing = ({
             </FloatingLabel>
             </Form.Group>
           
-          <Form.Group controlId='formBasicInput-ProchaineEcheance' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-ProchaineEcheance' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Prochaine échéance'>
               <Form.Control
               placeholder=' '
@@ -159,9 +157,8 @@ const Leasing = ({
             </FloatingLabel>
             </Form.Group>
           
-        </Row>
-        <Row className='w-full'>
-          <Form.Group controlId='formBasicInput-TotalLeasing' className='mt-2 col-md-6'>
+       
+          <Form.Group controlId='formBasicInput-TotalLeasing' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Total leasing H.T'>
               <Form.Control
               placeholder=' '

@@ -9,18 +9,7 @@ import { VehicleFormProps,
   StepsProps, VehicleFormState, VehicleValidateFormsStep4, 
   } from '../../utilities/interfaces';
 
-interface Step2Props {
-  nextStep: () => void;
-  userCallback: (info: any) => void;
-  user: any;
-  currentStep: number;
-  totalSteps: number;
-  previousStep: () => void;
-  lastStep: () => void;
-}
-
-const Step4: React.FC<Step2Props> = (props) => {
-  const [info2, setInfo2] = useState<{ [key: string]: string }>({});
+const Step4: React.FC<StepsProps> = (props) => {
   const [error, setError] = useState<string>("");
   const [formState, setFormState] = useState<VehicleFormState>(
     VehicleValidateFormsStep4
@@ -56,7 +45,7 @@ const Step4: React.FC<Step2Props> = (props) => {
         <Row>
           <Form.Group
             controlId="formBasicInput-AgenceAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Agence assurancen">
               <Form.Control
@@ -71,7 +60,7 @@ const Step4: React.FC<Step2Props> = (props) => {
               />
             </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId="formBasicInput-CoutAss" className="mt-2 col-md-6">
+          <Form.Group controlId="formBasicInput-CoutAss" className="mt-2 col-md-6 col-xl-3">
             <FloatingLabel
               controlId="floatingSelect"
               label="Coût assurance"
@@ -88,11 +77,10 @@ const Step4: React.FC<Step2Props> = (props) => {
               />
             </FloatingLabel>
           </Form.Group>
-        </Row>
-        <Row>
+      
           <Form.Group
             controlId="formBasicInput-TypeAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Type assurance">
               <Form.Control
@@ -109,7 +97,7 @@ const Step4: React.FC<Step2Props> = (props) => {
           </Form.Group>
           <Form.Group
             controlId="formBasicInput-DelaiAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Délai (Mois)">
               <Form.Control
@@ -128,7 +116,7 @@ const Step4: React.FC<Step2Props> = (props) => {
         <Row>
           <Form.Group
             controlId="formBasicInput-DateDebutAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Date début">
               <Form.Control
@@ -145,7 +133,7 @@ const Step4: React.FC<Step2Props> = (props) => {
           </Form.Group>
           <Form.Group
             controlId="formBasicInput-ReferenceAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Référence">
               <Form.Control
@@ -160,11 +148,10 @@ const Step4: React.FC<Step2Props> = (props) => {
               />
             </FloatingLabel>
           </Form.Group>
-        </Row>
-        <Row>
+       
           <Form.Group
             controlId="formBasicInput-DateExpAssurance"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Date expiration">
               <Form.Control

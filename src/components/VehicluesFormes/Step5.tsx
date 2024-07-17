@@ -1,20 +1,10 @@
 import React, { useState } from 'react';
 import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col, FloatingLabel } from 'react-bootstrap';
 import ActionButtons from './ActionButtons'; // Ajustez le chemin selon la structure de votre projet
-import { VehicleFormState, VehicleValidateFormsStep5 } from '../../utilities/interfaces';
+import { StepsProps, VehicleFormState, VehicleValidateFormsStep5 } from '../../utilities/interfaces';
 
-interface Step2Props {
-  nextStep: () => void;
-  userCallback: (info: any) => void;
-  user: any;
-  currentStep: number;
-  totalSteps: number;
-  previousStep: () => void;
-  lastStep: () => void;
-}
+const Step5: React.FC<StepsProps> = (props) => {
 
-const Step5: React.FC<Step2Props> = (props) => {
-  const [info2, setInfo2] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState<string>("");
   const [formState, setFormState] = useState<VehicleFormState>(
     VehicleValidateFormsStep5
@@ -50,7 +40,7 @@ const Step5: React.FC<Step2Props> = (props) => {
         <Row>
           <Form.Group
             controlId="formBasicInput-EtabControle"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Etablissement de contrôle">
               <Form.Control
@@ -65,7 +55,7 @@ const Step5: React.FC<Step2Props> = (props) => {
               />
             </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId="formBasicInput-CoutControle" className="mt-2 col-md-6">
+          <Form.Group controlId="formBasicInput-CoutControle" className="mt-2 col-md-6 col-xl-3">
             <FloatingLabel
               controlId="floatingSelect"
               label="Coût contrôle"
@@ -82,11 +72,10 @@ const Step5: React.FC<Step2Props> = (props) => {
               />
             </FloatingLabel>
           </Form.Group>
-        </Row>
-        <Row>
+        
           <Form.Group
             controlId="formBasicInput-ReferenceControle"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Référence">
               <Form.Control
@@ -103,7 +92,7 @@ const Step5: React.FC<Step2Props> = (props) => {
           </Form.Group>
           <Form.Group
             controlId="formBasicInput-DateControle"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Date du contrôle">
               <Form.Control
@@ -122,7 +111,7 @@ const Step5: React.FC<Step2Props> = (props) => {
         <Row>
           <Form.Group
             controlId="formBasicInput-DateFinControle"
-            className="mt-2 col-md-6"
+            className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel controlId="floatingSelect" label="Début Fin">
               <Form.Control

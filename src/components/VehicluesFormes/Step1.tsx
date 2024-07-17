@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Container, Card, Col, FloatingLabel } from 'react-bootstrap';
-
+import React, { useState, useEffect } from "react";
+import {
+  Form,
+  Button,
+  Row,
+  Container,
+  Card,
+  Col,
+  FloatingLabel,
+} from "react-bootstrap";
 
 /**
  * Imports the `InvalidInputFloating` and `SelectorFloating` components from the `./InvalidInput` module.
  */
 import { InvalidInputFloating, SelectorFloating } from "./InvalidInput";
-
 
 /**
  * Imports various option types used for selecting vehicle-related data.
@@ -20,8 +26,7 @@ import {
   TypeCarburantOption,
   TypeOption,
   AffectationVehicleOption,
-} from "../../utilities/selectOptions"; 
-
+} from "../../utilities/selectOptions";
 
 /**
  * Imports various TypeScript interface types used in the VehicluesFormes/Step1.tsx component.
@@ -32,15 +37,12 @@ import {
   VehicleFormState,
   VehicleSelectOption,
   VehicleValidateFormsStep1,
-} from "../../utilities/interfaces"; 
+} from "../../utilities/interfaces";
 
-import { Bounce, toast } from 'react-toastify';
-import { useTranslate } from '../LanguageProvider';
+import { Bounce, toast } from "react-toastify";
+import { useTranslate } from "../LanguageProvider";
 
-
-
-const backendUrl = 'http://localhost:5000/api/geop';
-
+const backendUrl = "http://localhost:5000/api/geop";
 
 /**
  * Renders the first step of the vehicle form, which includes general information about the vehicle.
@@ -52,6 +54,12 @@ const backendUrl = 'http://localhost:5000/api/geop';
  * @param nextStep - A callback function to trigger the next step of the form.
  * @param userCallback - A callback function to pass the form state to the parent component.
  * @returns The rendered Step1 component.
+ */
+/**
+ * Renders the first step of the vehicle form, which includes fields for general vehicle information such as registration, acquisition, category, state, type, fuel type, brand, model, parc, driver, and other details.
+ *
+ * @param {VehicleFormProps} props - The props passed to the component, including `nextStep` and `userCallback` functions.
+ * @returns {React.ReactElement} The rendered Step1 component.
  */
 const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
   const [error, setError] = useState<string>("");
@@ -155,12 +163,12 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
      */
     if (!formState.validations.Immatriculation) {
       setError("Valide l'Immatriculation");
-    // } else if (!formState.validations.Acquisition) {
-    //   setError("Valide l'Acquisition ");
-    // } else if (!formState.validations.Categorie) {
-    //   setError("Valide la Catégorie");
-    // } else if (!formState.validations.Etat) {
-    //   setError("Valide l'Etat ");
+      // } else if (!formState.validations.Acquisition) {
+      //   setError("Valide l'Acquisition ");
+      // } else if (!formState.validations.Categorie) {
+      //   setError("Valide la Catégorie");
+      // } else if (!formState.validations.Etat) {
+      //   setError("Valide l'Etat ");
     } else {
       /**
        * Clears any existing error, moves to the next step in the form flow, and calls the provided user callback with the current form state values.
@@ -173,16 +181,13 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
 
   return (
     <div className="w-100">
-
       <span style={{ color: "red" }}>{error}</span> {/* Return Erreur */}
-
       <h2 className="text-3xl font-bold underline">Informations Générales</h2>
-
       <Form onSubmit={(e) => e.preventDefault()}>
-        <Row className="w-full">
+        <Row className="">
           {/* Immatriculation */}
           <InvalidInputFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Immatriculation :"
             name="Immatriculation"
             placeholder=" "
@@ -192,10 +197,9 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             errorMessage="Ce champ est obligatoire."
             showValid={true}
           />
-
           {/* Acquisition  -acqui- */}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Acquisition"
             name="Acquisition"
             value={formState.values.Acquisition}
@@ -205,12 +209,10 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             options={AcquisitionOption}
             showValid={true}
           />
-        </Row>
 
-        <Row className="w-full">
           {/* Catégorie */}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Catégorie"
             name="Categorie"
             value={formState.values.Categorie}
@@ -220,10 +222,9 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             options={CategorieOption}
             showValid={true}
           />
-
           {/* Etat */}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Etat"
             name="Etat"
             value={formState.values.Etat}
@@ -235,10 +236,10 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           />
         </Row>
 
-        <Row className="w-full">
+        <Row className="">
           {/* Type */}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Type"
             name="Type"
             value={formState.values.Type}
@@ -251,7 +252,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
 
           {/* Type carburant  -typeCarb-*/}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Type carburant"
             name="TypeCarburant"
             value={formState.values.TypeCarburant}
@@ -261,12 +262,10 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             options={TypeCarburantOption}
             showValid={true}
           />
-        </Row>
 
-        <Row className="w-full">
           {/* Marque */}
           <SelectorFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Marque"
             name="Marque"
             value={formState.values.Marque}
@@ -279,7 +278,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
 
           {/* Modèle  --*/}
           <InvalidInputFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Modèle :"
             name="Modele"
             placeholder=" "
@@ -295,14 +294,16 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           {/* NameParc -nameParc- */}
           <Form.Group
             controlId="formBasicSelect-NameParc"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel controlId="floatingSelect" label="Parc">
               <Form.Select
                 as="select"
                 name="NameParc"
                 value={formState.values.NameParc}
                 onChange={(e) => handleChange(e)}
-                className={formState.validations.NameParc ? "is-valid" : ""}>
+                className={formState.validations.NameParc ? "is-valid" : ""}
+              >
                 <option value="">Sélectionnez une option</option>
                 {selectParc.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -316,14 +317,16 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           {/* Driver -conducteur- */}
           <Form.Group
             controlId="formBasicSelect-driver"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel controlId="floatingSelect" label="Conducteur">
               <Form.Select
                 as="select"
                 name="Driver"
                 value={formState.values.Driver}
                 onChange={(e) => handleChange(e)}
-                className={formState.validations.Driver ? "is-valid" : ""}>
+                className={formState.validations.Driver ? "is-valid" : ""}
+              >
                 <option value="">Sélectionnez une option</option>
                 {selectDriver.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -333,16 +336,16 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
               </Form.Select>
             </FloatingLabel>
           </Form.Group>
-        </Row>
 
-        <Row>
           {/* AffectationVehicl -service- */}
           <Form.Group
             controlId="formBasicSelect-AffectationVehicl"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel
               controlId="floatingSelect"
-              label="Affectation Vehicule">
+              label="Affectation Vehicule"
+            >
               <Form.Select
                 as="select"
                 name="AffectationVehicl"
@@ -350,7 +353,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
                 onChange={(e) => handleChange(e)}
                 className={
                   formState.validations.AffectationVehicl ? "is-valid" : ""
-                }>
+                }
+              >
                 <option value="">Sélectionnez une option</option>
                 {AffectationVehicleOption.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -364,7 +368,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           {/*  Moteur */}
           <Form.Group
             controlId="formBasicInput-Gamme"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel controlId="floatingSelect" label="Gamme">
               <Form.Control
                 placeholder=" "
@@ -372,7 +377,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
                 name="Moteur"
                 value={formState.values.Moteur}
                 onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Moteur ? "is-valid" : ""}/>
+                className={formState.validations.Moteur ? "is-valid" : ""}
+              />
             </FloatingLabel>
           </Form.Group>
         </Row>
@@ -381,42 +387,48 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           {/* Capacite_res */}
           <Form.Group
             controlId="formBasicInput-Capacite_res"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel
               controlId="floatingSelect"
-              label="Capacité réservoir (L)">
+              label="Capacité réservoir (L)"
+            >
               <Form.Control
                 placeholder=" "
                 type="text"
                 name="Capacite_res"
                 value={formState.values.Capacite_res}
                 onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Capacite_res ? "is-valid" : ""}/>
+                className={formState.validations.Capacite_res ? "is-valid" : ""}
+              />
             </FloatingLabel>
           </Form.Group>
 
-          {/* Consom_moy */}
+          {/* Consom_moyenne */}
           <Form.Group
-            controlId="formBasicInput-consom_moy"
-            className="mt-2 col-md-6">
+            controlId="formBasicInput-Consom_moyenne"
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel
               controlId="floatingSelect"
-              label="Consommation moyenne (l/100km)s">
+              label="Consommation moyenne (l/100km)s"
+            >
               <Form.Control
                 placeholder=" "
                 type="text"
-                name="Consom_moy"
-                value={formState.values.Consom_moy}
+                name="Consom_moyenne"
+                value={formState.values.Consom_moyenne}
                 onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Consom_moy ? "is-valid" : ""}/>
+                className={
+                  formState.validations.Consom_moyenne ? "is-valid" : ""
+                }
+              />
             </FloatingLabel>
           </Form.Group>
-        </Row>
 
-        <Row>
           {/* Codification */}
           <InvalidInputFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Codification véhicule :"
             name="Codification"
             placeholder=" "
@@ -430,7 +442,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
           {/* Kilom */}
           <Form.Group
             controlId="formBasicInput-Kilom"
-            className="mt-2 col-md-6">
+            className="mt-2 col-md-6 col-xl-3"
+          >
             <FloatingLabel controlId="floatingSelect" label="Kilométrage (Km)">
               <Form.Control
                 placeholder=" "
@@ -438,7 +451,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
                 name="Kilom"
                 value={formState.values.Kilom}
                 onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Kilom ? "is-valid" : ""}/>
+                className={formState.validations.Kilom ? "is-valid" : ""}
+              />
             </FloatingLabel>
           </Form.Group>
         </Row>
@@ -446,7 +460,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
         <Row>
           {/*  Payback_Period -couleur- */}
           <InvalidInputFloating
-            className="col-md-6"
+            className="col-md-6 col-xl-3"
             label="Durée d'amortissement (jours) :"
             name="Payback_Period"
             placeholder=" "

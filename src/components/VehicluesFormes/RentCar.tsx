@@ -24,7 +24,7 @@ const RentCar = ({
     <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
-          <Form.Group controlId='formBasicInput-NumContratL' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-NumContratL' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Numéro du contrat de location'>
             <Form.Control
             placeholder='N° Contrat (location)'
@@ -36,7 +36,7 @@ const RentCar = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-TotalLocation' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-TotalLocation' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Total location'>
             <Form.Control
             placeholder=' '
@@ -48,9 +48,8 @@ const RentCar = ({
             />
           </FloatingLabel>
           </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group controlId='formBasicInput-FournisseurL' className='mt-2 col-md-6'>
+       
+          <Form.Group controlId='formBasicInput-FournisseurL' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Fournisseur location'>
             <Form.Control
             placeholder=' '
@@ -62,7 +61,7 @@ const RentCar = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-DernierVersement' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-DernierVersement' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Dernier versement'>
             <Form.Control
             placeholder=' '
@@ -77,7 +76,7 @@ const RentCar = ({
         </Row>       
 
         <Row className='w-full'>
-          <Form.Group controlId='formBasicInput-CoutLocation' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-CoutLocation' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Coût location'>
               <Form.Control
               placeholder='Coût location - mensuel'
@@ -90,7 +89,7 @@ const RentCar = ({
             </FloatingLabel>
             </Form.Group>
           
-          <Form.Group controlId='formBasicInput-DateDebutLocation' className='mt-2 col-md-6'>
+          <Form.Group controlId='formBasicInput-DateDebutLocation' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Date début location'>
               <Form.Control
               placeholder=' '
@@ -103,9 +102,8 @@ const RentCar = ({
             </FloatingLabel>
             </Form.Group>
           
-        </Row>
-        <Row className='w-full'>
-          <Form.Group controlId='formBasicInput-NbreMoisLocation' className='mt-2 col-md-6'>
+      
+          <Form.Group controlId='formBasicInput-NbreMoisLocation' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Nombre de mois'>
               <Form.Control
               placeholder=' '
