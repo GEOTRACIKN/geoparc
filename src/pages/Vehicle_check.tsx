@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Container, Row, Col, Form, Button, ProgressBar, Card, }
     from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,52 @@ type FormData = {
     matriculerem: string;
     operating_hours: string;
     papierStatus: string;
+    truck_step_right: string;
+    truck_step_left: string;
+    battery: string;
+    Pneutracteur: string;
+    Triangles: string;
+    extincteur_date: string;
+    PneuRemorque: string;
+    Crique: string;
+    Trousse: string;
+    Mannon: string;
+    étiquette: string;
+    Réservoir: string;
+    pharmacie: string;
+    Pipe: string;
+    Sangle: string;
+    Piedparc: string;
+    Butoirremorque: string;
+    Twis: string;
+    Bâche: string;
+    nbr_lattes: number | string;
+    Moteurcellule: string;
+    niv_gasoile: number | string;
+    Rétroviseur: string;
+    Parebrise: string;
+    Feuxclignotants: string; 
+    Feuxstop: string;
+    Cataphote: string;
+    PneuGaucheavant: number | string;
+    PneuDroiteavant: number | string;
+    PneuGauchearrièreInt: number | string;
+    PneuDroitearrièreInt: number | string;
+    PneuGauchearrièreExt: number | string;
+    PneuDroitearrièreExt: number | string;
+    Loquet: string;
+    feuxS_clign_maraicher: string;
+    secours_tracteur: string;
+    secours_tractee: string;
+    g_av_tr_pression: number | string;
+    d_av_tr_pression: number | string;
+    g_ar_tr_int_pression: number | string;
+    d_ar_tr_int_pression: number | string;
+    g_ar_tr_ext_pression: number | string;
+    d_ar_tr_ext_pression: number | string;
+    proprete_int: string;
+    proprete_ext: string;
+    maintenance: string;
 };
 
 // Définition des règles de validation par champ
@@ -43,6 +89,52 @@ export function Vehiclecheck() {
         matriculerem: "",
         operating_hours: "",
         papierStatus: "",
+        truck_step_right: "",
+        truck_step_left: "",
+        battery: "",
+        Pneutracteur: '',
+        Triangles: '',
+        extincteur_date: '',
+        PneuRemorque: '',
+        Crique: '',
+        Trousse: '',
+        Mannon: '',
+        étiquette: '',
+        Réservoir: '',
+        pharmacie: '',
+        Pipe: '',
+        Sangle: '',
+        Piedparc: '',
+        Butoirremorque: '',
+        Twis: '',
+        Bâche: '',
+        nbr_lattes: '',
+        Moteurcellule: '',
+        niv_gasoile:  '',
+        Rétroviseur: '',
+        Parebrise: '',
+        Feuxclignotants: '' ,
+        Feuxstop:'' ,
+        Cataphote: '',
+        PneuGaucheavant:  '', 
+        PneuDroiteavant:''  ,
+        PneuGauchearrièreInt: '' ,
+        PneuDroitearrièreInt: '' ,
+        PneuGauchearrièreExt: '' ,
+        PneuDroitearrièreExt: '' ,
+        Loquet: '',
+        feuxS_clign_maraicher:'' ,
+        secours_tracteur:'' ,
+        secours_tractee:'' ,
+        g_av_tr_pression: '' ,
+        d_av_tr_pression: '' ,
+        g_ar_tr_int_pression: '' ,
+        d_ar_tr_int_pression: '' ,
+        g_ar_tr_ext_pression: '' ,
+        d_ar_tr_ext_pression: '' ,
+        proprete_int: '',
+        proprete_ext: '',
+        maintenance: '',
     });
     const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
@@ -78,17 +170,17 @@ export function Vehiclecheck() {
         return isValid;
     };
 
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+    const handleChange = (event :any) => {
+        const { name, value } = event.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
     };
-
-
+    
     const nextStep = () => {
-        setStep(step + 1);
-        if (validateForm()) { //vérifie les permiers champ si ils ont remplie ou pas 
-
+        if (validateForm()) {
+            setStep(step + 1);
         } else {
             toast.error("Veuillez remplir tous les champs obligatoires. ", {
                 position: "bottom-right",
@@ -106,7 +198,6 @@ export function Vehiclecheck() {
     const handleNext = () => {
         // Rediriger vers le haut de la fenêtre
         window.scrollTo(0, 0);
-
         // Appeler la fonction nextStep pour avancer au prochain étape
         nextStep();
     };
@@ -118,6 +209,56 @@ export function Vehiclecheck() {
     const goToVehicleChecks = () => {
         navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
     };
+
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+    const handleSubmit = async () =>  {
+        console.log('Données soumises :', formData);
+
+        if (validateForm()) {
+            try {
+                const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                    
+                });
+
+                if (response.ok) {
+                    toast.success("Vérification ajoutée avec succès.", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+                    });
+                    navigate("/vehicles_checks");
+                } else {
+                    throw new Error("Erreur lors de l'ajout de la vérification.");
+                }
+            } catch (error) {
+             console.log('erreure' ,error);
+            }
+        } else {
+            toast.error("Veuillez remplir tous les champs obligatoires.", {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
+        }
+    }
 
 
     return (
@@ -325,15 +466,15 @@ export function Vehiclecheck() {
                                     <Form.Group as={Row} controlId="marchePiedDroite" className="mb-3">
                                         <Form.Label column sm={10}>Droite</Form.Label>
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Droite" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Droite" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" name="truck_step_right" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" name="truck_step_right" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} controlId="marchePiedGauche" className="mb-3">
                                         <Form.Label column sm={10}>Gauche</Form.Label>
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Gauche" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Gauche" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" name="truck_step_left" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" name="truck_step_left" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -345,8 +486,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/2720003_3quart_900px_1.jpg'} alt="Batterie" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="batterie" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Batterie" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Batterie" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" name="battery" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" name="battery" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -663,10 +804,10 @@ export function Vehiclecheck() {
                                 <Card.Header>Pare-brise + essuie-glaces</Card.Header>
                                 <Card.Body>
                                     <img className="check_item_img" src={'../asset/images/checklist/retroviseur.jpg'} alt="Pare-brise + essuie-glaces" style={{ width: '100%', height: 'auto' }} />
-                                    <Form.Group as={Row} controlId="Pare-brise" className="mb-3">
+                                    <Form.Group as={Row} controlId="Parebrise" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Pare-brise" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Pare-brise" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" name="Parebrise" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" name="Parebrise" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -1029,7 +1170,7 @@ export function Vehiclecheck() {
                         >
                             Précédent
                         </Button>
-                        <Button variant="primary" onClick={nextStep}>
+                        <Button variant="primary" onClick={handleSubmit}>
                             Suivant
                         </Button>
                     </div>
