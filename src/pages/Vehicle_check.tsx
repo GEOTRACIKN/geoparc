@@ -1,3 +1,4 @@
+import { error } from "console";
 import React, { useCallback, useState } from "react";
 import { Container, Row, Col, Form, Button, ProgressBar, Card, }
     from "react-bootstrap";
@@ -18,10 +19,20 @@ type FormData = {
     truck_step_right: string;
     truck_step_left: string;
     battery: string;
-    Pneutracteur: string;
+    g_av_tr: string;
+    d_av_tr: string;
+    g_ar_tr_int: string;
+    d_ar_tr_int: string;
+    g_ar_tr_ext: string;
+    d_ar_tr_ext: string;
     Triangles: string;
     extincteur_date: string;
-    PneuRemorque: string;
+    g_issue1_rm: string;
+    d_issue1_rm: string;
+    g_issue2_rm: string;
+    d_issue2_rm: string;
+    g_issue3_rm: string;
+    d_issue3_rm: string;
     Crique: string;
     Trousse: string;
     Mannon: string;
@@ -34,30 +45,30 @@ type FormData = {
     Butoirremorque: string;
     Twis: string;
     Bâche: string;
-    nbr_lattes: number | string;
+    nbr_lattes: number;
     Moteurcellule: string;
-    niv_gasoile: number | string;
+    niv_gasoile: number;
     Rétroviseur: string;
     Parebrise: string;
-    Feuxclignotants: string; 
+    Feuxclignotants: string;
     Feuxstop: string;
     Cataphote: string;
-    PneuGaucheavant: number | string;
-    PneuDroiteavant: number | string;
-    PneuGauchearrièreInt: number | string;
-    PneuDroitearrièreInt: number | string;
-    PneuGauchearrièreExt: number | string;
-    PneuDroitearrièreExt: number | string;
+    PneuGaucheavant: number;
+    PneuDroiteavant: number;
+    PneuGauchearrièreInt: number;
+    PneuDroitearrièreInt: number;
+    PneuGauchearrièreExt: number;
+    PneuDroitearrièreExt: number;
     Loquet: string;
     feuxS_clign_maraicher: string;
     secours_tracteur: string;
     secours_tractee: string;
-    g_av_tr_pression: number | string;
-    d_av_tr_pression: number | string;
-    g_ar_tr_int_pression: number | string;
-    d_ar_tr_int_pression: number | string;
-    g_ar_tr_ext_pression: number | string;
-    d_ar_tr_ext_pression: number | string;
+    g_av_tr_pression: number;
+    d_av_tr_pression: number;
+    g_ar_tr_int_pression: number;
+    d_ar_tr_int_pression: number;
+    g_ar_tr_ext_pression: number;
+    d_ar_tr_ext_pression: number;
     proprete_int: string;
     proprete_ext: string;
     maintenance: string;
@@ -77,7 +88,7 @@ const initialValidationState = {
 };
 
 export function Vehiclecheck() {
-
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
         checker: "",
@@ -92,10 +103,20 @@ export function Vehiclecheck() {
         truck_step_right: "",
         truck_step_left: "",
         battery: "",
-        Pneutracteur: '',
+        g_av_tr: "",
+        d_av_tr: "",
+        g_ar_tr_int: "",
+        d_ar_tr_int: "",
+        g_ar_tr_ext: "",
+        d_ar_tr_ext: "",
         Triangles: '',
         extincteur_date: '',
-        PneuRemorque: '',
+        g_issue1_rm: "",
+        d_issue1_rm: "",
+        g_issue2_rm: "",
+        d_issue2_rm: "",
+        g_issue3_rm: "",
+        d_issue3_rm: "",
         Crique: '',
         Trousse: '',
         Mannon: '',
@@ -108,30 +129,30 @@ export function Vehiclecheck() {
         Butoirremorque: '',
         Twis: '',
         Bâche: '',
-        nbr_lattes: '',
+        nbr_lattes: 0,
         Moteurcellule: '',
-        niv_gasoile:  '',
+        niv_gasoile: 0,
         Rétroviseur: '',
         Parebrise: '',
-        Feuxclignotants: '' ,
-        Feuxstop:'' ,
+        Feuxclignotants: '',
+        Feuxstop: '',
         Cataphote: '',
-        PneuGaucheavant:  '', 
-        PneuDroiteavant:''  ,
-        PneuGauchearrièreInt: '' ,
-        PneuDroitearrièreInt: '' ,
-        PneuGauchearrièreExt: '' ,
-        PneuDroitearrièreExt: '' ,
+        PneuGaucheavant: 0,
+        PneuDroiteavant: 0,
+        PneuGauchearrièreInt: 0,
+        PneuDroitearrièreInt: 0,
+        PneuGauchearrièreExt: 0,
+        PneuDroitearrièreExt: 0,
         Loquet: '',
-        feuxS_clign_maraicher:'' ,
-        secours_tracteur:'' ,
-        secours_tractee:'' ,
-        g_av_tr_pression: '' ,
-        d_av_tr_pression: '' ,
-        g_ar_tr_int_pression: '' ,
-        d_ar_tr_int_pression: '' ,
-        g_ar_tr_ext_pression: '' ,
-        d_ar_tr_ext_pression: '' ,
+        feuxS_clign_maraicher: '',
+        secours_tracteur: '',
+        secours_tractee: '',
+        g_av_tr_pression: 0,
+        d_av_tr_pression: 0,
+        g_ar_tr_int_pression: 0,
+        d_ar_tr_int_pression: 0,
+        g_ar_tr_ext_pression: 0,
+        d_ar_tr_ext_pression: 0,
         proprete_int: '',
         proprete_ext: '',
         maintenance: '',
@@ -170,14 +191,14 @@ export function Vehiclecheck() {
         return isValid;
     };
 
-    const handleChange = (event :any) => {
+    const handleChange = (event: any) => {
         const { name, value } = event.target;
         setFormData({
             ...formData,
             [name]: value,
         });
     };
-    
+
     const nextStep = () => {
         if (validateForm()) {
             setStep(step + 1);
@@ -210,20 +231,31 @@ export function Vehiclecheck() {
         navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
     };
 
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const convertValue = (value: any) => {
+        if (value === "Conforme" || value === "Oui" || value === "Fonctionnel") {
+            return 1;
+        } else if (value === "Non Conforme" || value === "Non" || value === "Alerte") {
+            return 2;
+        } else {
+            return value; // pour les valeurs numériques ou autres
+        }
+    };
 
-    const handleSubmit = async () =>  {
-        console.log('Données soumises :', formData);
-
+    const handleSubmit = async () => {
         if (validateForm()) {
             try {
+                // Convertir les valeurs avant l'envoi
+                const convertedFormData: { [key: string]: any } = { ...formData };
+                for (let key in convertedFormData) {
+                    convertedFormData[key] = convertValue(convertedFormData[key]);
+                }
+
                 const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(formData),
-                    
+                    body: JSON.stringify(convertedFormData),
                 });
 
                 if (response.ok) {
@@ -243,7 +275,18 @@ export function Vehiclecheck() {
                     throw new Error("Erreur lors de l'ajout de la vérification.");
                 }
             } catch (error) {
-             console.log('erreure' ,error);
+                console.log('erreure', error);
+                toast.error("Erreur lors de l'ajout de la vérification.", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             }
         } else {
             toast.error("Veuillez remplir tous les champs obligatoires.", {
@@ -258,8 +301,7 @@ export function Vehiclecheck() {
                 transition: Bounce,
             });
         }
-    }
-
+    };
 
     return (
         <Container>
@@ -466,15 +508,15 @@ export function Vehiclecheck() {
                                     <Form.Group as={Row} controlId="marchePiedDroite" className="mb-3">
                                         <Form.Label column sm={10}>Droite</Form.Label>
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="truck_step_right" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="truck_step_right" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.truck_step_right === "Conforme"} onChange={handleChange} name="truck_step_right" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.truck_step_right === "Non Conforme"} onChange={handleChange} name="truck_step_right" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                     <Form.Group as={Row} controlId="marchePiedGauche" className="mb-3">
                                         <Form.Label column sm={10}>Gauche</Form.Label>
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="truck_step_left" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="truck_step_left" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.truck_step_left === "Conforme"} onChange={handleChange} name="truck_step_left" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.truck_step_left === "Non Conforme"} onChange={handleChange} name="truck_step_left" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -486,8 +528,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/2720003_3quart_900px_1.jpg'} alt="Batterie" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="batterie" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="battery" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="battery" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.battery === "Conforme"} onChange={handleChange} name="battery" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.battery === "Non Conforme"} onChange={handleChange} name="battery" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -504,14 +546,33 @@ export function Vehiclecheck() {
                                             </Form.Label>
                                             <Col sm={10}>
                                                 <div>
-                                                    <Form.Check type="checkbox" label="Conforme" name="Pneutracteur" value="Conforme" inline className="mr-4" />
-                                                    <Form.Check type="checkbox" label="Non Conforme" name="Pneutracteur" value="Non Conforme" inline className="ml-4" />
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        label="Conforme"
+                                                        name={position}
+                                                        value="Conforme"
+                                                        checked={formData[position as keyof FormData] === 'Conforme'}
+                                                        onChange={handleChange}
+                                                        inline
+                                                        className="mr-4"
+                                                    />
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        label="Non Conforme"
+                                                        name={position}
+                                                        value="Non Conforme"
+                                                        checked={formData[position as keyof FormData] === 'Non Conforme'}
+                                                        onChange={handleChange}
+                                                        inline
+                                                        className="ml-4"
+                                                    />
                                                 </div>
                                             </Col>
                                         </Form.Group>
                                     ))}
                                 </Card.Body>
                             </Card>
+
                         </Col>
 
                         <Col sm={6}>
@@ -521,8 +582,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/triangle.jpg'} alt="Triangles/cales" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Triangles" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Triangles" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Triangles" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Triangles === "Conforme"} onChange={handleChange} name="Triangles" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Triangles === "Non Conforme"} onChange={handleChange} name="Triangles" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -534,7 +595,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/extincteur.png'} alt="Extincteur (date d'expiration)" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="extincteurDate" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Control type="date" name="extincteur_date" />
+                                            <Form.Control type="date" name="extincteur_date" value={formData.extincteur_date || ""} onChange={handleChange}
+                                            />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -551,8 +613,26 @@ export function Vehiclecheck() {
                                             </Form.Label>
                                             <Col sm={10}>
                                                 <div>
-                                                    <Form.Check type="checkbox" label="Conforme" name="PneuRemorque" value="Conforme" inline className="mr-4" />
-                                                    <Form.Check type="checkbox" label="Non Conforme" name="PneuRemorque" value="Non Conforme" inline className="ml-4" />
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        label="Conforme"
+                                                        name={position}
+                                                        value="Conforme"
+                                                        checked={formData[position as keyof FormData] === 'Conforme'}
+                                                        onChange={handleChange}
+                                                        inline
+                                                        className="mr-4"
+                                                    />
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        label="Non Conforme"
+                                                        name={position}
+                                                        value="Non Conforme"
+                                                        checked={formData[position as keyof FormData] === 'Non Conforme'}
+                                                        onChange={handleChange}
+                                                        inline
+                                                        className="ml-4"
+                                                    />
                                                 </div>
                                             </Col>
                                         </Form.Group>
@@ -583,8 +663,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/crique.jpg'} alt="Crique" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Crique" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Crique" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Crique" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Crique === "Conforme"} onChange={handleChange} name="Crique" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Crique === "Non Conforme"} onChange={handleChange} name="Crique" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -596,8 +676,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/trousse_outils.jpg'} alt="Trousse outils" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Trousse" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Trousse" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Trousse" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Trousse === "Conforme"} onChange={handleChange} name="Trousse" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Trousse === "Non Conforme"} onChange={handleChange} name="Trousse" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -609,8 +689,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/manon.jpg'} alt="Mannon de pression" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Mannon" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Mannon" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Mannon" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Mannon === "Conforme"} onChange={handleChange} name="Mannon" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Mannon === "Non Conforme"} onChange={handleChange} name="Mannon" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -622,8 +702,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/1MZL5_AS01.jpg'} alt="étiquette géolocalisation" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="étiquette" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="étiquette" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="étiquette" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.étiquette === "Conforme"} onChange={handleChange} name="étiquette" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.étiquette === "Non Conforme"} onChange={handleChange} name="étiquette" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -637,8 +717,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/reservoir.jpg'} alt="Réservoir (fissure, bouchon)" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Réservoir" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Réservoir" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Réservoir" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Réservoir === "Conforme"} onChange={handleChange} name="Réservoir" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Réservoir === "Non Conforme"} onChange={handleChange} name="Réservoir" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -650,8 +730,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/boite_pharmacie.jpg'} alt="Boite pharmacie" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="pharmacie" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="pharmacie" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="pharmacie" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.pharmacie === "Conforme"} onChange={handleChange} name="pharmacie" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.pharmacie === "Non Conforme"} onChange={handleChange} name="pharmacie" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -663,8 +743,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/pipe_admission.jpg'} alt="Pipe d'admission" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Pipe" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Pipe" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Pipe" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Pipe === "Conforme"} onChange={handleChange} name="Pipe" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Pipe === "Non Conforme"} onChange={handleChange} name="Pipe" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -676,8 +756,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/sangle.png'} alt="Sangle (03), câble scellé" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Sangle" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Sangle" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Sangle" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Sangle === "Conforme"} onChange={handleChange} name="Sangle" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Sangle === "Non Conforme"} onChange={handleChange} name="Sangle" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -706,8 +786,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/pied_parc.jpg'} alt="Pied parc" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Piedparc" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Piedparc" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Piedparc" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Piedparc === "Conforme"} onChange={handleChange} name="Piedparc" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Piedparc === "Non Conforme"} onChange={handleChange} name="Piedparc" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -719,8 +799,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/buttoir.png'} alt="Butoir remorque" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Butoirremorque" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Butoirremorque" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Butoirremorque" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Butoirremorque === "Conforme"} onChange={handleChange} name="Butoirremorque" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Butoirremorque === "Non Conforme"} onChange={handleChange} name="Butoirremorque" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -732,8 +812,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/twis_lock.jpg'} alt="Twis lock squelette" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Twis" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Twis" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Twis" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Twis === "Conforme"} onChange={handleChange} name="Twis" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Twis === "Non Conforme"} onChange={handleChange} name="Twis" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -745,8 +825,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/bache_remorque.jpg'} alt="Bâche remorque" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Bâche" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Bâche" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Bâche" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Bâche === "Conforme"} onChange={handleChange} name="Bâche" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Bâche === "Non Conforme"} onChange={handleChange} name="Bâche" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -761,7 +841,8 @@ export function Vehiclecheck() {
                                         <Col sm={10}>
                                             <div className="d-flex">
                                                 <div className="flex-grow-1"><span>Nombre de lattes :</span></div>
-                                                <div><input type="number" name="nbr_lattes" /></div>
+                                                <div><input type="number" name="nbr_lattes" value={formData.nbr_lattes} onChange={handleChange}
+                                                /></div>
                                             </div>
                                         </Col>
                                     </Form.Group>
@@ -774,13 +855,14 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/moteur_cellule_frigo.jpg'} alt="Moteur cellule frigo" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Moteurcellule" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Fonctionnel" name="Moteurcellule" value="Fonctionnel" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Alerte" name="Moteurcellule" value="Alerte" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Fonctionnel" checked={formData.Moteurcellule === "Fonctionnel"} onChange={handleChange} name="Moteurcellule" value="Fonctionnel" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Alerte" checked={formData.Moteurcellule === "Alerte"} onChange={handleChange} name="Moteurcellule" value="Alerte" inline className="ml-4" />
                                         </Col>
                                         <Col sm={10}>
                                             <div className="d-flex">
                                                 <div className="flex-grow-1"><span>Niveau gasoil :</span></div>
-                                                <div><input type="number" name="niv_gasoile" /></div>
+                                                <div><input type="number" name="niv_gasoile" value={formData.niv_gasoile} onChange={handleChange}
+                                                /></div>
                                             </div>
                                         </Col>
                                     </Form.Group>
@@ -793,8 +875,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/retroviseur.jpg'} alt="Rétroviseur vitres" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Rétroviseur" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Rétroviseur" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Rétroviseur" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Rétroviseur === "Conforme"} onChange={handleChange} name="Rétroviseur" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Rétroviseur === "Non Conforme"} onChange={handleChange} name="Rétroviseur" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -806,8 +888,8 @@ export function Vehiclecheck() {
                                     <img className="check_item_img" src={'../asset/images/checklist/retroviseur.jpg'} alt="Pare-brise + essuie-glaces" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Parebrise" className="mb-3">
                                         <Col sm={10}>
-                                            <Form.Check type="checkbox" label="Conforme" name="Parebrise" value="Conforme" inline className="mr-4" />
-                                            <Form.Check type="checkbox" label="Non Conforme" name="Parebrise" value="Non Conforme" inline className="ml-4" />
+                                            <Form.Check type="checkbox" label="Conforme" checked={formData.Parebrise === "Conforme"} onChange={handleChange} name="Parebrise" value="Conforme" inline className="mr-4" />
+                                            <Form.Check type="checkbox" label="Non Conforme" checked={formData.Parebrise === "Non Conforme"} onChange={handleChange} name="Parebrise" value="Non Conforme" inline className="ml-4" />
                                         </Col>
                                     </Form.Group>
                                 </Card.Body>
@@ -840,6 +922,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="Feuxclignotants"
                                             value="Conforme"
+                                            checked={formData.Feuxclignotants === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -848,6 +931,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="Feuxclignotants"
                                             value="Non Conforme"
+                                            checked={formData.Feuxclignotants === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -865,6 +949,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="Feuxstop"
                                             value="Conforme"
+                                            checked={formData.Feuxstop === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -873,6 +958,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="Feuxstop"
                                             value="Non Conforme"
+                                            checked={formData.Feuxstop === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -890,6 +976,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="Cataphote"
                                             value="Conforme"
+                                            checked={formData.Cataphote === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -898,6 +985,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="Cataphote"
                                             value="Non Conforme"
+                                            checked={formData.Cataphote === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -912,27 +1000,27 @@ export function Vehiclecheck() {
                                     <Form.Group controlId="PressionPneuRemorque" className="mb-3">
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche avant :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGaucheavant" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGaucheavant" value={formData.PneuGaucheavant} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite avant :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroiteavant" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroiteavant" value={formData.PneuDroiteavant} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche arrière (int) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt" value={formData.PneuGauchearrièreInt} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite arrière (int) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt" value={formData.PneuDroitearrièreInt} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche arrière (ext) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt" value={formData.PneuGauchearrièreExt} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite arrière (ext) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt" /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt" value={formData.PneuDroitearrièreExt} onChange={handleChange} /></div>
                                         </div>
                                     </Form.Group>
                                 </Card.Body>
@@ -950,6 +1038,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="Loquet"
                                             value="Conforme"
+                                            checked={formData.Loquet === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -958,6 +1047,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="Loquet"
                                             value="Non Conforme"
+                                            checked={formData.Loquet === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -975,6 +1065,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="feuxS_clign_maraicher"
                                             value="Conforme"
+                                            checked={formData.feuxS_clign_maraicher === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -983,6 +1074,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="feuxS_clign_maraicher"
                                             value="Non Conforme"
+                                            checked={formData.feuxS_clign_maraicher === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1001,6 +1093,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="secours_tracteur"
                                             value="Conforme"
+                                            checked={formData.secours_tracteur === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -1009,6 +1102,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="secours_tracteur"
                                             value="Non Conforme"
+                                            checked={formData.secours_tracteur === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1020,6 +1114,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="secours_tractee"
                                             value="Conforme"
+                                            checked={formData.secours_tractee === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -1028,6 +1123,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="secours_tractee"
                                             value="Non Conforme"
+                                            checked={formData.secours_tractee === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1042,27 +1138,27 @@ export function Vehiclecheck() {
                                     <Form.Group controlId="PressionPneuTracteur" className="mb-3">
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche 1ère issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="g_av_tr_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="g_av_tr_pression" value={formData.g_av_tr_pression} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite 1ère issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="d_av_tr_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="d_av_tr_pression" value={formData.d_av_tr_pression} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche 2ème issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_int_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_int_pression" value={formData.g_ar_tr_int_pression} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite 2ème issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_int_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_int_pression" value={formData.d_ar_tr_int_pression} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche 3ème issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_ext_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="g_ar_tr_ext_pression" value={formData.g_ar_tr_ext_pression} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite 3ème issue :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_ext_pression" /></div>
+                                            <div className="col-lg-6"><input type="number" name="d_ar_tr_ext_pression" value={formData.d_ar_tr_ext_pression} onChange={handleChange} /></div>
                                         </div>
                                     </Form.Group>
                                 </Card.Body>
@@ -1100,6 +1196,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="proprete_int"
                                             value="Conforme"
+                                            checked={formData.proprete_int === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -1108,6 +1205,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="proprete_int"
                                             value="Non Conforme"
+                                            checked={formData.proprete_int === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1119,6 +1217,7 @@ export function Vehiclecheck() {
                                             label="Conforme"
                                             name="proprete_ext"
                                             value="Conforme"
+                                            checked={formData.proprete_ext === "Conforme"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -1127,6 +1226,7 @@ export function Vehiclecheck() {
                                             label="Non Conforme"
                                             name="proprete_ext"
                                             value="Non Conforme"
+                                            checked={formData.proprete_ext === "Non Conforme"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1146,6 +1246,7 @@ export function Vehiclecheck() {
                                             label="Oui"
                                             name="maintenance"
                                             value="Oui"
+                                            checked={formData.maintenance === "oui"} onChange={handleChange}
                                             inline
                                             className="mr-4"
                                         />
@@ -1154,6 +1255,7 @@ export function Vehiclecheck() {
                                             label="Non"
                                             name="maintenance"
                                             value="Non"
+                                            checked={formData.maintenance === "Non"} onChange={handleChange}
                                             inline
                                             className="ml-4"
                                         />
@@ -1171,22 +1273,10 @@ export function Vehiclecheck() {
                             Précédent
                         </Button>
                         <Button variant="primary" onClick={handleSubmit}>
-                            Suivant
+                            Enregistré
                         </Button>
                     </div>
                 </Form>
-            )}
-            {step > 6 && (
-                <div>
-                    <h5>Vérification terminée</h5>
-                    <p>Merci d'avoir complété la vérification.</p>
-                    <Button variant="primary" className="mr-2" onClick={() => setStep(1)}>
-                        Recommencer
-                    </Button>
-                    <Button variant="danger" onClick={goToVehicleChecks}>
-                        Quitter
-                    </Button>
-                </div>
             )}
         </Container>
     );
