@@ -63,7 +63,7 @@ export interface StepsProps {
 export const VehicleValidateFormsStep1 = {
   values: {
     Immatriculation: "",  // immatriculation_vehicule
-    Acquisition : "", // propriete_vehicule
+    Acquisition : "", //! propriete_vehicule  {table vehicule_cout : Acquisition}
     Categorie: "", // category_vehicule
     Etat: "", // etat_vehicule
     Type: "", // vehicule_type
@@ -145,29 +145,27 @@ export const VehicleValidateFormsStep2 = {
 // ? Acquisition [Leasing - Location - Achat]
 export const VehicleValidateFormsStep3 = {
   values: {
-    Fournisseur: "",
-    Echeance: "",
-    NumContrat: "",
-    EcheanceRestante: "",
-    Duree: "",
-    PayeAcejour: "",
-    Apport: "",
-    DernierPaiment: "",
-    DatePremiereEcheance: "",
-    ProchaineEcheance: "",
-    TotalLeasing: "",
-    NumContratL: "",
+    Fournisseur: "", // ? fournisseur_vh
+    Echeance: "", // echeance_leasing
+    NumContrat: "", // num_contrat_aquis
+    EcheanceRestante: "", // echeance_restante_leasing
+    Duree: "", // duree_leasing
+    PayeAcejour: "", // payer_a_ce_jour_leasing
+    Apport: "", // premier_appor_leas
+    DernierPaiment: "",  // date_versement
+    DatePremiereEcheance: "",// date_prem_echeance_leas
+    ProchaineEcheance: "", // prochaine_echeance_leasing
+    TotalLeasing: "", // cout_tot_vh
+    NumContratL: "", // num_contrat_aquis
     TotalLocation: "",
     FournisseurL: "",
-    DernierVersement: "",
-    CoutLocation: "",
-    DateDebutLocation: "",
+    DernierVersement: "", // date_versement
+    CoutLocation: "", // cout_vente_veh
+    DateDebutLocation: "", // date_debut_locati
     NbreMoisLocation: "",
-    DateAcquis: "",
-    Taxe: "",
-    TotalAchat: "",
-    
-
+    DateAcquis: "", // date_aquisition_veh
+    Taxe: "", // taxe_veh_neuf
+    TotalAchat: "", // cout_tot_vh
   },
   validations: {
     Fournisseur: false,
