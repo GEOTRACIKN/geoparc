@@ -53,12 +53,12 @@ type FormData = {
     Feuxclignotants: string;
     Feuxstop: string;
     Cataphote: string;
-    PneuGaucheavant: number;
-    PneuDroiteavant: number;
-    PneuGauchearrièreInt: number;
-    PneuDroitearrièreInt: number;
-    PneuGauchearrièreExt: number;
-    PneuDroitearrièreExt: number;
+    PneuGaucheavant_rem: number;
+    PneuDroiteavant_rem: number;
+    PneuGauchearrièreInt_rem: number;
+    PneuDroitearrièreInt_rem: number;
+    PneuGauchearrièreExt_rem: number;
+    PneuDroitearrièreExt_rem: number;
     Loquet: string;
     feuxS_clign_maraicher: string;
     secours_tracteur: string;
@@ -137,12 +137,12 @@ export function Vehiclecheck() {
         Feuxclignotants: '',
         Feuxstop: '',
         Cataphote: '',
-        PneuGaucheavant: 0,
-        PneuDroiteavant: 0,
-        PneuGauchearrièreInt: 0,
-        PneuDroitearrièreInt: 0,
-        PneuGauchearrièreExt: 0,
-        PneuDroitearrièreExt: 0,
+        PneuGaucheavant_rem: 0,
+        PneuDroiteavant_rem: 0,
+        PneuGauchearrièreInt_rem: 0,
+        PneuDroitearrièreInt_rem: 0,
+        PneuGauchearrièreExt_rem: 0,
+        PneuDroitearrièreExt_rem: 0,
         Loquet: '',
         feuxS_clign_maraicher: '',
         secours_tracteur: '',
@@ -1000,27 +1000,27 @@ export function Vehiclecheck() {
                                     <Form.Group controlId="PressionPneuRemorque" className="mb-3">
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche avant :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGaucheavant" value={formData.PneuGaucheavant} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGaucheavant_rem" value={formData.PneuGaucheavant_rem} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite avant :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroiteavant" value={formData.PneuDroiteavant} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroiteavant_rem" value={formData.PneuDroiteavant_rem} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche arrière (int) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt" value={formData.PneuGauchearrièreInt} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreInt_rem" value={formData.PneuGauchearrièreInt_rem} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite arrière (int) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt" value={formData.PneuDroitearrièreInt} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreInt_rem" value={formData.PneuDroitearrièreInt_rem} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Gauche arrière (ext) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt" value={formData.PneuGauchearrièreExt} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuGauchearrièreExt_rem" value={formData.PneuGauchearrièreExt_rem} onChange={handleChange} /></div>
                                         </div>
                                         <div className="col-lg-12">
                                             <div className="col-lg-6"><span>Droite arrière (ext) :</span></div>
-                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt" value={formData.PneuDroitearrièreExt} onChange={handleChange} /></div>
+                                            <div className="col-lg-6"><input type="number" name="PneuDroitearrièreExt_rem" value={formData.PneuDroitearrièreExt_rem} onChange={handleChange} /></div>
                                         </div>
                                     </Form.Group>
                                 </Card.Body>

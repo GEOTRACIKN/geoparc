@@ -43,9 +43,21 @@ interface VehicleDetails {
   reflector_lights: number;
   stop_Lights: number;
   spare_wheel: number;
-  tire_pressure_Tractor: number;
-  tire_pressure_trailer: number;
-  cleanliness: number;
+  spare_trailer: number;
+  pression_tr_av_g: number;
+  pression_tr_av_d: number;
+  pression_tr_ar_g_int: number;
+  pression_tr_ar_d_int: number;
+  pression_tr_ar_g_ext: number;
+  pression_tr_ar_d_ext: number;
+  pression_rm_issue1_g: number;
+  pression_rm_issue1_d	: number;
+  pression_rm_issue2_g	: number;
+  pression_rm_issue2_d	: number;
+  pression_rm_issue3_g: number;
+  pression_rm_issue3_d: number;
+  cleanliness_int: number;
+  cleanliness_ext: number;
   maintenance : number;
 }
 
