@@ -673,7 +673,7 @@ export function Vehiclecheck() {
                             <Card className="mb-3">
                                 <Card.Header>Trousse outils</Card.Header>
                                 <Card.Body>
-                                    <img className="check_item_img" src={'../asset/images/checklist/trousse_outils.jpg'} alt="Trousse outils" style={{ width: '100%', height: 'auto' }} />
+                                    <img className="check_item_img" src={'../asset/images/checklist/outils.jpg'} alt="Trousse outils" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Trousse" className="mb-3">
                                         <Col sm={10}>
                                             <Form.Check type="checkbox" label="Conforme" checked={formData.Trousse === "Conforme"} onChange={handleChange} name="Trousse" value="Conforme" inline className="mr-4" />
@@ -837,6 +837,7 @@ export function Vehiclecheck() {
                             <Card className="mb-3">
                                 <Card.Header>Lattes</Card.Header>
                                 <Card.Body>
+                                <img className="check_item_img" src={'../asset/images/checklist/4434898_5 mercedes Axor.jpg'} alt="latte" style={{ width: '100%', height: 'auto' }} />
                                     <Form.Group as={Row} controlId="Lattes" className="mb-3">
                                         <Col sm={10}>
                                             <div className="d-flex">
