@@ -235,7 +235,7 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Roue de Secours et 2 Cannes de Sécurité (Tracteur): {renderCheckIcon(vehicleDetails.spare_wheel)}</li>
                         <li className="list-group-item">Roue de Secours et 2 Cannes de Sécurité (Tractée): {renderCheckIcon(vehicleDetails.spare_trailer)}</li>
                         <li className="list-group-item">Pipe d'admission Tr: {renderCheckIcon(vehicleDetails.intake_pipe)}</li>
-                        <li className="list-group-item">Bache Remorque: {renderCheckIcon(vehicleDetails.stop_Lights)}</li>
+                        <li className="list-group-item">Bache Remorque: {renderCheckIcon(vehicleDetails.tarpaulin_trailer)}</li>
                         <li className="list-group-item">Marche Pied Gauche: {renderCheckIcon(vehicleDetails.truck_step_left)}</li>
                         <li className="list-group-item">Marche Pied Droite: {renderCheckIcon(vehicleDetails.truck_step_right)}</li>
                         <li className="list-group-item">Etat de Propreté de Camion (extérieur)	: {renderCheckIcon(vehicleDetails.cleanliness_ext)}</li>
