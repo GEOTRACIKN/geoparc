@@ -1,4 +1,4 @@
-import { Dropdown, Modal, Table } from "react-bootstrap";
+import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
@@ -31,6 +31,9 @@ export function Vehicleschecks() {
   const [searchType, setSearchType] = useState('Checker');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedvehiclecheckID, setSelectedvehiclecheckID] = useState<string | null>(null);
+  const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+  const [selectedDownloadFormat, setSelectedDownloadFormat] = useState(''); // État pour le format de téléchargement
+
 
 
   const initialColumns = {
@@ -177,6 +180,22 @@ export function Vehicleschecks() {
   const handleDeleteClick = (id_verif: any) => {
     setSelectedvehiclecheckID(id_verif);
     setShowDeleteModal(true);
+  };
+
+  // Function to handle the download modal
+  const handleDownloadClick = () => {
+    setShowDownloadModal(true);
+  };
+
+  const handleDownloadConfirm = (format: string) => {
+    setSelectedDownloadFormat(format);
+    setShowDownloadModal(false);
+    // Call your download function here based on the selected format
+    if (format === 'excel') {
+      // Add your Excel download logic here
+    } else if (format === 'pdf') {
+      // Add your PDF download logic here
+    }
   };
 
 
@@ -377,6 +396,8 @@ export function Vehicleschecks() {
                       data-toggle="tooltip"
                       data-placement="top"
                       title="download"
+                      onClick={handleDownloadClick}
+
                     >
                       <i className="las la-download mr-0" style={{ fontSize: "1.2em" }}></i>
 
@@ -388,37 +409,6 @@ export function Vehicleschecks() {
           </tbody>
         </Table>
       </div>
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        dialogClassName="modal-90w"
-        aria-labelledby=""
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title style={{ fontWeight: 'bold', color: 'grey' }}>
-            {translate('Trash')}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center">
-          {translate('Do you really want to remove this check vehicle?')}
-        </Modal.Body>
-        <Modal.Footer className="d-flex">
-          <button
-            className="btn btn-outline-danger mt-2 mx-auto"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            {translate('Cancel')}
-          </button>
-          <button
-            className="btn btn-outline-success mt-2 mx-auto"
-            onClick={handleConfirmDelete}
-          >
-            {translate('Confirm')}
-          </button>
-        </Modal.Footer>
-      </Modal>
-
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>Affichage 1 à {limit} sur {total} </span>
@@ -445,6 +435,50 @@ export function Vehicleschecks() {
           />
         </div>
       </div>
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{translate("Confirm Delete")}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {translate("Are you sure you want to delete this vehicle check?")}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            {translate("Cancel")}
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            {translate("Delete")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{translate("Select Download Format")}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          {translate("Please select the format to download the data:")}
+          <div className="mt-3 d-flex justify-content-center">
+            <Button
+              variant="success"
+              className="mr-2"
+              onClick={() => handleDownloadConfirm("excel")}
+            >
+              Excel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => handleDownloadConfirm("pdf")}
+            >
+              PDF
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 }

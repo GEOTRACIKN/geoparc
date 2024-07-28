@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Nav, Tab, Col, Row, Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
+import { toTimestamp } from '../functions';
 
 
 interface VehicleDetails {
@@ -164,7 +165,7 @@ export function DetailVehicleCheck() {
                
                       <h5 className="card-title">Informations Générales</h5>
                       <ul className="list-group list-group-flush">
-                        <li className="list-group-item">Date de création: {vehicleDetails.creation_date}</li>
+                        <li className="list-group-item">Date de création: {toTimestamp(vehicleDetails.creation_date)}</li> 
                         <li className="list-group-item">Vérificateur: {vehicleDetails.checker}</li>
                         <li className="list-group-item">Nom Chauffeur sortant: {vehicleDetails.driver_out}</li>
                         <li className="list-group-item">Nom Chauffeur sortant: {vehicleDetails.driver_in}</li>
@@ -268,7 +269,7 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Cataphote / Feux de gabari									: {renderCheckIcon(vehicleDetails.reflector_lights)}</li>
                         <li className="list-group-item">Papiers								: {renderCheckIcon(vehicleDetails.papierStatus)}</li>
 
-                        <li className="list-group-item">Extincteur (Date d'expiration)									: {vehicleDetails.fire_extinguisher}</li>
+                        <li className="list-group-item">Extincteur (Date d'expiration){toTimestamp(vehicleDetails.fire_extinguisher)}</li>
                         <li className="list-group-item">Nombre de lattes							: {renderCheckIcon(vehicleDetails.slats)}</li>
                         <li className="list-group-item">Moteur cellule frigo						: {renderCheckIcon(vehicleDetails.refrigerator_motor)}</li>
                         <li className="list-group-item">Niveau gasoil						: {renderCheckIcon(vehicleDetails.slats)}</li>
