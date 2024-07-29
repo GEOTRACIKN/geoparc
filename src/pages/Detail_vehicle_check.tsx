@@ -269,7 +269,7 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Cataphote / Feux de gabari									: {renderCheckIcon(vehicleDetails.reflector_lights)}</li>
                         <li className="list-group-item">Papiers								: {renderCheckIcon(vehicleDetails.papierStatus)}</li>
 
-                        <li className="list-group-item">Extincteur (Date d'expiration){toTimestamp(vehicleDetails.fire_extinguisher)}</li>
+                        <li className="list-group-item">Extincteur (Date d'expiration) : {toTimestamp(vehicleDetails.fire_extinguisher)}</li>
                         <li className="list-group-item">Nombre de lattes							: {renderCheckIcon(vehicleDetails.slats)}</li>
                         <li className="list-group-item">Moteur cellule frigo						: {renderCheckIcon(vehicleDetails.refrigerator_motor)}</li>
                         <li className="list-group-item">Niveau gasoil						: {renderCheckIcon(vehicleDetails.slats)}</li>
@@ -285,6 +285,7 @@ export function DetailVehicleCheck() {
                       {/* <li className="list-group-item">Autre commentaire		: {renderCheckIcon(vehicleDetails.maintenance)}</li> */}
                 
                 </Tab.Pane>
+                
               </Tab.Content>
             </Col>
           </Row>
