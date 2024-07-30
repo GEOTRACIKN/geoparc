@@ -15,18 +15,18 @@ interface VehicleDetails {
   trailer_number: string;
   km: string;
   operating_hours: string;
-  papierStatus: number;
+  papers: number;
   truck_step_right: number;
   truck_step_left: number;
   triangles_wedges: number;
   battery: number;
   fire_extinguisher: string;
-  g_av_tr: number;
-  d_av_tr: number;
-  g_ar_tr_int: number;
-  d_ar_tr_int: number;
-  g_ar_tr_ext: number;
-  d_ar_tr_ext: number;
+  pneu_tr_av_g: number;
+  pneu_tr_av_d: number;
+  pneu_tr_ar_g_int: number;
+  pneu_tr_ar_d_int: number;
+  pneu_tr_ar_g_ext: number;
+  pneu_tr_ar_d_ext: number;
   pneu_rm_issue1_g: number;
   pneu_rm_issue1_d: number;
   pneu_rm_issue2_g: number;
@@ -47,8 +47,9 @@ interface VehicleDetails {
   tarpaulin_trailer: number;
   slats: number;
   refrigerator_motor: number;
+  niv_gasoile :number;
   window_mirrors: number;
-  windshield_wipers: number;
+  windshield_wipers: number; 
   lights_turn_signals: number;
   latch: number;
   tbl_truck: number;
@@ -71,6 +72,7 @@ interface VehicleDetails {
   cleanliness_int: number;
   cleanliness_ext: number;
   maintenance : number;
+  comment : string;
 }
 
 export function DetailVehicleCheck() {
@@ -161,8 +163,7 @@ export function DetailVehicleCheck() {
             <Col sm={9}>
               <Tab.Content>
                 {/* Onglet Général */}
-                <Tab.Pane eventKey="general">
-               
+                <Tab.Pane eventKey="general">             
                       <h5 className="card-title">Informations Générales</h5>
                       <ul className="list-group list-group-flush">
                         <li className="list-group-item">Date de création: {toTimestamp(vehicleDetails.creation_date)}</li> 
@@ -171,23 +172,21 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Nom Chauffeur sortant: {vehicleDetails.driver_in}</li>
                         <li className="list-group-item">Km: {vehicleDetails.km}</li>
                         <li className="list-group-item">Heur de Fonctionnement: {vehicleDetails.operating_hours}</li>
-                      </ul>
-                 
+                      </ul>              
                 </Tab.Pane>
 
                 {/* Onglet Pneus Tracteur */}
-                <Tab.Pane eventKey="tractor-tire">
-                
+                <Tab.Pane eventKey="tractor-tire">              
                       <h5 className="card-title">Pneus du Tracteur</h5>
                       <ul className="list-group list-group-flush">
                         <li className="list-group-item">Matricule tracteur: {vehicleDetails.tractor_number}</li>
-                        <li className="list-group-item">Pneu Tracteur avant gauche: {renderCheckIcon(vehicleDetails.g_av_tr)}</li>
-                        <li className="list-group-item">Pneu Tracteur avant droite: {renderCheckIcon(vehicleDetails.d_av_tr)}</li>
-                        <li className="list-group-item">Pnue Tracteur arrière gauche interieur: {renderCheckIcon(vehicleDetails.g_ar_tr_int)}</li>
-                        <li className="list-group-item">Pnue Tracteur arrière gauche exterieur: {renderCheckIcon(vehicleDetails.d_ar_tr_int)}</li>
-                        <li className="list-group-item">Pnue Tracteur arrière droite interieur: {renderCheckIcon(vehicleDetails.g_ar_tr_ext)}</li>
-                        <li className="list-group-item">Pnue Tracteur arrière droite exterieur: {renderCheckIcon(vehicleDetails.d_ar_tr_ext)}</li>
-                      
+                        <li className="list-group-item">Pneu Tracteur avant gauche: {renderCheckIcon(vehicleDetails.pneu_tr_av_g)}</li>
+                        <li className="list-group-item">Pneu Tracteur avant droite: {renderCheckIcon(vehicleDetails.pneu_tr_av_d)}</li>
+                        <li className="list-group-item">Pnue Tracteur arrière gauche interieur: {renderCheckIcon(vehicleDetails.pneu_tr_ar_g_int)}</li>
+                        <li className="list-group-item">Pnue Tracteur arrière gauche exterieur: {renderCheckIcon(vehicleDetails.pneu_tr_ar_d_int)}</li>
+                        <li className="list-group-item">Pnue Tracteur arrière droite interieur: {renderCheckIcon(vehicleDetails.pneu_tr_ar_g_ext)}</li>
+                        <li className="list-group-item">Pnue Tracteur arrière droite exterieur: {renderCheckIcon(vehicleDetails.pneu_tr_ar_d_ext)}</li>
+
                         <li className="list-group-item">Pression Pnue Tracteur avant gauche: {vehicleDetails.pression_tr_av_g}</li>
                         <li className="list-group-item">Pression Pnue Tracteur avant droite: {vehicleDetails.pression_tr_av_d}</li>
                         <li className="list-group-item">Pression Pnue Tracteur arrière gauche interieur: {vehicleDetails.pression_tr_ar_g_int}</li>
@@ -196,8 +195,7 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Pression Pnue Tracteur arrière droite exterieur: {vehicleDetails.pression_tr_ar_d_ext}</li>
 
                         {/* Ajoutez d'autres détails spécifiques aux pneus du tracteur ici */}
-                      </ul>
-                  
+                      </ul>                 
                 </Tab.Pane>
 
                 {/* Onglet Pneus Remorque */}
@@ -223,8 +221,7 @@ export function DetailVehicleCheck() {
                 </Tab.Pane>
 
                 {/* Onglet État Extérieur */}
-                <Tab.Pane eventKey="external-condition">
-                 
+                <Tab.Pane eventKey="external-condition">                 
                       <h5 className="card-title">État Extérieur</h5>
                       <ul className="list-group list-group-flush">
                       <li className="list-group-item">Retroviseur Vitres: {renderCheckIcon(vehicleDetails.window_mirrors)}</li>
@@ -241,16 +238,12 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Marche Pied Droite: {renderCheckIcon(vehicleDetails.truck_step_right)}</li>
                         <li className="list-group-item">Etat de Propreté de Camion (extérieur)	: {renderCheckIcon(vehicleDetails.cleanliness_ext)}</li>
                         <li className="list-group-item">Etat de Propreté de Camion (intérieure)	: {renderCheckIcon(vehicleDetails.cleanliness_int)}</li>
-                   
-                        
-                        {/* Ajoutez d'autres détails spécifiques à l'état extérieur ici */}
                       </ul>
                   
                 </Tab.Pane>
 
                 {/* Onglet Autres */}
-                <Tab.Pane eventKey="others">
-                
+                <Tab.Pane eventKey="others">               
                       <h5 className="card-title">Autres</h5>
                       <ul className="list-group list-group-flush">
                       <li className="list-group-item">Triangles / Cales	: {renderCheckIcon(vehicleDetails.triangles_wedges)}</li>
@@ -267,23 +260,22 @@ export function DetailVehicleCheck() {
                         <li className="list-group-item">Twis lock squelette							: {renderCheckIcon(vehicleDetails.twist_lock_skeleton)}</li>
                         <li className="list-group-item">Pare brise / Essuie Glasses								: {renderCheckIcon(vehicleDetails.windshield_wipers)}</li>
                         <li className="list-group-item">Cataphote / Feux de gabari									: {renderCheckIcon(vehicleDetails.reflector_lights)}</li>
-                        <li className="list-group-item">Papiers								: {renderCheckIcon(vehicleDetails.papierStatus)}</li>
+                        <li className="list-group-item">Papiers								: {renderCheckIcon(vehicleDetails.papers)}</li>
 
                         <li className="list-group-item">Extincteur (Date d'expiration) : {toTimestamp(vehicleDetails.fire_extinguisher)}</li>
-                        <li className="list-group-item">Nombre de lattes							: {renderCheckIcon(vehicleDetails.slats)}</li>
+                        <li className="list-group-item">Nombre de lattes							: {vehicleDetails.slats}</li>
                         <li className="list-group-item">Moteur cellule frigo						: {renderCheckIcon(vehicleDetails.refrigerator_motor)}</li>
-                        <li className="list-group-item">Niveau gasoil						: {renderCheckIcon(vehicleDetails.slats)}</li>
-                      </ul>
-                  
+                        <li className="list-group-item">Niveau gasoil						: {vehicleDetails.niv_gasoile}</li>
+                      </ul>                 
                 </Tab.Pane>
 
                 {/* Onglet Remarques */}
-                <Tab.Pane eventKey="remarks">
-                
+                <Tab.Pane eventKey="remarks">               
                       <h5 className="card-title">Remarques</h5>
+                      <ul className="list-group list-group-flush">
                       <li className="list-group-item">Maintenance	: {renderCheckIcon(vehicleDetails.maintenance)}</li>
-                      {/* <li className="list-group-item">Autre commentaire		: {renderCheckIcon(vehicleDetails.maintenance)}</li> */}
-                
+                      <li className="list-group-item">Autre Commentaire	: {vehicleDetails.comment}</li>   
+                      </ul>      
                 </Tab.Pane>
                 
               </Tab.Content>
