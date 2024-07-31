@@ -57,7 +57,47 @@ export interface StepsProps {
   lastStep: () => void;
 }
 
+/* 
+`vehicule`(`id_vehicule`, `vehicule_type`, `category_vehicule`, `id_dispositif`, `propriete_vehicule`, `id_marque`, `modele_vehicule`, `date_aquisition_vehicule`, `type_carburant_vehicule`, `immatriculation_vehicule`, `annee_vehicule`, `couleur_vehicule`, `date_circulation_vehicule`, `num_chassis_vehicule`, `nbre_place_vehicule`, `puissance_vehicule`, `etat_vehicule`, `kilometrage_vehicule`, `commentaire_vehicule`, `companie_assurance_vehicule`, `type_assurance_vehicule`, `date_debut_assurance_vehicule`, `date_expir_assurance_vehicule`, `cout_assurance_vehicule`, `delai_assurance_vehicule`, `reference_assurance_vehicule`, `note_assurance_vehicule`, `etat_ctr_tech_vehicule`, `date_debut_ctr_tech_vehicule`, `date_fin_ctr_tech_vehicule`, `station_ctr_vehicule`, `cout_ctr_tech_vehicule`, `note_ctr_tech_vehicule`, `date_vignette_vehicule`, `cout_vignette_vehicule`, `id_gps`, `id_conducteur_vehicule`, `longueur_vehicule`, `largeur_vehicule`, `hauteur_vehicule`, `poid_vehicule`, `nbre_porte_vehicule`, `icon_vehicule`, `detail_vehicule`, `num_porte_vehicule`, `ptac_vehicule`, `kilometrage_reel_vehicule`, `image_vehicule`, `consomatio_gasoil_reel_vehicule`, `latitude_vehicule`, `longitude_vehicule`, `date_heure_position_vehicule`, `id_sousParc_vehicule`, `num_vignette_vehicule`, `famille_vehicule`, `gamme_vehicule`, `id_groupe`, `fuel_level_vehicule`, `co2_vehicule`, `capacite_res_vehicule`, `prochain_vidange_vehicule`, `info_vehicule`, `id_user`, `draft`, `inService_vehicule`, `date_creation_vehicule`, `date_modification_vehicule`, `date_suppression_vehicule`, `PSN`, `LAST_IB_CODE`, `fuel_type`) 
 
+*/
+
+
+
+/* 
+CREATE TABLE gp_vehicle_cost (
+    cost_id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identifiant unique pour l'enregistrement des coûts du véhicule',
+    IDvehicule INT NOT NULL COMMENT 'Identifiant du véhicule',
+    immatriculation_vehicule VARCHAR(50) NOT NULL COMMENT 'Immatriculation du véhicule',
+    aquisition VARCHAR(50) NOT NULL COMMENT 'Type d'acquisition (Leasing, Location, Achat, etc.)',
+    fournisseur_vh VARCHAR(50) NOT NULL COMMENT 'Fournisseur du véhicule',
+    date_versement DATE NOT NULL COMMENT 'Date du versement',
+    num_contrat_aquis VARCHAR(50) NOT NULL COMMENT 'Numéro de contrat pour l'acquisition',
+    duree_leasing INT NOT NULL COMMENT 'Durée du leasing (pour Leasing)',
+    echeance_leasing DECIMAL(10, 2) NOT NULL COMMENT 'Montant de l'échéance du leasing (pour Leasing)',
+    echeance_restante_leasing INT NOT NULL COMMENT 'Nombre d'échéances restantes du leasing (pour Leasing)',
+    payer_a_ce_jour_leasing DECIMAL(10, 2) NOT NULL COMMENT 'Montant payé à ce jour pour le leasing (pour Leasing)',
+    prochaine_echeance_leasing DATE NOT NULL COMMENT 'Date de la prochaine échéance du leasing (pour Leasing)',
+    cout_tot_vh DECIMAL(10, 2) NOT NULL COMMENT 'Coût total du véhicule (pour Leasing)',
+    premier_appor_leas DECIMAL(10, 2) NOT NULL COMMENT 'Premier apport pour le leasing (pour Leasing)',
+    date_prem_echeance_leas DATE NOT NULL COMMENT 'Date de la première échéance du leasing (pour Leasing)',
+    IDSousParc INT NOT NULL COMMENT 'Identifiant du sous-parc (pour Leasing)',
+    temps_amort VARCHAR(50) NOT NULL COMMENT 'Période d'amortissement (pour Leasing)',
+    num_contrat_location VARCHAR(50) NOT NULL COMMENT 'Numéro de contrat pour la location (pour Location)',
+    fournisseur_location VARCHAR(50) NOT NULL COMMENT 'Fournisseur pour la location (pour Location)',
+    cout_location DECIMAL(10, 2) NOT NULL COMMENT 'Coût de la location (pour Location)',
+    date_debut_locati DATE NOT NULL COMMENT 'Date de début de la location (pour Location)',
+    locati_mensuel INT NOT NULL COMMENT 'Durée de la location en mois (pour Location)',
+    date_dernier_versement DATE NOT NULL COMMENT 'Date du dernier versement (pour Location)',
+    cout_tot_location DECIMAL(10, 2) NOT NULL COMMENT 'Coût total de la location (pour Location)',
+    date_achat DATE NOT NULL COMMENT 'Date d'achat (pour Achat)',
+    taxe_veh_neuf DECIMAL(10, 2) NOT NULL COMMENT 'Taxe associée à l'achat (pour Achat)',
+    cout_tot_achat DECIMAL(10, 2) NOT NULL COMMENT 'Coût total de l'achat (pour Achat)',
+    IDSousParc_achat INT NOT NULL COMMENT 'Identifiant du sous-parc (pour Achat)',
+    temps_amort_achat VARCHAR(50) NOT NULL COMMENT 'Période d'amortissement pour l'achat (pour Achat)'
+) COMMENT='Table contenant les coûts associés aux véhicules en fonction du type d'acquisition';
+
+*/
 
 // ? Informations Générales
 export const VehicleValidateFormsStep1 = {
@@ -79,6 +119,7 @@ export const VehicleValidateFormsStep1 = {
     Codification: "", //! LAST_IB_CODE
     Kilom: "", // kilometrage_vehicule
     Payback_Period: "", // couleur_vehicule -- couleur
+    Step3: "", 
   },
   validations: {
     Immatriculation: false,
@@ -98,6 +139,7 @@ export const VehicleValidateFormsStep1 = {
     Codification: false,
     Kilom: false,
     Payback_Period: false,
+    Step3: false,
   },
 }
 
@@ -109,7 +151,7 @@ export const VehicleValidateFormsStep2 = {
     Psn: "", // PSN
     Year: "", // annee_vehicule
     Power: "", // puissance_vehicule
-    MaximumAllowedTotal: "", //!     -Poids total autorisé en charge-
+    MaximumAllowedTotal: "", // maximum_allowed_total -Poids total autorisé en charge-
     CirculationDate: '', // date_circulation_vehicule
     Longueur: '', // longueur_vehicule
     NumChassis: '', // num_chassis_vehicule

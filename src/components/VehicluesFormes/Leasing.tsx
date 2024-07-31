@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { FloatingLabel, Form, Row } from 'react-bootstrap'
+import { InvalidNumberInput } from './InvalidInput'
 import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
 import { DureeOption } from '../../utilities/selectOptions';
 
@@ -36,19 +37,13 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-Echeance' className='mt-2 col-md-6 col-xl-3'>
-            <FloatingLabel controlId="floatingSelect" label='Echéance'>
-            <Form.Control
-            placeholder=' '
-            type="number"
-            name='Echeance'
-            value={formState.values.Echeance}
+          <InvalidNumberInput
+            className="col-md-6 col-xl-3"
+            label="Echeance :"
+            name="Echeance"
             onChange={handleChange}
-            className={formState.validations.Echeance ? 'is-valid' : ''}
-            />
-          </FloatingLabel>
-          </Form.Group>
-       
+            value={formState.values.Echeance}
+          />
           <Form.Group controlId='formBasicInput-NumContrat' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Numéro du contrat'>
             <Form.Control
@@ -104,19 +99,13 @@ const Leasing = ({
             />
           </FloatingLabel>
           </Form.Group>
-      
-          <Form.Group controlId='formBasicInput-Apport' className='mt-2 col-md-6 col-xl-3'>
-            <FloatingLabel controlId="floatingSelect" label='Apport'>
-            <Form.Control
-            placeholder=' '
-            type="number"
-            name='Apport'
-            value={formState.values.Apport}
+          <InvalidNumberInput
+            className="col-md-6 col-xl-3"
+            label="Apport :"
+            name="Apport"
             onChange={handleChange}
-            className={formState.validations.Apport ? 'is-valid' : ''}
-            />
-          </FloatingLabel>
-          </Form.Group>
+            value={formState.values.Apport}
+          />
           <Form.Group controlId='formBasicInput-DernierPaiment' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Dernier paiement'>
             <Form.Control
@@ -157,23 +146,15 @@ const Leasing = ({
             </FloatingLabel>
             </Form.Group>
           
-       
-          <Form.Group controlId='formBasicInput-TotalLeasing' className='mt-2 col-md-6 col-xl-3'>
-              <FloatingLabel controlId="floatingSelect" label='Total leasing H.T'>
-              <Form.Control
-              placeholder=' '
-              type="number"
-              name='TotalLeasing'
-              value={formState.values.TotalLeasing}
-              onChange={handleChange}
-              className={formState.validations.TotalLeasing ? 'is-valid' : ''}
-              />
-            </FloatingLabel>
-            </Form.Group>
-  
+            <InvalidNumberInput
+            className="col-md-6 col-xl-3"
+            label="Total leasing H.T :"
+            name="TotalLeasing"
+            onChange={handleChange}
+            value={formState.values.TotalLeasing}
+          />
+
         </Row>
-
-
         </Form>
       
     </>

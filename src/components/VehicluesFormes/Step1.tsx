@@ -69,6 +69,22 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
   const [formState, setFormState] = useState<VehicleFormState>(
     VehicleValidateFormsStep1
   );
+  const [selectedOption, setSelectedOption] = useState('');
+  const handleChangeChuck = (
+    e: React.ChangeEvent<HTMLInputElement>  ) => {
+    const { checked, value } = e.target;
+    setSelectedOption(value);
+    setFormState((prevState) => ({
+      values: {
+        ...prevState.values,
+        Step3: value,
+      },
+      validations: {
+        ...prevState.validations,
+        Step3: checked,
+      },
+    }));
+  };
   const [selectBrand, setSelectBrand] = useState<VehicleSelectOption[]>([]);
   const [selectParc, setSelectParc] = useState<VehicleSelectOption[]>([]);
   const [selectDriver, setSelectDriver] = useState<VehicleSelectOption[]>([]);
@@ -169,6 +185,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
       //   setError("Valide la Catégorie");
       // } else if (!formState.validations.Etat) {
       //   setError("Valide l'Etat ");
+      } else if (!formState.validations.Step3) {
+        setError("Valide l'Etat ");
     } else {
       /**
        * Clears any existing error, moves to the next step in the form flow, and calls the provided user callback with the current form state values.
@@ -196,6 +214,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             isValid={formState.validations.Immatriculation}
             errorMessage="Ce champ est obligatoire."
             showValid={true}
+            type="text"
           />
           {/* Acquisition  -acqui- */}
           <SelectorFloating
@@ -287,6 +306,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             isValid={formState.validations.Modele}
             errorMessage="Ce champ est obligatoire."
             showValid={true}
+            type="text"
           />
         </Row>
 
@@ -437,6 +457,7 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             isValid={formState.validations.Codification}
             errorMessage="Ce champ est obligatoire."
             showValid={true}
+            type="text"
           />
 
           {/* Kilom */}
@@ -469,7 +490,38 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             isValid={formState.validations.Payback_Period}
             errorMessage="Ce champ est obligatoire."
             showValid={true}
+            type="text"
           />
+          {/* Leasing Location Achat */}
+          <Form.Group  className="col d-flex mt-4">
+                <Form.Check
+                    className="me-4"
+                    name="Leasing"
+                    type="radio"
+                    label="Leasing"
+                    value="Leasing"
+                    checked={selectedOption === 'Leasing'}
+                    onChange={handleChangeChuck}
+                />
+                <Form.Check
+                    className="me-4"
+                    name="Location"
+                    type="radio"
+                    label="Location"
+                    value="Location"
+                    checked={selectedOption === 'Location'}
+                    onChange={handleChangeChuck}
+                />
+                <Form.Check
+                    className="me-4"
+                    name="Achat"
+                    type="radio"
+                    label="Achat"
+                    value="Achat"
+                    checked={selectedOption === 'Achat'}
+                    onChange={handleChangeChuck}
+                />
+            </Form.Group>
         </Row>
 
         <div className="d-flex align-items-end flex-column">

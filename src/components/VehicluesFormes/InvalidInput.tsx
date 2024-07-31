@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Container } from 'react-bootstrap';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
 // Définir une interface pour les props du composant
 interface InvalidInputProps {
+  type: 'text' | 'number';
   label: string;
   name: string;
   value: string;
@@ -13,6 +14,13 @@ interface InvalidInputProps {
   className?: string;
   placeholder?: string;
   showValid?: boolean;
+}
+interface InvalidNumberInputPropsProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
 }
 
 interface SelectorProps {
@@ -48,14 +56,14 @@ export const InvalidInput: React.FC<InvalidInputProps> = ({ label, name, value, 
     </Form.Group>
   );
 };
-export const InvalidInputFloating: React.FC<InvalidInputProps> = ({ label, name, value, onChange, isValid, errorMessage,className,placeholder,showValid }) => {
+export const InvalidInputFloating: React.FC<InvalidInputProps> = ({ type, label, name, value, onChange, isValid, errorMessage,className,placeholder,showValid }) => {
   return (
     
     <Form.Group controlId={`formBasicInput-${name}`} className={`mt-2 ${className}`}>
       <FloatingLabel controlId="floatingSelect" label={label}>
       <Form.Control
       placeholder={placeholder}
-      type="text"
+      type={type}
       name={name}
       value={value}
       onChange={onChange}
@@ -66,6 +74,41 @@ export const InvalidInputFloating: React.FC<InvalidInputProps> = ({ label, name,
         {errorMessage}
       </Form.Control.Feedback>
     </FloatingLabel>
+    </Form.Group>
+  );
+};
+
+// Composant fonctionnel qui affiche un input de type nombre avec la classe 'is-invalid' si nécessaire
+export const InvalidNumberInput: React.FC<InvalidNumberInputPropsProps> = ({ label, name, value, onChange,className }) => {
+
+  const isNumber = (value: string) => {
+    const trimmedValue = value.trim();
+    const hasOnlySpaces = /^\s*$/.test(trimmedValue);
+    return !hasOnlySpaces && !isNaN(Number(trimmedValue));
+  };
+
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+
+    if (newValue === '' || isNumber(newValue)) {
+    return onChange(e);
+    } 
+  }
+  
+
+  return (
+    <Form.Group controlId={`formBasicNumberInput-${name}`} className={`mt-2 ${className}`}>
+      <FloatingLabel controlId="floatingSelect" label={label}>
+      <Form.Control
+        placeholder='Enter a number'
+        type="text"
+        name={name}
+        value={value}
+        onChange={handleChange}
+        className={isNumber(value) ? `is-valid` : ''}
+      />
+      </FloatingLabel>
     </Form.Group>
   );
 };

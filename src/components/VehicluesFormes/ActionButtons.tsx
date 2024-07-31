@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
 interface ActionButtonsProps {
   currentStep: number;
@@ -9,21 +9,26 @@ interface ActionButtonsProps {
   lastStep: () => void;
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = (props) => {
-  const handleBack = () => {
-    props.previousStep();
-  };
-
-  const handleNext = () => {
-    props.nextStep();
-  };
-
-  const handleFinish = () => {
-    props.lastStep();
-  };
-
+const ActionButtons: React.FC<ActionButtonsProps> = ({ currentStep, totalSteps, previousStep, nextStep, lastStep }) => {
   return (
-    <div className='w-100'>
+    <Row className="w-100">
+      <Col>
+        {currentStep > 1 && <Button onClick={previousStep}>Précédent</Button>}
+      </Col>
+      <Col className="d-flex justify-content-center">
+        {currentStep < totalSteps ? (
+          <Button onClick={nextStep}>Suivant</Button>
+        ) : (
+          <Button onClick={lastStep}>Compléter</Button>
+        )}
+      </Col>
+    </Row>
+  );
+};
+
+export default ActionButtons;
+/* 
+ <div className='w-100'>
       <Row>
         {props.currentStep > 1 && (
           <Col>
@@ -39,8 +44,4 @@ const ActionButtons: React.FC<ActionButtonsProps> = (props) => {
           )}
         </Col>
       </Row>
-    </div>
-  );
-};
-
-export default ActionButtons;
+*/

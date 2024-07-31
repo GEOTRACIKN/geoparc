@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { FloatingLabel, Form, Row } from 'react-bootstrap'
 import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
 import { DureeOption } from '../../utilities/selectOptions';
+import { InvalidNumberInput } from './InvalidInput';
 
 
 interface RentCarProps {
@@ -36,19 +37,14 @@ const RentCar = ({
             />
           </FloatingLabel>
           </Form.Group>
-          <Form.Group controlId='formBasicInput-TotalLocation' className='mt-2 col-md-6 col-xl-3'>
-            <FloatingLabel controlId="floatingSelect" label='Total location'>
-            <Form.Control
-            placeholder=' '
-            type="number"
-            name='TotalLocation'
-            value={formState.values.TotalLocation}
+          
+          <InvalidNumberInput
+            className="col-md-6 col-xl-3"
+            label="Total location :"
+            name="TotalLocation"
             onChange={handleChange}
-            className={formState.validations.TotalLocation ? 'is-valid' : ''}
-            />
-          </FloatingLabel>
-          </Form.Group>
-       
+            value={formState.values.TotalLocation}
+          />
           <Form.Group controlId='formBasicInput-FournisseurL' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Fournisseur location'>
             <Form.Control
@@ -88,7 +84,6 @@ const RentCar = ({
               />
             </FloatingLabel>
             </Form.Group>
-          
           <Form.Group controlId='formBasicInput-DateDebutLocation' className='mt-2 col-md-6 col-xl-3'>
               <FloatingLabel controlId="floatingSelect" label='Date début location'>
               <Form.Control
@@ -101,26 +96,15 @@ const RentCar = ({
               />
             </FloatingLabel>
             </Form.Group>
-          
-      
-          <Form.Group controlId='formBasicInput-NbreMoisLocation' className='mt-2 col-md-6 col-xl-3'>
-              <FloatingLabel controlId="floatingSelect" label='Nombre de mois'>
-              <Form.Control
-              placeholder=' '
-              type="number"
-              name='NbreMoisLocation'
-              value={formState.values.NbreMoisLocation}
-              onChange={handleChange}
-              className={formState.validations.NbreMoisLocation ? 'is-valid' : ''}
-              />
-            </FloatingLabel>
-            </Form.Group>
-  
+            <InvalidNumberInput
+            className="col-md-6 col-xl-3"
+            label="Nombre de mois :"
+            name="NbreMoisLocation"
+            onChange={handleChange}
+            value={formState.values.NbreMoisLocation}
+          />
         </Row>
-
-
         </Form>
-      
     </>
   )
 }

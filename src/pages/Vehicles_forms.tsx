@@ -7,7 +7,6 @@ import Step3 from '../components/VehicluesFormes/Step3';
 import Step4 from '../components/VehicluesFormes/Step4';
 import Step5 from '../components/VehicluesFormes/Step5';
 import Step6 from '../components/VehicluesFormes/Step6';
-import { WizardForm } from '../components/VehicluesFormes/wizardForm';
 import StepWizard from "react-step-wizard";
 import ActionButtons from '../components/VehicluesFormes/ActionButtons';
 
@@ -18,11 +17,7 @@ export const VehiclesForms = () => {
   const [stepWizard, setStepWizard] = useState<any>(null);
   const [user, setUser] = useState<any>({});
   const [activeStep, setActiveStep] = useState<number>(0);
-  const [formData, setFormData] = useState<{
-    name?: string;
-    email?: string;
-    message?: string;
-  }>({});
+  const [formData, setFormData] = useState<{ [key: string]: any }>({});
 
   const [steps, setSteps] = useState<Step[]>([
     { index: 1, statusClass: 'step-active', stepTitle: '' },
@@ -46,15 +41,23 @@ export const VehiclesForms = () => {
     }));
   };
 
+  const updateFormeData = (stepData: {[key: string] :any}) =>{
+    setFormData((prevData) => ({
+      ...prevData,
+      ...stepData
+    }))
+  }
+
   const handleStepChange = (e: any) => {
     console.log("step change");
-    console.log(e);
+    // console.log(e);
     setActiveStep(e.activeStep - 1);
     updateStepStatus(e.activeStep - 1);
   };
 
   const handleComplete = () => {
     alert("Form Complete");
+    console.log("Collected Form Data: ", formData);
   };
 
   const nextStep = () => {
@@ -98,31 +101,30 @@ export const VehiclesForms = () => {
         return { ...step, statusClass: '' };
       }
     });
-    console.log('useEffect-newSteps',newSteps);
     
     setSteps(newSteps);
   }, [activeStep]);
 
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  // const handleInputChange = (
+  //   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // ) => {
+  //   const { name, value } = event.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // handle form submission
-  };
+  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   // handle form submission
+  // };
 
 
   return (
-    <div className="w-100">
+    <div className="w-100 mb-3">
       <h1>Ajouter véhicule</h1>
         <div className='mainWizard'>
   
         <MultiStepProgressBar params={steps} />
-        <StepWizard instance={assignStepWizard} onStepChange={handleStepChange}  className='w-100'>
+        <StepWizard instance={assignStepWizard} onStepChange={handleStepChange} className='w-100'>
           <Step1
             userCallback={assignUser}
             nextStep={nextStep}
@@ -173,13 +175,13 @@ export const VehiclesForms = () => {
             lastStep={lastStep}
           />
           <Step6
-           user={user}
-           userCallback={assignUser}
-           currentStep={activeStep + 1}
-           totalSteps={steps.length}
-           previousStep={previousStep}
-           nextStep={nextStep}
-           lastStep={lastStep}
+            user={user}
+            userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
+            nextStep={nextStep}
+            lastStep={lastStep}
   
           />
         </StepWizard>
