@@ -69,9 +69,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
   const [formState, setFormState] = useState<VehicleFormState>(
     VehicleValidateFormsStep1
   );
-  const [selectedOption, setSelectedOption] = useState('');
-  const handleChangeChuck = (
-    e: React.ChangeEvent<HTMLInputElement>  ) => {
+  const [selectedOption, setSelectedOption] = useState("");
+  const handleChangeChuck = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked, value } = e.target;
     setSelectedOption(value);
     setFormState((prevState) => ({
@@ -177,24 +176,24 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
      *
      * @returns {void} This function does not return a value, it only sets the error state.
      */
-    if (!formState.validations.Immatriculation) {
-      setError("Valide l'Immatriculation");
-      // } else if (!formState.validations.Acquisition) {
-      //   setError("Valide l'Acquisition ");
-      // } else if (!formState.validations.Categorie) {
-      //   setError("Valide la Catégorie");
-      // } else if (!formState.validations.Etat) {
-      //   setError("Valide l'Etat ");
-      } else if (!formState.validations.Step3) {
-        setError("Valide l'Etat ");
-    } else {
-      /**
-       * Clears any existing error, moves to the next step in the form flow, and calls the provided user callback with the current form state values.
-       */
-      setError("");
-      nextStep();
-      userCallback(formState.values);
-    }
+    // if (!formState.validations.Immatriculation) {
+    //   setError("Valide l'Immatriculation");
+    // } else if (!formState.validations.Acquisition) {
+    //   setError("Valide l'Acquisition ");
+    // } else if (!formState.validations.Categorie) {
+    //   setError("Valide la Catégorie");
+    // } else if (!formState.validations.Etat) {
+    //   setError("Valide l'Etat ");
+    //   } else if (!formState.validations.Step3) {
+    //     setError("Valide l'Etat ");
+    // } else {
+    /**
+     * Clears any existing error, moves to the next step in the form flow, and calls the provided user callback with the current form state values.
+     */
+    setError("");
+    nextStep();
+    userCallback(formState.values);
+    // }
   };
 
   return (
@@ -493,35 +492,35 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             type="text"
           />
           {/* Leasing Location Achat */}
-          <Form.Group  className="col d-flex mt-4">
-                <Form.Check
-                    className="me-4"
-                    name="Leasing"
-                    type="radio"
-                    label="Leasing"
-                    value="Leasing"
-                    checked={selectedOption === 'Leasing'}
-                    onChange={handleChangeChuck}
-                />
-                <Form.Check
-                    className="me-4"
-                    name="Location"
-                    type="radio"
-                    label="Location"
-                    value="Location"
-                    checked={selectedOption === 'Location'}
-                    onChange={handleChangeChuck}
-                />
-                <Form.Check
-                    className="me-4"
-                    name="Achat"
-                    type="radio"
-                    label="Achat"
-                    value="Achat"
-                    checked={selectedOption === 'Achat'}
-                    onChange={handleChangeChuck}
-                />
-            </Form.Group>
+          <Form.Group className="col d-flex mt-4">
+            <Form.Check
+              className="me-4"
+              name="Leasing"
+              type="radio"
+              label="Leasing"
+              value="Leasing"
+              checked={selectedOption === "Leasing"}
+              onChange={handleChangeChuck}
+            />
+            <Form.Check
+              className="me-4"
+              name="Location"
+              type="radio"
+              label="Location"
+              value="Location"
+              checked={selectedOption === "Location"}
+              onChange={handleChangeChuck}
+            />
+            <Form.Check
+              className="me-4"
+              name="Achat"
+              type="radio"
+              label="Achat"
+              value="Achat"
+              checked={selectedOption === "Achat"}
+              onChange={handleChangeChuck}
+            />
+          </Form.Group>
         </Row>
 
         <div className="d-flex align-items-end flex-column">

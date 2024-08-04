@@ -34,6 +34,11 @@ export interface VehicleSelectOption {
   label: string;
 }
 
+export interface ContentTabProps {
+  formState: VehicleFormState
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
 
 
 /**
@@ -185,7 +190,7 @@ export const VehicleValidateFormsStep2 = {
 
 
 // ? Acquisition [Leasing - Location - Achat]
-export const VehicleValidateFormsStep3 = {
+export const VehicleValidateFormsStep4 = {
   values: {
     Fournisseur: "", // ? fournisseur_vh
     Echeance: "", // echeance_leasing
@@ -239,7 +244,7 @@ export const VehicleValidateFormsStep3 = {
 
 
 // ? Assurance
-export const VehicleValidateFormsStep4 = {
+export const VehicleValidateFormsStep3 = {
   values: {
     AgenceAssurance: "", // companie_assurance_vehicule
     CoutAss: "", // cout_assurance_vehicule
@@ -249,6 +254,18 @@ export const VehicleValidateFormsStep4 = {
     ReferenceAssurance: "", // reference_assurance_vehicule
     DateExpAssurance: "", // date_expir_assurance_vehicule
 
+
+    // ? Contrôle technique
+    EtabControle: "", // etat_ctr_tech_vehicule
+    CoutControle: "", // cout_ctr_tech_vehicule
+    ReferenceControle: "", // note_ctr_tech_vehicule
+    DateControle: "", // date_debut_ctr_tech_vehicule
+    DateFinControle: "", // date_fin_ctr_tech_vehicule
+    
+    // ? Vignette
+    NumVignette: "", // num_vignette_vehicule
+    DateVignette: "", // date_vignette_vehicule
+    CoutVignette: "", // cout_vignette_vehicule
   },
   validations: {
     AgenceAssurance: false,
@@ -258,46 +275,40 @@ export const VehicleValidateFormsStep4 = {
     DateDebutAssurance: false,
     ReferenceAssurance: false,
     DateExpAssurance: false,
-  },
-}
 
-
-
-
-// ? Contrôle technique
-export const VehicleValidateFormsStep5 = {
-  values: {
-    EtabControle: "", // etat_ctr_tech_vehicule
-    CoutControle: "", // cout_ctr_tech_vehicule
-    ReferenceControle: "", // note_ctr_tech_vehicule
-    DateControle: "", // date_debut_ctr_tech_vehicule
-    DateFinControle: "", // date_fin_ctr_tech_vehicule
-
-  },
-  validations: {
+    // ? Contrôle technique
     EtabControle: false,
     CoutControle: false,
     ReferenceControle: false,
     DateControle: false,
     DateFinControle: false,
     
+    // ? Vignette
+    NumVignette: false,
+    DateVignette: false,
+    CoutVignette: false,
+  },
+}
+
+
+
+
+export const VehicleValidateFormsStep5 = {
+  values: {
+
+  },
+  validations: {
+    
 
   },
 }
 
 
-// ? Vignette
 export const VehicleValidateFormsStep6 = {
   values: {
-    NumVignette: "", // num_vignette_vehicule
-    DateVignette: "", // date_vignette_vehicule
-    CoutVignette: "", // cout_vignette_vehicule
     
   },
   validations: {
-    NumVignette: false,
-    DateVignette: false,
-    CoutVignette: false,
     
 
   },

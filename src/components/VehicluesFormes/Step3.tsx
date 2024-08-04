@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import ActionButtons from './ActionButtons'; 
+import React, { useState, useEffect } from "react";
+import ActionButtons from "./ActionButtons";
 
-import { Tab, TabPanel, Tabs } from './Tabs';
-import './Tabs.css'
+import { Tab, TabPanel, Tabs } from "./Tabs";
 
-import { StepsProps, VehicleFormState, VehicleValidateFormsStep3 } from '../../utilities/interfaces';
-import RentCar from './RentCar';
-import Leasing from './Leasing';
-import Purchase from './Purchase';
+import {
+  StepsProps,
+  VehicleFormState,
+  VehicleValidateFormsStep3,
+} from "../../utilities/interfaces";
+
+import Assurance from "./Assurance";
+import Vignette from "./Vignette";
+import VehicleInspection from "./VehicleInspection";
 
 const Step3: React.FC<StepsProps> = (props) => {
-  const [activeTab, setActiveTab] = useState<string>("Leasing");
+  const [activeTab, setActiveTab] = useState<string>("Assurance");
   const [error, setError] = useState<string>("");
-
-  // Utilisez useEffect pour mettre à jour l'onglet actif lorsque props.user.Step3 change
-  useEffect(() => {
-    setActiveTab(props.user.Step3);
-  }, [props.user.Step3]);
 
   const validate = () => {
     setError("");
@@ -44,42 +43,48 @@ const Step3: React.FC<StepsProps> = (props) => {
     }));
   };
 
-  const isTabDisabled = (tabName: string) => {
-    return props.user.Step3 !== tabName;
-  };
-
   return (
     <div>
-      <span style={{ color: "red" }}>{error}</span>
-      <h2>Acquisition</h2>
+      <div className="p-4">
+        <h2>
+          Assurer la Conformité - Assurance, Vignette et Contrôle Technique
+        </h2>
+        <hr className="w-50 mx-auto border-dark-subtle" />
+        <span className="" style={{ color: "red" }}>
+          {error}
+        </span>
+      </div>
+  
+
+      <br />
       <Tabs>
         <Tab
-          label="Leasing"
-          isActive={activeTab === "Leasing"}
-          onClick={() => setActiveTab("Leasing")}
-          disabled={isTabDisabled("Leasing")}
+          label="Assurance"
+          isActive={activeTab === "Assurance"}
+          onClick={() => setActiveTab("Assurance")}
         />
         <Tab
-          label="Location"
-          isActive={activeTab === "Location"}
-          onClick={() => setActiveTab("Location")}
-          disabled={isTabDisabled("Location")}
+          label="Vignette"
+          isActive={activeTab === "Vignette"}
+          onClick={() => setActiveTab("Vignette")}
         />
         <Tab
-          label="Achat"
-          isActive={activeTab === "Achat"}
-          onClick={() => setActiveTab("Achat")}
-          disabled={isTabDisabled("Achat")}
+          label="Contrôle Technique"
+          isActive={activeTab === "VehicleInspection"}
+          onClick={() => setActiveTab("VehicleInspection")}
         />
       </Tabs>
-      <TabPanel activeTab={activeTab} id="Leasing">
-        <Leasing formState={formState} handleChange={handleChange} />
+
+      <TabPanel activeTab={activeTab} id="Assurance">
+        <Assurance formState={formState} handleChange={handleChange} />
       </TabPanel>
-      <TabPanel activeTab={activeTab} id="Location">
-        <RentCar formState={formState} handleChange={handleChange} />
+
+      <TabPanel activeTab={activeTab} id="Vignette">
+        <Vignette formState={formState} handleChange={handleChange} />
       </TabPanel>
-      <TabPanel activeTab={activeTab} id="Achat">
-        <Purchase formState={formState} handleChange={handleChange} />
+
+      <TabPanel activeTab={activeTab} id="VehicleInspection">
+        <VehicleInspection formState={formState} handleChange={handleChange} />
       </TabPanel>
       <br />
       <ActionButtons

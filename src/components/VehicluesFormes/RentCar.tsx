@@ -1,30 +1,24 @@
-import React, { useState } from 'react'
 import { FloatingLabel, Form, Row } from 'react-bootstrap'
-import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
-import { DureeOption } from '../../utilities/selectOptions';
+import { ContentTabProps} from '../../utilities/interfaces';
 import { InvalidNumberInput } from './InvalidInput';
+import InputFloating from './InputFloating';
 
 
-interface RentCarProps {
-  formState: VehicleFormState
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-/**
- * Renders a form for entering vehicle details, including fields for PSN, power, year, maximum allowed total, circulation date, length, width, height, number of doors, chassis number, and number of seats.
- * 
- * @param params - An object containing the form state and a function to handle changes to the form.
- * @param formState - The current state of the vehicle form.
- * @param handleChange - A function to handle changes to the form.
- */
 const RentCar = ({
   formState,
   handleChange
-}: RentCarProps) => {
+}: ContentTabProps) => {
   return (
     <>
         <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
+          <InputFloating
+            label='Numéro du contrat de location'
+            placeholder="N° Contrat (location)"
+            name='NumContratL'
+            value={formState.values.NumContratL}
+            onChangeFunction={handleChange}
+          />
           <Form.Group controlId='formBasicInput-NumContratL' className='mt-2 col-md-6 col-xl-3'>
             <FloatingLabel controlId="floatingSelect" label='Numéro du contrat de location'>
             <Form.Control

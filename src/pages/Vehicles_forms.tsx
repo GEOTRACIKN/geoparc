@@ -6,9 +6,9 @@ import Step2 from '../components/VehicluesFormes/Step2';
 import Step3 from '../components/VehicluesFormes/Step3';
 import Step4 from '../components/VehicluesFormes/Step4';
 import Step5 from '../components/VehicluesFormes/Step5';
-import Step6 from '../components/VehicluesFormes/Step6';
 import StepWizard from "react-step-wizard";
 import ActionButtons from '../components/VehicluesFormes/ActionButtons';
+import '../components/VehicluesFormes/Tabs.css'
 
 // https://codesandbox.io/p/sandbox/react-v5stq?file=%2Fsrc%2Fsample.js%3A1%2C1-220%2C1
 // https://codesandbox.io/p/sandbox/bold-chihiro-98q4df?file=%2Fsrc%2Fsample.js%3A171%2C1
@@ -25,7 +25,6 @@ export const VehiclesForms = () => {
     { index: 3, statusClass: '', stepTitle: '' },
     { index: 4, statusClass: '', stepTitle: '' },
     { index: 5, statusClass: '', stepTitle: '' },
-    { index: 6, statusClass: '', stepTitle: '' },
   ]);
 
   const assignStepWizard = (instance: any) => {
@@ -174,16 +173,7 @@ export const VehiclesForms = () => {
             nextStep={nextStep}
             lastStep={lastStep}
           />
-          <Step6
-            user={user}
-            userCallback={assignUser}
-            currentStep={activeStep + 1}
-            totalSteps={steps.length}
-            previousStep={previousStep}
-            nextStep={nextStep}
-            lastStep={lastStep}
-  
-          />
+    
         </StepWizard>
   
       </div>

@@ -1,72 +1,42 @@
-import React, { useState } from 'react'
-import { FloatingLabel, Form, Row } from 'react-bootstrap'
-import { VehicleFormState, VehicleValidateFormsStep2 } from '../../utilities/interfaces';
-import { DureeOption } from '../../utilities/selectOptions';
+import { Form, Row } from "react-bootstrap";
+import { ContentTabProps } from "../../utilities/interfaces";
+import  InputFloating  from "./InputFloating";
 
 
-interface PurchaseProps {
-  formState: VehicleFormState
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-}
+const Purchase = ({ formState, handleChange }: ContentTabProps) => {
 
-/**
- * Renders a form for entering vehicle details, including fields for PSN, power, year, maximum allowed total, circulation date, length, width, height, number of doors, chassis number, and number of seats.
- * 
- * @param params - An object containing the form state and a function to handle changes to the form.
- * @param formState - The current state of the vehicle form.
- * @param handleChange - A function to handle changes to the form.
- */
-const Purchase = ({
-  formState,
-  handleChange
-}: PurchaseProps) => {
   return (
     <>
-        <Form onSubmit={(e) => e.preventDefault()}>
+      <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
-          <Form.Group controlId='formBasicInput-DateAcquis' className='mt-2 col-md-6'>
-            <FloatingLabel controlId="floatingSelect" label='Date acquisition'>
-            <Form.Control
-            placeholder=' '
+          <InputFloating
             type="date"
-            name='DateAcquis'
+            label="Date acquisition"
+            name="DateAcquis"
             value={formState.values.DateAcquis}
-            onChange={handleChange}
-            className={formState.validations.DateAcquis ? 'is-valid' : ''}
+            onChangeFunction={handleChange}
+            xl={false}
             />
-          </FloatingLabel>
-          </Form.Group>
-          <Form.Group controlId='formBasicInput-Taxe' className='mt-2 col-md-6'>
-            <FloatingLabel controlId="floatingSelect" label='Taxe véhicule neuf'>
-            <Form.Control
-            placeholder=' '
-            type="text"
-            name='Taxe'
+          <InputFloating
+            label="Taxe véhicule neuf"
+            name="Taxe"
             value={formState.values.Taxe}
-            onChange={handleChange}
-            className={formState.validations.Taxe ? 'is-valid' : ''}
+            onChangeFunction={handleChange}
+            xl={false}
             />
-          </FloatingLabel>
-          </Form.Group>
         </Row>
         <Row>
-          <Form.Group controlId='formBasicInput-TotalAchat' className='mt-2 col-md-6'>
-            <FloatingLabel controlId="floatingSelect" label='Total achat'>
-            <Form.Control
-            placeholder=' '
-            type="text"
-            name='TotalAchat'
+          <InputFloating
+            label="Total achat"
+            name="TotalAchat"
             value={formState.values.TotalAchat}
-            onChange={handleChange}
-            className={formState.validations.TotalAchat ? 'is-valid' : ''}
-            />
-          </FloatingLabel>
-          </Form.Group>
+            onChangeFunction={handleChange}
+            xl={false}
+          />
         </Row>
-        </Form>
-      
+      </Form>
     </>
-  )
-}
+  );
+};
 
-export default Purchase
+export default Purchase;
