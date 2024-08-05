@@ -83,9 +83,55 @@ const GeneralInformations = ({
             value={formState.values.AffectationVehicl}
             onChangeFunction={handleChange}
           />
+        <InputFloating
+            label='Gamme'
+            name='Moteur'
+            value={formState.values.Moteur}
+            onChangeFunction={handleChange}
+          />
 
         </Row>
-        <Row></Row>
+        <Row>
+        <InputFloating
+            label='Capacité réservoir (L)'
+            name='Capacite_res'
+            value={formState.values.Capacite_res}
+            onChangeFunction={handleChange}
+          />
+        <InputFloating
+            label='Consommation moyenne (l/100km)s'
+            name='Consom_moyenne'
+            value={formState.values.Consom_moyenne}
+            onChangeFunction={handleChange}
+          />
+        <InputFloating
+            label='Codification véhicule'
+            name='Codification'
+            value={formState.values.Codification}
+            onChangeFunction={handleChange}
+          />
+        <InputFloating
+            label='Kilométrage (Km)'
+            name='Kilom'
+            value={formState.values.Kilom}
+            onChangeFunction={handleChange}
+          />
+        </Row>
+        <Row>
+        <InputFloating
+            label="Durée d'amortissement (jours)"
+            name='Payback_Period'
+            value={formState.values.Payback_Period}
+            onChangeFunction={handleChange}
+          />
+        <InputFloating
+            label="Durée d'amortissement (jours)"
+            name='Payback_Period'
+            value={formState.values.Payback_Period}
+            onChangeFunction={handleChange}
+          />
+
+        </Row>
       </Form>
     </>
   );

@@ -315,7 +315,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             controlId="formBasicSelect-NameParc"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Parc">
+            <FloatingLabel controlId="floatingSelect" label="Parc" className="text-truncate"
+              style={{ maxWidth: '100%' }}>
               <Form.Select
                 as="select"
                 name="NameParc"
@@ -338,7 +339,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             controlId="formBasicSelect-driver"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Conducteur">
+            <FloatingLabel controlId="floatingSelect" label="Conducteur" className="text-truncate"
+              style={{ maxWidth: '100%' }}>
               <Form.Select
                 as="select"
                 name="Driver"
@@ -364,6 +366,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             <FloatingLabel
               controlId="floatingSelect"
               label="Affectation Vehicule"
+              className="text-truncate"
+              style={{ maxWidth: '100%' }}
             >
               <Form.Select
                 as="select"
@@ -389,7 +393,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             controlId="formBasicInput-Gamme"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Gamme">
+            <FloatingLabel controlId="floatingSelect" label="Gamme" className="text-truncate"
+              style={{ maxWidth: '100%' }}>
               <Form.Control
                 placeholder=" "
                 type="text"
@@ -411,6 +416,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             <FloatingLabel
               controlId="floatingSelect"
               label="Capacité réservoir (L)"
+              className="text-truncate"
+              style={{ maxWidth: '100%' }}
             >
               <Form.Control
                 placeholder=" "
@@ -431,6 +438,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             <FloatingLabel
               controlId="floatingSelect"
               label="Consommation moyenne (l/100km)s"
+              className="text-truncate"
+              style={{ maxWidth: '100%' }}
             >
               <Form.Control
                 placeholder=" "
@@ -464,7 +473,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
             controlId="formBasicInput-Kilom"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Kilométrage (Km)">
+            <FloatingLabel controlId="floatingSelect" label="Kilométrage (Km)" className="text-truncate"
+              style={{ maxWidth: '100%' }}>
               <Form.Control
                 placeholder=" "
                 type="text"

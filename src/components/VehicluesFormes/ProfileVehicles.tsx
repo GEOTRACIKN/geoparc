@@ -31,7 +31,7 @@ const ProfileVehicles: React.FC<{ formState: any }> = ({ formState }) => {
   return (
     <div className="container">
       <div className="row gy-4 gy-lg-0">
-        <div className="col-12 col-lg-4 col-xl-3">
+        {/* <div className="col-12 col-lg-4 col-xl-3">
           <div className="row gy-4">
             <div className="col-12">
               <div className="card widget-card border-light shadow-sm">
@@ -39,43 +39,15 @@ const ProfileVehicles: React.FC<{ formState: any }> = ({ formState }) => {
                   Bienvenue, {userData.nom}
                 </div>
                 <div className="card-body">
-                  <div className="text-center mb-3">
-                    <img
-                      src={userData.imageProfil}
-                      className="img-fluid rounded-circle"
-                      alt={userData.nom}
-                    />
-                  </div>
-                  <h5 className="text-center mb-1">{userData.nom}</h5>
-                  <p className="text-center text-secondary mb-4">
-                    {userData.poste}
-                  </p>
-                  <ul className="list-group list-group-flush mb-4">
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                      <h6 className="m-0">Abonnés</h6>
-                      <span>{userData.followers}</span>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                      <h6 className="m-0">Abonnements</h6>
-                      <span>{userData.following}</span>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                      <h6 className="m-0">Amis</h6>
-                      <span>{userData.amis}</span>
-                    </li>
-                  </ul>
-                  <div className="d-grid m-0">
-                    <button className="btn btn-outline-primary" type="button">
-                      S'abonner
-                    </button>
-                  </div>
+                
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="col-12 col-lg-8 col-xl-9">
+        {/* <div className="col-12 col-lg-8 col-xl-9"> */}
+        <div className="col-12 ">
           <div className="card widget-card border-light shadow-sm">
             <div className="card-body p-4">
               {formState && (

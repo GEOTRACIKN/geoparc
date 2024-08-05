@@ -19,7 +19,12 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             controlId="formBasicInput-Fournisseur"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Fournisseur">
+            <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
+              controlId="floatingSelect"
+              label="Fournisseur"
+            >
               <Form.Control
                 placeholder=" "
                 type="text"
@@ -41,7 +46,12 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             controlId="formBasicInput-NumContrat"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Numéro du contrat">
+            <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
+              controlId="floatingSelect"
+              label="Numéro du contrat"
+            >
               <Form.Control
                 placeholder="N° du contrat"
                 type="text"
@@ -57,6 +67,8 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
               controlId="floatingSelect"
               label="Echéance restantes"
             >
@@ -78,7 +90,12 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             controlId="formBasicInput-Duree"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Durée">
+            <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
+              controlId="floatingSelect"
+              label="Durée"
+            >
               <Form.Select
                 as="select"
                 name="Duree"
@@ -99,7 +116,12 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             controlId="formBasicInput-PayeAcejour"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Payé à ce jour">
+            <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
+              controlId="floatingSelect"
+              label="Payé à ce jour"
+            >
               <Form.Control
                 placeholder=" "
                 type="text"
@@ -121,7 +143,12 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             controlId="formBasicInput-DernierPaiment"
             className="mt-2 col-md-6 col-xl-3"
           >
-            <FloatingLabel controlId="floatingSelect" label="Dernier paiement">
+            <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
+              controlId="floatingSelect"
+              label="Dernier paiement"
+            >
               <Form.Control
                 placeholder=" "
                 type="text"
@@ -141,6 +168,8 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
               controlId="floatingSelect"
               label="Date 1ere échéance"
             >
@@ -162,6 +191,8 @@ const Leasing = ({ formState, handleChange }: ContentTabProps) => {
             className="mt-2 col-md-6 col-xl-3"
           >
             <FloatingLabel
+              className="text-truncate"
+              style={{ maxWidth: "100%" }}
               controlId="floatingSelect"
               label="Prochaine échéance"
             >

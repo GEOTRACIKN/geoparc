@@ -118,7 +118,7 @@ export const VehiclesForms = () => {
 
 
   return (
-    <div className="w-100 mb-3">
+    <div className="w-100 mb-3 bg-amber-200">
       <h1>Ajouter véhicule</h1>
         <div className='mainWizard'>
   

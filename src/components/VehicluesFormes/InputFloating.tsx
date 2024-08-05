@@ -22,7 +22,12 @@ const InputFloating = ({
       controlId={`formBasicInput-${name}`}
       className={`mt-2 col-md-6 ${xl ? 'col-xl-3' : '' } `}
     >
-      <FloatingLabel controlId="floatingSelect" label={label}>
+      <FloatingLabel  
+          className="text-truncate"
+          style={{ maxWidth: '100%' }} 
+          controlId="floatingSelect" 
+          label={label}
+          >
         <Form.Control
           placeholder={placeholder}
           type={type}
