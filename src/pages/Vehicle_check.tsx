@@ -1,5 +1,4 @@
-import { error } from "console";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button, ProgressBar, Card, }
     from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -72,7 +71,7 @@ type FormData = {
     proprete_int: string;
     proprete_ext: string;
     maintenance: string;
-    commentaire : string;
+    commentaire: string;
 };
 
 // Définition des règles de validation par champ
@@ -157,10 +156,12 @@ export function Vehiclecheck() {
         proprete_int: '',
         proprete_ext: '',
         maintenance: '',
-        commentaire : '',
+        commentaire: '',
     });
     const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
+    const [matricules, setMatricules] = useState<string[]>([]);
+
 
     const validateForm = () => {
         const {
@@ -305,17 +306,26 @@ export function Vehiclecheck() {
         }
     };
 
-    const getmatricule = async () =>{
-      try{
-         const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`,
-        { mode: "cors" });
-        const data = await res.json();
-        return data;
-      }
-      catch(error){
-        console.error("Erreur lors du chargement  :", error);
-      }
-    }
+    const getMatricule = async () => {
+        try {
+            const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`, { mode: "cors" });
+            const data = await res.json();
+            return data;
+        } catch (error) {
+            console.error("Erreur lors du chargement :", error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchMatricule = async () => {
+            const data = await getMatricule();
+            if (data && Array.isArray(data)) {
+                const immatriculations = data.map((item: { immatriculation_vehicule: string }) => item.immatriculation_vehicule);
+                setMatricules(immatriculations);
+            }
+        };
+        fetchMatricule();
+    }, []);
 
     return (
         <Container>
@@ -362,23 +372,23 @@ export function Vehiclecheck() {
                                         placeholder="Entrez le chauffeur entrant"
                                     />
                                 </Col>
-                            </Form.Group>
-                            <Form.Group
-                                as={Row}
-                                controlId="formmatriculetrac"
-                                className="mb-3"
-                            >
-                                <Form.Label column sm={10}>
-                                    Immatriculation tracteur
-                                </Form.Label>
+                            </Form.Group >
+                            <Form.Group as={Row}  className="mb-3">
+                                <Form.Label>Matricule Tracteur</Form.Label>
                                 <Col sm={10}>
-                                    <Form.Control
-                                        type="text"
-                                        name="matriculetrac"
-                                        value={formData.matriculetrac}
-                                        onChange={handleChange}
-                                        placeholder="Entrez l'immatriculation du tracteur"
-                                    />
+                                <Form.Control
+                                    as="select"
+                                    name="matriculetrac"
+                                    value={formData.matriculetrac}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Sélectionner un matricule</option>
+                                    {matricules.map((matricule, index) => (
+                                        <option key={index} value={matricule}>
+                                            {matricule}
+                                        </option>
+                                    ))}
+                                </Form.Control>
                                 </Col>
                             </Form.Group>
 
@@ -461,24 +471,25 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group
-                                as={Row}
-                                controlId="formmatriculerem"
-                                className="mb-3"
+                            <Form.Group as={Row}  className="mb-3"
                             >
-                                <Form.Label column sm={10}>
-                                    Immatriculation remorque
-                                </Form.Label>
-                                <Col sm={10}>
-                                    <Form.Control
-                                        type="text"
-                                        name="matriculerem"
-                                        value={formData.matriculerem}
-                                        onChange={handleChange}
-                                        placeholder="Entrez l'immatriculation de la remorque"
-                                    />
-                                </Col>
-                            </Form.Group>
+                            <Form.Label>Matricule Remorque</Form.Label>
+                            <Col sm={10}>
+                            <Form.Control
+                                as="select"
+                                name="matriculetrac"
+                                value={formData.matriculetrac}
+                                onChange={handleChange}
+                            >
+                                <option value="">Sélectionner un matricule</option>
+                                {matricules.map((matricule, index) => (
+                                    <option key={index} value={matricule}>
+                                        {matricule}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                            </Col>
+                        </Form.Group>
 
                             <Form.Group as={Row} controlId="formHeures" className="mb-3">
                                 <Form.Label column sm={10}>
