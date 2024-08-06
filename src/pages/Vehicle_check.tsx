@@ -305,6 +305,18 @@ export function Vehiclecheck() {
         }
     };
 
+    const getmatricule = async () =>{
+      try{
+         const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`,
+        { mode: "cors" });
+        const data = await res.json();
+        return data;
+      }
+      catch(error){
+        console.error("Erreur lors du chargement  :", error);
+      }
+    }
+
     return (
         <Container>
             <h3 className="text-center mb-4">Vérification véhicule</h3>
