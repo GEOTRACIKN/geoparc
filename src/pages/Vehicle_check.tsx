@@ -160,7 +160,8 @@ export function Vehiclecheck() {
     });
     const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
-    const [matricules, setMatricules] = useState<string[]>([]);
+    const [tractorMatricules, setTractorMatricules] = useState<string[]>([]);
+    const [trailerMatricules, setTrailerMatricules] = useState<string[]>([]);
 
 
     const validateForm = () => {
@@ -306,7 +307,7 @@ export function Vehiclecheck() {
         }
     };
 
-    const getMatricule = async () => {
+    const getMatricules = async () => {
         try {
             const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`, { mode: "cors" });
             const data = await res.json();
@@ -317,14 +318,21 @@ export function Vehiclecheck() {
     };
 
     useEffect(() => {
-        const fetchMatricule = async () => {
-            const data = await getMatricule();
-            if (data && Array.isArray(data)) {
-                const immatriculations = data.map((item: { immatriculation_vehicule: string }) => item.immatriculation_vehicule);
-                setMatricules(immatriculations);
+        const fetchMatricules = async () => {
+            const tractorData = await getMatricules();
+            const trailerData = await getMatricules();
+
+            if (tractorData && Array.isArray(tractorData)) {
+                const tractorImmatriculations = tractorData.map((item: { immatriculation_vehicule: string }) => item.immatriculation_vehicule);
+                setTractorMatricules(tractorImmatriculations);
+            }
+
+            if (trailerData && Array.isArray(trailerData)) {
+                const trailerImmatriculations = trailerData.map((item: { immatriculation_vehicule: string }) => item.immatriculation_vehicule);
+                setTrailerMatricules(trailerImmatriculations);
             }
         };
-        fetchMatricule();
+        fetchMatricules();
     }, []);
 
     return (
@@ -373,9 +381,9 @@ export function Vehiclecheck() {
                                     />
                                 </Col>
                             </Form.Group >
-                            <Form.Group as={Row}  className="mb-3">
-                                <Form.Label>Matricule Tracteur</Form.Label>
-                                <Col sm={10}>
+                            <Form.Group as={Row} className="mb-3">
+                            <Form.Label>Matricule Tracteur</Form.Label>
+                            <Col sm={10}>
                                 <Form.Control
                                     as="select"
                                     name="matriculetrac"
@@ -383,14 +391,14 @@ export function Vehiclecheck() {
                                     onChange={handleChange}
                                 >
                                     <option value="">Sélectionner un matricule</option>
-                                    {matricules.map((matricule, index) => (
+                                    {tractorMatricules.map((matricule, index) => (
                                         <option key={index} value={matricule}>
                                             {matricule}
                                         </option>
                                     ))}
                                 </Form.Control>
-                                </Col>
-                            </Form.Group>
+                            </Col>
+                        </Form.Group>
 
                             <Form.Group as={Row} controlId="formKm" className="mb-3">
                                 <Form.Label column sm={10}>
@@ -471,23 +479,22 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row}  className="mb-3"
-                            >
+                            <Form.Group as={Row} className="mb-3">
                             <Form.Label>Matricule Remorque</Form.Label>
                             <Col sm={10}>
-                            <Form.Control
-                                as="select"
-                                name="matriculetrac"
-                                value={formData.matriculetrac}
-                                onChange={handleChange}
-                            >
-                                <option value="">Sélectionner un matricule</option>
-                                {matricules.map((matricule, index) => (
-                                    <option key={index} value={matricule}>
-                                        {matricule}
-                                    </option>
-                                ))}
-                            </Form.Control>
+                                <Form.Control
+                                    as="select"
+                                    name="matriculerem"
+                                    value={formData.matriculerem}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Sélectionner un matricule</option>
+                                    {trailerMatricules.map((matricule, index) => (
+                                        <option key={index} value={matricule}>
+                                            {matricule}
+                                        </option>
+                                    ))}
+                                </Form.Control>
                             </Col>
                         </Form.Group>
 
