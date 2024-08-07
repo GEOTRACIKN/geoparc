@@ -25,6 +25,7 @@
     "bootstrap": "^5.3.2",
     "bootstrap-steps": "^1.0.3",
     "date-fns-tz": "^2.0.0",
+    "geoparc": "file:",
     "highcharts": "^11.2.0",
     "highcharts-gantt": "^0.1.7",
     "highcharts-react-official": "^3.2.1",
@@ -53,7 +54,7 @@
     "react-paginate": "^8.2.0",
     "react-pdf": "^7.7.0",
     "react-router-dom": "^6.22.3",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-select": "^5.8.0",
     "react-slick": "^0.29.0",
     "react-spinners": "^0.13.8",
@@ -63,14 +64,13 @@
     "react-toastify": "^10.0.5",
     "typescript": "^4.9.5",
     "universal-cookie": "^6.1.1",
-    "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts start",
     "build": "set \"REACT_APP_BACKEND_URL=https://geoparc.com\" && react-scripts build",
     "copy-build": "xcopy /E /I /Y \"build\" \"..\\..\\httpdocs\"",
-    "build-and-copy": "npm run build && npm run copy-build", 
+    "build-and-copy": "npm run build && npm run copy-build",
     "test": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts test",
     "eject": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts eject"
   },
