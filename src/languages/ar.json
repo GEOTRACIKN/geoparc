@@ -469,6 +469,7 @@
 "Can't updating vehicle": "لا يمكن تحديث المركبة", 
 "Vehicle updated successfully": "تم تحديث المركبة بنجاح",
 "List reports": "قائمة التقارير",
+"List drivers": "قائمة السائقين",
 "Grid View": "عرض شبكي",
 "List view": "عرض القائمة",
 "Search for a report": "ابحث عن تقرير" ,     
@@ -505,7 +506,13 @@
 "Tractor Registration": "تسجيل الجرار",
 "Trailer Registration": "تسجيل المقطورة",
 "Maintenance": "الصيانة",
-"Verified Vehicles": "المركبات المُتحقَّق منها"
-
-
+"Verified Vehicles": "المركبات المُتحقَّق منها",
+"Last & first Name": "الإسم واللقب",
+"Date of birth": "تاريخ الميلاد",
+"Park": "موقف السيارات",
+"Code": "رمز",
+"Displaying": "إظهار",
+"Import": "تحميل",
+"Validate employees' salaries":"التحقق من رواتب الموظفين",  
+"on":"على"
 }

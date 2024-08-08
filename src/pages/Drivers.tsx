@@ -4,17 +4,17 @@ import { Form, Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
-import { PropagateLoader } from 'react-spinners'; 
+import { PropagateLoader } from 'react-spinners';
 
 interface Drivers {
-  id_conducteur:number;
-  code_conducteur:number;
-  nom_conducteur:string;
-  prenom_conducteur:string;
-  date_naissance_conducteur:string;
-  email_conducteur:string;	
-  telephone_conducteur:string;
-  id_parc:number; 
+  id_conducteur: number;
+  code_conducteur: number;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+  date_naissance_conducteur: string;
+  email_conducteur: string;
+  telephone_conducteur: string;
+  id_parc: number;
 }
 
 
@@ -31,17 +31,17 @@ export function Drivers() {
   const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
-  let [total, settotal] = useState(0);   
+  let [total, settotal] = useState(0);
   const [colum, setSortColum] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
-  const [search, setSearch] = useState(""); 
-  const [type, setType] = useState(0); 
+  const [search, setSearch] = useState("");
+  const [type, setType] = useState(0);
   const [typeSeach, setTypeSeach] = useState("ID");
-  
+
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);  
+  const handleShow = () => setShow(true);
 
   const handleSubmit = () => {
     // Votre logique de soumission ici
@@ -74,10 +74,10 @@ export function Drivers() {
 
       const totalPagesJson = await totalPagesResponse.json();
       const total = totalPagesJson[0]["count"];
-      settotal(total); 
+      settotal(total);
 
       // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, { 
+      const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,12 +88,12 @@ export function Drivers() {
 
       const data = await DriversResponse.json();
       setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue) 
+      setLimit(limitValue)
       setDrivers(data);
-  
+
     } catch (error) {
       console.error(error);
- 
+
     } finally {
       setLoading(false);
     }
@@ -143,7 +143,7 @@ export function Drivers() {
       const data = await DriversResponse.json();
       setpageCount(Math.ceil(total / limitValue));
       setLimit(limitValue)
-    
+
       return data;
     } catch (error) {
       console.error(error);
@@ -171,19 +171,19 @@ export function Drivers() {
     setLimit(newValue);
     const commentsFormServer = await getAlarmlimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
     setDrivers(commentsFormServer);
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
   };
-  
+
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_conducteur:true,
-    code_conducteur:true,
-    nom_conducteur:true,
-    prenom_conducteur:true,
-    date_naissance_conducteur:true,
-    email_conducteur:true,
-    telephone_conducteur:true,
-    id_parc:true
+    id_conducteur: true,
+    code_conducteur: true,
+    nom_conducteur: true,
+    prenom_conducteur: true,
+    date_naissance_conducteur: true,
+    email_conducteur: true,
+    telephone_conducteur: true,
+    id_parc: true
   });
 
   const handleColumnChange = (column: string) => {
@@ -195,52 +195,54 @@ export function Drivers() {
 
 
 
-  
-  const handleTypeSearch = (event:any) => {
+
+  const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
-   
+
     switch (selectedValue) {
       case translate("ID Driver"):
-          setType(0);
+        setType(0);
         break;
-      case translate("Last & First Name"):
-       setType(1);
-       
+      case translate("Code"): 
+        setType(1);
         break;
-      case translate("Date Of Birth"):
-     setType(2);
- 
+      case translate("Last & first Name"):
+        setType(2);
+        break;
+      case translate("Date of Birth"):
+        setType(3);
+
         break;
       case translate("Email"):
-         setType(3);
+        setType(4);
         break;
-        case translate("Phone"):
-          setType(4);
-         break;
-         case translate("Park"):
-          setType(4);
-         break;
+      case translate("Phone"):
+        setType(5);
+        break;
+      case translate("Park"):
+        setType(6);
+        break;
       default:
         console.log('Unknown selection');
         break;
     }
     setTypeSeach(selectedValue);
-    console.log('Selected value:', selectedValue); 
+    console.log('Selected value:', selectedValue);
   };
 
-  const handleAdvancedSearch = async (event:any) => {
+  const handleAdvancedSearch = async (event: any) => {
 
-    const newValue = event.target.value; 
+    const newValue = event.target.value;
     setSearch(newValue)
-    await getAlarm(limit, currentPage, search, type, colum, sort);
+    await getAlarm(limit, currentPage, newValue, type, colum, sort);
   };
 
 
-  const handleSortingColum =  (curentColum:string) => {
+  const handleSortingColum = (curentColum: string) => {
 
-    setSortColum(curentColum) 
-    sort=="ASC" ? setSort("DESC") :  setSort("ASC") ; 
-     getAlarm(limit, currentPage, search, type, colum, sort);
+    setSortColum(curentColum)
+    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    getAlarm(limit, currentPage, search, type, colum, sort);
   };
 
   return (
@@ -248,19 +250,19 @@ export function Drivers() {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-           <i className="las la-user-nurse"></i> 
-            {translate("Drivers")} ({total})
+            <i className="las la-user-nurse"></i>
+            {translate("Drivers")} <span>({total})</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
           <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>Add Driver
+            <i className="las la-plus mr-3"></i>{translate("Add")} {translate("Driver")}
           </Button>
           <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-cubes mr-3"></i>Validate employees' salaries
+            <i className="las la-cubes mr-3"></i>{translate("Validate employees' salaries")}
           </Button>
           <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-file-excel mr-3"></i>Import Conductors
+            <i className="las la-file-excel mr-3"></i> {translate("Import")} {translate("Driver")}
           </Button>
         </div>
       </div>
@@ -279,14 +281,15 @@ export function Drivers() {
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
                 <Dropdown.Item>{translate("ID Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Last & First Name")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date Of Birth")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Code")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Last & first Name")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Date of Birth")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Email")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Phone")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Park")}</Dropdown.Item> 
+                <Dropdown.Item>{translate("Park")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` By ${typeSeach}` } onChange={handleAdvancedSearch} className="form-control" />
+            <input type="text" placeholder={` By ${typeSeach}`} onChange={handleAdvancedSearch} className="form-control" />
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
@@ -396,7 +399,7 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.email_conducteur} 
+                  checked={selectedColumns.email_conducteur}
                   onChange={() => handleColumnChange("email_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>{translate("Email")}</span>
@@ -414,88 +417,88 @@ export function Drivers() {
                   <input className="form-check-input" type="checkbox" />
                   <label className="form-check-label"></label>
                 </div>
-              </th> 
+              </th>
 
               {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumns.code_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & First Name")}</th>)}
-              {selectedColumns.date_naissance_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
-              {selectedColumns.email_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumns.telephone_conducteur && (<th className="sorting"  onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumns.id_parc && (<th className="sorting"  onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
+              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & first Name")}</th>)}
+              {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
+              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
+              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
+              {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
           <tbody key="#" className="ligth-body">
             {loading ? (
-              <tr > 
+              <tr >
                 <td className="text-center" colSpan={7}> <PropagateLoader color={'#123abc'} loading={loading} size={20} /></td>
               </tr>
-            ) : 
-            (
-              list_Drivers.length > 0 ? (
-                list_Drivers.map((driver) => (
-                  <tr key={driver.id_conducteur}>
-                    <td>
-                      <div className="form-check form-check-inline">
-                        <input type="checkbox" className="form-check-input" />
-                      </div>
-                    </td>
-                    {selectedColumns.id_conducteur && <td>{driver.id_conducteur }</td>}
-                    {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}  
-                    {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur+" " + driver.prenom_conducteur}</td>)}
-                    {selectedColumns.date_naissance_conducteur && <td>{formatToTimestamp(driver.date_naissance_conducteur)}</td>}
-                    {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
-                    {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                    {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
-                 
-                    <td>
-                      <div className="d-flex align-items-center list-action">
-                        <Link
-                          to={`#`}
-                          className="badge badge-success mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Editer alarme"
-                        >
-                          <i
-                            className="las la-cog"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </Link>
-                        <a
-                          className="badge bg-warning mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Méthodes de notification"
-                          data-original-title="Delete"
-                        >
-                          <i
-                            className="las la-exclamation-circle"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </a>
-                        <a
-                          className="badge bg-primary mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Attaché à"
-                          data-original-title="download"
-                        >
-                          <i
-                            className="las la-magnet"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))) : (
+            ) :
+              (
+                list_Drivers.length > 0 ? (
+                  list_Drivers.map((driver) => (
+                    <tr key={driver.id_conducteur}>
+                      <td>
+                        <div className="form-check form-check-inline">
+                          <input type="checkbox" className="form-check-input" />
+                        </div>
+                      </td>
+                      {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
+                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
+                      {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
+                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur!= null ? driver.date_naissance_conducteur.split('T')[0]+' '+driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0]  : translate("None")}</td>}
+                      {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
+                      {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
+                      {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
 
-                <tr>
-                  <td colSpan={7}>No drivers available</td>
-                </tr>
-              )
+                      <td>
+                        <div className="d-flex align-items-center list-action">
+                          <Link
+                            to={`#`}
+                            className="badge badge-success mr-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Editer alarme"
+                          >
+                            <i
+                              className="las la-cog"
+                              style={{ fontSize: "1.2em" }}
+                            ></i>
+                          </Link>
+                          <a
+                            className="badge bg-warning mr-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Méthodes de notification"
+                            data-original-title="Delete"
+                          >
+                            <i
+                              className="las la-exclamation-circle"
+                              style={{ fontSize: "1.2em" }}
+                            ></i>
+                          </a>
+                          <a
+                            className="badge bg-primary mr-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Attaché à"
+                            data-original-title="download"
+                          >
+                            <i
+                              className="las la-magnet"
+                              style={{ fontSize: "1.2em" }}
+                            ></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))) : (
+
+                  <tr>
+                    <td colSpan={7}>No drivers available</td>
+                  </tr>
+                )
               )}
           </tbody>
         </Table>
@@ -503,29 +506,29 @@ export function Drivers() {
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            {translate("Displaying")} {list_Drivers.length} {translate("out of")}{" "}
+            {translate("Displaying")} {list_Drivers.length} {translate("on")}{" "}
             {total}
           </span>
         </div>
         <div className="col-md-6">
           <ReactPaginate
-              previousLabel={translate("previous")}
-              nextLabel={translate("next")}
-              breakLabel={"..."}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination justify-content-center"}
-              pageClassName={"page-item"}
-              pageLinkClassName={"page-link"}
-              previousClassName={"page-item"}
-              previousLinkClassName={"page-link"}
-              nextClassName={"page-item"}
-              nextLinkClassName={"page-link"}
-              breakClassName={"page-item"}
-              breakLinkClassName={"page-link"}
-              activeClassName={"active"}
+            previousLabel={translate("previous")}
+            nextLabel={translate("next")}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-center"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
           />
         </div>
       </div>

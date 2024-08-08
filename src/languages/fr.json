@@ -49,6 +49,7 @@
 "Vehicle": "Véhicule",
 "New vehicle": "Nouveau véhicule", 
 "List vehicles": "Liste vehicules",
+"List drivers": "Liste conducteurs",
 "Driver assignments": "Affectations conducteurs",
 "Import drivers": "Importer conducteurs",
 "Import vehicles": "Importer véhicules",
@@ -497,7 +498,12 @@
 "Incoming Driver": "Chauffeur Entrant",
 "Tractor Registration": "Matricule Tracteur",
 "Trailer Registration": "Matricule Remorque",
-"Verified Vehicles": "Véhicules Vérifiés"
-
-
+"Verified Vehicles": "Véhicules Vérifiés",
+"Last & first Name": "Nom et prénom",
+"Park": "Parc",
+"Code": "Code",
+"Displaying": "Affichage" ,
+"Import": "Importer",
+"Validate employees' salaries":"Valider les salaires des employés",
+"on":"sur"
 }

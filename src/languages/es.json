@@ -301,7 +301,7 @@
 "Driving time": "Tiempo de conducción",
 "Average speed": "Velocidad promedio",
 "Parking duration": "Duración de estacionamiento",
-
+"Date of birth": "Fecha de nacimiento",
 "Speed range (km/h)": "Rango de velocidad (km/h)",
 "Percentage of time spent per speed range": "Porcentaje de tiempo por rango de velocidad",
 "Speed Statistics": "Estadísticas de velocidad",
@@ -548,6 +548,7 @@
 "Can't create a vehicle": "No se puede crear un vehículo",
 "Vehicle created successfully!": "Vehículo creado exitosamente !",
 "List reports":"Listar informes",
+"List drivers": "Listar conductores",
 "Grid View": "Vista rejilla",
 "List view": "Vista lista",   
 "Search for a report": "Buscar un informe",           
@@ -585,7 +586,13 @@
 "Tractor Registration": "Matrícula del Tractor",
 "Trailer Registration": "Matrícula del Remolque",
 "Maintenance": "Mantenimiento",
-"Verified Vehicles": "Vehículos Verificados"
-
+"Verified Vehicles": "Vehículos Verificados",
+"Last & first Name": "Nombre y apellido",
+"Park": "Aparcamiento",
+"Code": "Codigo",
+"Displaying": "Mostrar",
+"Import": "Importar",
+"Validate employees' salaries":"Validar salarios de empleados",
+"on":"en"
 
 }

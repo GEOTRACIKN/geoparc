@@ -452,6 +452,7 @@
 "Can't updating vehicle": "Can't updating vehicle",
 "Vehicle updated successfully": "Vehicle updated successfully",
 "List reports": "List reports",
+"List drivers": "List drivers",
 "Grid View": "Grid View",
 "List view": "List view",
 "Search for a report": "Search for a report",
@@ -490,9 +491,12 @@
 "Incoming Driver": "Incoming Driver",
 "Tractor Registration": "Tractor Registration",
 "Trailer Registration": "Trailer Registration",
-"Verified Vehicles": "Verified Vehicles"
-
-
-
-
+"Verified Vehicles": "Verified Vehicles",
+"Last & first Name": "Last & First Name",
+"Park": "Park",
+"Code": "Code",
+"Displaying": "Displaying",
+"Import": "Import",
+"Validate employees' salaries":"Validate employees' salaries",
+"on":"on"
 }
