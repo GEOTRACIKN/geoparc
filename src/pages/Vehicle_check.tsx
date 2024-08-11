@@ -236,14 +236,17 @@ export function Vehiclecheck() {
     };
 
     const convertValue = (value: any) => {
-        if (value === "Conforme" || value === "Oui" || value === "Fonctionnel") {
+        if (!value) {
+            return 0;
+        } else if (value === "Conforme" || value === "Oui" || value === "Fonctionnel") {
             return 1;
         } else if (value === "Non Conforme" || value === "Non" || value === "Alerte") {
             return 2;
         } else {
-            return value; // pour les valeurs numériques ou autres
+            return value;
         }
     };
+
 
     const handleSubmit = async () => {
         if (validateForm()) {
@@ -382,38 +385,39 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group >
                             <Form.Group as={Row} className="mb-3">
-                            <Form.Label>Matricule Tracteur</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    as="select"
-                                    name="matriculetrac"
-                                    value={formData.matriculetrac}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Sélectionner un matricule</option>
-                                    {tractorMatricules.map((matricule, index) => (
-                                        <option key={index} value={matricule}>
-                                            {matricule}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </Col>
-                        </Form.Group>
-
+                                <Form.Label>Matricule Tracteur</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        as="select"
+                                        name="matriculetrac"
+                                        value={formData.matriculetrac}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Sélectionner un matricule</option>
+                                        {tractorMatricules.map((matricule, index) => (
+                                            <option key={index} value={matricule}>
+                                                {matricule}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
                             <Form.Group as={Row} controlId="formKm" className="mb-3">
                                 <Form.Label column sm={10}>
                                     Km
                                 </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
-                                        type="text"
+                                        type="number"
                                         name="km"
                                         value={formData.km}
                                         onChange={handleChange}
                                         placeholder="Entrez le nombre de kilomètres"
+                                        min="0"
                                     />
                                 </Col>
                             </Form.Group>
+
                             <Form.Group as={Row} controlId="formpapier" className="mb-3">
                                 <Form.Label column sm={10}>
                                     Papiers *
@@ -480,23 +484,23 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-3">
-                            <Form.Label>Matricule Remorque</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    as="select"
-                                    name="matriculerem"
-                                    value={formData.matriculerem}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Sélectionner un matricule</option>
-                                    {trailerMatricules.map((matricule, index) => (
-                                        <option key={index} value={matricule}>
-                                            {matricule}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </Col>
-                        </Form.Group>
+                                <Form.Label>Matricule Remorque</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        as="select"
+                                        name="matriculerem"
+                                        value={formData.matriculerem}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Sélectionner un matricule</option>
+                                        {trailerMatricules.map((matricule, index) => (
+                                            <option key={index} value={matricule}>
+                                                {matricule}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
 
                             <Form.Group as={Row} controlId="formHeures" className="mb-3">
                                 <Form.Label column sm={10}>
