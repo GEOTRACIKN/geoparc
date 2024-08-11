@@ -31,6 +31,7 @@ import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
 
 
 import axios from "axios";
+import { Driver } from "./pages/Driver";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -108,6 +109,8 @@ function App() {
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
           <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
+          <Route path="/driver/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+          <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violations" element={<DashboardLayout>{<Violations />}</DashboardLayout>} />

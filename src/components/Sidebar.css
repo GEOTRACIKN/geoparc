@@ -546,7 +546,7 @@
       }
     
     .active {
-        background: #f4f5fa
+       /* background: #f4f5fa*/
     }
     
     .submenu-enter {
@@ -718,7 +718,7 @@
     /*# sourceMappingURL=bootstrap-steps.min.css.map */
     
     
-    .nav-tabs{ display: none!important;}
+   /* .nav-tabs{ display: none!important;}*/
     
     
     /*.date-control{width: 100%!important;} */

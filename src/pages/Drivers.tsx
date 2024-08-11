@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
-import { Form, Link } from "react-router-dom";
+import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
@@ -47,7 +47,7 @@ export function Drivers() {
     // Votre logique de soumission ici
   };
 
-  const getAlarm = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
+  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
     try {
       setLoading(true);
 
@@ -101,7 +101,7 @@ export function Drivers() {
 
 
 
-  const getAlarmlimitValue = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
+  const getDriverslimitValue = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
     try {
       setLoading(true);
 
@@ -155,13 +155,13 @@ export function Drivers() {
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    const commentsFormServer = await getAlarm(limit, currentPage, search, type, colum, sort);
+    const commentsFormServer = await getDrivers(limit, currentPage, search, type, colum, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
-    getAlarm(limit, currentPage, search, type, colum, sort);
+    getDrivers(limit, currentPage, search, type, colum, sort);
   }, []);
 
 
@@ -169,7 +169,7 @@ export function Drivers() {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getAlarmlimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getDriverslimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -234,7 +234,7 @@ export function Drivers() {
 
     const newValue = event.target.value;
     setSearch(newValue)
-    await getAlarm(limit, currentPage, newValue, type, colum, sort);
+    await getDrivers(limit, currentPage, newValue, type, colum, sort);
   };
 
 
@@ -242,7 +242,7 @@ export function Drivers() {
 
     setSortColum(curentColum)
     sort == "ASC" ? setSort("DESC") : setSort("ASC");
-    getAlarm(limit, currentPage, search, type, colum, sort);
+    getDrivers(limit, currentPage, search, type, colum, sort);
   };
 
   return (
@@ -255,9 +255,13 @@ export function Drivers() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Button variant="" className="btn btn-primary mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-plus mr-3"></i>{translate("Add")} {translate("Driver")}
-          </Button>
+        
+
+          <NavLink to="/driver/add" className="btn btn-primary mt-2 mr-1">
+              <i className="las la-plus mr-3"></i>
+              {translate("Add")} {translate("Driver")}
+          </NavLink> 
+
           <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
             <i className="las la-cubes mr-3"></i>{translate("Validate employees' salaries")}
           </Button>
@@ -455,7 +459,7 @@ export function Drivers() {
                       <td>
                         <div className="d-flex align-items-center list-action">
                           <Link
-                            to={`#`}
+                            to={`/driver/edit/${driver.id_conducteur}`}
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
