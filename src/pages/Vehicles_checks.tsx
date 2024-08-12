@@ -20,7 +20,7 @@ type Vehicles = {
 
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
@@ -56,7 +56,7 @@ export function Vehicleschecks() {
   // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${userID}?searchTerm=${searchTerm}&searchType=${searchType}`,
         { mode: "cors" });
       const totalpages = await total_pages.json();
       const total = totalpages[0].total;
@@ -64,7 +64,7 @@ export function Vehicleschecks() {
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
 
-      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
         { mode: "cors" });
       const data = await res.json();
       setItems(data);
@@ -74,7 +74,7 @@ export function Vehicleschecks() {
   };
   // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
       { mode: "cors" });
     const data = await res.json();
     return data;

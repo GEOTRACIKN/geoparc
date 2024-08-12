@@ -72,6 +72,7 @@ type FormData = {
     proprete_ext: string;
     maintenance: string;
     commentaire: string;
+    id_user: string,
 };
 
 // Définition des règles de validation par champ
@@ -89,6 +90,7 @@ const initialValidationState = {
 
 export function Vehiclecheck() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const userID = localStorage.getItem("GeopUserID");
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
         checker: "",
@@ -157,6 +159,7 @@ export function Vehiclecheck() {
         proprete_ext: '',
         maintenance: '',
         commentaire: '',
+        id_user: '',
     });
     const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
@@ -257,12 +260,17 @@ export function Vehiclecheck() {
                     convertedFormData[key] = convertValue(convertedFormData[key]);
                 }
 
+                convertedFormData.id_user = userID;  // Ajouter id_user dans l'objet
+
+                const data = JSON.stringify(convertedFormData);  // Convertir en JSON
+
                 const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(convertedFormData),
+                    body: data,  // Envoyer l'objet combiné
+
                 });
 
                 if (response.ok) {
@@ -312,7 +320,7 @@ export function Vehiclecheck() {
 
     const getMatricules = async () => {
         try {
-            const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`, { mode: "cors" });
+            const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${userID}`, { mode: "cors" });
             const data = await res.json();
             return data;
         } catch (error) {
