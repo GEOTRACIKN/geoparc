@@ -20,7 +20,7 @@ type Vehicles = {
 
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
@@ -56,7 +56,7 @@ export function Vehicleschecks() {
   // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${1}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${userID}?searchTerm=${searchTerm}&searchType=${searchType}`,
         { mode: "cors" });
       const totalpages = await total_pages.json();
       const total = totalpages[0].total;
@@ -64,7 +64,7 @@ export function Vehicleschecks() {
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
 
-      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
         { mode: "cors" });
       const data = await res.json();
       setItems(data);
@@ -74,7 +74,7 @@ export function Vehicleschecks() {
   };
   // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${1}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
       { mode: "cors" });
     const data = await res.json();
     return data;
@@ -197,6 +197,17 @@ export function Vehicleschecks() {
       // Add your PDF download logic here
     }
   };
+
+  const convertValue = (value: any) => {
+    if (!value) {
+      return "Not mentioned";
+    } else if (value === 1) {
+      return "Oui";
+    } else if (value === 2) {
+      return "Non";
+    }
+  };
+
 
 
   return (
@@ -342,7 +353,7 @@ export function Vehicleschecks() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_verif && <th>N°</th>}
+              {selectedColumns.id_verif && <th>Id</th>}
               {selectedColumns.creation_date && <th>{translate("creation Date")}</th>}
               {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
@@ -368,7 +379,12 @@ export function Vehicleschecks() {
                 {selectedColumns.Driver_in && <td>{data.driver_in}</td>}
                 {selectedColumns.tractor_number && <td>{data.tractor_number}</td>}
                 {selectedColumns.trailer_number && <td>{data.trailer_number}</td>}
-                {selectedColumns.maintenance && <td>{data.maintenance}</td>}
+                {selectedColumns.maintenance && (
+                  <td style={{ color: 'orange' }}>
+                    {convertValue(data.maintenance)}
+                  </td>
+                )}
+
                 <td>
                   <div className="d-flex align-items-center list-action">
                     <Link

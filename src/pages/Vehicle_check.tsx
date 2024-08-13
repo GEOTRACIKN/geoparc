@@ -72,6 +72,7 @@ type FormData = {
     proprete_ext: string;
     maintenance: string;
     commentaire: string;
+    id_user: string,
 };
 
 // Définition des règles de validation par champ
@@ -89,6 +90,7 @@ const initialValidationState = {
 
 export function Vehiclecheck() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const userID = localStorage.getItem("GeopUserID");
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState<FormData>({
         checker: "",
@@ -157,6 +159,7 @@ export function Vehiclecheck() {
         proprete_ext: '',
         maintenance: '',
         commentaire: '',
+        id_user: '',
     });
     const [formValidation, setFormValidation] = useState(initialValidationState);
     const navigate = useNavigate();
@@ -236,14 +239,17 @@ export function Vehiclecheck() {
     };
 
     const convertValue = (value: any) => {
-        if (value === "Conforme" || value === "Oui" || value === "Fonctionnel") {
+        if (!value) {
+            return 0;
+        } else if (value === "Conforme" || value === "oui" || value === "Fonctionnel") {
             return 1;
         } else if (value === "Non Conforme" || value === "Non" || value === "Alerte") {
             return 2;
         } else {
-            return value; // pour les valeurs numériques ou autres
+            return value;
         }
     };
+
 
     const handleSubmit = async () => {
         if (validateForm()) {
@@ -254,12 +260,17 @@ export function Vehiclecheck() {
                     convertedFormData[key] = convertValue(convertedFormData[key]);
                 }
 
+                convertedFormData.id_user = userID;  // Ajouter id_user dans l'objet
+
+                const data = JSON.stringify(convertedFormData);  // Convertir en JSON
+
                 const response = await fetch(`${backendUrl}/api/geop/addvehiclecheck`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(convertedFormData),
+                    body: data,  // Envoyer l'objet combiné
+
                 });
 
                 if (response.ok) {
@@ -309,7 +320,7 @@ export function Vehiclecheck() {
 
     const getMatricules = async () => {
         try {
-            const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${1}`, { mode: "cors" });
+            const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/matricule/${userID}`, { mode: "cors" });
             const data = await res.json();
             return data;
         } catch (error) {
@@ -382,38 +393,39 @@ export function Vehiclecheck() {
                                 </Col>
                             </Form.Group >
                             <Form.Group as={Row} className="mb-3">
-                            <Form.Label>Matricule Tracteur</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    as="select"
-                                    name="matriculetrac"
-                                    value={formData.matriculetrac}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Sélectionner un matricule</option>
-                                    {tractorMatricules.map((matricule, index) => (
-                                        <option key={index} value={matricule}>
-                                            {matricule}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </Col>
-                        </Form.Group>
-
+                                <Form.Label>Matricule Tracteur</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        as="select"
+                                        name="matriculetrac"
+                                        value={formData.matriculetrac}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Sélectionner un matricule</option>
+                                        {tractorMatricules.map((matricule, index) => (
+                                            <option key={index} value={matricule}>
+                                                {matricule}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
                             <Form.Group as={Row} controlId="formKm" className="mb-3">
                                 <Form.Label column sm={10}>
                                     Km
                                 </Form.Label>
                                 <Col sm={10}>
                                     <Form.Control
-                                        type="text"
+                                        type="number"
                                         name="km"
                                         value={formData.km}
                                         onChange={handleChange}
                                         placeholder="Entrez le nombre de kilomètres"
+                                        min="0"
                                     />
                                 </Col>
                             </Form.Group>
+
                             <Form.Group as={Row} controlId="formpapier" className="mb-3">
                                 <Form.Label column sm={10}>
                                     Papiers *
@@ -480,23 +492,23 @@ export function Vehiclecheck() {
                             </Form.Group>
 
                             <Form.Group as={Row} className="mb-3">
-                            <Form.Label>Matricule Remorque</Form.Label>
-                            <Col sm={10}>
-                                <Form.Control
-                                    as="select"
-                                    name="matriculerem"
-                                    value={formData.matriculerem}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Sélectionner un matricule</option>
-                                    {trailerMatricules.map((matricule, index) => (
-                                        <option key={index} value={matricule}>
-                                            {matricule}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </Col>
-                        </Form.Group>
+                                <Form.Label>Matricule Remorque</Form.Label>
+                                <Col sm={10}>
+                                    <Form.Control
+                                        as="select"
+                                        name="matriculerem"
+                                        value={formData.matriculerem}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Sélectionner un matricule</option>
+                                        {trailerMatricules.map((matricule, index) => (
+                                            <option key={index} value={matricule}>
+                                                {matricule}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Col>
+                            </Form.Group>
 
                             <Form.Group as={Row} controlId="formHeures" className="mb-3">
                                 <Form.Label column sm={10}>
@@ -1276,9 +1288,9 @@ export function Vehiclecheck() {
                                     <Form.Group controlId="maintenance" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
-                                            label="Oui"
+                                            label="oui"
                                             name="maintenance"
-                                            value="Oui"
+                                            value="oui"
                                             checked={formData.maintenance === "oui"} onChange={handleChange}
                                             inline
                                             className="mr-4"
