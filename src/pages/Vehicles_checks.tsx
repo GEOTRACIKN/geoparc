@@ -198,6 +198,17 @@ export function Vehicleschecks() {
     }
   };
 
+  const convertValue = (value: any) => {
+    if (!value) {
+      return "Not mentioned";
+    } else if (value === 1) {
+      return "Oui";
+    } else if (value === 2) {
+      return "Non";
+    }
+  };
+
+
 
   return (
     <>
@@ -342,7 +353,7 @@ export function Vehicleschecks() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_verif && <th>N°</th>}
+              {selectedColumns.id_verif && <th>Id</th>}
               {selectedColumns.creation_date && <th>{translate("creation Date")}</th>}
               {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
@@ -368,7 +379,12 @@ export function Vehicleschecks() {
                 {selectedColumns.Driver_in && <td>{data.driver_in}</td>}
                 {selectedColumns.tractor_number && <td>{data.tractor_number}</td>}
                 {selectedColumns.trailer_number && <td>{data.trailer_number}</td>}
-                {selectedColumns.maintenance && <td>{data.maintenance}</td>}
+                {selectedColumns.maintenance && (
+                  <td style={{ color: 'orange' }}>
+                    {convertValue(data.maintenance)}
+                  </td>
+                )}
+
                 <td>
                   <div className="d-flex align-items-center list-action">
                     <Link

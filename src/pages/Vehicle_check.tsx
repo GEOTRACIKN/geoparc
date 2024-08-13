@@ -241,7 +241,7 @@ export function Vehiclecheck() {
     const convertValue = (value: any) => {
         if (!value) {
             return 0;
-        } else if (value === "Conforme" || value === "Oui" || value === "Fonctionnel") {
+        } else if (value === "Conforme" || value === "oui" || value === "Fonctionnel") {
             return 1;
         } else if (value === "Non Conforme" || value === "Non" || value === "Alerte") {
             return 2;
@@ -1288,9 +1288,9 @@ export function Vehiclecheck() {
                                     <Form.Group controlId="maintenance" className="mb-3">
                                         <Form.Check
                                             type="checkbox"
-                                            label="Oui"
+                                            label="oui"
                                             name="maintenance"
-                                            value="Oui"
+                                            value="oui"
                                             checked={formData.maintenance === "oui"} onChange={handleChange}
                                             inline
                                             className="mr-4"
