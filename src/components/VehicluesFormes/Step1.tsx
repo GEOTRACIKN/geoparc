@@ -9,6 +9,7 @@ import {
   FloatingLabel,
 } from "react-bootstrap";
 
+import ActionButtons from "./ActionButtons";
 /**
  * Imports the `InvalidInputFloating` and `SelectorFloating` components from the `./InvalidInput` module.
  */
@@ -33,6 +34,7 @@ import {
  * These interfaces define the shape of the component's props, state, and validation logic.
  */
 import {
+  StepsProps,
   VehicleFormProps,
   VehicleFormState,
   VehicleSelectOption,
@@ -61,7 +63,7 @@ const backendUrl = "http://localhost:5000/api/geop";
  * @param {VehicleFormProps} props - The props passed to the component, including `nextStep` and `userCallback` functions.
  * @returns {React.ReactElement} The rendered Step1 component.
  */
-const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
+const Step1: React.FC<StepsProps> = (props) => {
   const [error, setError] = useState<string>("");
   // const id_user = localStorage.getItem("GeopUserID");
   const id_user = 8;
@@ -176,8 +178,8 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
      *
      * @returns {void} This function does not return a value, it only sets the error state.
      */
-    // if (!formState.validations.Immatriculation) {
-    //   setError("Valide l'Immatriculation");
+    if (!formState.validations.Immatriculation) {
+      setError("Valide l'Immatriculation");
     // } else if (!formState.validations.Acquisition) {
     //   setError("Valide l'Acquisition ");
     // } else if (!formState.validations.Categorie) {
@@ -186,362 +188,367 @@ const Step1: React.FC<VehicleFormProps> = ({ nextStep, userCallback }) => {
     //   setError("Valide l'Etat ");
     //   } else if (!formState.validations.Step3) {
     //     setError("Valide l'Etat ");
-    // } else {
+    } else {
     /**
      * Clears any existing error, moves to the next step in the form flow, and calls the provided user callback with the current form state values.
      */
     setError("");
-    nextStep();
-    userCallback(formState.values);
-    // }
+    props.nextStep();
+    props.userCallback(formState.values);
+
+    }
   };
 
   return (
-    <div className="w-100">
-      <span style={{ color: "red" }}>{error}</span> {/* Return Erreur */}
-      <h2 className="text-3xl font-bold underline">Informations Générales</h2>
-      <Form onSubmit={(e) => e.preventDefault()}>
-        <Row className="">
-          {/* Immatriculation */}
-          <InvalidInputFloating
-            className="col-md-6 col-xl-3"
-            label="Immatriculation :"
-            name="Immatriculation"
-            placeholder=" "
-            value={formState.values.Immatriculation}
-            onChange={handleChange}
-            isValid={formState.validations.Immatriculation}
-            errorMessage="Ce champ est obligatoire."
-            showValid={true}
-            type="text"
-          />
-          {/* Acquisition  -acqui- */}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Acquisition"
-            name="Acquisition"
-            value={formState.values.Acquisition}
-            onChange={handleChange}
-            isValid={formState.validations.Acquisition}
-            errorMessage="Ce champ est obligatoire."
-            options={AcquisitionOption}
-            showValid={true}
-          />
-
-          {/* Catégorie */}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Catégorie"
-            name="Categorie"
-            value={formState.values.Categorie}
-            onChange={handleChange}
-            isValid={formState.validations.Categorie}
-            errorMessage="Ce champ est obligatoire."
-            options={CategorieOption}
-            showValid={true}
-          />
-          {/* Etat */}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Etat"
-            name="Etat"
-            value={formState.values.Etat}
-            onChange={handleChange}
-            isValid={formState.validations.Etat}
-            errorMessage="Ce champ est obligatoire."
-            options={EtatOption}
-            showValid={true}
-          />
-        </Row>
-
-        <Row className="">
-          {/* Type */}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Type"
-            name="Type"
-            value={formState.values.Type}
-            onChange={handleChange}
-            isValid={formState.validations.Type}
-            errorMessage="Ce champ est obligatoire."
-            options={TypeOption}
-            showValid={true}
-          />
-
-          {/* Type carburant  -typeCarb-*/}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Type carburant"
-            name="TypeCarburant"
-            value={formState.values.TypeCarburant}
-            onChange={handleChange}
-            isValid={formState.validations.TypeCarburant}
-            errorMessage="Ce champ est obligatoire."
-            options={TypeCarburantOption}
-            showValid={true}
-          />
-
-          {/* Marque */}
-          <SelectorFloating
-            className="col-md-6 col-xl-3"
-            label="Marque"
-            name="Marque"
-            value={formState.values.Marque}
-            onChange={handleChange}
-            isValid={formState.validations.Marque}
-            errorMessage="Ce champ est obligatoire."
-            options={selectBrand}
-            showValid={true}
-          />
-
-          {/* Modèle  --*/}
-          <InvalidInputFloating
-            className="col-md-6 col-xl-3"
-            label="Modèle :"
-            name="Modele"
-            placeholder=" "
-            value={formState.values.Modele}
-            onChange={handleChange}
-            isValid={formState.validations.Modele}
-            errorMessage="Ce champ est obligatoire."
-            showValid={true}
-            type="text"
-          />
-        </Row>
-
-        <Row className="w-full">
-          {/* NameParc -nameParc- */}
-          <Form.Group
-            controlId="formBasicSelect-NameParc"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel controlId="floatingSelect" label="Parc" className="text-truncate"
-              style={{ maxWidth: '100%' }}>
-              <Form.Select
-                as="select"
-                name="NameParc"
-                value={formState.values.NameParc}
-                onChange={(e) => handleChange(e)}
-                className={formState.validations.NameParc ? "is-valid" : ""}
-              >
-                <option value="">Sélectionnez une option</option>
-                {selectParc.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Form.Group>
-
-          {/* Driver -conducteur- */}
-          <Form.Group
-            controlId="formBasicSelect-driver"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel controlId="floatingSelect" label="Conducteur" className="text-truncate"
-              style={{ maxWidth: '100%' }}>
-              <Form.Select
-                as="select"
-                name="Driver"
-                value={formState.values.Driver}
-                onChange={(e) => handleChange(e)}
-                className={formState.validations.Driver ? "is-valid" : ""}
-              >
-                <option value="">Sélectionnez une option</option>
-                {selectDriver.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Form.Group>
-
-          {/* AffectationVehicl -service- */}
-          <Form.Group
-            controlId="formBasicSelect-AffectationVehicl"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel
-              controlId="floatingSelect"
-              label="Affectation Vehicule"
-              className="text-truncate"
-              style={{ maxWidth: '100%' }}
-            >
-              <Form.Select
-                as="select"
-                name="AffectationVehicl"
-                value={formState.values.AffectationVehicl}
-                onChange={(e) => handleChange(e)}
-                className={
-                  formState.validations.AffectationVehicl ? "is-valid" : ""
-                }
-              >
-                <option value="">Sélectionnez une option</option>
-                {AffectationVehicleOption.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Form.Group>
-
-          {/*  Moteur */}
-          <Form.Group
-            controlId="formBasicInput-Gamme"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel controlId="floatingSelect" label="Gamme" className="text-truncate"
-              style={{ maxWidth: '100%' }}>
-              <Form.Control
-                placeholder=" "
-                type="text"
-                name="Moteur"
-                value={formState.values.Moteur}
-                onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Moteur ? "is-valid" : ""}
-              />
-            </FloatingLabel>
-          </Form.Group>
-        </Row>
-
-        <Row>
-          {/* Capacite_res */}
-          <Form.Group
-            controlId="formBasicInput-Capacite_res"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel
-              controlId="floatingSelect"
-              label="Capacité réservoir (L)"
-              className="text-truncate"
-              style={{ maxWidth: '100%' }}
-            >
-              <Form.Control
-                placeholder=" "
-                type="text"
-                name="Capacite_res"
-                value={formState.values.Capacite_res}
-                onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Capacite_res ? "is-valid" : ""}
-              />
-            </FloatingLabel>
-          </Form.Group>
-
-          {/* Consom_moyenne */}
-          <Form.Group
-            controlId="formBasicInput-Consom_moyenne"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel
-              controlId="floatingSelect"
-              label="Consommation moyenne (l/100km)s"
-              className="text-truncate"
-              style={{ maxWidth: '100%' }}
-            >
-              <Form.Control
-                placeholder=" "
-                type="text"
-                name="Consom_moyenne"
-                value={formState.values.Consom_moyenne}
-                onChange={(e: any) => handleChange(e)}
-                className={
-                  formState.validations.Consom_moyenne ? "is-valid" : ""
-                }
-              />
-            </FloatingLabel>
-          </Form.Group>
-
-          {/* Codification */}
-          <InvalidInputFloating
-            className="col-md-6 col-xl-3"
-            label="Codification véhicule :"
-            name="Codification"
-            placeholder=" "
-            value={formState.values.Codification}
-            onChange={handleChange}
-            isValid={formState.validations.Codification}
-            errorMessage="Ce champ est obligatoire."
-            showValid={true}
-            type="text"
-          />
-
-          {/* Kilom */}
-          <Form.Group
-            controlId="formBasicInput-Kilom"
-            className="mt-2 col-md-6 col-xl-3"
-          >
-            <FloatingLabel controlId="floatingSelect" label="Kilométrage (Km)" className="text-truncate"
-              style={{ maxWidth: '100%' }}>
-              <Form.Control
-                placeholder=" "
-                type="text"
-                name="Kilom"
-                value={formState.values.Kilom}
-                onChange={(e: any) => handleChange(e)}
-                className={formState.validations.Kilom ? "is-valid" : ""}
-              />
-            </FloatingLabel>
-          </Form.Group>
-        </Row>
-
-        <Row>
-          {/*  Payback_Period -couleur- */}
-          <InvalidInputFloating
-            className="col-md-6 col-xl-3"
-            label="Durée d'amortissement (jours) :"
-            name="Payback_Period"
-            placeholder=" "
-            value={formState.values.Payback_Period}
-            onChange={handleChange}
-            isValid={formState.validations.Payback_Period}
-            errorMessage="Ce champ est obligatoire."
-            showValid={true}
-            type="text"
-          />
-          {/* Leasing Location Achat */}
-          <Form.Group className="col d-flex mt-4">
-            <Form.Check
-              className="me-4"
-              name="Leasing"
-              type="radio"
-              label="Leasing"
-              value="Leasing"
-              checked={selectedOption === "Leasing"}
-              onChange={handleChangeChuck}
-            />
-            <Form.Check
-              className="me-4"
-              name="Location"
-              type="radio"
-              label="Location"
-              value="Location"
-              checked={selectedOption === "Location"}
-              onChange={handleChangeChuck}
-            />
-            <Form.Check
-              className="me-4"
-              name="Achat"
-              type="radio"
-              label="Achat"
-              value="Achat"
-              checked={selectedOption === "Achat"}
-              onChange={handleChangeChuck}
-            />
-          </Form.Group>
-        </Row>
-
-        <div className="d-flex align-items-end flex-column">
-          {/*  Renders a primary button that, when clicked, calls the
-          `validate` function.  */}
-          <Button className="mr-5" variant="primary" onClick={validate}>
-            Suivent
-          </Button>
+    <>
+      <div className="w-100 h-100 card widget-card border-light shadow-sm">
+        <div className="p-4">
+          <h2 >Informations Générales</h2>
+          <hr className="w-50 mx-auto border-dark-subtle" />
+          <span className="" style={{ color: "red" }}>{error}</span>
         </div>
-      </Form>
-    </div>
+        <div className="card-body p-2">
+          <Form onSubmit={(e) => e.preventDefault()}>
+            <Row className="">
+              {/* Immatriculation */}
+              <InvalidInputFloating
+                className="col-md-6 col-xl-3"
+                label="Immatriculation :"
+                name="Immatriculation"
+                placeholder=" "
+                value={formState.values.Immatriculation}
+                onChange={handleChange}
+                isValid={formState.validations.Immatriculation}
+                errorMessage="Ce champ est obligatoire."
+                showValid={true}
+                type="text"
+              />
+              {/* Acquisition  -acqui- */}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Acquisition"
+                name="Acquisition"
+                value={formState.values.Acquisition}
+                onChange={handleChange}
+                isValid={formState.validations.Acquisition}
+                errorMessage="Ce champ est obligatoire."
+                options={AcquisitionOption}
+                showValid={true}
+              />
+              {/* Catégorie */}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Catégorie"
+                name="Categorie"
+                value={formState.values.Categorie}
+                onChange={handleChange}
+                isValid={formState.validations.Categorie}
+                errorMessage="Ce champ est obligatoire."
+                options={CategorieOption}
+                showValid={true}
+              />
+              {/* Etat */}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Etat"
+                name="Etat"
+                value={formState.values.Etat}
+                onChange={handleChange}
+                isValid={formState.validations.Etat}
+                errorMessage="Ce champ est obligatoire."
+                options={EtatOption}
+                showValid={true}
+              />
+            </Row>
+            <Row className="">
+              {/* Type */}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Type"
+                name="Type"
+                value={formState.values.Type}
+                onChange={handleChange}
+                isValid={formState.validations.Type}
+                errorMessage="Ce champ est obligatoire."
+                options={TypeOption}
+                showValid={true}
+              />
+              {/* Type carburant  -typeCarb-*/}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Type carburant"
+                name="TypeCarburant"
+                value={formState.values.TypeCarburant}
+                onChange={handleChange}
+                isValid={formState.validations.TypeCarburant}
+                errorMessage="Ce champ est obligatoire."
+                options={TypeCarburantOption}
+                showValid={true}
+              />
+              {/* Marque */}
+              <SelectorFloating
+                className="col-md-6 col-xl-3"
+                label="Marque"
+                name="Marque"
+                value={formState.values.Marque}
+                onChange={handleChange}
+                isValid={formState.validations.Marque}
+                errorMessage="Ce champ est obligatoire."
+                options={selectBrand}
+                showValid={true}
+              />
+              {/* Modèle  --*/}
+              <InvalidInputFloating
+                className="col-md-6 col-xl-3"
+                label="Modèle :"
+                name="Modele"
+                placeholder=" "
+                value={formState.values.Modele}
+                onChange={handleChange}
+                isValid={formState.validations.Modele}
+                errorMessage="Ce champ est obligatoire."
+                showValid={true}
+                type="text"
+              />
+            </Row>
+            <Row className="w-full">
+              {/* NameParc -nameParc- */}
+              <Form.Group
+                controlId="formBasicSelect-NameParc"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel controlId="floatingSelect" label="Parc" className="text-truncate"
+                  style={{ maxWidth: '100%' }}>
+                  <Form.Select
+                    as="select"
+                    name="NameParc"
+                    value={formState.values.NameParc}
+                    onChange={(e) => handleChange(e)}
+                    className={formState.validations.NameParc ? "is-valid" : ""}
+                  >
+                    <option value="">Sélectionnez une option</option>
+                    {selectParc.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </FloatingLabel>
+              </Form.Group>
+              {/* Driver -conducteur- */}
+              <Form.Group
+                controlId="formBasicSelect-driver"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel controlId="floatingSelect" label="Conducteur" className="text-truncate"
+                  style={{ maxWidth: '100%' }}>
+                  <Form.Select
+                    as="select"
+                    name="Driver"
+                    value={formState.values.Driver}
+                    onChange={(e) => handleChange(e)}
+                    className={formState.validations.Driver ? "is-valid" : ""}
+                  >
+                    <option value="">Sélectionnez une option</option>
+                    {selectDriver.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </FloatingLabel>
+              </Form.Group>
+              {/* AffectationVehicl -service- */}
+              <Form.Group
+                controlId="formBasicSelect-AffectationVehicl"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel
+                  controlId="floatingSelect"
+                  label="Affectation Vehicule"
+                  className="text-truncate"
+                  style={{ maxWidth: '100%' }}
+                >
+                  <Form.Select
+                    as="select"
+                    name="AffectationVehicl"
+                    value={formState.values.AffectationVehicl}
+                    onChange={(e) => handleChange(e)}
+                    className={
+                      formState.validations.AffectationVehicl ? "is-valid" : ""
+                    }
+                  >
+                    <option value="">Sélectionnez une option</option>
+                    {AffectationVehicleOption.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </FloatingLabel>
+              </Form.Group>
+              {/*  Moteur */}
+              <Form.Group
+                controlId="formBasicInput-Gamme"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel controlId="floatingSelect" label="Gamme" className="text-truncate"
+                  style={{ maxWidth: '100%' }}>
+                  <Form.Control
+                    placeholder=" "
+                    type="text"
+                    name="Moteur"
+                    value={formState.values.Moteur}
+                    onChange={(e: any) => handleChange(e)}
+                    className={formState.validations.Moteur ? "is-valid" : ""}
+                  />
+                </FloatingLabel>
+              </Form.Group>
+            </Row>
+            <Row>
+              {/* Capacite_res */}
+              <Form.Group
+                controlId="formBasicInput-Capacite_res"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel
+                  controlId="floatingSelect"
+                  label="Capacité réservoir (L)"
+                  className="text-truncate"
+                  style={{ maxWidth: '100%' }}
+                >
+                  <Form.Control
+                    placeholder=" "
+                    type="text"
+                    name="Capacite_res"
+                    value={formState.values.Capacite_res}
+                    onChange={(e: any) => handleChange(e)}
+                    className={formState.validations.Capacite_res ? "is-valid" : ""}
+                  />
+                </FloatingLabel>
+              </Form.Group>
+              {/* Consom_moyenne */}
+              <Form.Group
+                controlId="formBasicInput-Consom_moyenne"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel
+                  controlId="floatingSelect"
+                  label="Consommation moyenne (l/100km)s"
+                  className="text-truncate"
+                  style={{ maxWidth: '100%' }}
+                >
+                  <Form.Control
+                    placeholder=" "
+                    type="text"
+                    name="Consom_moyenne"
+                    value={formState.values.Consom_moyenne}
+                    onChange={(e: any) => handleChange(e)}
+                    className={
+                      formState.validations.Consom_moyenne ? "is-valid" : ""
+                    }
+                  />
+                </FloatingLabel>
+              </Form.Group>
+              {/* Codification */}
+              <InvalidInputFloating
+                className="col-md-6 col-xl-3"
+                label="Codification véhicule :"
+                name="Codification"
+                placeholder=" "
+                value={formState.values.Codification}
+                onChange={handleChange}
+                isValid={formState.validations.Codification}
+                errorMessage="Ce champ est obligatoire."
+                showValid={true}
+                type="text"
+              />
+              {/* Kilom */}
+              <Form.Group
+                controlId="formBasicInput-Kilom"
+                className="mt-2 col-md-6 col-xl-3"
+              >
+                <FloatingLabel controlId="floatingSelect" label="Kilométrage (Km)" className="text-truncate"
+                  style={{ maxWidth: '100%' }}>
+                  <Form.Control
+                    placeholder=" "
+                    type="text"
+                    name="Kilom"
+                    value={formState.values.Kilom}
+                    onChange={(e: any) => handleChange(e)}
+                    className={formState.validations.Kilom ? "is-valid" : ""}
+                  />
+                </FloatingLabel>
+              </Form.Group>
+            </Row>
+            <Row>
+              {/*  Payback_Period -couleur- */}
+              <InvalidInputFloating
+                className="col-md-6 col-xl-3"
+                label="Durée d'amortissement (jours) :"
+                name="Payback_Period"
+                placeholder=" "
+                value={formState.values.Payback_Period}
+                onChange={handleChange}
+                isValid={formState.validations.Payback_Period}
+                errorMessage="Ce champ est obligatoire."
+                showValid={true}
+                type="text"
+              />
+              {/* Leasing Location Achat */}
+              <Form.Group className="col d-flex mt-4">
+                <Form.Check
+                  className="me-4"
+                  name="Leasing"
+                  type="radio"
+                  label="Leasing"
+                  value="Leasing"
+                  checked={selectedOption === "Leasing"}
+                  onChange={handleChangeChuck}
+                />
+                <Form.Check
+                  className="me-4"
+                  name="Location"
+                  type="radio"
+                  label="Location"
+                  value="Location"
+                  checked={selectedOption === "Location"}
+                  onChange={handleChangeChuck}
+                />
+                <Form.Check
+                  className="me-4"
+                  name="Achat"
+                  type="radio"
+                  label="Achat"
+                  value="Achat"
+                  checked={selectedOption === "Achat"}
+                  onChange={handleChangeChuck}
+                />
+              </Form.Group>
+            </Row>
+            <div className="d-flex align-items-end flex-column">
+              {/*  Renders a primary button that, when clicked, calls the
+              `validate` function.  */}
+              {/* <Button className="mr-5" variant="primary" onClick={validate}>
+                Suivent
+              </Button> */}
+            </div>
+      
+          </Form>
+        </div>
+      </div>
+      <div className="p-4 card widget-card border-light shadow-sm">
+          <br />
+          <ActionButtons
+            currentStep={props.currentStep}
+            totalSteps={props.totalSteps}
+            previousStep={props.previousStep}
+            nextStep={validate}
+            lastStep={props.lastStep}
+          />
+        </div>
+    </>
+
   );
 };
 

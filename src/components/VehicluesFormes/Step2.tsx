@@ -76,7 +76,7 @@ const Step2: React.FC<StepsProps> = (props) => {
     <>
       <div className="w-100 h-100 card widget-card border-light shadow-sm">
         <div className="p-4">
-          <h2>Informations complémentaires</h2>
+          <h2>Informations Complémentaires</h2>
           <hr className="w-50 mx-auto border-dark-subtle" />
           <span className="" style={{ color: "red" }}>{error}</span>
         </div>

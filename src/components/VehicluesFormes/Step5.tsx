@@ -23,37 +23,31 @@ const Step5: React.FC<StepsProps> = (props) => {
     <div>
        <span style={{ color: "red" }}>{error}</span>
       
-      {/* Boucle sur un objet */}
-      {/* {Object.entries(props.user).map(([key, value]) => (
-        <div key={key}>
-          <strong>{key}:</strong> {String(value)}
-        </div>
-      ))} */}
-
-      <section className=" py-3 py-md-5 py-xl-8">
-        {/* <div className="container">
-          <div className="row justify-content-md-center">
-            <div className="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
-              <h2 className="mb-4 display-5 text-center">Profile</h2>
-              <hr className="w-50 mx-auto mb-5 mb-xl-9 border-dark-subtle" />
-            </div>
-          </div>
-        </div> */}
+      
+      <section className="card-body py-3 py-md-5 py-xl-8">
 
         <ProfileVehicles formState={formState} />
-
+              <ul>
+                {Object.entries(formState?.values || {}).map(([key, value]) => (
+                  <li key={key}>
+                    <strong>{key}:</strong> {JSON.stringify(value)}
+                  </li>
+                ))}
+              </ul>
      
       </section>
 
-      <br />
-      <ActionButtons
-        currentStep={props.currentStep}
-        totalSteps={props.totalSteps}
-        previousStep={props.previousStep}
-        nextStep={props.nextStep}
-        lastStep={props.lastStep}
-        retrieveData={() => props.user}
-        />
+      <div className="p-4 card widget-card border-light shadow-sm">
+        <br />
+        <ActionButtons
+          currentStep={props.currentStep}
+          totalSteps={props.totalSteps}
+          previousStep={props.previousStep}
+          nextStep={props.nextStep}
+          lastStep={props.lastStep}
+          retrieveData={() => props.user}
+          />
+      </div>
     </div>
   );
 };

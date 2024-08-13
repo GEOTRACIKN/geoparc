@@ -123,19 +123,15 @@ export const VehiclesForms = () => {
         <div className='mainWizard'>
   
         <MultiStepProgressBar params={steps} />
-        <StepWizard instance={assignStepWizard} onStepChange={handleStepChange} className='w-100'>
+        <StepWizard instance={assignStepWizard} onStepChange={handleStepChange} className='w-100 mt-2'>
           <Step1
             userCallback={assignUser}
+            currentStep={activeStep + 1}
+            totalSteps={steps.length}
+            previousStep={previousStep}
             nextStep={nextStep}
-            actionButtons={
-              <ActionButtons
-                currentStep={activeStep + 1}
-                totalSteps={steps.length}
-                previousStep={previousStep}
-                nextStep={nextStep}
-                lastStep={lastStep}
-              />
-            }
+            lastStep={lastStep}
+             
           />
           <Step2
             user={user}

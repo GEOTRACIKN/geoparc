@@ -55,7 +55,7 @@ export interface ContentTabProps {
 export interface StepsProps {
   nextStep: () => void;
   userCallback: (info: any) => void;
-  user: any;
+  user?: any;
   currentStep: number;
   totalSteps: number;
   previousStep: () => void;
@@ -73,8 +73,39 @@ export interface StepsProps {
 CREATE TABLE gp_vehicle_cost (
     cost_id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identifiant unique pour l'enregistrement des coûts du véhicule',
     IDvehicule INT NOT NULL COMMENT 'Identifiant du véhicule',
-    immatriculation_vehicule VARCHAR(50) NOT NULL COMMENT 'Immatriculation du véhicule',
-    aquisition VARCHAR(50) NOT NULL COMMENT 'Type d'acquisition (Leasing, Location, Achat, etc.)',
+    * fournisseur_vh VARCHAR(50) NOT NULL COMMENT 'Fournisseur du véhicule',
+    * date_versement DATE NOT NULL COMMENT 'Date du versement',
+    * num_contrat_aquis VARCHAR(50) NOT NULL COMMENT 'Numéro de contrat pour l'acquisition',
+    * duree_leasing INT NOT NULL COMMENT 'Durée du leasing (pour Leasing)',
+    * echeance_leasing DECIMAL(10, 2) NOT NULL COMMENT 'Montant de l'échéance du leasing (pour Leasing)',
+    * echeance_restante_leasing INT NOT NULL COMMENT 'Nombre d'échéances restantes du leasing (pour Leasing)',
+    * payer_a_ce_jour_leasing DECIMAL(10, 2) NOT NULL COMMENT 'Montant payé à ce jour pour le leasing (pour Leasing)',
+    * prochaine_echeance_leasing DATE NOT NULL COMMENT 'Date de la prochaine échéance du leasing (pour Leasing)',
+    * cout_tot_vh DECIMAL(10, 2) NOT NULL COMMENT 'Coût total du véhicule (pour Leasing)',
+    * premier_appor_leas DECIMAL(10, 2) NOT NULL COMMENT 'Premier apport pour le leasing (pour Leasing)',
+    * date_prem_echeance_leas DATE NOT NULL COMMENT 'Date de la première échéance du leasing (pour Leasing)',
+    IDSousParc INT NOT NULL COMMENT 'Identifiant du sous-parc (pour Leasing)',
+    temps_amort VARCHAR(50) NOT NULL COMMENT 'Période d'amortissement (pour Leasing)',
+    * num_contrat_location VARCHAR(50) NOT NULL COMMENT 'Numéro de contrat pour la location (pour Location)',
+    * fournisseur_location VARCHAR(50) NOT NULL COMMENT 'Fournisseur pour la location (pour Location)',
+    * cout_location DECIMAL(10, 2) NOT NULL COMMENT 'Coût de la location (pour Location)',
+    * date_debut_locati DATE NOT NULL COMMENT 'Date de début de la location (pour Location)',
+    * locati_mensuel INT NOT NULL COMMENT 'Durée de la location en mois (pour Location)',
+    date_dernier_versement DATE NOT NULL COMMENT 'Date du dernier versement (pour Location)',
+    * cout_tot_location DECIMAL(10, 2) NOT NULL COMMENT 'Coût total de la location (pour Location)',
+    * date_achat DATE NOT NULL COMMENT 'Date d'achat (pour Achat)',
+    * taxe_veh_neuf DECIMAL(10, 2) NOT NULL COMMENT 'Taxe associée à l'achat (pour Achat)',
+    * cout_tot_achat DECIMAL(10, 2) NOT NULL COMMENT 'Coût total de l'achat (pour Achat)',
+    IDSousParc_achat INT NOT NULL COMMENT 'Identifiant du sous-parc (pour Achat)',
+    temps_amort_achat VARCHAR(50) NOT NULL COMMENT 'Période d'amortissement pour l'achat (pour Achat)'
+) COMMENT='Table contenant les coûts associés aux véhicules en fonction du type d'acquisition';
+
+*/
+
+/* 
+CREATE TABLE gp_vehicle_cost (
+    cost_id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identifiant unique pour l'enregistrement des coûts du véhicule',
+    IDvehicule INT NOT NULL COMMENT 'Identifiant du véhicule',
     fournisseur_vh VARCHAR(50) NOT NULL COMMENT 'Fournisseur du véhicule',
     date_versement DATE NOT NULL COMMENT 'Date du versement',
     num_contrat_aquis VARCHAR(50) NOT NULL COMMENT 'Numéro de contrat pour l'acquisition',
@@ -115,13 +146,13 @@ export const VehicleValidateFormsStep1 = {
     TypeCarburant: "", // type_carburant_vehicule
     Marque: "", // id_marque table --> vahicule_marque 
     Modele: "", // modele_vehicule
-    NameParc: "", // ! id_sousParc_vehicule
-    Driver: "", //! id_conducteur_vehicule
-    AffectationVehicl: "", // ? inService_vehicule -- service 
+    NameParc: "", //  id_parc
+    Driver: "", // id_conducteur_vehicule
+    AffectationVehicl: "", //  inService_vehicule -- service 
     Moteur: "", // gamme_vehicule
     Capacite_res: "", // capacite_res_vehicule 
-    Consom_moyenne: "", /* Consommation moyenne (l/100km) */
-    Codification: "", //! LAST_IB_CODE
+    Consom_moyenne: "", // consommation_moyenne_vehicule
+    Codification: "", // LAST_IB_CODE
     Kilom: "", // kilometrage_vehicule
     Payback_Period: "", // couleur_vehicule -- couleur
     Step3: "", 
@@ -156,7 +187,7 @@ export const VehicleValidateFormsStep2 = {
     Psn: "", // PSN
     Year: "", // annee_vehicule
     Power: "", // puissance_vehicule
-    MaximumAllowedTotal: "", // maximum_allowed_total -Poids total autorisé en charge-
+    MaximumAllowedTotal: "", // capacite_totale_vehicule
     CirculationDate: '', // date_circulation_vehicule
     Longueur: '', // longueur_vehicule
     NumChassis: '', // num_chassis_vehicule
@@ -192,27 +223,32 @@ export const VehicleValidateFormsStep2 = {
 // ? Acquisition [Leasing - Location - Achat]
 export const VehicleValidateFormsStep4 = {
   values: {
-    Fournisseur: "", // ? fournisseur_vh
-    Echeance: "", // echeance_leasing
-    NumContrat: "", // num_contrat_aquis
-    EcheanceRestante: "", // echeance_restante_leasing
-    Duree: "", // duree_leasing
-    PayeAcejour: "", // payer_a_ce_jour_leasing
-    Apport: "", // premier_appor_leas
-    DernierPaiment: "",  // date_versement
-    DatePremiereEcheance: "",// date_prem_echeance_leas
-    ProchaineEcheance: "", // prochaine_echeance_leasing
-    TotalLeasing: "", // cout_tot_vh
-    NumContratL: "", // num_contrat_aquis
-    TotalLocation: "",
-    FournisseurL: "",
-    DernierVersement: "", // date_versement
-    CoutLocation: "", // cout_vente_veh
-    DateDebutLocation: "", // date_debut_locati
-    NbreMoisLocation: "",
-    DateAcquis: "", // date_aquisition_veh
-    Taxe: "", // taxe_veh_neuf
-    TotalAchat: "", // cout_tot_vh
+    // Leasing
+    Fournisseur: "", //  fournisseur_vh  : Leasing
+    Echeance: "", // echeance_leasing : Leasing
+    NumContrat: "", // num_contrat_aquis !! location - leasing
+    EcheanceRestante: "", // echeance_restante_leasing :: leqsing
+    Duree: "", // duree_leasing :: leasing
+    PayeAcejour: "", // payer_a_ce_jour_leasing :: leasing
+    Apport: "", // premier_appor_leas :: leasing
+    DernierPaiment: "",  // date_versement :: leasing
+    DatePremiereEcheance: "",// date_prem_echeance_leas :: leasing
+    ProchaineEcheance: "", // prochaine_echeance_leasing :: leasing
+    TotalLeasing: "", // cout_tot_vh :: leasing
+
+    // Location RentCar
+    NumContratL: "", // num_contrat_location :: location
+    TotalLocation: "", // cout_tot_location :: location
+    FournisseurL: "", // fournisseur_location :: location
+    DernierVersement: "", // date_versement :: location
+    CoutLocation: "", // cout_location :: location
+    DateDebutLocation: "", // date_debut_locati :: location
+    NbreMoisLocation: "", // locati_mensuel :: location
+    
+    // Purchase achat
+    DateAcquis: "", // date_achat :: achat
+    Taxe: "", // taxe_veh_neuf :: achat
+    TotalAchat: "", // cout_tot_achat :: achat
   },
   validations: {
     Fournisseur: false,

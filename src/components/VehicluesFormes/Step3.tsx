@@ -44,57 +44,58 @@ const Step3: React.FC<StepsProps> = (props) => {
   };
 
   return (
-    <div>
-      <div className="p-4">
-        <h2>
-          Assurer la Conformité - Assurance, Vignette et Contrôle Technique
-        </h2>
-        <hr className="w-50 mx-auto border-dark-subtle" />
-        <span className="" style={{ color: "red" }}>
-          {error}
-        </span>
+    <>
+      <div className="w-100 h-100 card widget-card border-light shadow-sm">
+        <div className="p-4">
+          <h2>
+            Assurer la Conformité - Assurance, Vignette et Contrôle Technique
+          </h2>
+          <hr className="w-50 mx-auto border-dark-subtle" />
+          <span className="" style={{ color: "red" }}>
+            {error}
+          </span>
+        </div>
+        <br />
+        <Tabs>
+          <Tab
+            label="Assurance"
+            isActive={activeTab === "Assurance"}
+            onClick={() => setActiveTab("Assurance")}
+          />
+          <Tab
+            label="Vignette"
+            isActive={activeTab === "Vignette"}
+            onClick={() => setActiveTab("Vignette")}
+          />
+          <Tab
+            label="Contrôle Technique"
+            isActive={activeTab === "VehicleInspection"}
+            onClick={() => setActiveTab("VehicleInspection")}
+          />
+        </Tabs>
+        <TabPanel activeTab={activeTab} id="Assurance">
+          <Assurance formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <TabPanel activeTab={activeTab} id="Vignette">
+          <Vignette formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <TabPanel activeTab={activeTab} id="VehicleInspection">
+          <VehicleInspection formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <br />
+
       </div>
-  
-
-      <br />
-      <Tabs>
-        <Tab
-          label="Assurance"
-          isActive={activeTab === "Assurance"}
-          onClick={() => setActiveTab("Assurance")}
-        />
-        <Tab
-          label="Vignette"
-          isActive={activeTab === "Vignette"}
-          onClick={() => setActiveTab("Vignette")}
-        />
-        <Tab
-          label="Contrôle Technique"
-          isActive={activeTab === "VehicleInspection"}
-          onClick={() => setActiveTab("VehicleInspection")}
-        />
-      </Tabs>
-
-      <TabPanel activeTab={activeTab} id="Assurance">
-        <Assurance formState={formState} handleChange={handleChange} />
-      </TabPanel>
-
-      <TabPanel activeTab={activeTab} id="Vignette">
-        <Vignette formState={formState} handleChange={handleChange} />
-      </TabPanel>
-
-      <TabPanel activeTab={activeTab} id="VehicleInspection">
-        <VehicleInspection formState={formState} handleChange={handleChange} />
-      </TabPanel>
-      <br />
-      <ActionButtons
-        currentStep={props.currentStep}
-        totalSteps={props.totalSteps}
-        previousStep={props.previousStep}
-        nextStep={validate}
-        lastStep={props.lastStep}
-      />
-    </div>
+        <div className="p-4 card widget-card border-light shadow-sm">
+          <br />
+          <ActionButtons
+            currentStep={props.currentStep}
+            totalSteps={props.totalSteps}
+            previousStep={props.previousStep}
+            nextStep={validate}
+            lastStep={props.lastStep}
+          />
+        </div>
+    </>
   );
 };
 

@@ -15,6 +15,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentStep, totalSteps, 
   const handleSendData = () => {
     // Vérifier si senData est une fonction
     if (typeof retrieveData === 'function') {
+
+      
       // Appeler senData et récupérer les données
       const data = retrieveData();
       console.log('Données récupérées:', data);
@@ -33,10 +35,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentStep, totalSteps, 
         {currentStep > 1 && <Button onClick={previousStep}>Précédent</Button>}
       </Col>
       <Col className="d-flex justify-content-end">
-        {currentStep < totalSteps ? (
-          <Button onClick={nextStep}>Suivant</Button>
+        {(currentStep === 1 || currentStep < totalSteps ) ? (
+          <Button variant="primary" onClick={nextStep}>Suivant</Button>
         ) : (
-          <Button onClick={() => { lastStep(); handleSendData(); }}>Compléter</Button>
+          <Button variant="primary" onClick={() => { lastStep(); handleSendData(); }}>Compléter</Button>
         )}
       </Col>
     </Row>
