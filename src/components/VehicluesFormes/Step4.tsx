@@ -1,72 +1,107 @@
-import React, { useState } from 'react';
-import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from 'react-bootstrap';
-import ActionButtons from './ActionButtons'; // Ajustez le chemin selon la structure de votre projet
+import React, { useState, useEffect } from "react";
+import ActionButtons from "./ActionButtons";
 
-interface Step2Props {
-  nextStep: () => void;
-  userCallback: (info: any) => void;
-  user: any;
-  currentStep: number;
-  totalSteps: number;
-  previousStep: () => void;
-  lastStep: () => void;
-}
+import { Tab, TabPanel, Tabs } from "./Tabs";
 
-const Step4: React.FC<Step2Props> = (props) => {
-  const [info2, setInfo2] = useState<{ [key: string]: string }>({});
+import {
+  StepsProps,
+  VehicleFormState,
+  VehicleValidateFormsStep4,
+} from "../../utilities/interfaces";
+import RentCar from "./RentCar";
+import Leasing from "./Leasing";
+import Purchase from "./Purchase";
+
+const Step4: React.FC<StepsProps> = (props) => {
+  const [activeTab, setActiveTab] = useState<string>("Leasing");
   const [error, setError] = useState<string>("");
 
-  const onInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+  // Utilisez useEffect pour mettre à jour l'onglet actif lorsque props.user.Step3 change
+  useEffect(() => {
+    setActiveTab(props.user.Step3);
+  }, [props.user.Step3]);
 
-    setInfo2((info2) => ({
-      ...info2,
-      [name]: value
+  const validate = () => {
+    setError("");
+    props.userCallback(formState.values);
+    props.nextStep();
+  };
+
+  const [formState, setFormState] = useState<VehicleFormState>(
+    VehicleValidateFormsStep4
+  );
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      values: {
+        ...prevState.values,
+        [name]: value,
+      },
+      validations: {
+        ...prevState.validations,
+        [name]: value.trim() !== "",
+      },
     }));
   };
 
-  const validate2 = () => {
-    if (!info2.age) {
-      setError("ยังไม่ได้ป้อนจำนวนแปลงที่ดิน");
-    } else {
-      setError("");
-      props.userCallback(info2);
-      props.nextStep();
-    }
+  const isTabDisabled = (tabName: string) => {
+    return props.user.Step3 !== tabName;
   };
 
   return (
-    <div>
-      <span style={{ color: "red" }}>{error}</span>
-      <h1>
-         Informations complémentaires
-      </h1>
-      <Form>
-        <FormGroup>
-          <FormLabel>
-            ยินดีต้อนรับโครงการ <b>{props.user.name || ""}</b>
-          </FormLabel>
-        </FormGroup>
-        <FormGroup>
-          <FormLabel>แปลงที่ดิน: </FormLabel>
-          <FormControl
-            type="text"
-            name="age"
-            placeholder="จำนวนแปลงที่ดิน"
-            onChange={onInputChanged}
-            className="input input-bordered"
-          />
-        </FormGroup>
-      </Form>
-      <br />
-      <ActionButtons
-        currentStep={props.currentStep}
-        totalSteps={props.totalSteps}
-        previousStep={props.previousStep}
-        nextStep={validate2}
-        lastStep={props.lastStep}
-      />
-    </div>
+    <>
+      <div  className="w-100 h-100 card widget-card border-light shadow-sm">
+        <div  className="p-4">
+          <h2>Acquisition</h2>
+          <hr className="w-50 mx-auto border-dark-subtle" />
+          <span className="" style={{ color: "red" }}>{error}</span>
+        </div>
+        <div className="card-body p-2">
+          <Tabs>
+            <Tab
+              label="Leasing"
+              isActive={activeTab === "Leasing"}
+              onClick={() => setActiveTab("Leasing")}
+              disabled={isTabDisabled("Leasing")}
+            />
+            <Tab
+              label="Location"
+              isActive={activeTab === "Location"}
+              onClick={() => setActiveTab("Location")}
+              disabled={isTabDisabled("Location")}
+            />
+            <Tab
+              label="Achat"
+              isActive={activeTab === "Achat"}
+              onClick={() => setActiveTab("Achat")}
+              disabled={isTabDisabled("Achat")}
+            />
+          </Tabs>
+          <TabPanel activeTab={activeTab} id="Leasing">
+            <Leasing formState={formState} handleChange={handleChange} />
+          </TabPanel>
+          <TabPanel activeTab={activeTab} id="Location">
+            <RentCar formState={formState} handleChange={handleChange} />
+          </TabPanel>
+          <TabPanel activeTab={activeTab} id="Achat">
+            <Purchase formState={formState} handleChange={handleChange} />
+          </TabPanel>
+        </div>
+      </div>
+
+      <div className="p-4 card widget-card border-light shadow-sm">
+        <br />
+        <ActionButtons
+          currentStep={props.currentStep}
+          totalSteps={props.totalSteps}
+          previousStep={props.previousStep}
+          nextStep={validate}
+          lastStep={props.lastStep}
+        />
+      </div>
+    </>
   );
 };
 

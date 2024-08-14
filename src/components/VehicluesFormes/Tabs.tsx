@@ -2,6 +2,7 @@ interface TabProps {
   label: string;
   isActive: boolean;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface TabPanelProps {
@@ -16,9 +17,13 @@ export const Tabs: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <div className="tabs">{children}</div>;
 };
 
-export const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => {
+export const Tab: React.FC<TabProps> = ({ label, isActive, onClick, disabled }) => {
   return (
-    <button className={`tab ${isActive ? 'active' : ''}`} onClick={onClick}>
+    <button
+      className={`tab ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+      onClick={!disabled ? onClick : undefined} // Désactiver le clic si l'onglet est désactivé
+      disabled={disabled} // Attribut HTML pour désactiver le bouton
+    >
       {label}
     </button>
   );

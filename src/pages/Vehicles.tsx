@@ -6,7 +6,8 @@ import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 import AdvancedSearch from "../components/AdvancedSearch";
-import { Button } from "../components/ButtonHover";
+import { ButtonCustomHover } from "../components/ButtonHover";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -55,6 +56,13 @@ export function Vehicles() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState(searchOptions[0]);
+  const navigate = useNavigate();
+
+  const handleClickLink = (navigateTo: string) => {
+    if (navigateTo) {
+      navigate(navigateTo);
+    }
+  };
 
   const handleSearch = (term: string, type: string) => {
     setSearchTerm(term);
@@ -218,6 +226,9 @@ const clearSearchTerm = () => {
     await setCurrentPage(pageSelect); // Attendez la mise à jour de l'état
 };
 
+const handleClick = () => {
+  console.log("Button clicked!");
+};
 
 
 
@@ -245,13 +256,14 @@ const clearSearchTerm = () => {
           </div>
           <div className="col-sm-12 col-md-8">
           <div className="text-right">
-             <Button text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success' />
-              <Button text={translate("Initialisation des Affectations")} icon={<FaRedo />} />
-              <Button text={translate("Affectations Vehicule")} icon={<FaCar />} />
-              <Button text={translate("Maj Assurance")} icon={<FaShieldAlt />} />
-              <Button text={translate("Maj Vignette")} icon={<FaStickyNote />} />
-              <Button text={translate("Maj Kilometrage")} icon={<FaTachometerAlt />} />
-              <Button text={translate("Maj Controle Thechnique")} icon={<FaWrench />} /> 
+              <ButtonCustomHover text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success'   onClick={() => handleClickLink('/vehicles-forms')}/> 
+
+              <ButtonCustomHover text={translate("Initialisation des Affectations")} icon={<FaRedo />} />
+              <ButtonCustomHover text={translate("Affectations Vehicule")} icon={<FaCar />} />
+              <ButtonCustomHover text={translate("Maj Assurance")} icon={<FaShieldAlt />} />
+              <ButtonCustomHover text={translate("Maj Vignette")} icon={<FaStickyNote />} />
+              <ButtonCustomHover text={translate("Maj Kilometrage")} icon={<FaTachometerAlt />} />
+              <ButtonCustomHover text={translate("Maj Controle Thechnique")} icon={<FaWrench />} /> 
           </div>
 
             <div className="row justify-content-end">

@@ -1,6 +1,7 @@
 .tabs {
   display: flex;
   border-bottom: 2px solid #ddd;
+  flex-wrap: wrap;
 }
 
 .tab {
@@ -11,7 +12,9 @@
   background-color: #f9f9f9;
   transition: background-color 0.3s;
   margin-bottom: -1px;
-   border-radius: 10px 10px 0 0; 
+  border-radius: 10px 10px 0 0;
+  flex: 1 1 auto;
+  text-align: center;
 }
 
 .tab:not(:last-child) {
@@ -29,12 +32,42 @@
   border-left: 2px solid #ddd;
   border-right: 2px solid #ddd;
   border-bottom: 1px solid white;
-  border-radius: 10px 10px 0 0; 
+  border-radius: 10px 10px 0 0;
+}
+
+.tab.disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
 }
 
 .tab-content {
   border: 1px solid #ddd;
   padding: 20px;
   background-color: white;
-   border-radius: 0 0 10px 10px; 
+  border-radius: 0 0 10px 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    width: 100%;
+    border-radius: 0;
+    border-right: 1px solid #ddd;
+  }
+
+  .tab:not(:last-child) {
+    border-bottom: none;
+  }
+
+  .tab.active {
+    border-radius: 0;
+  }
+
+  .tab-content {
+    border-radius: 0;
+  }
 }

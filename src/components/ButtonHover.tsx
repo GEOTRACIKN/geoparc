@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { IconType} from 'react-icons';
+import { Navigate } from 'react-router-dom';
 
 interface Buttons {
   text: string;
-  icon:any;
-  ClasStyle?: string
+  icon:React.ReactNode;
+  ClasStyle?: string | undefined;
+  onClick?: () => void | undefined;
 }
 /**
  * A custom button component that displays an icon and optional text on hover.
@@ -18,7 +20,7 @@ interface Buttons {
   * <Button text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success' />
  */
 
-export const Button = ({ text, icon, ClasStyle }: Buttons) => {
+export const ButtonCustomHover = ({ text, icon, ClasStyle,onClick }: Buttons) => {
   const [showText, setShowText] = useState(false);
 
   return (
@@ -82,6 +84,7 @@ export const Button = ({ text, icon, ClasStyle }: Buttons) => {
         className={`custom-button my-custom-button ${ClasStyle}`}
         onMouseEnter={() => setShowText(true)}
         onMouseLeave={() => setShowText(false)}
+        onClick={onClick} 
       >
         <span>{text}</span>
         <i className="ico">{icon}</i>

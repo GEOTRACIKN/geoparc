@@ -1,48 +1,35 @@
-import React, { useState } from 'react';
-import { Form, FormGroup, FormLabel, FormControl, Button, Row, Col } from 'react-bootstrap';
-import ActionButtons from './ActionButtons'; 
+import React, { useState, useEffect } from "react";
+import ActionButtons from "./ActionButtons";
 
-import { 
-  VehicleFormProps,
-  VehicleSelectOption,
+import { Tab, TabPanel, Tabs } from "./Tabs";
+
+import {
   StepsProps,
-} from '../../utilities/interfaces';
-import { Tab, TabContent, TabPanel, Tabs } from './Tabs';
-import './Tabs.css'
+  VehicleFormState,
+  VehicleValidateFormsStep3,
+} from "../../utilities/interfaces";
 
-import { VehicleFormState, VehicleValidateFormsStep3 } from '../../utilities/interfaces';
-import RentCar from './RentCar';
-import Leasing from './Leasing';
-import Purchase from './Purchase';
-
-
-
+import Assurance from "./Assurance";
+import Vignette from "./Vignette";
+import VehicleInspection from "./VehicleInspection";
 
 const Step3: React.FC<StepsProps> = (props) => {
-  const [activeTab, setActiveTab] = useState<string>('Tab1');
-  const [info2, setInfo2] = useState<{ [key: string]: string }>({});
+  const [activeTab, setActiveTab] = useState<string>("Assurance");
   const [error, setError] = useState<string>("");
 
-  const onInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-
-    setInfo2((info2) => ({
-      ...info2,
-      [name]: value
-    }));
+  const validate = () => {
+    setError("");
+    props.userCallback(formState.values);
+    props.nextStep();
   };
 
-  const validate2 = () => {
-  
-      setError("");
-      props.userCallback(formState.values);
-      props.nextStep();
-    
-  };
+  const [formState, setFormState] = useState<VehicleFormState>(
+    VehicleValidateFormsStep3
+  );
 
-  const [formState, setFormState] = useState<VehicleFormState>(VehicleValidateFormsStep3);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormState((prevState) => ({
       values: {
@@ -52,53 +39,64 @@ const Step3: React.FC<StepsProps> = (props) => {
       validations: {
         ...prevState.validations,
         [name]: value.trim() !== "",
-      }
-    }))
-  }
+      },
+    }));
+  };
 
   return (
-    <div>
-      <span style={{ color: "red" }}>{error}</span>
-      <h2>
-      Acquisition
-      </h2>
-     {/* 
-     Leasing === Tab1,
-     Location === Tab2,
-     Achat === Tab3
-     */}
+    <>
+      <div className="w-100 h-100 card widget-card border-light shadow-sm">
+        <div className="p-4">
+          <h2>
+            Assurer la Conformité - Assurance, Vignette et Contrôle Technique
+          </h2>
+          <hr className="w-50 mx-auto border-dark-subtle" />
+          <span className="" style={{ color: "red" }}>
+            {error}
+          </span>
+        </div>
+        <br />
+        <Tabs>
+          <Tab
+            label="Assurance"
+            isActive={activeTab === "Assurance"}
+            onClick={() => setActiveTab("Assurance")}
+          />
+          <Tab
+            label="Vignette"
+            isActive={activeTab === "Vignette"}
+            onClick={() => setActiveTab("Vignette")}
+          />
+          <Tab
+            label="Contrôle Technique"
+            isActive={activeTab === "VehicleInspection"}
+            onClick={() => setActiveTab("VehicleInspection")}
+          />
+        </Tabs>
+        <TabPanel activeTab={activeTab} id="Assurance">
+          <Assurance formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <TabPanel activeTab={activeTab} id="Vignette">
+          <Vignette formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <TabPanel activeTab={activeTab} id="VehicleInspection">
+          <VehicleInspection formState={formState} handleChange={handleChange} />
+        </TabPanel>
+        <br />
 
-      <Tabs>
-        <Tab label="Leasing" isActive={activeTab === 'Tab1'} onClick={() => setActiveTab('Tab1')} />
-        <Tab label="Location" isActive={activeTab === 'Tab2'} onClick={() => setActiveTab('Tab2')} />
-        <Tab label="Achat" isActive={activeTab === 'Tab3'} onClick={() => setActiveTab('Tab3')} />
-      </Tabs>
-      {/* <TabContent activeTab={activeTab} /> */}
-      <TabPanel activeTab={activeTab} id="Tab1">
-      <Leasing formState={formState} handleChange={handleChange} />
-      </TabPanel>
-
-      <TabPanel activeTab={activeTab} id="Tab2">
-      <RentCar formState={formState} handleChange={handleChange} />
-
-      </TabPanel>
-      <TabPanel activeTab={activeTab} id="Tab3">
-      <Purchase formState={formState} handleChange={handleChange} />
-
-      </TabPanel>
-   
-      <br />
-      <ActionButtons
-        currentStep={props.currentStep}
-        totalSteps={props.totalSteps}
-        previousStep={props.previousStep}
-        nextStep={validate2}
-        lastStep={props.lastStep}
-      />
-    </div>
+      </div>
+        <div className="p-4 card widget-card border-light shadow-sm">
+          <br />
+          <ActionButtons
+            currentStep={props.currentStep}
+            totalSteps={props.totalSteps}
+            previousStep={props.previousStep}
+            nextStep={validate}
+            lastStep={props.lastStep}
+          />
+        </div>
+    </>
   );
 };
-
-
 
 export default Step3;
