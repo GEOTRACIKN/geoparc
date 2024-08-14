@@ -6,6 +6,10 @@ import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
 import { toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
+import ExcelJS from 'exceljs';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 type Vehicles = {
   id_verif: string;
@@ -187,15 +191,177 @@ export function Vehicleschecks() {
     setShowDownloadModal(true);
   };
 
+// Fonction pour générer un fichier Excel pour les vérifications de véhicules
+const downloadExcel = async () => {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Vehicle Checks");
+
+    // Définition des propriétés de la feuille de calcul pour un affichage plus esthétique
+    worksheet.properties.defaultRowHeight = 30;
+    worksheet.properties.defaultColWidth = 25;
+
+    // Ajouter les en-têtes à la feuille
+    worksheet.addRow([
+      "ID Vérif",
+      "Date de Création",
+      "Vérificateur",
+      "Conducteur Sortant",
+      "Conducteur Entrant",
+      "Matricule Tracteur",
+      "Matricule Remorque",
+      "Maintenance"
+    ]).font = { bold: true };
+
+    // Ajouter les données des vérifications à la feuille
+    list_Vehicleschecks.forEach((vehicleCheck) => {
+      worksheet.addRow([
+        vehicleCheck.id_verif,
+        toTimestamp(vehicleCheck.creation_date).split(' ')[0],
+        vehicleCheck.checker,
+        vehicleCheck.driver_out,
+        vehicleCheck.driver_in,
+        vehicleCheck.tractor_number,
+        vehicleCheck.trailer_number,
+        convertValue(vehicleCheck.maintenance)
+
+      ]);
+    });
+
+    // Générer un fichier Excel en buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Créer un blob pour le téléchargement
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "VehicleChecks.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    // Notification de succès
+    toast.success("Le fichier Excel a été téléchargé avec succès.", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la génération du fichier Excel :", error);
+
+    // Notification d'erreur
+    toast.error("Une erreur s'est produite lors de la génération du fichier Excel.", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  }
+};
+
+const downloadPDF = async () => {
+  try {
+    const doc = new jsPDF();
+
+    // Définir les en-têtes
+    const columns = [
+      "ID Vérif",
+      "Date de Création",
+      "Vérificateur",
+      "Conducteur Sortant",
+      "Conducteur Entrant",
+      "Matricule Tracteur",
+      "Matricule Remorque",
+      "Maintenance"
+    ];
+
+    // Préparer les données
+    const rows = list_Vehicleschecks.map(vehicleCheck => [
+      vehicleCheck.id_verif || '',
+      toTimestamp(vehicleCheck.creation_date).split(' ')[0] || '',
+      vehicleCheck.checker || '',
+      vehicleCheck.driver_out || '',
+      vehicleCheck.driver_in || '',
+      vehicleCheck.tractor_number || '',
+      vehicleCheck.trailer_number || '',
+      convertValue(vehicleCheck.maintenance) || ''
+    ]);
+
+    // Ajouter un titre
+    doc.setFontSize(16);
+    doc.text("Vehicle Checks", 14, 16);
+
+    // Ajouter les données au PDF
+    autoTable(doc, {
+      head: [columns],
+      body: rows,
+      startY: 30,
+      margin: { top: 30 },
+      styles: { fontSize: 10 },
+    });
+
+    // Générer le PDF en buffer
+    const blob = doc.output("blob");
+
+    // Créer un URL pour le téléchargement
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "VehicleChecks.pdf";
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    // Notification de succès
+    toast.success("Le fichier PDF a été téléchargé avec succès.", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la génération du fichier PDF :", error);
+
+    // Notification d'erreur
+    toast.error("Une erreur s'est produite lors de la génération du fichier PDF.", {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  }
+};
+
+
   const handleDownloadConfirm = (format: string) => {
     setSelectedDownloadFormat(format);
     setShowDownloadModal(false);
     // Call your download function here based on the selected format
     if (format === 'excel') {
-      // Add your Excel download logic here
+      downloadExcel();
     } else if (format === 'pdf') {
-      // Add your PDF download logic here
-    }
+      downloadPDF();
+        }
   };
 
   const convertValue = (value: any) => {
@@ -224,7 +390,15 @@ export function Vehicleschecks() {
             <i className="las la-plus mr-3"></i>
             {translate("Add Verification")}
           </Link>
+          <button
+          className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={handleDownloadClick}
+          >
+            <i className="las la-download"></i>            
+            Exporter
+          </button>
         </div>
+
       </div>
       <div className="row">
         <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
@@ -396,8 +570,6 @@ export function Vehicleschecks() {
                     >
                       <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
                     </Link>
-
-
                     <a
                       className="badge bg-warning mr-2"
                       data-toggle="tooltip"
@@ -406,17 +578,6 @@ export function Vehicleschecks() {
                       onClick={() => handleDeleteClick(data.id_verif)}
                     >
                       <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
-                    </a>
-                    <a
-                      className="badge bg-primary mr-2"
-                      data-toggle="tooltip"
-                      data-placement="top"
-                      title="download"
-                      onClick={handleDownloadClick}
-
-                    >
-                      <i className="las la-download mr-0" style={{ fontSize: "1.2em" }}></i>
-
                     </a>
                   </div>
                 </td>
@@ -498,3 +659,4 @@ export function Vehicleschecks() {
     </>
   );
 }
+
