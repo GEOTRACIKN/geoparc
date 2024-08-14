@@ -24,17 +24,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
 
-
-
-
   // useEffect(() => {
   //   const savedToken = localStorage.getItem("authToken");
   //   if (savedToken) {
   //     //  navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
   //   }
   // }, [location.pathname]);
-
-
 
   interface Permission {
     id_rel: number;
@@ -59,7 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   }
 
   const checkPermission = (idPermission: number): boolean => {
-
     return userPermissions.some(
       (permission) => permission.id_permission === idPermission
     );
@@ -102,7 +96,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     navigate("/login");
   };
   return (
-    <div style={{ zIndex: 10015 }} className={`iq-sidebar  sidebar-default  ${sidebar}`}>
+    <div
+      style={{ zIndex: 10015 }}
+      className={`iq-sidebar  sidebar-default  ${sidebar}`}
+    >
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
           <Image
@@ -138,10 +135,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 className="iq-menu"
                 style={{ padding: 0 }}
               >
-                
                 <li>
                   <Nav.Link to="/" className="svg-icon" as={NavLink}>
-                    <svg style={{ minWidth: "fit-content" }} className="svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>{" "} <polyline points="9 22 9 12 15 12 15 22"></polyline>{" "} </svg>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      {" "}
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>{" "}
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>{" "}
+                    </svg>
                     <span className={`ml-2 ${activeMenuText}`}>
                       {translate("Dashboard")}
                     </span>
@@ -182,8 +194,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("Vehicles")
-                      ? "submenu-enter-active"
-                      : "submenu-enter"
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
@@ -272,17 +284,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("Drivers")
-                      ? "submenu-enter-active"
-                      : "submenu-enter"
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
                     <li>
-                      <Nav.Link
-                        to="/Drivers"
-                        className="svg-icon"
-                        as={NavLink}
-                      >
+                      <Nav.Link to="/Drivers" className="svg-icon" as={NavLink}>
                         <i className="las la-list-alt"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("List Drivers")}
@@ -290,17 +298,55 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                       </Nav.Link>
                     </li>
                     <li>
-                      <Nav.Link
-                        to="/contrat"
-                        className="svg-icon"
-                        as={NavLink}
-                      >
+                      <Nav.Link to="/contrat" className="svg-icon" as={NavLink}>
                         <i className="las la-file-contract"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Contracts")}
                         </span>
                       </Nav.Link>
                     </li>
+                  </ul>
+                </li>
+                {/* HSE section */}
+                <li>
+                  <Nav.Link
+                    to="/hse"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("hse");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="fas fa-shield-alt"></i>
+                    <span className={`ml-2 ${activeMenuText}`}>
+                      {translate("hse")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="Vehicles"
+                    className={`iq-submenu ${openSubmenus.includes("hse")
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
+                      }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
                     <li>
                       <Nav.Link
                         to="/warnings"
@@ -325,9 +371,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
-
                   </ul>
                 </li>
+
                 {/* fuels section */}
                 <li>
                   <Nav.Link
@@ -363,8 +409,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("fuel")
-                      ? "submenu-enter-active"
-                      : "submenu-enter"
+                        ? "submenu-enter-active"
+                        : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
@@ -416,12 +462,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
-
                   </ul>
                 </li>
-
-                
-
 
                 <li className="divider"></li>
                 <li>
