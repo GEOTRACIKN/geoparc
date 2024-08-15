@@ -435,8 +435,14 @@ export function Drivers() {
           </thead>
           <tbody key="#" className="ligth-body">
             {loading ? (
-              <tr >
-                <td className="text-center" colSpan={7}> <PropagateLoader color={'#123abc'} loading={loading} size={20} /></td>
+              <tr style={{textAlign:"center"}}>
+                <td  className="text-center" colSpan={10}>
+                  <p><PropagateLoader
+                    color={"#123abc"}
+                    loading={loading}
+                    size={20}
+                  /></p>
+                </td>
               </tr>
             ) :
               (
@@ -463,7 +469,7 @@ export function Drivers() {
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title="Editer alarme"
+                            title={translate("Edit")+" "+ translate("Driver")}
                           >
                             <i
                               className="las la-cog"
@@ -474,23 +480,17 @@ export function Drivers() {
                             className="badge bg-warning mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title="Méthodes de notification"
+                            title={translate("Update park")}
                             data-original-title="Delete"
                           >
                             <i
-                              className="las la-exclamation-circle"
+                              className="ri-share-forward-fill  mr-0"
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a
-                            className="badge bg-primary mr-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Attaché à"
-                            data-original-title="download"
-                          >
+                          <a className="badge bg-primary mr-2"  title={translate("Delete")} >
                             <i
-                              className="las la-magnet"
+                              className="las la-trash"
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>

@@ -3,9 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../components/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
+import { PropagateLoader } from "react-spinners";
 
 interface DriverInterface {
-  id_conducteur: number;
+  id_conducteur?: number  | null;
   nom_conducteur: string | null;
   prenom_conducteur: string | null;
   date_naissance_conducteur: string | null; // Utilisez `string` pour la date, ou `Date` si vous convertissez en objet Date
@@ -21,21 +22,20 @@ interface DriverInterface {
   numero_permis_conducteur: string | null;
   date_delivrance_permis_conducteur: string | null; // Utilisez `string` pour la date/heure
   lieu_delivrance_permis_conducteur: string | null;
-  id_sousParc: number;
+  id_sousParc: number  | null;
   situation_conducteur: string | null;
   prenom_pere_conducteur: string | null;
   nom_mere_conducteur: string | null;
   prenom_mere_conducteur: string | null;
   role_conducteur: string | null;
-  id_tag: number;
   service_conducteur: string | null;
   sexe_conducteur: string | null;
   date_expir_permis_conducteur: string | null; // Utilisez `string` pour la date/heure
   total_salaire_conducteur: string | null;
   code_conducteur: string | null;
-  tag_conducteur: string | null;
-  id_user: number | null;
-  service: number;
+  id_user: string | null;
+  service: number  | null;
+  type_permis: string | null;
   groupe_sanguin: string | null;
 }
 
@@ -45,17 +45,53 @@ export function Driver() {
   const isEditing = Boolean(id_conducteur);
   const navigate = useNavigate();
   const { translate } = useTranslate();
+  const id_user = localStorage.getItem("GeopUserID");
+  const [driver, setDriver] = useState<DriverInterface | null>({
+    id_conducteur: isEditing && id_conducteur ? Number(id_conducteur) : null,
+    nom_conducteur: null,
+    prenom_conducteur: null,
+    date_naissance_conducteur: null,
+    premis_conducteur: null,
+    nationalite_conducteur: null,
+    adresse_conducteur: null,
+    email_conducteur: null,
+    telephone_conducteur: null,
+    piece_identite_conducteur: null,
+    numero_piece_identite_conducteur: null,
+    date_delivrance_pi_conducteur: null,
+    lieu_delivrance_pi_conducteur: null,
+    numero_permis_conducteur: null,
+    date_delivrance_permis_conducteur: null,
+    lieu_delivrance_permis_conducteur: null,
+    id_sousParc: null,
+    situation_conducteur: null,
+    prenom_pere_conducteur: null,
+    nom_mere_conducteur: null,
+    prenom_mere_conducteur: null,
+    role_conducteur: null,
+    service_conducteur: null,
+    sexe_conducteur: null,
+    date_expir_permis_conducteur: null,
+    total_salaire_conducteur: null,
+    code_conducteur: null,
+    id_user:isEditing ? null : id_user,
+    service: null,
+    groupe_sanguin: null,
+    type_permis: null,
+  });
 
-  const [driver, setDriver] = useState<DriverInterface | null>(null);
-  const [loading, setLoading] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState<boolean | null>(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatedCodeConducteur, setUpdatedCodeConducteur] = useState("");
+  const [buttonClicked, setButtonClicked] = useState(false);
+
 
   const cancelClicked = () => {
     navigate("/drivers");
   };
 
   useEffect(() => {
-    const fetchDriver = async () => {
+    const getDriver = async () => {
       try {
         // Récupération des informations du conducteur
         const res = await fetch(
@@ -73,6 +109,10 @@ export function Driver() {
 
         const data: DriverInterface = await res.json();
         setDriver(data);
+       
+        setUpdatedCodeConducteur(driver?.code_conducteur || "")
+
+
       } catch (error) {
         console.error("Erreur lors de la récupération du conducteur", error);
         setError("Erreur lors de la récupération du conducteur");
@@ -80,8 +120,11 @@ export function Driver() {
         setLoading(false);
       }
     };
+    if(isEditing) {getDriver();} 
+    else{setLoading(false);}
 
-    fetchDriver();
+    
+
   }, [id_conducteur]);
 
   // Fonction de validation des emails
@@ -152,32 +195,27 @@ export function Driver() {
       return;
     }
 
-    const driverData = {
-      driver
-    };
 
     try {
       // Vérification si le conducteur avec le même email ou numéro de téléphone existe déjà
       const rescheck = await fetch(`${backendUrl}/api/geop/driver/check`, {
         method: "POST",
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
         },
         mode: "cors",
         body: JSON.stringify({
-          email_conducteur: driver.email_conducteur,
-          telephone_conducteur: driver.telephone_conducteur,
-          updatedEmail: driver.email_conducteur,
-          updatedPhone: driver.telephone_conducteur,
-          updated: driver.email_conducteur === driver.email_conducteur ? 0 : 1,
+          code_conducteur: driver.code_conducteur,
+          updated_code_conducteur:  driver.code_conducteur,
+          updated: driver.code_conducteur ===updatedCodeConducteur ? 0 : 1,
         }),
       });
 
       if (rescheck.ok) {
         const jsonResponse = await rescheck.json();
 
-        if (jsonResponse.driver_count != 0) {
-          toast.warn("Driver email or phone number already exists", {
+        if (jsonResponse.driver_count !== 0) {
+          toast.warn("Driver code already exists", {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -193,8 +231,49 @@ export function Driver() {
           return;
         }
 
+        
+        let driverData = Object.fromEntries(
+          Object.entries(driver).filter(([_, value]) => value !== null)
+        );
+
+
+        const dateFields = [
+          'date_naissance_conducteur',
+          'date_delivrance_permis_conducteur',
+          'date_delivrance_pi_conducteur',
+          'date_expir_permis_conducteur'
+        ];
+        
+         driverData = Object.fromEntries(
+          Object.entries(driver)
+            .filter(([_, value]) => value !== null)
+            .map(([key, value]) => {
+              // Check if the key is one of the specific date fields
+              if (dateFields.includes(key)) {
+                let date: Date;
+        
+                // If the value is already a Date object
+                if (value instanceof Date) {
+                  date = value;
+                } else if (typeof value === 'string' && value.includes('T')) {
+                  // Convert ISO string to Date object
+                  date = new Date(value);
+                } else {
+                  return [key, value];
+                }
+        
+                // Format the date as "YYYY-MM-DD HH:mm:ss"
+                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+                return [key, formattedDate];
+              }
+              return [key, value];
+            })
+        );
+
+
+
         // Si les validations passent, mettre à jour le conducteur
-        const res = await fetch(`${backendUrl}/api/driver/update`, {
+        const res = await fetch(`${backendUrl}/api/geop/driver/update`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -202,6 +281,9 @@ export function Driver() {
           mode: "cors",
           body: JSON.stringify(driverData),
         });
+
+
+        
 
         if (!res.ok) {
           toast.warn("Can't update driver", {
@@ -267,11 +349,208 @@ export function Driver() {
     }
   };
 
+  const createDriver = async (driver: DriverInterface) => {
+    const isEmailValid = validateEmail(driver.email_conducteur ?? "");
+    const isPhoneValid = validatePhone(driver.telephone_conducteur ?? "");
+   
+  
+    // Validation échouée
+    if (!isEmailValid || !isPhoneValid) {
+      const emailElement = document.getElementById(
+        "email_conducteur"
+      ) as HTMLInputElement;
+      if (emailElement) {
+        emailElement.style.borderColor = isEmailValid ? "#ced4da" : "red";
+      }
+  
+      const phoneElement = document.getElementById(
+        "telephone_conducteur"
+      ) as HTMLInputElement;
+      if (phoneElement) {
+        phoneElement.style.borderColor = isPhoneValid ? "#ced4da" : "red";
+      }
+  
+  
+
+      toast.warn("Please fill in all required fields", {
+        position: "bottom-right",
+        autoClose: 2400,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+  
+      setButtonClicked(false);
+      return;
+    } else {
+      try {
+        const driverData = {
+          ...driver,
+        };
+  
+        // Check if the driver code already exists
+        const rescheck = await fetch(`${backendUrl}/api/geop/driver/check`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+          body: JSON.stringify({
+            code_conducteur: driver.code_conducteur,
+            updated_code_conducteur: driver.code_conducteur,
+            update: 0, // For create operation
+          }),
+        });
+  
+        if (rescheck.ok) {
+          const jsonResponse = await rescheck.json();
+  
+          if (jsonResponse.driver_count != 0) {
+            toast.warn("Driver code already exists", {
+              position: "bottom-right",
+              autoClose: 2400,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+  
+            setButtonClicked(false);
+            return;
+          }
+
+          let  driverData = Object.fromEntries(
+            Object.entries(driver).filter(([_, value]) => value !== null)
+          );
+
+
+
+          const dateFields = [
+            'date_naissance_conducteur',
+            'date_delivrance_permis_conducteur',
+            'date_delivrance_pi_conducteur',
+            'date_expir_permis_conducteur'
+          ];
+          
+           driverData = Object.fromEntries(
+            Object.entries(driver)
+              .filter(([_, value]) => value !== null)
+              .map(([key, value]) => {
+                // Check if the key is one of the specific date fields
+                if (dateFields.includes(key)) {
+                  let date: Date;
+          
+                  // If the value is already a Date object
+                  if (value instanceof Date) {
+                    date = value;
+                  } else if (typeof value === 'string' && value.includes('T')) {
+                    // Convert ISO string to Date object
+                    date = new Date(value);
+                  } else {
+                    return [key, value];
+                  }
+          
+                  // Format the date as "YYYY-MM-DD HH:mm:ss"
+                  const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+                  return [key, formattedDate];
+                }
+                return [key, value];
+              })
+          );
+  
+      
+          // If validations pass, create the driver
+          const res = await fetch(`${backendUrl}/api/geop/driver/create`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            mode: "cors",
+            body: JSON.stringify(driverData),
+          });
+  
+          if (!res.ok) {
+            toast.warn("Can't create driver", {
+              position: "bottom-right",
+              autoClose: 2400,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+  
+            console.error("Error creating driver");
+            setButtonClicked(false);
+            return;
+          }
+  
+          toast.success("Driver created successfully", {
+            position: "bottom-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+  
+          setButtonClicked(false);
+          navigate("/drivers");
+        } else {
+          toast.warn("Can't create driver", {
+            position: "bottom-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+  
+          setButtonClicked(false);
+        }
+      } catch (error) {
+        console.error("Can't create driver", error);
+  
+        toast.warn("Can't create driver", {
+          position: "bottom-right",
+          autoClose: 2400,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+  
+        setButtonClicked(false);
+      }
+    }
+  };
+  
+
 
   // Utilisez l'interface ChangeEvent pour le gestionnaire d'événements
   const handleChange = (name: any, value: any) => {
     console.log("name: " + name);
     console.log("value: " + value);
+
+    
 
     if (driver) {
       setDriver({
@@ -279,15 +558,13 @@ export function Driver() {
         [name]: value,
       });
     }
+
+
+   console.log(driver) 
+
   };
 
-  const handleClick = () => {
-    if (isEditing) {
-      if (driver) { updateDriver(driver);} // Met à jour le conducteur
-    } else {
-     // createDriver(driver); // Crée un nouveau conducteur
-    }
-  };
+  
 
   return (
     <>
@@ -321,6 +598,11 @@ export function Driver() {
         </div>
 
         <div className="col-md-12">
+        {loading ? (
+          <div style={{ textAlign: "center" }}>
+            <PropagateLoader color={"#123abc"} loading={loading} size={20} />
+          </div>
+        ) : (
           <Tabs
             defaultActiveKey="tab_1"
             id="uncontrolled-tab-example"
@@ -539,7 +821,7 @@ export function Driver() {
                     </Form.Label>
                     <Form.Control
                       as="select"
-                      name="typePermis"
+                      name="premis_conducteur"
                       placeholder="Type de permis"
                       value={driver?.premis_conducteur || ""}
                       onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -617,6 +899,7 @@ export function Driver() {
               </div>
             </Tab>
           </Tabs>
+           )}
         </div>
 
         <div className="col-md-12 footer">
@@ -629,7 +912,21 @@ export function Driver() {
           >
             {translate("Cancel")}
           </button>
-          <Button variant="primary" type="submit" onClick={handleClick}>
+          <Button 
+          variant="primary" 
+          type="submit" 
+     
+           onClick={() => {
+            setButtonClicked(true); 
+            driver &&
+              (isEditing
+                ?  updateDriver(driver)
+                :  createDriver(driver))
+          }}
+           
+           disabled={buttonClicked}
+          
+          >
             {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
             {isEditing ? "Modifier" : "Ajouter"}
           </Button>
@@ -639,6 +936,3 @@ export function Driver() {
   );
 }
 
-function setButtonClicked(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
