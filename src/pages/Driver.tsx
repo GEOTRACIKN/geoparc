@@ -150,11 +150,12 @@ export function Driver() {
 
     const isEmailValid = validateEmail(driver.email_conducteur ?? "");
     const isPhoneValid = validatePhone(driver.telephone_conducteur ?? "");
-    const isUserSelected = driver.id_user != null;
-    const isServiceValid = driver.service_conducteur != null;
+    const isNomConducteurValid = validateString(driver.nom_conducteur ?? "");
+    const isPreNomConducteurValid = validateString(driver.prenom_conducteur ?? "");
+    const isCodeConducteurValid = validateString(driver.code_conducteur ?? "");
 
     // Validation échouée
-    if (!isEmailValid || !isPhoneValid || !isUserSelected || !isServiceValid) {
+    if (!isEmailValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid || !isCodeConducteurValid) {
       const emailElement = document.getElementById(
         "email_conducteur"
       ) as HTMLInputElement;
@@ -169,22 +170,19 @@ export function Driver() {
         phoneElement.style.borderColor = isPhoneValid ? "#ced4da" : "red";
       }
 
-      const userElement = document.getElementById("user") as HTMLInputElement;
-      if (userElement) {
-        userElement.style.borderColor = isUserSelected ? "#ced4da" : "red";
-        userElement.style.border = isUserSelected
-          ? "0px solid #ced4da"
-          : "1px solid red";
+      const nomElement = document.getElementById("nom_conducteur") as HTMLInputElement;
+      if (nomElement) {
+        nomElement.style.borderColor = isNomConducteurValid ? "#ced4da" : "red";
       }
-
-      const serviceElement = document.getElementById(
-        "service"
-      ) as HTMLInputElement;
-      if (serviceElement) {
-        serviceElement.style.borderColor = isServiceValid ? "#ced4da" : "red";
-        serviceElement.style.border = isServiceValid
-          ? "0px solid #ced4da"
-          : "1px solid red";
+    
+      const prenomElement = document.getElementById("prenom_conducteur") as HTMLInputElement;
+      if (prenomElement) {
+        prenomElement.style.borderColor = isPreNomConducteurValid ? "#ced4da" : "red";
+      }
+    
+      const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
+      if (codeElement) {
+        codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
       }
 
       toast.warn("Please fill in all required fields", {
