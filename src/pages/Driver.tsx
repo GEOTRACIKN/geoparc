@@ -125,7 +125,7 @@ export function Driver() {
 
 
 
-  }, []);
+  }, [id_conducteur]);
 
   // Fonction de validation des emails
   const validateEmail = (email: string): boolean => {
@@ -565,8 +565,6 @@ export function Driver() {
     console.log("name: " + name);
     console.log("value: " + value);
 
-
-
     if (driver) {
       setDriver({
         ...driver,
@@ -675,6 +673,7 @@ export function Driver() {
                       <Form.Control
                         type="text"
                         name="role_conducteur"
+                        id="role_conducteur"
                         value={driver?.role_conducteur || ''}
                         placeholder="Entrez la fonction du conducteur"
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -690,6 +689,7 @@ export function Driver() {
                       <Form.Control
                         type="date"
                         name="date_naissance_conducteur"
+                        id="date_naissance_conducteur"
                         placeholder="Sélectionnez la date de naissance"
                         value={driver?.date_naissance_conducteur || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -704,6 +704,7 @@ export function Driver() {
                       <Form.Control
                         type="text"
                         name="adresse_conducteur"
+                        id="adresse_conducteur"
                         placeholder="Entrez l'adresse du conducteur"
                         value={driver?.adresse_conducteur || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
