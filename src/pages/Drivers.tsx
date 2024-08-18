@@ -6,6 +6,8 @@ import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from 'react-spinners';
 import DriverModal from "../components/Driver/DriverModal";
+import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
+import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 
 interface Drivers {
   id_conducteur: number;
@@ -25,15 +27,21 @@ export function Drivers() {
   const { translate } = useTranslate();
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Drivers, setDrivers] = useState<Drivers[]>([]); 
+  const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
   const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
   const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
   const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
+  const [modalConfirmStatus, setModalConfirmStatus] = useState<string | null>(null);
+  const [titleConfirmStatus, setTitleConfirmStatus] = useState<string | null>(null);
+  const [modalAssignmentStatus, setModalAssignmentStatus] = useState<string | null>(null);
+  const [titleAssignmentStatus, setTitleAssignmentStatus] = useState<string | null>(null);
   const [IdDriver, setIdDriver] = useState<number>(0);
   const [IdUser, setIdUser] = useState<number>(0);
+  const [IdPark, setIdPark] = useState<number>(0);
+  
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);
@@ -45,12 +53,7 @@ export function Drivers() {
 
 
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
-  const handleSubmit = () => {
-    // Votre logique de soumission ici
-  };
 
   const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
     try {
@@ -199,8 +202,6 @@ export function Drivers() {
   };
 
 
-
-
   const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
 
@@ -208,7 +209,7 @@ export function Drivers() {
       case translate("ID Driver"):
         setType(0);
         break;
-      case translate("Code"): 
+      case translate("Code"):
         setType(1);
         break;
       case translate("Last & first Name"):
@@ -256,13 +257,50 @@ export function Drivers() {
       console.log(id_conducteur);
       setModalStatus('Do you want to delete this Driver');
       setTitleStatus('Delete Driver');
-      setIdUser(parseInt(id_user || '0', 0)); 
+      setIdUser(parseInt(id_user || '0', 0));
       setIdDriver(id_conducteur);
 
       // Perform deletion logic here...
 
       // After successful deletion, update the vehicle list
-    //  await updateVehicleList();
+      //  await updateVehicleList();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  const handleConfirmSalaryDriver = async () => {
+    try {
+
+      setModalConfirmStatus('Are you sure you want to validate the salary?');
+      setTitleConfirmStatus('Confirm!');
+      setIdUser(parseInt(id_user || '0', 0));
+      // setIdDriver(id_conducteur);
+
+      // Perform deletion logic here...
+
+      // After successful deletion, update the vehicle list
+      //  await updateVehicleList();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  
+  const handleDriverAssignmentDriver = async (id_conducteur:number,id_parc:number,id_user:any) => {
+    try {
+
+      setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
+      setTitleAssignmentStatus('Driver assignment');
+      setIdUser(parseInt(id_user || '0', 0));
+      setIdDriver(id_conducteur);
+      setIdPark(id_parc)
+      // Perform deletion logic here...
+
+      // After successful deletion, update the vehicle list
+      //  await updateVehicleList();
     } catch (error) {
       console.error(error);
     }
@@ -272,11 +310,31 @@ export function Drivers() {
     setModalStatus(null);
   };
 
+
+  const closeConfirmModal = () => {
+    setModalConfirmStatus(null);
+  };
+
+  const closeAssignmentModal = () => {
+    setModalAssignmentStatus(null);
+  };
+
+
+
   const handleUpdateDriverList = () => {
     getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
       console.error('Failed to update driver list:', error);
     });
   };
+
+
+  const handleUpdateParckList = () => {
+    handleDriverAssignmentDriver(IdDriver,IdPark,IdUser).catch(error => {
+      console.error('Failed to update driver list:', error);
+    });
+  };
+
+
 
 
   return (
@@ -289,14 +347,14 @@ export function Drivers() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-        
+
 
           <NavLink to="/driver/add" className="btn btn-primary mt-2 mr-1">
-              <i className="las la-plus mr-3"></i>
-              {translate("Add")} {translate("Driver")}
-          </NavLink> 
+            <i className="las la-plus mr-3"></i>
+            {translate("Add")} {translate("Driver")}
+          </NavLink>
 
-          <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={handleShowCreateTicketModal}>
+          <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={() => handleConfirmSalaryDriver()}>
             <i className="las la-cubes mr-3"></i>{translate("Validate employees' salaries")}
           </Button>
           <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
@@ -469,8 +527,8 @@ export function Drivers() {
           </thead>
           <tbody key="#" className="ligth-body">
             {loading ? (
-              <tr style={{textAlign:"center"}}>
-                <td  className="text-center" colSpan={10}>
+              <tr style={{ textAlign: "center" }}>
+                <td className="text-center" colSpan={10}>
                   <p><PropagateLoader
                     color={"#123abc"}
                     loading={loading}
@@ -491,7 +549,7 @@ export function Drivers() {
                       {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
                       {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
                       {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
-                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur!= null ? driver.date_naissance_conducteur.split('T')[0]+' '+driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0]  : translate("None")}</td>}
+                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
                       {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
@@ -503,14 +561,14 @@ export function Drivers() {
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title={translate("Edit")+" "+ translate("Driver")}
+                            title={translate("Edit") + " " + translate("Driver")}
                           >
                             <i
                               className="las la-cog"
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2"
+                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur,driver.id_parc,id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -521,7 +579,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteDriver(driver.id_conducteur)}   title={translate("Delete")} >
+                          <a className="badge bg-primary mr-2" onClick={() => handledeleteDriver(driver.id_conducteur)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -568,16 +626,36 @@ export function Drivers() {
             activeClassName={"active"}
           />
         </div>
-        <DriverModal 
-        show={modalStatus !== null} 
-        onHide={closeModal} 
-        status={modalStatus} 
-        title={titleStatus}
-        IdUser= {IdUser} 
-        IdDriver= {IdDriver} 
-        updateDriverList={handleUpdateDriverList} 
+        <DriverModal
+          show={modalStatus !== null}
+          onHide={closeModal}
+          status={modalStatus}
+          title={titleStatus}
+          IdUser={IdUser}
+          IdDriver={IdDriver}
+          updateDriverList={handleUpdateDriverList}
         />
-      
+        <ConfirmSalaryModal
+          show={modalConfirmStatus !== null}
+          onHide={closeConfirmModal}
+          status={modalConfirmStatus}
+          title={titleConfirmStatus}
+          IdUser={IdUser}
+        // updateConfirmSalaryList={ }       
+        />
+
+        <DriverAssignmentModal
+          show={modalAssignmentStatus !== null}
+          onHide={closeAssignmentModal} 
+          status={modalAssignmentStatus}
+          title={titleAssignmentStatus}
+          id_user={IdUser} 
+          id_driver={IdDriver}
+          id_parc={IdPark}
+        />
+
+
+
       </div>
     </>
   );
