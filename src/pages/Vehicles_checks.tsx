@@ -4,7 +4,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
-import { toTimestamp } from "../functions";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
 import ExcelJS from 'exceljs';
 import jsPDF from "jspdf";
@@ -128,14 +128,14 @@ export function Vehicleschecks() {
   //------- Partie Delete -------
   const handleConfirmDelete = async () => {
     try {
-      const loggedInuserID = 1;
+      const loggedInuserID = localStorage.getItem("GeopUserID");
 
       const response = await fetch(`${backendUrl}/api/geop/delete/${selectedvehiclecheckID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ loggedInuserID: loggedInuserID }),
+        body: JSON.stringify({ loggedInuserID }),
 
       });
 
@@ -191,179 +191,6 @@ export function Vehicleschecks() {
     setShowDownloadModal(true);
   };
 
-// Fonction pour générer un fichier Excel pour les vérifications de véhicules
-const downloadExcel = async () => {
-  try {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Vehicle Checks");
-
-    // Définition des propriétés de la feuille de calcul pour un affichage plus esthétique
-    worksheet.properties.defaultRowHeight = 30;
-    worksheet.properties.defaultColWidth = 25;
-
-    // Ajouter les en-têtes à la feuille
-    worksheet.addRow([
-      "ID Vérif",
-      "Date de Création",
-      "Vérificateur",
-      "Conducteur Sortant",
-      "Conducteur Entrant",
-      "Matricule Tracteur",
-      "Matricule Remorque",
-      "Maintenance"
-    ]).font = { bold: true };
-
-    // Ajouter les données des vérifications à la feuille
-    list_Vehicleschecks.forEach((vehicleCheck) => {
-      worksheet.addRow([
-        vehicleCheck.id_verif,
-        toTimestamp(vehicleCheck.creation_date).split(' ')[0],
-        vehicleCheck.checker,
-        vehicleCheck.driver_out,
-        vehicleCheck.driver_in,
-        vehicleCheck.tractor_number,
-        vehicleCheck.trailer_number,
-        convertValue(vehicleCheck.maintenance)
-
-      ]);
-    });
-
-    // Générer un fichier Excel en buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    // Créer un blob pour le téléchargement
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "VehicleChecks.xlsx";
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    // Notification de succès
-    toast.success("Le fichier Excel a été téléchargé avec succès.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la génération du fichier Excel :", error);
-
-    // Notification d'erreur
-    toast.error("Une erreur s'est produite lors de la génération du fichier Excel.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-  }
-};
-
-const downloadPDF = async () => {
-  try {
-    const doc = new jsPDF();
-
-    // Définir les en-têtes
-    const columns = [
-      "ID Vérif",
-      "Date de Création",
-      "Vérificateur",
-      "Conducteur Sortant",
-      "Conducteur Entrant",
-      "Matricule Tracteur",
-      "Matricule Remorque",
-      "Maintenance"
-    ];
-
-    // Préparer les données
-    const rows = list_Vehicleschecks.map(vehicleCheck => [
-      vehicleCheck.id_verif || '',
-      toTimestamp(vehicleCheck.creation_date).split(' ')[0] || '',
-      vehicleCheck.checker || '',
-      vehicleCheck.driver_out || '',
-      vehicleCheck.driver_in || '',
-      vehicleCheck.tractor_number || '',
-      vehicleCheck.trailer_number || '',
-      convertValue(vehicleCheck.maintenance) || ''
-    ]);
-
-    // Ajouter un titre
-    doc.setFontSize(16);
-    doc.text("Vehicle Checks", 14, 16);
-
-    // Ajouter les données au PDF
-    autoTable(doc, {
-      head: [columns],
-      body: rows,
-      startY: 30,
-      margin: { top: 30 },
-      styles: { fontSize: 10 },
-    });
-
-    // Générer le PDF en buffer
-    const blob = doc.output("blob");
-
-    // Créer un URL pour le téléchargement
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "VehicleChecks.pdf";
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    // Notification de succès
-    toast.success("Le fichier PDF a été téléchargé avec succès.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la génération du fichier PDF :", error);
-
-    // Notification d'erreur
-    toast.error("Une erreur s'est produite lors de la génération du fichier PDF.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-  }
-};
-
-
-  const handleDownloadConfirm = (format: string) => {
-    setSelectedDownloadFormat(format);
-    setShowDownloadModal(false);
-    // Call your download function here based on the selected format
-    if (format === 'excel') {
-      downloadExcel();
-    } else if (format === 'pdf') {
-      downloadPDF();
-        }
-  };
-
   const convertValue = (value: any) => {
     if (!value) {
       return "Not mentioned";
@@ -373,7 +200,41 @@ const downloadPDF = async () => {
       return "Non";
     }
   };
+  //**** Partie Excel ****
+  const vehicleHeaders = [
+    "ID Vérif",
+    "Date de Création",
+    "Vérificateur",
+    "Conducteur Sortant",
+    "Conducteur Entrant",
+    "Matricule Tracteur",
+    "Matricule Remorque",
+    "Maintenance"
+  ];
+  
+  const vehicleData = list_Vehicleschecks.map(vehicleCheck => [
+    vehicleCheck.id_verif,
+    toTimestamp(vehicleCheck.creation_date),
+    vehicleCheck.checker,
+    vehicleCheck.driver_out,
+    vehicleCheck.driver_in,
+    vehicleCheck.tractor_number,
+    vehicleCheck.trailer_number,
+    convertValue(vehicleCheck.maintenance)
+  ]);
+  
+  const downloadVehicleExcel = () => {
+    generateExcelFile("Vehicle_Checks", vehicleHeaders, vehicleData);
+  };
 
+  const downloadVehiclePDF = () => {
+    generatePDFFile("Vehicle_Checks", vehicleHeaders, vehicleData);
+  };
+  
+
+const onDownloadConfirm = (format: string) => {
+  handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+};
 
 
   return (
@@ -391,13 +252,13 @@ const downloadPDF = async () => {
             {translate("Add Verification")}
           </Link>
           <button
-          className="btn btn-outline-secondary  mt-2 mr-1"
-            onClick={handleDownloadClick}
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
           >
-            <i className="las la-download"></i>            
+            <i className="las la-download"></i>
             Exporter
           </button>
-        </div>
+        </div>  
 
       </div>
       <div className="row">
@@ -628,34 +489,12 @@ const downloadPDF = async () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <Modal
+      {/* Le moodal est dans functions */}
+      <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{translate("Select Download Format")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center">
-          {translate("Please select the format to download the data:")}
-          <div className="mt-3 d-flex justify-content-center">
-            <Button
-              variant="success"
-              className="mr-2"
-              onClick={() => handleDownloadConfirm("excel")}
-            >
-              Excel
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => handleDownloadConfirm("pdf")}
-            >
-              PDF
-            </Button>
-          </div>
-        </Modal.Body>
-      </Modal>
+        onDownloadConfirm={onDownloadConfirm}    
+      />  
     </>
   );
 }
