@@ -174,12 +174,12 @@ export function Driver() {
       if (nomElement) {
         nomElement.style.borderColor = isNomConducteurValid ? "#ced4da" : "red";
       }
-    
+
       const prenomElement = document.getElementById("prenom_conducteur") as HTMLInputElement;
       if (prenomElement) {
         prenomElement.style.borderColor = isPreNomConducteurValid ? "#ced4da" : "red";
       }
-    
+
       const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
       if (codeElement) {
         codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
@@ -379,12 +379,12 @@ export function Driver() {
       if (nomElement) {
         nomElement.style.borderColor = isNomConducteurValid ? "#ced4da" : "red";
       }
-    
+
       const prenomElement = document.getElementById("prenom_conducteur") as HTMLInputElement;
       if (prenomElement) {
         prenomElement.style.borderColor = isPreNomConducteurValid ? "#ced4da" : "red";
       }
-    
+
       const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
       if (codeElement) {
         codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
@@ -691,7 +691,7 @@ export function Driver() {
                         name="date_naissance_conducteur"
                         id="date_naissance_conducteur"
                         placeholder="Sélectionnez la date de naissance"
-                        value={driver?.date_naissance_conducteur || ''}
+                        value={driver?.date_naissance_conducteur?.split("T")[0] || ''} 
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
@@ -779,23 +779,30 @@ export function Driver() {
                       <Form.Label>
                         <i className="fas fa-id-card"></i> Type de la pièce
                       </Form.Label>
+
                       <Form.Control
-                        type="text"
+                        as="select"
                         name="piece_identite_conducteur"
                         placeholder="Entrez le type de la pièce"
                         value={driver?.piece_identite_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
-                      />
+                      >
+                        <option value="">Sélectionnez le type de permis</option>
+                        <option value="Biométrie">Biométrie</option>
+                        <option value="Normal">Normal</option>
+                      </Form.Control>
+
+
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formNumP">
                       <Form.Label>
                         <i className="fas fa-id-card"></i> Numéro de la pièce
                       </Form.Label>
                       <Form.Control
-                        type="text"
-                        name="piece_identite_conducteur"
+                        type="number"
+                        name="numero_piece_identite_conducteur" 
                         placeholder="Entrez le numéro de la pièce"
-                        value={driver?.piece_identite_conducteur || ""}
+                        value={driver?.numero_piece_identite_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
@@ -812,7 +819,7 @@ export function Driver() {
                         type="date"
                         name="date_delivrance_pi_conducteur"
                         placeholder="Sélectionnez la date de délivrance"
-                        value={driver?.date_delivrance_pi_conducteur || ""}
+                        value={driver?.date_delivrance_pi_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
@@ -899,7 +906,7 @@ export function Driver() {
                         type="date"
                         name="date_delivrance_permis_conducteur"
                         placeholder="Sélectionnez la date de délivrance"
-                        value={driver?.date_delivrance_permis_conducteur || ""}
+                        value={driver?.date_delivrance_permis_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
@@ -911,7 +918,7 @@ export function Driver() {
                         type="date"
                         name="date_expir_permis_conducteur"
                         placeholder="Sélectionnez la date d'expiration"
-                        value={driver?.date_expir_permis_conducteur || ""}
+                        value={driver?.date_expir_permis_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>

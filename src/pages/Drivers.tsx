@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from 'react-spinners';
+import DriverModal from "../components/Driver/DriverModal";
 
 interface Drivers {
   id_conducteur: number;
@@ -24,11 +25,15 @@ export function Drivers() {
   const { translate } = useTranslate();
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
+  const [list_Drivers, setDrivers] = useState<Drivers[]>([]); 
   const id_user = localStorage.getItem("GeopUserID");
   const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
   const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
   const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
+  const [modalStatus, setModalStatus] = useState<string | null>(null);
+  const [titleStatus, setTitleStatus] = useState<string | null>(null);
+  const [IdDriver, setIdDriver] = useState<number>(0);
+  const [IdUser, setIdUser] = useState<number>(0);
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);
@@ -244,6 +249,35 @@ export function Drivers() {
     sort == "ASC" ? setSort("DESC") : setSort("ASC");
     getDrivers(limit, currentPage, search, type, colum, sort);
   };
+
+
+  const handledeleteDriver = async (id_conducteur: number) => {
+    try {
+      console.log(id_conducteur);
+      setModalStatus('Do you want to delete this Driver');
+      setTitleStatus('Delete Driver');
+      setIdUser(parseInt(id_user || '0', 0)); 
+      setIdDriver(id_conducteur);
+
+      // Perform deletion logic here...
+
+      // After successful deletion, update the vehicle list
+    //  await updateVehicleList();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const closeModal = () => {
+    setModalStatus(null);
+  };
+
+  const handleUpdateDriverList = () => {
+    getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
+      console.error('Failed to update driver list:', error);
+    });
+  };
+
 
   return (
     <>
@@ -476,8 +510,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a
-                            className="badge bg-warning mr-2"
+                          <a className="badge bg-warning mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -488,7 +521,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-primary mr-2"  title={translate("Delete")} >
+                          <a className="badge bg-primary mr-2" onClick={() => handledeleteDriver(driver.id_conducteur)}   title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -535,6 +568,16 @@ export function Drivers() {
             activeClassName={"active"}
           />
         </div>
+        <DriverModal 
+        show={modalStatus !== null} 
+        onHide={closeModal} 
+        status={modalStatus} 
+        title={titleStatus}
+        IdUser= {IdUser} 
+        IdDriver= {IdDriver} 
+        updateDriverList={handleUpdateDriverList} 
+        />
+      
       </div>
     </>
   );
