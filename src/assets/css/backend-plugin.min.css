@@ -17110,7 +17110,8 @@ g[aria-describedby=id-22-description] {
     margin-left: 217px;
     padding: 105px 15px 0;
     min-height: 100vh;
-    transition: all .3s ease-in-out
+    transition: all .3s ease-in-out;
+    background: #dddddd30;
 }
 
 @media (min-width: 1300px) {

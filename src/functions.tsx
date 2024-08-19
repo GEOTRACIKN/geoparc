@@ -227,3 +227,50 @@ export function DownloadModal({
     </Modal>
   );
 }
+
+
+export function engineStat(enginestat: number, speed: number, translate?: (key: string) => string) {
+  let iconState = "asset/images/mapicon/stop.png";
+  let tooltipMessage = translate ? translate("engineStopped") : "Engine stopped";
+
+
+  if (enginestat == 0) {
+
+    iconState = "asset/images/mapicon/stop.png";
+    tooltipMessage = translate ? translate("engineStopped") : "Engine stopped";
+
+  } else {
+
+    if (enginestat == 1 && speed > 5) {
+      iconState = "asset/images/mapicon/on-icon.png";
+      tooltipMessage = translate ? translate("engineRunning") : "Engine running";
+    } else {
+      iconState = "asset/images/mapicon/pause.png";
+      tooltipMessage = translate ? translate("enginePaused") : "Engine paused";
+    }
+  }
+
+  return { iconState, tooltipMessage };
+}
+
+
+
+export async function getAddressFromCoordinates(lat: number, lon: number): Promise<string> {
+
+  const apiUrl = `https://geotrackin.xyz/nominatim/reverse.php?format=jsonv2&lat=${lat}&lon=${lon}`;
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch address');
+    }
+    const data = await response.json();
+    // Assuming your API returns an object with an 'address' property
+    const address = data.display_name;
+    return address;
+  } catch (error: any) { // Explicitly type error as 'any' or 'unknown'
+    console.error('Error:', error.message);
+    throw new Error('Failed to fetch address');
+  }
+}
+
+

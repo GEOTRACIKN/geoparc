@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import FleetCounter from "../components/Dashboard/fleetCounter";
 import FleetSate from "../components/Dashboard/fleetSate";
 import StatsComponent from "../components/Dashboard/StatsComponent";
-import Alert from "../components/Dashboard/alerts";
+
 import { useTranslate } from "../components/LanguageProvider";
-import FleetCo2 from "../components/Dashboard/fleetCo2";
+
 import { Table } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
@@ -14,11 +14,13 @@ import Select from 'react-select';
 
 import {
   engineStat,
-  BarreReseau,
-  ValiderPosition,
+  // BarreReseau,
+  // ValiderPosition,
   getAddressFromCoordinates,
   formatDateForAlgeriaTimeZone,
 } from "../utilities/functions";
+import AlertCounter from "../components/Dashboard/AlertCounter";
+import FleetCo2 from "../components/Dashboard/fleetCo2";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 // Définir une interface pour les données de véhicule
@@ -34,7 +36,7 @@ interface VehicleData {
 
 export function Dashboard() {
   const { translate } = useTranslate();
-  const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
@@ -224,7 +226,7 @@ export function Dashboard() {
       setRefreshing(true);
 
       try {
-        const response = await fetch(`${backendUrl}/api/dash-data/${userID}`); 
+        const response = await fetch(`${backendUrl}/api/dash-data/${userID}`);
         if (response.ok) {
           const data = await response.json();
           setDashData(data);
@@ -362,12 +364,12 @@ export function Dashboard() {
               point.y === 0
                 ? "red"
                 : point.y > 75
-                ? "green"
-                : point.y > 50
-                ? "yellow"
-                : point.y < 50
-                ? "orange"
-                : null,
+                  ? "green"
+                  : point.y > 50
+                    ? "yellow"
+                    : point.y < 50
+                      ? "orange"
+                      : null,
             dataLabels: {
               enabled: true,
               formatter: function () {
@@ -492,10 +494,6 @@ export function Dashboard() {
     getMarkers();
   }, []);
 
-  const clearInputs = () => {
-    setSearchTerm("");
-    // Ajoutez d'autres instructions pour effacer d'autres saisies si nécessaire
-  };
 
   // Fonction pour calculer la différence en heures entre deux timestamps
   function calculateHoursDifference(
@@ -508,40 +506,26 @@ export function Dashboard() {
   }
   const currentDate = new Date().toLocaleDateString();
 
+
+  const alertData = [
+    { id: 'assurances', value: 5, max: 10, color: '#3c8dbc', label: 'Assurances', modalId: 'detailASS' },
+    { id: 'controle-technique', value: 5, max: 10, color: '#f56954', label: 'Contrôle technique', modalId: 'detailCnrlTech' },
+    { id: 'vidange', value: 7, max: 10, color: '#00a65a', label: 'Vidange', modalId: 'detailVidange' },
+    { id: 'entretien-klm', value: 10, max: 10, color: 'purple', label: 'Entretiens planifiés par kilométrage', modalId: 'detailEntretienKlm' },
+    { id: 'entretien-date', value: 10, max: 10, color: 'yellow', label: 'Entretiens planifiés par date', modalId: 'detailEntretienDate' },
+    { id: 'permis', value: 2, max: 10, color: '#e66d05', label: 'Permis de conduire', modalId: 'detailPermis' },
+    { id: 'stock', value: 6, max: 10, color: '#e60505', label: 'Stock', modalId: 'stockpiece' },
+    { id: 'extincteur', value: 4, max: 10, color: '#3c8dbc', label: 'Extincteur', modalId: 'detailExt' },
+    { id: 'Permis circulé', value: 4, max: 10, color: '#9896f1', label: 'Permis circulé', modalId: 'detailPermis' },
+    { id: 'Agrément Sanitaire', value: 4, max: 10, color: '#264e70', label: 'Agrément Sanitaire', modalId: 'detaiAgrement' },
+    { id: 'Récépissé', value: 4, max: 10, color: '#edb1f1', label: 'Récépissé', modalId: 'detailRecepisse' }
+  ];
   return (
     <>
       <div className="row">
-        <div className="col-lg-4">
-          <div className="card card-transparent card-block card-stretch card-height border-none">
-            <div className="card-body p-0 mt-lg-2 mt-0">
-              <h3 className="mb-3">
-                {translate("Hello")}, {userName} {currentDate}{" "}
-              </h3>
-
-              <p
-                style={{
-                  marginBottom: "0",
-                  marginRight: "20px",
-                  fontSize: "16px",
-                  lineHeight: "1.5",
-                  color: "#333",
-                  padding: "10px",
-                  backgroundColor: "#f9f9f9",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-              >
-                {translate(
-                  "Your dashboard monitors business processes. Fleet Management optimizes operations. Geotrackin provides location data, while ensuring real-time tracking."
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-8">
+        <div className="col-lg-12">
           <div className="row">
-            <div className="col-lg-3 col-md-3">
+            <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={totalVehicles}
                 title={translate("Vehicles")}
@@ -550,7 +534,7 @@ export function Dashboard() {
                 linkTo="/vehicles" // Add the link here
               ></FleetCounter>
             </div>
-            <div className="col-lg-3 col-md-3">
+            <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={totalDrivers}
                 title={translate("Drivers")}
@@ -559,22 +543,96 @@ export function Dashboard() {
                 linkTo="/drivers" // Add the link here
               ></FleetCounter>
             </div>
-            <div className="col-lg-3 col-md-3">
+            <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={totalReports}
-                title={translate("Reports")}
+                title={translate("Alert")}
                 icon={"chart-bar"}
                 color={"bg-success-light"}
                 linkTo="/reports" // Add the link here
               ></FleetCounter>
             </div>
-            <div className="col-lg-3 col-md-3">
+            <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={totalUsers}
                 title={translate("Users")}
                 icon={"users-cog"}
-                color={"bg-success-user"}   
+                color={"bg-success-user"}
                 linkTo="/users" // Add the link here
+              ></FleetCounter>
+            </div>
+
+            {/* Ajout des pavés supplémentaires */}
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={0}
+                title={translate("Hors Service")}
+                icon={"exclamation-circle"}
+                color={"bg-warning-light"}
+                linkTo="/hors-service"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={1}
+                title={translate("En panne")}
+                icon={"tools"}
+                color={"bg-danger-light"}
+                linkTo="/en-panne"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={3}
+                title={translate("En Réparation")}
+                icon={"wrench"}
+                color={"bg-info-light"}
+                linkTo="/en-reparation"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={6}
+                title={translate("Disponibles")}
+                icon={"check-circle"}
+                color={"bg-success-light"}
+                linkTo="/disponibles"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={0}
+                title={translate("Disponible-HS")}
+                icon={"ban"}
+                color={"bg-secondary-light"}
+                linkTo="/disponible-hs"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={0}
+                title={translate("Affectés")}
+                icon={"users"}
+                color={"bg-primary-light"}
+                linkTo="/affectes"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={0}
+                title={translate("Report")}
+                icon={"chart-bar"}
+                color={"bg-primary-light"}
+                linkTo="/affectes"
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={0}
+                title={translate("Statistic")}
+                icon={"chart-pie"}
+                color={"bg-primary-light"}
+                linkTo="/affectes"
               ></FleetCounter>
             </div>
           </div>
@@ -582,190 +640,45 @@ export function Dashboard() {
 
         <>
           <div className="container-fluid">
-            {" "}
-            {/* Use container-fluid to make it full-width */}
-            <div className="row">
-              <div className="col position-relative">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-control"
-                    placeholder={
-                      translate("Matriculation") + " " + translate("Vehicle")
-                    }
-                    list="immatriculationSuggestions"
-                  />
-                  {searchTerm && (
-                    <button
-                      className="btn-close"
-                      onClick={clearInputs}
-                    ></button>
-                  )}
-                  <datalist id="immatriculationSuggestions">
-                    {immatriculationSuggestions.map((suggestion, index) => (
-                      <option
-                        key={index}
-                        value={suggestion.immatriculation_vehicule}
-                      />
-                    ))}
-                  </datalist>
-                </div>
-              </div>
-              <div className="col-auto">
-                <button className="btn btn-primary" onClick={handleSearch}>
-                  <i className="las la-search"></i>
-                </button>
-              </div>
-            </div>
-            <div className="row mt-4">
-              <div className="col-lg-12">
-                {loading ? (
-                  <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '20px' }}>
-                  <BarLoader color="#007bff" loading={loading} />
-                </div>
-                ) : searchResults.length === 0 ? (
-                  <p></p>
-                ) : (
-                  <Table bordered hover responsive className="w-100">
-                    <thead className="bg-primary text-white">
-                      <tr className="ligth ligth-data">
-                        <th>{translate("Vehicle")}</th>
-                        <th>{translate("User")}</th>
-                        <th>{translate("Driver")}</th>
-                        <th>{translate("Vehicles Groups")}</th>
-                        <th> {translate("Vitesse")}</th>
-                        <th> {translate("Address")}</th>
-                        <th>{translate("Distance")}</th>
-                        <th>{translate("State")}</th>
-                        <th>{translate("Category/Type")}</th>
-                        <th>{translate("Date Time")}</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {searchResults.map((result, index) => (
-                        <tr key={index}>
-                          <td>{result.immatriculation_vehicule}</td>
-                          <td>
-                            {result.nom_user} {result.prenom_user}
-                          </td>
-                          <td>
-                            {result.nom_conducteur} {result.prenom_conducteur}
-                          </td>
-                          <td>{result.nom_groupe}</td>
-                          <td>{result.SOG} km/h</td>
-                          <td>{result.Adresse}</td>
-                          <td>{(result.GPSDIST / 1000).toFixed(0)} km</td>
-                          <td>
-                            <img
-                              src={
-                                engineStat(
-                                  result.ENGINESTAT,
-                                  result.SOG,
-                                  translate
-                                ).iconState
-                              }
-                              alt=""
-                              title={
-                                engineStat(
-                                  result.ENGINESTAT,
-                                  result.SOG,
-                                  translate
-                                ).tooltipMessage
-                              }
-                            />
-                          </td>
-                          <td>
-                            {result.category_vehicule} / {result.vehicule_type}
-                          </td>
-                          <td>
-                            {formatDateForAlgeriaTimeZone(result.TIMESTAMP)}
-                          </td>
-                          <td>
-                            <button
-                              className="btn-close"
-                              onClick={() =>
-                                setSearchResults(
-                                  searchResults.filter((_, i) => i !== index)
-                                )
-                              }
-                            ></button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
-              </div>
-            </div>
           </div>
         </>
 
-        <div className="col-lg-4">
+        <div className="col-lg-6" >
           <FleetSate
             options={{
-              DrivingValue: Driving,
-              ParckingValue: Parcking,
-              ParkingEngineRunningValue: ParkingEngineRunning,
-              LastTransmissionValue: LastTransmission,
+              maintenanceCosts: 5000,  // Coûts de Maintenance
+              missionCosts: 3000,      // Coûts des Missions
+              fuelCosts: 2000,         // Coûts de Carburant
+              legalCosts: 1500,        // Coûts Juridiques
+              employeeCosts: 4000,     // Coûts des Employés
+              hseCosts: 1000,          // Coûts HSE (Hygiène, Sécurité, Environnement)
             }}
-          ></FleetSate>
+          />
         </div>
-        <div className="col-lg-8">
-          <GSMLVLChart data={convertToVehicle(dashData)} />
+        <div className="col-lg-6">
+          <FleetCo2 />
         </div>
-        <br />
-        <div className="row">
-          <div className="col-lg-8">
-            {/* Mettez votre composant SOGChart ici */}
-            <SOGChart data={convertToVehicle(dashData)} />
+        <div className="card col-lg-12" >
+          <div className="">
+            <i className="fa fa-warning"></i>
+            <h6 className="box-title">
+              Alertes <span className="badge bg-red">{alertData.reduce((acc, alert) => acc + alert.value, 0)}</span>
+            </h6>
           </div>
-          <div className="col-lg-4">
-  <Select
-    options={dashData.map((vehicle) => ({
-      value: vehicle.immatriculation_vehicule,
-      label: vehicle.immatriculation_vehicule
-    }))}
-    onChange={(selectedOption) => handleImmatriculationSelect(selectedOption)}
-    placeholder={translate("Vehicles")}
-  />
-  <br />
-  <br />
-  {selectedPsn ? (
-    <StatsComponent psn={selectedPsn} />
-  ) : (
-    <p
-      style={{
-        fontSize: "20px",
-        color: "#000000",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {translate("Select a vehicle to view more statistics.")}
-    </p>
-  )}
-</div>
-
+          <div className="row">
+            {alertData.map((alert) => (
+              <div key={alert.id} className="col-lg-4">
+                <AlertCounter
+                  value={alert.value}
+                  max={alert.max}
+                  color={alert.color}
+                  label={alert.label}
+                  modalId={alert.modalId}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-
-        {/* <div className="col-lg-8">
-          <h3>Alertes en cours</h3>
-          <Table>
-            <thead className="bg-white text-uppercase">
-              <tr className="ligth ligth-data">
-                <th>{translate("Type")}</th>
-                <th>{translate("matriculation")}</th>
-                <th>{translate("Message")}</th>
-                <th>{translate("Date")}</th>
-              </tr>
-            </thead>
-
-            <Alert alerts={alertsData}></Alert>
-          </Table>
-        </div> */}
       </div>
     </>
   );
