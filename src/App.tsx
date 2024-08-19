@@ -28,6 +28,8 @@ import { Card_management } from "./pages/Card_management";
 import { Tank_management } from "./pages/Tank_management";
 import { Cash_management } from "./pages/Cash_management";
 import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
+import { Reception } from "./pages/Reception";
+import { Garage } from "./pages/Garage";
 
 
 import axios from "axios";
@@ -119,6 +121,9 @@ function App() {
           <Route path="/tank_management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
           <Route path="/cash_management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
           <Route path="/detail_vehicle_check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
+          <Route path="/Reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
+          <Route path="/Garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+
 
      
         </Routes>
