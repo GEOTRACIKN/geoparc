@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
+import FleetCounter from "../components/Dashboard/fleetCounter";
+import FleetSate from "../components/Dashboard/fleetSate";
+import StatsComponent from "../components/Dashboard/StatsComponent";
+import Alert from "../components/Dashboard/alerts";
 import { useTranslate } from "../components/LanguageProvider";
+import FleetCo2 from "../components/Dashboard/fleetCo2";
 import { Table } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { MoonLoader } from "react-spinners";
+import { BarLoader } from "react-spinners";
+import Select from 'react-select';
 
+
+import {
+  engineStat,
+  BarreReseau,
+  ValiderPosition,
+  getAddressFromCoordinates,
+  formatDateForAlgeriaTimeZone,
+} from "../utilities/functions";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 // Définir une interface pour les données de véhicule
@@ -20,22 +34,22 @@ interface VehicleData {
 
 export function Dashboard() {
   const { translate } = useTranslate();
-  const GeopUserID = localStorage.getItem("GeopUserID");
-  const Geopusername = localStorage.getItem("Geopusername");
+  const userID = localStorage.getItem("userID");
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
- 
+  const [userName, setUserName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
-  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<ImmatriSuggestion[]>([]);
+  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<
+    ImmatriSuggestion[]
+  >([]);
   const [selectedPsn, setSelectedPsn] = useState<string | null>(null); // État pour stocker le PSN sélectionné
   const [refreshing, setRefreshing] = useState(false);
-
-
+  const [loading, setLoading] = useState(false);
 
   interface SearchResult {
     psn_dispositif: string;
@@ -65,7 +79,7 @@ export function Dashboard() {
       try {
         // Fetch total number of drivers
         const responseDrivers = await fetch(
-          `${backendUrl}/api/dash/driver/${GeopUserID}`,
+          `${backendUrl}/api/dash/driver/${userID}`,
           { mode: "cors" }
         );
         if (responseDrivers.ok) {
@@ -79,7 +93,7 @@ export function Dashboard() {
 
         // Fetch total number of vehicle
         const responseVehicles = await fetch(
-          `${backendUrl}/api/vehicle/totalpage/${GeopUserID}`,
+          `${backendUrl}/api/vehicle/totalpage/${userID}`,
           { mode: "cors" }
         );
         if (responseVehicles.ok) {
@@ -92,7 +106,7 @@ export function Dashboard() {
 
         // Fetch total number of repport
         const responseReports = await fetch(
-          `${backendUrl}/api/rapport/totalpage/${GeopUserID}`,
+          `${backendUrl}/api/rapport/totalpage/${userID}`,
           { mode: "cors" }
         );
         if (responseVehicles.ok) {
@@ -105,7 +119,7 @@ export function Dashboard() {
 
         // Fetch total number of users
         const responseUsers = await fetch(
-          `${backendUrl}/api/user/totalpage/${GeopUserID}`,
+          `${backendUrl}/api/user/totalpage/${userID}`,
           { mode: "cors" }
         );
         if (responseUsers.ok) {
@@ -123,7 +137,7 @@ export function Dashboard() {
 
       try {
         const responseimmatriculation = await fetch(
-          `${backendUrl}/api/immatriculation/${GeopUserID}`
+          `${backendUrl}/api/immatriculation/${userID}`
         );
         if (responseimmatriculation.ok) {
           const data = await responseimmatriculation.json();
@@ -134,20 +148,83 @@ export function Dashboard() {
       } catch (error) {
         console.error("Error fetching immatriculation data:", error);
       }
-
     };
 
     fetchData();
-  }, []);
+  }, [userID]);
 
+  const handleSearch = async () => {
+    setLoading(true);
+    if (!searchTerm.trim()) {
+      setSearchResults([]); // Clear search results if search term is empty
+      return;
+    }
 
+    try {
+      const response = await fetch(`${backendUrl}/api/dash-data/${userID}`);
+      if (response.ok) {
+        const data: SearchResult[] = await response.json();
+
+        const searchedItems: SearchResult[] = [];
+        const getAddressPromises: Promise<void>[] = [];
+
+        for (const item of data) {
+          // Check if the immatriculation_vehicule matches the search term
+          if (item.immatriculation_vehicule.includes(searchTerm.trim())) {
+            // Extract necessary fields for getAddressFromCoordinates
+            const { LAT, LON } = item;
+            const addressPromise = getAddressFromCoordinates(LAT, LON)
+              .then((address) => {
+                // Push the item with the address into the search results
+                searchedItems.push({ ...item, Adresse: address });
+              })
+              .catch((error) => {
+                console.error("Error fetching address:", error);
+              });
+            getAddressPromises.push(addressPromise);
+          }
+        }
+
+        // Wait for all getAddressFromCoordinates calls to complete
+        await Promise.all(getAddressPromises);
+
+        // Update the search results with all items that have addresses
+        setSearchResults(searchedItems);
+      } else {
+        console.error("Failed to fetch search results");
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+    setLoading(false);
+  };
+
+  const fetchUserName = async (userID: any) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/getUserName/${userID}`);
+      if (response.ok) {
+        const userData = await response.json();
+        // Concatenate nom_user and username_user to form the userName
+        const userName = `${userData.nom_user} ${userData.prenom_user}`;
+        setUserName(userName);
+      } else {
+        console.error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserName(userID); // Add this line to fetch the user's name
+  }, [userID]);
 
   useEffect(() => {
     const fetchdashData = async () => {
       setRefreshing(true);
 
       try {
-        const response = await fetch(`${backendUrl}/api/dash-data/${GeopUserID}`);
+        const response = await fetch(`${backendUrl}/api/dash-data/${userID}`); 
         if (response.ok) {
           const data = await response.json();
           setDashData(data);
@@ -156,8 +233,7 @@ export function Dashboard() {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-      }
-      finally {
+      } finally {
         setRefreshing(false);
       }
     };
@@ -200,8 +276,10 @@ export function Dashboard() {
         zoomType: "x",
       },
       title: {
-        text: translate("Speed Over Ground (SOG) of Fleet") + " - " + `${currentDate}`,
-
+        text:
+          translate("Speed Over Ground (SOG) of Fleet") +
+          " - " +
+          `${currentDate}`,
       },
       xAxis: {
         categories: immatriculations,
@@ -257,7 +335,10 @@ export function Dashboard() {
         zoomType: "x",
       },
       title: {
-        text: translate("Niveau de GSM pour chaque véhicule") + " - " + `${currentDate}`,
+        text:
+          translate("Niveau de GSM pour chaque véhicule") +
+          " - " +
+          `${currentDate}`,
       },
       xAxis: {
         categories: immatriculations,
@@ -281,12 +362,12 @@ export function Dashboard() {
               point.y === 0
                 ? "red"
                 : point.y > 75
-                  ? "green"
-                  : point.y > 50
-                    ? "yellow"
-                    : point.y < 50
-                      ? "orange"
-                      : null,
+                ? "green"
+                : point.y > 50
+                ? "yellow"
+                : point.y < 50
+                ? "orange"
+                : null,
             dataLabels: {
               enabled: true,
               formatter: function () {
@@ -309,17 +390,22 @@ export function Dashboard() {
       LON: 0,
       COG: 0,
       ENGINESTAT: 0,
-      TIMESTAMP: '',
+      TIMESTAMP: "",
       GPSDIST: 0,
       ...vehicleData,
     }));
   };
-
-  const handleImmatriculationSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedImmatriculation = event.target.value;
-    // Ici, vous devez rechercher l'objet correspondant dans dashData pour obtenir le PSN
-    const correspondingPsn = dashData.find(vehicle => vehicle.immatriculation_vehicule === selectedImmatriculation)?.psn_dispositif;
-    setSelectedPsn(correspondingPsn || null);
+  const handleImmatriculationSelect = (selectedOption: { value: string; label: string } | null) => {
+    if (selectedOption) {
+      const selectedImmatriculation = selectedOption.value;
+      // Recherchez l'objet correspondant dans dashData pour obtenir le PSN
+      const correspondingPsn = dashData.find(
+        (vehicle) => vehicle.immatriculation_vehicule === selectedImmatriculation
+      )?.psn_dispositif;
+      setSelectedPsn(correspondingPsn || null);
+    } else {
+      setSelectedPsn(null);
+    }
   };
 
   const alertsData = [
@@ -365,7 +451,7 @@ export function Dashboard() {
   useEffect(() => {
     const getMarkers = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/map/find/${GeopUserID}`);
+        const response = await fetch(`${backendUrl}/api/map/find/${userID}`);
         if (response.ok) {
           const data = await response.json();
           setMarkers(data);
@@ -429,7 +515,7 @@ export function Dashboard() {
           <div className="card card-transparent card-block card-stretch card-height border-none">
             <div className="card-body p-0 mt-lg-2 mt-0">
               <h3 className="mb-3">
-                {translate("Hello")}, {Geopusername}{" "}{" "}{currentDate}{" "} 
+                {translate("Hello")}, {userName} {currentDate}{" "}
               </h3>
 
               <p
@@ -446,13 +532,225 @@ export function Dashboard() {
                 }}
               >
                 {translate(
-                  "Your Geopark dashboard monitors business processes, optimizing park management."
+                  "Your dashboard monitors business processes. Fleet Management optimizes operations. Geotrackin provides location data, while ensuring real-time tracking."
                 )}
               </p>
             </div>
           </div>
         </div>
+
+        <div className="col-lg-8">
+          <div className="row">
+            <div className="col-lg-3 col-md-3">
+              <FleetCounter
+                numberOfItem={totalVehicles}
+                title={translate("Vehicles")}
+                icon={"car"}
+                color={"bg-info-light"}
+                linkTo="/vehicles" // Add the link here
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-3 col-md-3">
+              <FleetCounter
+                numberOfItem={totalDrivers}
+                title={translate("Drivers")}
+                icon={"user-tie"}
+                color={"bg-danger-light"}
+                linkTo="/drivers" // Add the link here
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-3 col-md-3">
+              <FleetCounter
+                numberOfItem={totalReports}
+                title={translate("Reports")}
+                icon={"chart-bar"}
+                color={"bg-success-light"}
+                linkTo="/reports" // Add the link here
+              ></FleetCounter>
+            </div>
+            <div className="col-lg-3 col-md-3">
+              <FleetCounter
+                numberOfItem={totalUsers}
+                title={translate("Users")}
+                icon={"users-cog"}
+                color={"bg-success-user"}   
+                linkTo="/users" // Add the link here
+              ></FleetCounter>
+            </div>
+          </div>
+        </div>
+
+        <>
+          <div className="container-fluid">
+            {" "}
+            {/* Use container-fluid to make it full-width */}
+            <div className="row">
+              <div className="col position-relative">
+                <div className="input-group">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="form-control"
+                    placeholder={
+                      translate("Matriculation") + " " + translate("Vehicle")
+                    }
+                    list="immatriculationSuggestions"
+                  />
+                  {searchTerm && (
+                    <button
+                      className="btn-close"
+                      onClick={clearInputs}
+                    ></button>
+                  )}
+                  <datalist id="immatriculationSuggestions">
+                    {immatriculationSuggestions.map((suggestion, index) => (
+                      <option
+                        key={index}
+                        value={suggestion.immatriculation_vehicule}
+                      />
+                    ))}
+                  </datalist>
+                </div>
+              </div>
+              <div className="col-auto">
+                <button className="btn btn-primary" onClick={handleSearch}>
+                  <i className="las la-search"></i>
+                </button>
+              </div>
+            </div>
+            <div className="row mt-4">
+              <div className="col-lg-12">
+                {loading ? (
+                  <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '20px' }}>
+                  <BarLoader color="#007bff" loading={loading} />
+                </div>
+                ) : searchResults.length === 0 ? (
+                  <p></p>
+                ) : (
+                  <Table bordered hover responsive className="w-100">
+                    <thead className="bg-primary text-white">
+                      <tr className="ligth ligth-data">
+                        <th>{translate("Vehicle")}</th>
+                        <th>{translate("User")}</th>
+                        <th>{translate("Driver")}</th>
+                        <th>{translate("Vehicles Groups")}</th>
+                        <th> {translate("Vitesse")}</th>
+                        <th> {translate("Address")}</th>
+                        <th>{translate("Distance")}</th>
+                        <th>{translate("State")}</th>
+                        <th>{translate("Category/Type")}</th>
+                        <th>{translate("Date Time")}</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {searchResults.map((result, index) => (
+                        <tr key={index}>
+                          <td>{result.immatriculation_vehicule}</td>
+                          <td>
+                            {result.nom_user} {result.prenom_user}
+                          </td>
+                          <td>
+                            {result.nom_conducteur} {result.prenom_conducteur}
+                          </td>
+                          <td>{result.nom_groupe}</td>
+                          <td>{result.SOG} km/h</td>
+                          <td>{result.Adresse}</td>
+                          <td>{(result.GPSDIST / 1000).toFixed(0)} km</td>
+                          <td>
+                            <img
+                              src={
+                                engineStat(
+                                  result.ENGINESTAT,
+                                  result.SOG,
+                                  translate
+                                ).iconState
+                              }
+                              alt=""
+                              title={
+                                engineStat(
+                                  result.ENGINESTAT,
+                                  result.SOG,
+                                  translate
+                                ).tooltipMessage
+                              }
+                            />
+                          </td>
+                          <td>
+                            {result.category_vehicule} / {result.vehicule_type}
+                          </td>
+                          <td>
+                            {formatDateForAlgeriaTimeZone(result.TIMESTAMP)}
+                          </td>
+                          <td>
+                            <button
+                              className="btn-close"
+                              onClick={() =>
+                                setSearchResults(
+                                  searchResults.filter((_, i) => i !== index)
+                                )
+                              }
+                            ></button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+
+        <div className="col-lg-4">
+          <FleetSate
+            options={{
+              DrivingValue: Driving,
+              ParckingValue: Parcking,
+              ParkingEngineRunningValue: ParkingEngineRunning,
+              LastTransmissionValue: LastTransmission,
+            }}
+          ></FleetSate>
+        </div>
+        <div className="col-lg-8">
+          <GSMLVLChart data={convertToVehicle(dashData)} />
+        </div>
         <br />
+        <div className="row">
+          <div className="col-lg-8">
+            {/* Mettez votre composant SOGChart ici */}
+            <SOGChart data={convertToVehicle(dashData)} />
+          </div>
+          <div className="col-lg-4">
+  <Select
+    options={dashData.map((vehicle) => ({
+      value: vehicle.immatriculation_vehicule,
+      label: vehicle.immatriculation_vehicule
+    }))}
+    onChange={(selectedOption) => handleImmatriculationSelect(selectedOption)}
+    placeholder={translate("Vehicles")}
+  />
+  <br />
+  <br />
+  {selectedPsn ? (
+    <StatsComponent psn={selectedPsn} />
+  ) : (
+    <p
+      style={{
+        fontSize: "20px",
+        color: "#000000",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {translate("Select a vehicle to view more statistics.")}
+    </p>
+  )}
+</div>
+
+        </div>
+
         {/* <div className="col-lg-8">
           <h3>Alertes en cours</h3>
           <Table>
