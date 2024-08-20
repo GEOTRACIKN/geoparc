@@ -194,8 +194,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("Vehicles")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
@@ -284,8 +284,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("Drivers")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
@@ -318,7 +318,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     }}
                     as={NavLink}
                   >
-                    <i className="fas fa-shield-alt"></i>
+                    <i className="las la-shield-alt"></i>
                     <span className={`ml-2 ${activeMenuText}`}>
                       {translate("hse")}
                     </span>
@@ -342,8 +342,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("hse")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
@@ -368,6 +368,129 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         <i className="las la-ban"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Violations")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                  </ul>
+                </li>
+                  {/* GMAO Atelier section */}
+                  <li>
+                  <Nav.Link
+                    to="/"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("GMAO");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="las la-cogs"></i>
+                    <span className={`ml-2 ${activeMenuText}`}>
+                      {translate("GMAO")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="Vehicles"
+                    className={`iq-submenu ${openSubmenus.includes("GMAO")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link
+                        to="/reception"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                       
+                        <span className={` ${activeMenuText}`}>
+                          {translate("Reception")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/garage"
+                        className="svg-icon"
+                        as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+
+                      >
+                       <span className={` ${activeMenuText}`}>
+                          {translate("Garage")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/"
+                        className="svg-icon"
+                        as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+
+                      >
+                      
+                        <span className={` ${activeMenuText}`}>
+                          {translate("Planification d'entretiens")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/"
+                        className="svg-icon"
+                        as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+
+                      >
+                      
+                        <span className={` ${activeMenuText}`}>
+                          {translate("Entretiens")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/"
+                        className="svg-icon"
+                        as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+
+                      >
+                      
+                        <span className={` ${activeMenuText}`}>
+                          {translate("Changements de pneu")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/"
+                        className="svg-icon"
+                        as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+
+                      >
+                      
+                        <span className={` ${activeMenuText}`}>
+                          {translate("Changements de peice")}
                         </span>
                       </Nav.Link>
                     </li>
@@ -409,8 +532,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   <ul
                     id="Vehicles"
                     className={`iq-submenu ${openSubmenus.includes("fuel")
-                        ? "submenu-enter-active"
-                        : "submenu-enter"
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >

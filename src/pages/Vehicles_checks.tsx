@@ -6,9 +6,7 @@ import { useState, useEffect } from "react";
 import AdvancedSearch from "../components/AdvancedSearch";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
-import ExcelJS from 'exceljs';
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
 
 
 type Vehicles = {
@@ -36,7 +34,6 @@ export function Vehicleschecks() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedvehiclecheckID, setSelectedvehiclecheckID] = useState<string | null>(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
-  const [selectedDownloadFormat, setSelectedDownloadFormat] = useState(''); // État pour le format de téléchargement
 
 
 
