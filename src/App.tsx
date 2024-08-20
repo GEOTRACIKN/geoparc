@@ -106,10 +106,10 @@ function App() {
           <Route path="/" element={<DashboardLayout>{<Dashboard />}</DashboardLayout>} />
           <Route path="/vehicles" element={<DashboardLayout>{<Vehicles />}</DashboardLayout>} />
           <Route path="/vehicles-forms" element={<DashboardLayout>{<VehiclesForms />}</DashboardLayout>} />
-          <Route path="/Vehicles_checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
-          <Route path="/Vehicle_check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
-          <Route path="/Vehicle_cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
-          <Route path="/Vehicle_sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
+          <Route path="/vehicles-checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
+          <Route path="/vehicle-check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
+          <Route path="/vehicle-cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
+          <Route path="/vehicle-sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
           <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
@@ -118,15 +118,15 @@ function App() {
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violations" element={<DashboardLayout>{<Violations />}</DashboardLayout>} />
-          <Route path="/fuel_consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
-          <Route path="/card_management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
-          <Route path="/tank_management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
-          <Route path="/cash_management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
-          <Route path="/detail_vehicle_check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
-          <Route path="/Reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
-          <Route path="/Extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
-          <Route path="/Pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
-          <Route path="/Garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+          <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
+          <Route path="/card-management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
+          <Route path="/tank-management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
+          <Route path="/cash-management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
+          <Route path="/detail-vehicle-check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
+          <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
+          <Route path="/extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
+          <Route path="/pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
+          <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
 
           
      
