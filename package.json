@@ -69,8 +69,8 @@
   },
   "scripts": {
     "start": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts start",
-    "build": "set \"REACT_APP_BACKEND_URL=https://geoparc.com\" && react-scripts build",
-    "copy-build": "xcopy /E /I /Y \"build\" \"..\\..\\httpdocs\"",
+    "build": "set \"REACT_APP_BACKEND_URL=https://geoparc.geotrackin.com\" && react-scripts build",
+    "copy-build": "xcopy /E /I /Y \"build\" \"..\\..\\geoparc.geotrackin.com\"",
     "build-and-copy": "npm run build && npm run copy-build",
     "test": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts test",
     "eject": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts eject"
