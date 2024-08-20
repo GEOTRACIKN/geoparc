@@ -6,7 +6,7 @@ import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
 import ModalEditVilation from "../components/EditViolations";
 
-interface Violations{
+interface Violations {
   id_violation: number;
   id_driver: number;
   id_user: number;
@@ -65,18 +65,18 @@ export function Violations() {
 
   const getViolation = async () => {
     try {
-        setLoading(true);
-        const response = await fetch(
-            `${backendUrl}/api/geop/violation/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
-        );
-        const data = await response.json();
-        setviolation(data);
+      setLoading(true);
+      const response = await fetch(
+        `${backendUrl}/api/geop/violation/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+      );
+      const data = await response.json();
+      setviolation(data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
 
   useEffect(() => {
@@ -129,13 +129,13 @@ export function Violations() {
     setSortColumn(currentColumn);
     setSort(newSortOrder);
     getViolation();
-};
+  };
 
 
   const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
   const initialColumns = {
     id_violation: true,
-    vehicule : true,
+    vehicule: true,
     cost: true,
     type_violation: true,
     description: true,
@@ -278,7 +278,7 @@ export function Violations() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {["ID", "driver","vehicule", "type", "description","cost", "date"].map(
+              {["ID", "driver", "vehicule", "type", "description", "cost", "date"].map(
                 (col, idx) => (
                   <Dropdown.Item
                     key={idx}
@@ -313,7 +313,23 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("id_violation")}
                 >
-                  {translate("ID Violation")}
+                  {translate("Id")}
+                </th>
+              )}
+              {selectedColumns.date && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("date_violation")}
+                >
+                  {translate("Date et Heure")}
+                </th>
+              )}
+              {selectedColumns.date && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("Coût")}
+                >
+                  {translate("Coût")}
                 </th>
               )}
               {selectedColumns.driver && (
@@ -322,8 +338,11 @@ export function Violations() {
                   {translate("Driver")}
                 </th>
               )}
-               {selectedColumns.vehicule && (
+
+              {selectedColumns.description && (
                 <th
+                  className="sorting"
+                  onClick={() => handleSortingColumn("Vehicule")}
                 >
                   {translate("Vehicule")}
                 </th>
@@ -336,15 +355,7 @@ export function Violations() {
                   {translate("Type violation")}
                 </th>
               )}
-              {selectedColumns.description && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColumn("description")}
-                >
-                  {translate("Description")}
-                </th>
-              )}
-               {selectedColumns.cost && (
+              {selectedColumns.cost && (
                 <th
                   className="sorting"
                   onClick={() => handleSortingColumn("cost")}
@@ -352,77 +363,58 @@ export function Violations() {
                   {translate("Cost")}
                 </th>
               )}
-              {selectedColumns.date && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColumn("date_violation")}
-                >
-                  {translate("Date")}
-                </th>
-              )}
+
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
           <tbody className="ligth-body" >
-            {list_violation.map((violation, idx) => (
-              <tr key={idx}>
-                <td>
-                  <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" />
-                  </div>
-                </td>
-                {selectedColumns.ID && <td>{violation.id_violation}</td>}
-                {selectedColumns.driver && (
-                  <td>
-                    {violation.conducteur_nom} {violation.conducteur_prenom}
-                  </td>
-                )}
-                {selectedColumns.vehicule && (
-                  <td>
-                    {violation.vehicule}
-                
-                  </td>
-                )}
-                {selectedColumns.type && <td>{violation.type_violation}</td>}
-                {selectedColumns.description && <td>{violation.description}</td>}
-                {selectedColumns.cost && <td>{violation.cost}</td>}
-                {selectedColumns.date && (
-                  <td>{new Date(violation.date_violation).toLocaleDateString()}</td>
-                )}
-                <td>
-                  <div className="d-flex align-items-center list-action">
-                    <a className="badge badge-success mr-2" title="Détail">
-                      <i
-                        className="fa fa-eye"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a>
-                    <a
-                      className="badge bg-primary mr-2"
-                      title="Edit"
-                      onClick={() => handleEditViolation(violation.id_violation)}
-                    >
-                      <i
-                        className="las la-edit"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a>
 
-                    <a
-                      className="badge bg-warning mr-2"
-                      title="Delete"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleShowDeleteModal(violation.id_violation)}
-                    >
-                      <i
-                        className="ri-delete-bin-line mr-0"
-                        style={{ fontSize: "1.2em" }}
-                      ></i>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            <tr >
+              <td>
+                <div className="form-check form-check-inline">
+                  <input className="form-check-input" type="checkbox" />
+                </div>
+              </td>
+              <td>1</td>
+              <td>2021-07-17 15:00:00</td>
+              <td>2000 Da</td>
+              <td>MOI Mohamed</td>
+              <td>Peugeot 207 : 12345-112-16</td>
+              <td>Radar vitesse</td>
+              <td>
+                <div className="d-flex align-items-center list-action">
+                  <a className="badge badge-success mr-2" title="Détail">
+                    <i
+                      className="fa fa-eye"
+                      style={{ fontSize: "1.2em", cursor: "pointer" }}
+                    ></i>
+                  </a>
+                  <a
+                    className="badge bg-primary mr-2"
+                    title="Edit"
+                  //onClick={() => handleEditViolation(violation.id_violation)}
+                  >
+                    <i
+                      className="las la-edit"
+                      style={{ fontSize: "1.2em", cursor: "pointer" }}
+                    ></i>
+                  </a>
+
+                  <a
+                    className="badge bg-warning mr-2"
+                    title="Delete"
+                    style={{ cursor: "pointer" }}
+                  // onClick={() => handleShowDeleteModal(violation.id_violation)}
+                  >
+                    <i
+                      className="ri-delete-bin-line mr-0"
+                      style={{ fontSize: "1.2em" }}
+                    ></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+
           </tbody>
         </Table>
       </div>
@@ -452,7 +444,7 @@ export function Violations() {
           />
         </div>
       </div>
-      <ModalNewVilation show={show} handleClose={handleClose}  refreshviolation={() =>{getViolation()}}></ModalNewVilation>
+      <ModalNewVilation show={show} handleClose={handleClose} refreshviolation={() => { getViolation() }}></ModalNewVilation>
 
       <ModalEditVilation
         show={showEditModal}
