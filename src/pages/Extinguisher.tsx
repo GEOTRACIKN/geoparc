@@ -37,7 +37,7 @@ export function Extinguisher() {
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        Nouvelle Demande
+                        Add fire extinguisher
                     </Button>
                 </div>
 
@@ -151,12 +151,12 @@ export function Extinguisher() {
                             <th>Id</th>
                             <th>Date</th>
                             <th>Client</th>
-                            <th>Véhicule</th>
-                            <th>Odométre</th>
-                            <th>Priorité</th>
-                            <th>Etat</th>
-                            <th>Date Maj</th>
-                            <th>Actions</th>
+                            <th>Volume</th>
+                            <th>Purchase Date</th>
+                            <th>Expiration Date</th>
+                            <th>Cost</th>
+                            <th>Vehicle</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody key="#" className="ligth-body">
@@ -174,7 +174,44 @@ export function Extinguisher() {
                             <td>Normal</td>
                             <td>Cloturée</td>
                             <td>2023-10-5</td>
+                            <td> 
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
                             <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                            <td>1</td>
+                            <td>2018-09-02</td>
+                            <td>EEGH</td>
+                            <td>Nissan Micra 02891-117-31</td>
+                            <td>10427 Km</td>
+                            <td>Normal</td>
+                            <td>Cloturée</td>
+                            <td>2023-10-5</td>
+                            <td> 
                                 <div className="d-flex align-items-center list-action">
                                     <Link
                                         to={``}
