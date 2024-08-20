@@ -2,24 +2,27 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Bounce, toast } from "react-toastify";
 
 interface ModalNewWArningProps {
   show: boolean;
   handleClose: () => void;
   refreshwarning?: () => void; // Optional prop
+}
 
-};
 type Driver = {
   id_conducteur: number;
   nom_conducteur: string;
   prenom_conducteur: string;
 };
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
+
 const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   show,
   handleClose,
-  refreshwarning
+  refreshwarning,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -27,64 +30,102 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     date: "",
     description: "",
   });
-  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
+  const [drivers, setdrivers] = useState<Driver[]>([]);
+
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
         .then((response) => response.json())
         .then((data) => setdrivers(data))
         .catch((error) => console.error("Error fetching Drivers:", error));
     }
   }, [show]);
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch(
-        `${backendUrl}/api/geop/Add_warning/${geopuserID}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_driver: formData.conducteur,
-            type_warning: formData.type,
-            description: formData.description,
-            date: formData.date,
-          }),
-        }
-      );
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault(); // Prevent default form submission
+  try {
+    const response = await fetch(
+      `${backendUrl}/api/geop/Add_warning/${geopuserID}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_driver: formData.conducteur,
+          type_warning: formData.type,
+          description: formData.description,
+          date: formData.date,
+        }),
+      }
+    );
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Warning added successfully:", data);
-        if (refreshwarning) {
-          refreshwarning();
-        }
-        handleClose();
-      } else {
-        console.error("Failed to add Warning:", response.statusText);
+    if (response.ok) {
+      toast.success("Warning ajouté avec succès.", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+
+      if (refreshwarning) {
+        refreshwarning(); // Mettre à jour les avertissements dans le composant parent
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error adding Warning:", error.message);
-      } else {
-        console.error("Unexpected error:", error);
-      }
+      handleClose(); // Fermer le modal
+      setFormData({
+        conducteur: 0,
+        type: "",
+        date: "",
+        description: "",
+      }); // Réinitialiser les champs du formulaire
+    } else {
+      toast.error("Erreur lors de l'ajout du Warning.", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
-  };
+  } catch (error) {
+    toast.error(
+      `Erreur lors de l'ajout du Warning: ${error instanceof Error ? error.message : "Erreur inattendue"}`,
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      }
+    );
+  }
+};
+
 
   const conducteursOptions = drivers.map((driver) => ({
     value: driver.id_conducteur,
-    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
+    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
   }));
 
-  const handleSelectChange = (selectedOption: any, actionMeta: any) => {
-    const { name } = actionMeta;
-    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
-    setFormData({ ...formData, [name]: value });
+  const handleSelectChange = (selectedOption: any) => {
+    setFormData({
+      ...formData,
+      conducteur: selectedOption ? Number(selectedOption.value) : 0,
+    });
   };
-
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,9 +135,9 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   return (
     <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
-        <Modal.Title>Add warning</Modal.Title>
+        <Modal.Title>Add Warning</Modal.Title>
       </Modal.Header>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Modal.Body>
           <Form.Group controlId="type">
             <Form.Label>Type Warning</Form.Label>
@@ -113,7 +154,6 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             <Select
               options={conducteursOptions}
               onChange={handleSelectChange}
-              name="conducteur"
               value={conducteursOptions.find(
                 (option) => option.value === formData.conducteur
               )}
@@ -135,7 +175,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             <Form.Control
               as="textarea"
               name="description"
-              rows={4} // Set the number of rows for the textarea
+              rows={4}
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Enter description here"
@@ -146,7 +186,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
+          <Button variant="primary" type="submit">
             Add
           </Button>
         </Modal.Footer>
@@ -154,4 +194,5 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     </Modal>
   );
 };
+
 export default ModalNewWaring;
