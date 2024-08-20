@@ -34,12 +34,14 @@ import { Garage } from "./pages/Garage";
 
 import axios from "axios";
 import { Driver } from "./pages/Driver";
+import { Extinguisher } from "./pages/Extinguisher";
+import { PharmacyBox } from "./pages/pharmacy_box";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
 
-
+ 
   const navigate = useNavigate();
 
 
@@ -122,9 +124,11 @@ function App() {
           <Route path="/cash_management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
           <Route path="/detail_vehicle_check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
           <Route path="/Reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
+          <Route path="/Extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
+          <Route path="/Pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
           <Route path="/Garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
 
-
+          
      
         </Routes>
       </div>

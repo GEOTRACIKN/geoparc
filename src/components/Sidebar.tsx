@@ -371,6 +371,30 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         </span>
                       </Nav.Link>
                     </li>
+                    <li>
+                      <Nav.Link
+                        to="/Extinguisher"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-fire-extinguisher"></i>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("Management of fire extinguishers")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link
+                        to="/Pharmacy-box"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <i className="las la-briefcase-medical"></i>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("Emergency box management")}
+                        </span>
+                      </Nav.Link>
+                    </li>
                   </ul>
                 </li>
                   {/* GMAO Atelier section */}
@@ -542,6 +566,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         to="/fuel_consumption"
                         className="svg-icon"
                         as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
                       >
                         <i className="las la-gas-pump"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
@@ -554,6 +579,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         to="/card_management"
                         className="svg-icon"
                         as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
                       >
                         <i className="las fa-id-card"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
@@ -566,6 +592,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         to="/tank_management"
                         className="svg-icon"
                         as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
                       >
                         <i className="las fa-truck-moving"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
@@ -578,6 +605,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         to="/cash_management"
                         className="svg-icon"
                         as={NavLink}
+                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
                       >
                         <i className="las fa-money-bill-wave"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
