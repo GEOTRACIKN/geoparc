@@ -149,9 +149,9 @@ export function Extinguisher() {
                                 </div>
                             </th>
                             <th>Id</th>
-                            <th>Date</th>
-                            <th>Client</th>
+                            <th>Type</th>
                             <th>Volume</th>
+                            <th>Location</th>
                             <th>Purchase Date</th>
                             <th>Expiration Date</th>
                             <th>Cost</th>
@@ -166,14 +166,14 @@ export function Extinguisher() {
                                     <input type="checkbox" className="form-check-input" />
                                 </div>
                             </td>
-                            <td>1</td>
-                            <td>2018-09-02</td>
-                            <td>EEGH</td>
-                            <td>Nissan Micra 02891-117-31</td>
-                            <td>10427 Km</td>
-                            <td>Normal</td>
-                            <td>Cloturée</td>
-                            <td>2023-10-5</td>
+                            <td>001</td>
+                            <td>Feux classe C : gaz inflammables</td>
+                            <td>1000</td>
+                            <td>-</td>
+                            <td>2018-11-14</td>
+                            <td>2019-10-14</td>
+                            <td>2500.00</td>
+                            <td>06057-506-42 Man TGA416</td>
                             <td> 
                                 <div className="d-flex align-items-center list-action">
                                     <Link
@@ -203,14 +203,14 @@ export function Extinguisher() {
                                     <input type="checkbox" className="form-check-input" />
                                 </div>
                             </td>
-                            <td>1</td>
-                            <td>2018-09-02</td>
-                            <td>EEGH</td>
-                            <td>Nissan Micra 02891-117-31</td>
-                            <td>10427 Km</td>
-                            <td>Normal</td>
-                            <td>Cloturée</td>
-                            <td>2023-10-5</td>
+                            <td>002</td>
+                            <td>Feux classe B : liquides inflammables</td>
+                            <td>1500</td>
+                            <td>-</td>
+                            <td>2021-01-05</td>
+                            <td>2021-07-20</td>
+                            <td>1500.00</td>
+                            <td>12345-112-16 Peugeot 207</td>
                             <td> 
                                 <div className="d-flex align-items-center list-action">
                                     <Link
