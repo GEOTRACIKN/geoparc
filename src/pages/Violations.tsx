@@ -28,7 +28,7 @@ export function Violations() {
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_violation, setviolation] = useState<Violations[]>([]);
-  const id_user = localStorage.getItem("GeopUserID");
+  const id_user = 1;
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
