@@ -321,28 +321,22 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("date_violation")}
                 >
-                  {translate("Date et Heure")}
-                </th>
-              )}
-              {selectedColumns.date && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColumn("Coût")}
-                >
-                  {translate("Coût")}
+                  {translate("Date and time")}
                 </th>
               )}
               {selectedColumns.driver && (
                 <th
-                >
-                  {translate("Driver")}
+                className="sorting"
+
+                   onClick={() => handleSortingColumn("driver")}
+                  >
+                     {translate("driver")}
                 </th>
               )}
-
-              {selectedColumns.description && (
+              {selectedColumns.vehicule && (
                 <th
                   className="sorting"
-                  onClick={() => handleSortingColumn("Vehicule")}
+                  onClick={() => handleSortingColumn("vehicule")}
                 >
                   {translate("Vehicule")}
                 </th>
@@ -352,7 +346,7 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("type_violation")}
                 >
-                  {translate("Type violation")}
+                  {translate("Violation type")}
                 </th>
               )}
               {selectedColumns.cost && (
@@ -360,63 +354,70 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("cost")}
                 >
-                  {translate("Cost")}
+                 {translate("Cost")}
                 </th>
               )}
-
+              {selectedColumns.description && (
+                <th>
+                  {translate("Description")}
+                </th>
+              )}
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody className="ligth-body" >
-
-            <tr >
-              <td>
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
-                </div>
-              </td>
-              <td>1</td>
-              <td>2021-07-17 15:00:00</td>
-              <td>2000 Da</td>
-              <td>MOI Mohamed</td>
-              <td>Peugeot 207 : 12345-112-16</td>
-              <td>Radar vitesse</td>
-              <td>
-                <div className="d-flex align-items-center list-action">
-                  <a className="badge badge-success mr-2" title="Détail">
-                    <i
-                      className="fa fa-eye"
-                      style={{ fontSize: "1.2em", cursor: "pointer" }}
-                    ></i>
-                  </a>
-                  <a
-                    className="badge bg-primary mr-2"
-                    title="Edit"
-                  //onClick={() => handleEditViolation(violation.id_violation)}
-                  >
-                    <i
-                      className="las la-edit"
-                      style={{ fontSize: "1.2em", cursor: "pointer" }}
-                    ></i>
-                  </a>
-
-                  <a
-                    className="badge bg-warning mr-2"
-                    title="Delete"
-                    style={{ cursor: "pointer" }}
-                  // onClick={() => handleShowDeleteModal(violation.id_violation)}
-                  >
-                    <i
-                      className="ri-delete-bin-line mr-0"
-                      style={{ fontSize: "1.2em" }}
-                    ></i>
-                  </a>
-                </div>
-              </td>
-            </tr>
-
+          <tbody className="ligth-body">
+            {list_violation.map((violation, idx) => (
+              <tr key={idx}>
+                <td>
+                  <div className="form-check form-check-inline">
+                    <input className="form-check-input" type="checkbox" />
+                  </div>
+                </td>
+                {selectedColumns.ID && <td>{violation.id_violation}</td>}
+                {selectedColumns.date && (
+                  <td>{new Date(violation.date_violation).toLocaleDateString()}</td>
+                )}
+                {selectedColumns.driver && (
+                  <td>{violation.conducteur_nom} {violation.conducteur_prenom}</td>
+                )}
+                {selectedColumns.vehicule && <td>{violation.vehicule}</td>}
+                {selectedColumns.type && <td>{violation.type_violation}</td>}
+                {selectedColumns.cost && <td>{violation.cost}</td>}
+                {selectedColumns.description && <td>{violation.description}</td>}
+                <td>
+                  <div className="d-flex align-items-center list-action">
+                    <a className="badge badge-success mr-2" title="Détail">
+                      <i
+                        className="fa fa-eye"
+                        style={{ fontSize: "1.2em", cursor: "pointer" }}
+                      ></i>
+                    </a>
+                    <a
+                      className="badge bg-primary mr-2"
+                      title="Edit"
+                    >
+                      <i
+                        className="las la-edit"
+                        style={{ fontSize: "1.2em", cursor: "pointer" }}
+                      ></i>
+                    </a>
+                    <a
+                      className="badge bg-warning mr-2"
+                      title="Delete"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <i
+                        className="ri-delete-bin-line mr-0"
+                        style={{ fontSize: "1.2em" }}
+                      ></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
+
       </div>
       <div className="row justify-content-between">
         <div className="col-md-4 d-flex align-items-center">

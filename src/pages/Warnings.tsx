@@ -6,6 +6,8 @@ import { PropagateLoader } from "react-spinners";
 import ModalNewWaring from "../components/NewWarning";
 import ModalEditWarning from "../components/EditWarning";
 
+//?apikey=u3I84lt6B1sHE7z8MNwS
+
 interface Warning {
   id_warning: number;
   id_driver: number;
@@ -25,7 +27,7 @@ export function Warnings() {
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Warnings, setWarnings] = useState<Warning[]>([]);
-  const id_user = localStorage.getItem("GeopUserID");
+  const id_user =  localStorage.getItem("GeopUserID");
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
