@@ -132,7 +132,7 @@ const clearSearchTerm = () => {
           {state && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
-                        {translate("Sate")}
+                        {translate("Status")}
                 {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -236,10 +236,7 @@ const handleClick = () => {
 
   return (
     <>
-      <div
-        id="DataTables_Table_0_wrapper"
-        className="dataTables_wrapper dt-bootstrap4 no-footer"
-      >
+      <div   id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer" >
         <div className="row">
           <div
             className="col-sm-12 col-md-4 dataTables_length"
@@ -247,7 +244,7 @@ const handleClick = () => {
           >
             <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
-              {translate("Vehicles")} ({total})
+              {translate("Vehicles")} {total}
             </h4>
             <AdvancedSearch
                 searchOptions={searchOptions}
@@ -363,7 +360,7 @@ const handleClick = () => {
       </div>
       <div>
        
-        <div className="row m-2">
+        <div className="row">
           <Table striped responsive className="table-fixed">
             <TableHeader />
             <tbody className="ligth-body">
