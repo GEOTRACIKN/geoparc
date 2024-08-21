@@ -44,61 +44,49 @@ export function PharmacyBox() {
                 {/* Modal pour Nouvelle Demande */}
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Nouvelle demande</Modal.Title>
+                        <Modal.Title>Add emergency box</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form>
-                            <Form.Group controlId="formDate">
-                                <Form.Label>Date de la demande</Form.Label>
-                                <Form.Control type="date" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formPriority">
-                                <Form.Label></Form.Label>
-                                <Form.Control as="select">
-                                    <option>Priorité</option>
-                                    <option>Normal</option>
-                                    <option>Urgent</option>
-                                </Form.Control>
-                            </Form.Group>
-
-                            <Form.Group controlId="formVehicle">
-                                <Form.Label>Véhicule</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le véhicule" />
+                    <Form>
+                  
+                            <Form.Group controlId="formMileage">
+                                <Form.Label>Type</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the type" />
                             </Form.Group>
 
                             <Form.Group controlId="formMileage">
-                                <Form.Label>Kilométrage</Form.Label>
-                                <Form.Control type="number" placeholder="Entrez le kilométrage" />
+                                <Form.Label>product</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the product" />
+                            </Form.Group>
+
+                            <Form.Group controlId="formDate">
+                                <Form.Label>Purchase Date</Form.Label>
+                                <Form.Control type="date" />
+                            </Form.Group>
+
+                            <Form.Group controlId="formDate">
+                                <Form.Label>Expiration Date</Form.Label>
+                                <Form.Control type="date" />
                             </Form.Group>
 
                             <Form.Group controlId="formSubject">
-                                <Form.Label>Objet</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez l'objet de la demande" />
+                                <Form.Label>Cost</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the cost" />
                             </Form.Group>
 
-                            <Form.Group controlId="formClient">
-                                <Form.Label>Client</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du client" />
+                            <Form.Group controlId="formVehicle">
+                                <Form.Label>Vehicle</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the vehicle" />
                             </Form.Group>
-
-                            <Form.Group controlId="formClientPhone">
-                                <Form.Label>Tél Client</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le numéro de téléphone du client" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formReceptionistName">
-                                <Form.Label>Nom du Réceptionniste</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du réceptionniste" />
-                            </Form.Group>
+                           
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
-                            Annuler
+                        Cancel
                         </Button>
                         <Button variant="primary" onClick={handleClose}>
-                            Sauvegarder la demande
+                        Save
                         </Button>
                     </Modal.Footer>
                 </Modal>
