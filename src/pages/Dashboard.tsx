@@ -45,10 +45,7 @@ export function Dashboard() {
   const [userName, setUserName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-
-  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<
-    ImmatriSuggestion[]
-  >([]);
+  const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<ImmatriSuggestion[]>([]);
   const [selectedPsn, setSelectedPsn] = useState<string | null>(null); // État pour stocker le PSN sélectionné
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -512,7 +509,7 @@ export function Dashboard() {
     { id: 'controle-technique', value: 5, max: 10, color: '#f56954', label: 'Contrôle technique', modalId: 'detailCnrlTech' },
     { id: 'vidange', value: 7, max: 10, color: '#00a65a', label: 'Vidange', modalId: 'detailVidange' },
     { id: 'entretien-klm', value: 10, max: 10, color: 'purple', label: 'Entretiens planifiés par kilométrage', modalId: 'detailEntretienKlm' },
-    { id: 'entretien-date', value: 10, max: 10, color: 'yellow', label: 'Entretiens planifiés par date', modalId: 'detailEntretienDate' },
+    { id: 'entretien-date', value: 10, max: 10, color: '#d5d546', label: 'Entretiens planifiés par date', modalId: 'detailEntretienDate' },
     { id: 'permis', value: 2, max: 10, color: '#e66d05', label: 'Permis de conduire', modalId: 'detailPermis' },
     { id: 'stock', value: 6, max: 10, color: '#e60505', label: 'Stock', modalId: 'stockpiece' },
     { id: 'extincteur', value: 4, max: 10, color: '#3c8dbc', label: 'Extincteur', modalId: 'detailExt' },
@@ -658,25 +655,27 @@ export function Dashboard() {
         <div className="col-lg-6">
           <FleetCo2 />
         </div>
-        <div className="card col-lg-12" >
-          <div className="">
-            <i className="fa fa-warning"></i>
-            <h6 className="box-title">
-              Alertes <span className="badge bg-red">{alertData.reduce((acc, alert) => acc + alert.value, 0)}</span>
-            </h6>
-          </div>
-          <div className="row">
-            {alertData.map((alert) => (
-              <div key={alert.id} className="col-lg-4">
-                <AlertCounter
-                  value={alert.value}
-                  max={alert.max}
-                  color={alert.color}
-                  label={alert.label}
-                  modalId={alert.modalId}
-                />
-              </div>
-            ))}
+        <div className="col-lg-12" >
+          <div className="card">
+            <div className="" style={{padding:"20px"}}>
+              <h6 className="box-title">
+              <i className="las la-bell" style={{fontSize: "24px"}}></i>  Alertes <span className="badge bg-red">{alertData.reduce((acc, alert) => acc + alert.value, 0)}</span>
+              </h6>
+            </div>
+            <div className="row">
+              {alertData.map((alert) => (
+                <div key={alert.id} className="col-lg-2">
+                  <AlertCounter
+                    value={alert.value}
+                    max={alert.max}
+                    color={alert.color}
+                    label={alert.label}
+                    modalId={alert.modalId}
+                    height={120}                 
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

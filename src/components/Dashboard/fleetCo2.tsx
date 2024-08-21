@@ -10,7 +10,7 @@ const FleetCo2: React.FC = () => {
     },
 
     title: {
-      text: 'Consommation de Carburant, Distance Parcourue et Émissions de CO2',
+      text: '',
       align: 'left'
     },
 
@@ -105,7 +105,14 @@ const FleetCo2: React.FC = () => {
     ]
   };
 
-  return  <div className='card'><HighchartsReact highcharts={Highcharts} options={options} /></div>;
+  return  <div className='card'>
+      <div className="" style={{ padding: "20px" }}>
+      <h6 className="box-title">
+        <i className="las la-gas-pump" style={{ fontSize: "24px" }}></i>  Consommation de Carburant, Distance Parcourue et Émissions de CO2
+      </h6>
+    </div>
+    <HighchartsReact highcharts={Highcharts} options={options} />
+    </div>;
 };
 
 export default FleetCo2;

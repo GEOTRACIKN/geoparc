@@ -15,9 +15,10 @@ type AlertCounterProps = {
     color: string;
     label: string;
     modalId: string;
+    height:number;
 };
 
-const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, modalId }) => {
+const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, modalId,height }) => {
     const [showModal, setShowModal] = React.useState(false);
 
     const handleShow = () => setShowModal(true);
@@ -26,7 +27,7 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
     const options: Highcharts.Options = {
         chart: {
             type: 'solidgauge',
-           // height: 'auto',
+            height: height,
             backgroundColor: 'transparent',
             events: {
                 click: handleShow,
@@ -45,7 +46,10 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
         },
         yAxis: {
             min: 0, // Required for calculations
-            max: max, // Used for the scale of the gauge
+            max: max, 
+            stops: [
+                [1, color], // Couleur de la jauge au point maximum
+            ],// Used for the scale of the gauge
             lineWidth: 0,
             tickWidth: 0,
             title: {
@@ -68,15 +72,24 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
                                     <span>${label}</span>
                                 </div>`;
                     },
+                    // style: {
+                    //     color: color, // Assure la couleur du texte
+                    // },
                 },
             },
+            
         },
         series: [
             {
                 type: 'solidgauge', // Ensure you include the type
                 name: label,
                 data: [value],
-                color: color, // Apply the color
+                color: color,// Apply the color
+                dataLabels: {
+                    style: {
+                        color: "#000", // Assure la couleur du label
+                    },
+                },
             },
         ],
         credits: {
@@ -86,14 +99,9 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
 
     return (
         <div className="text-center">
-            <Button onClick={handleShow} variant="link" className="p-0">
-                <HighchartsReact
-                    highcharts={Highcharts}
-                    options={options}
-                />
-            </Button>
-
-            <Modal show={showModal} onHide={handleClose} id={modalId}>
+           <div  onClick={handleShow} style={{cursor:"pointer"}}> <HighchartsReact highcharts={Highcharts} options={options}/></div>
+          
+           <Modal show={showModal} onHide={handleClose} id={modalId}>
                 <Modal.Header closeButton>
                     <Modal.Title>{label}</Modal.Title>
                 </Modal.Header>
