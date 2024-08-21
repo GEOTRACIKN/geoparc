@@ -187,7 +187,7 @@
 "Odometer": "kilométrage",
 "Category": "Catégorie",
 "License category": "Catégorie de permis",
-"Matriculation": "Immatriculation", 
+"Immatriculation": "Matriculation", 
 "Vehicle type": "Type véhicule",
 "Acquisition date": "Date aquisition",
 "Door number": "Número de puerta",
@@ -498,6 +498,8 @@
 "Incoming Driver": "Chauffeur Entrant",
 "Tractor Registration": "Matricule Tracteur",
 "Trailer Registration": "Matricule Remorque",
+"Trailer": "Remorque",
+"Model": "Modèle",
 "Verified Vehicles": "Véhicules Vérifiés",
 "Last & first Name": "Nom et prénom",
 "Park": "Parc",
@@ -505,5 +507,6 @@
 "Displaying": "Affichage" ,
 "Import": "Importer",
 "Validate employees' salaries":"Valider les salaires des employés",
-"on":"sur"
+"on":"sur",
+"Status":"État"
 }

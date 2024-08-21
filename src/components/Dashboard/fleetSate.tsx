@@ -15,12 +15,24 @@ interface Options {
 }
 
 const FleetSate: React.FC<{ options: Options }> = ({ options }) => {
+
+
+
+  const FleetData = [
+    { y: options.maintenanceCosts, label: 'Coûts de Maintenance', name: 'Maintenance' },
+    { y: options.missionCosts, label: 'Coûts des Missions', name: 'Missions' },
+    { y: options.fuelCosts, label: 'Coûts de Carburant', name: 'Carburant' },
+    { y: options.legalCosts, label: 'Coûts Juridiques', name: 'Juridiques' },
+    { y: options.employeeCosts, label: 'Coûts des Employés', name: 'Employés' },
+    { y: options.hseCosts, label: 'Coûts HSE', name: 'HSE' },
+  ];
+
   const chartOptions = {
     chart: {
       type: 'pie',
     },
     title: {
-      text: 'Répartition des Coûts TCO',
+      text: '',
       align: 'center',
     },
     tooltip: {
@@ -53,18 +65,25 @@ const FleetSate: React.FC<{ options: Options }> = ({ options }) => {
         name: 'Répartition des Coûts',
         colorByPoint: true,
         data: [
-          { y: options.maintenanceCosts, label: 'Coûts de Maintenance', name: 'Maintenance' },
-          { y: options.missionCosts, label: 'Coûts des Missions', name: 'Missions' },
-          { y: options.fuelCosts, label: 'Coûts de Carburant', name: 'Carburant' },
-          { y: options.legalCosts, label: 'Coûts Juridiques', name: 'Juridiques' },
-          { y: options.employeeCosts, label: 'Coûts des Employés', name: 'Employés' },
+          { y: options.maintenanceCosts, label: 'Maintenance', name: 'Maintenance' },
+          { y: options.missionCosts, label: 'Missions', name: 'Missions' },
+          { y: options.fuelCosts, label: 'Carburant', name: 'Carburant' },
+          { y: options.legalCosts, label: 'Juridiques', name: 'Juridiques' },
+          { y: options.employeeCosts, label: 'Employés', name: 'Employés' },
           { y: options.hseCosts, label: 'Coûts HSE', name: 'HSE' },
         ],
       },
     ],
   };
 
-  return <div className='card'><HighchartsReact class highcharts={Highcharts} options={chartOptions} /></div>;
+  return <div className='card'>
+    <div className="" style={{ padding: "20px" }}>
+      <h6 className="box-title">
+        <i className="las la-file-invoice-dollar" style={{ fontSize: "24px" }}></i>  Répartition des Coûts TCO
+      </h6>
+    </div>
+    <HighchartsReact class highcharts={Highcharts} options={chartOptions} />
+  </div>;
 };
 
 export default FleetSate;

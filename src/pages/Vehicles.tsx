@@ -116,7 +116,7 @@ const clearSearchTerm = () => {
           {model && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("vehicule_type")} style={{ color: "#140A57" }}>
-                Modèle
+                  {translate("Model")}
                 {sortColumn === "vehicule_type" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -124,7 +124,7 @@ const clearSearchTerm = () => {
           {imatriculation && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("immatriculation_vehicule")} style={{ color: "#140A57" }}>
-                Immatriculation
+                {translate("Immatriculation")}
                 {sortColumn === "immatriculation_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -132,7 +132,7 @@ const clearSearchTerm = () => {
           {state && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
-                État
+                        {translate("Status")}
                 {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -140,7 +140,8 @@ const clearSearchTerm = () => {
           {assignment && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("affectation")} style={{ color: "#140A57" }}>
-                Affectation
+
+                {translate("Assignment")}
                 {sortColumn === "affectation" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -148,7 +149,8 @@ const clearSearchTerm = () => {
           {conducteur && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               {/* <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}> */}
-                Conducteur
+                
+                {translate("Driver")}
                 {/* {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span> */}
             </th>
@@ -156,7 +158,7 @@ const clearSearchTerm = () => {
           {trailer && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               {/* <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}> */}
-                Remorque
+                    {translate("Trailer")}
                 {/* {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span> */}
             </th>
@@ -234,10 +236,7 @@ const handleClick = () => {
 
   return (
     <>
-      <div
-        id="DataTables_Table_0_wrapper"
-        className="dataTables_wrapper dt-bootstrap4 no-footer"
-      >
+      <div   id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer" >
         <div className="row">
           <div
             className="col-sm-12 col-md-4 dataTables_length"
@@ -245,7 +244,7 @@ const handleClick = () => {
           >
             <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
-              {translate("Vehicles")} ({total})
+              {translate("Vehicles")} {total}
             </h4>
             <AdvancedSearch
                 searchOptions={searchOptions}
@@ -361,7 +360,7 @@ const handleClick = () => {
       </div>
       <div>
        
-        <div className="row m-2">
+        <div className="row">
           <Table striped responsive className="table-fixed">
             <TableHeader />
             <tbody className="ligth-body">
@@ -446,7 +445,11 @@ const handleClick = () => {
               <tr>
                 <td colSpan={6} align="left" >
                   <div className="text-nowrap">
-                    <span>Affichage 1 à {limit} sur {total} </span>
+                       
+                        <span>  {translate("Displaying")} {limit} {translate("on")}{" "}</span>
+                    {total}
+                  
+                  
                   </div>
                 </td>
                 <td colSpan={3} align="right" >

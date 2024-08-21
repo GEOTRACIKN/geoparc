@@ -393,6 +393,7 @@
 "Rapport Du": "Report From",
 "Au": "To",
 "Immatriculation du véhicule": "Vehicle Registration",
+"Immatriculation": "Immatriculation",
 "Turn Report": "Turn Report",
 "Date de création": "Creation Date",
 "Date/Heure": "Date/Time",
@@ -491,6 +492,8 @@
 "Incoming Driver": "Incoming Driver",
 "Tractor Registration": "Tractor Registration",
 "Trailer Registration": "Trailer Registration",
+"Trailer": "Trailer",
+"Model": "Model",
 "Verified Vehicles": "Verified Vehicles",
 "Last & first Name": "Last & First Name",
 "Park": "Park",
@@ -498,5 +501,6 @@
 "Displaying": "Displaying",
 "Import": "Import",
 "Validate employees' salaries":"Validate employees' salaries",
-"on":"on"
+"on":"on",
+"Status":"Status"
 }

@@ -396,6 +396,7 @@
 "Rapport Du": "Informe desde",
 "Au": "Hasta",
 "Immatriculation du véhicule": "Matrícula del vehículo",
+"Immatriculation": "Matrícula",
 "Turn Report": "Informe de Turno",
 "Date de création": "Fecha de creación",
 "Date/Heure": "Fecha/Hora",
@@ -585,6 +586,8 @@
 "Incoming Driver": "Conductor Entrante",
 "Tractor Registration": "Matrícula del Tractor",
 "Trailer Registration": "Matrícula del Remolque",
+"Trailer": "Remolque",
+"Model": "Modelo",
 "Maintenance": "Mantenimiento",
 "Verified Vehicles": "Vehículos Verificados",
 "Last & first Name": "Nombre y apellido",
@@ -593,6 +596,7 @@
 "Displaying": "Mostrar",
 "Import": "Importar",
 "Validate employees' salaries":"Validar salarios de empleados",
-"on":"en"
+"on":"en",
+"State":"State"
 
 }

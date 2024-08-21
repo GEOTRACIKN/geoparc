@@ -17,7 +17,7 @@
 "Import drivers": "استيراد سائق",
 "Import vehicles": "استيراد المركبات",
 "Driver data": "بيانات السائق",
-"Assignment": "Affectation",
+"Assignment": "تعيين",
 "Last Assignment": "المهمة الأخيرة",
 "Vehicle assignments": "تعيينات المركبات",
 "Assignments": "التعيين",
@@ -416,6 +416,7 @@
 "Rapport Du": "تقرير من",
 "Au": "إلى",
 "Immatriculation du véhicule": "تسجيل المركبة",
+"Immatriculation": "تسجيل",
 "Turn Report": "تقرير الدورة",
 "Date de création": "تاريخ الإنشاء",
 "Date/Heure": "التاريخ/الوقت",
@@ -505,6 +506,8 @@
 "Incoming Driver": "السائق القادم",
 "Tractor Registration": "تسجيل الجرار",
 "Trailer Registration": "تسجيل المقطورة",
+"Trailer": "المقطورة",
+"Model": "النموذج",
 "Maintenance": "الصيانة",
 "Verified Vehicles": "المركبات المُتحقَّق منها",
 "Last & first Name": "الإسم واللقب",
@@ -514,5 +517,6 @@
 "Displaying": "إظهار",
 "Import": "تحميل",
 "Validate employees' salaries":"التحقق من رواتب الموظفين",  
-"on":"على"
+"on":"على",
+"Status":"الحالة"
 }
