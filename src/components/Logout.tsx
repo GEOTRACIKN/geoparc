@@ -60,7 +60,7 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   localStorage.removeItem("GeopUserID");
   localStorage.removeItem("userPermissions");
   cookies.remove("jwtToken");
-  window.location.href ="http://localhost:3000/login";
+  window.location.href ="https://geotrackin.com";
 };
 
   
