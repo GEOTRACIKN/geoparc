@@ -293,7 +293,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                       <Nav.Link to="/drivers" className="svg-icon" as={NavLink}>
                         <i className="las la-list-alt"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
-                          {translate("List Drivers")}
+                          {translate("List drivers")}
                         </span>
                       </Nav.Link>
                     </li>

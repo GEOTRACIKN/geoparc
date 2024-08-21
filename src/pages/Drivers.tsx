@@ -342,7 +342,7 @@ export function Drivers() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-user-nurse"></i>
-            {translate("Drivers")} <span>({total})</span>
+            {translate("Drivers")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
