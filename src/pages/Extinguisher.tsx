@@ -37,7 +37,7 @@ export function Extinguisher() {
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        Nouvelle Demande
+                        Add fire extinguisher
                     </Button>
                 </div>
 
@@ -149,14 +149,14 @@ export function Extinguisher() {
                                 </div>
                             </th>
                             <th>Id</th>
-                            <th>Date</th>
-                            <th>Client</th>
-                            <th>Véhicule</th>
-                            <th>Odométre</th>
-                            <th>Priorité</th>
-                            <th>Etat</th>
-                            <th>Date Maj</th>
-                            <th>Actions</th>
+                            <th>Type</th>
+                            <th>Volume</th>
+                            <th>Location</th>
+                            <th>Purchase Date</th>
+                            <th>Expiration Date</th>
+                            <th>Cost</th>
+                            <th>Vehicle</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody key="#" className="ligth-body">
@@ -166,15 +166,52 @@ export function Extinguisher() {
                                     <input type="checkbox" className="form-check-input" />
                                 </div>
                             </td>
-                            <td>1</td>
-                            <td>2018-09-02</td>
-                            <td>EEGH</td>
-                            <td>Nissan Micra 02891-117-31</td>
-                            <td>10427 Km</td>
-                            <td>Normal</td>
-                            <td>Cloturée</td>
-                            <td>2023-10-5</td>
+                            <td>001</td>
+                            <td>Feux classe C : gaz inflammables</td>
+                            <td>1000</td>
+                            <td>-</td>
+                            <td>2018-11-14</td>
+                            <td>2019-10-14</td>
+                            <td>2500.00</td>
+                            <td>06057-506-42 Man TGA416</td>
+                            <td> 
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
                             <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                            <td>002</td>
+                            <td>Feux classe B : liquides inflammables</td>
+                            <td>1500</td>
+                            <td>-</td>
+                            <td>2021-01-05</td>
+                            <td>2021-07-20</td>
+                            <td>1500.00</td>
+                            <td>12345-112-16 Peugeot 207</td>
+                            <td> 
                                 <div className="d-flex align-items-center list-action">
                                     <Link
                                         to={``}
