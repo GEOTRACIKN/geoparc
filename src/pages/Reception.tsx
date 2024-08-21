@@ -3,10 +3,13 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import AdvancedSearch from "../components/AdvancedSearch";
+import { useTranslate } from "../components/LanguageProvider";
+
 
 
 
 export function Reception() {
+    const { translate } = useTranslate();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('Id');
@@ -14,16 +17,49 @@ export function Reception() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    
-    // Function to handle search
-  const searchOptions = ['Id', 'Client', 'Véhicule'];
-  const handleSearch = (term: string, type: string) => {
-  };
+    const data = [
+        {
+            id: 1,
+            date: "2023-08-01",
+            client: "Client A",
+            vehicle: "Toyota Prius 12345",
+            odometer: "5021 Km",
+            priority: "Urgent",
+            status: "En cours",
+            lastUpdate: "2023-08-05",
+        },
+        {
+            id: 2,
+            date: "2023-07-25",
+            client: "Client B",
+            vehicle: "Ford Fiesta 67890",
+            odometer: "11020 Km",
+            priority: "Normal",
+            status: "Cloturée",
+            lastUpdate: "2023-07-29",
+        },
+        {
+            id: 3,
+            date: "2023-07-15",
+            client: "Client C",
+            vehicle: "Honda Civic 11121",
+            odometer: "7560 Km",
+            priority: "Urgent",
+            status: "En attente",
+            lastUpdate: "2023-07-17",
+        },
+        // Add more objects here to have 10 rows
+    ];
 
-  const clearSearchTerm = () => {
-    setSearchTerm('');
-    
-  };
+    // Function to handle search
+    const searchOptions = ['Id', 'Client', 'Véhicule'];
+    const handleSearch = (term: string, type: string) => {
+    };
+
+    const clearSearchTerm = () => {
+        setSearchTerm('');
+
+    };
 
 
     return (
@@ -31,74 +67,76 @@ export function Reception() {
             <div className="row">
                 <div className="col-md-6 col-sm-12">
                     <h4>
-                        Demandes d'interventions
+
+                        {translate("Intervention Requests")}
                     </h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        Nouvelle Demande
+
+                        {translate("New Request")}
                     </Button>
                 </div>
 
                 {/* Modal pour Nouvelle Demande */}
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Nouvelle demande</Modal.Title>
+                        <Modal.Title>{translate("New Request")}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
                             <Form.Group controlId="formDate">
-                                <Form.Label>Date de la demande</Form.Label>
+                                <Form.Label>{translate("Request Date")}</Form.Label>
                                 <Form.Control type="date" />
                             </Form.Group>
 
                             <Form.Group controlId="formPriority">
                                 <Form.Label></Form.Label>
                                 <Form.Control as="select">
-                                    <option>Priorité</option>
-                                    <option>Normal</option>
-                                    <option>Urgent</option>
+                                    <option>{translate("Priority")}</option>
+                                    <option>{translate("Normal")}</option>
+                                    <option>{translate("Urgent")}</option>
                                 </Form.Control>
                             </Form.Group>
 
                             <Form.Group controlId="formVehicle">
-                                <Form.Label>Véhicule</Form.Label>
+                                <Form.Label>{translate("Vehicle")}</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez le véhicule" />
                             </Form.Group>
 
                             <Form.Group controlId="formMileage">
-                                <Form.Label>Kilométrage</Form.Label>
+                                <Form.Label>{translate("Km")}</Form.Label>
                                 <Form.Control type="number" placeholder="Entrez le kilométrage" />
                             </Form.Group>
 
                             <Form.Group controlId="formSubject">
-                                <Form.Label>Objet</Form.Label>
+                                <Form.Label>{translate("Subject")}</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez l'objet de la demande" />
                             </Form.Group>
 
                             <Form.Group controlId="formClient">
-                                <Form.Label>Client</Form.Label>
+                                <Form.Label>{translate("Client")}</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez le nom du client" />
                             </Form.Group>
 
                             <Form.Group controlId="formClientPhone">
-                                <Form.Label>Tél Client</Form.Label>
+                                <Form.Label>{translate("Client Phone")}</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez le numéro de téléphone du client" />
                             </Form.Group>
 
                             <Form.Group controlId="formReceptionistName">
-                                <Form.Label>Nom du Réceptionniste</Form.Label>
+                                <Form.Label>{translate("Receptionist's Name")}</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez le nom du réceptionniste" />
                             </Form.Group>
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
-                            Annuler
+                            {translate("Cancel")}
                         </Button>
                         <Button variant="primary" onClick={handleClose}>
-                            Sauvegarder la demande
+                            {translate("Save Request")}
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -149,54 +187,55 @@ export function Reception() {
                                 </div>
                             </th>
                             <th>Id</th>
-                            <th>Date</th>
-                            <th>Client</th>
-                            <th>Véhicule</th>
-                            <th>Odométre</th>
-                            <th>Priorité</th>
-                            <th>Etat</th>
-                            <th>Date Maj</th>
-                            <th>Actions</th>
+                            <th>{translate("Date")}</th>
+                            <th>{translate("Client")}</th>
+                            <th>{translate("Vehicle")}</th>
+                            <th>{translate("Odometer")}</th>
+                            <th>{translate("Priority")}</th>
+                            <th>{translate("Status")}</th>
+                            <th>{translate("Last Updated Date")}</th>
+                            <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
-                    <tbody key="#" className="ligth-body">
-                        <tr className={""}>
-                            <td>
-                                <div className="form-check form-check-inline">
-                                    <input type="checkbox" className="form-check-input" />
-                                </div>
-                            </td>
-                            <td>1</td>
-                            <td>2018-09-02</td>
-                            <td>EEGH</td>
-                            <td>Nissan Micra 02891-117-31</td>
-                            <td>10427 Km</td>
-                            <td>Normal</td>
-                            <td>Cloturée</td>
-                            <td>2023-10-5</td>
-                            <td>
-                                <div className="d-flex align-items-center list-action">
-                                    <Link
-                                        to={``}
-                                        className="badge badge-success mr-2"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
-                                        title="Détail"
-                                    >
-                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
-                                    </Link>
-                                    <a
-                                        className="badge bg-warning mr-2"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
-                                        title="Delete"
-                                    >
-                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
-                                    </a>
-                                </div>
-                            </td>
-
-                        </tr>
+                    <tbody>
+                        {data.map((item, index) => (
+                            <tr key={index}>
+                                <td>
+                                    <div className="form-check form-check-inline">
+                                        <input type="checkbox" className="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>{item.id}</td>
+                                <td>{item.date}</td>
+                                <td>{item.client}</td>
+                                <td>{item.vehicle}</td>
+                                <td>{item.odometer}</td>
+                                <td>{item.priority}</td>
+                                <td>{item.status}</td>
+                                <td>{item.lastUpdate}</td>
+                                <td>
+                                    <div className="d-flex align-items-center list-action">
+                                        <Link
+                                            to={``}
+                                            className="badge badge-success mr-2"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title="Détail"
+                                        >
+                                            <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                        </Link>
+                                        <a
+                                            className="badge bg-warning mr-2"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title="Delete"
+                                        >
+                                            <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </Table>
             </div>

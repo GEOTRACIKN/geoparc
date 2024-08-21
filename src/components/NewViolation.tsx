@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useTranslate } from "../components/LanguageProvider";
 
 interface ModalNewViolationProps {
   show: boolean;
@@ -19,7 +20,7 @@ type Vehicle = {
   immatriculation_vehicule: string;
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
+const geopuserID =1;
 
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
@@ -37,20 +38,34 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   });
 
+  const { translate } = useTranslate();
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const [drivers, setdrivers] = useState<Driver[]>([]);
+  
   useEffect(() => {
     if (show) {
       fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
         .then((response) => response.json())
-        .then((data) => setdrivers(data))
+        .then((data) => {
+          console.log("Drivers data:", data);
+          setdrivers(data);
+        })
         .catch((error) => console.error("Error fetching Drivers:", error));
+
+      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Vehicles data:", data);
+          setVehicles(data);
+        })
+        .catch((error) => console.error("Error fetching vehicles:", error));
     }
-  }, [show]);
+  }, [show])
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
@@ -86,12 +101,12 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   // Pour le champ de type de violation
   const violationOptions = [
-    { value: "vitesse", label: "Vitesse" },
-    { value: "survitesse", label: "Survitesse" },
-    { value: "pause_insuffisante", label: "Pause Insuffisante" },
-    { value: "conduite_nuit", label: "Conduite de Nuit" },
-    { value: "depassement_heure", label: "Dépassement Heure de Conduite" },
-    { value: "autre", label: "Autre" },
+    { value: "speed", label: "speed" },
+    { value: "overspeed", label: "overspeed" },
+    { value: "insufficient_break", label: "Insufficient Break" },
+    { value: "night_driving", label: "Night Driving" },
+    { value: "overtime_driving", label: "Overtime Driving" },
+    { value: "other", label: "Other" },
   ];
 
   const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
@@ -101,7 +116,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({
       ...formData,
       [name]: value,
-      customType: value === "autre" ? formData.customType : "", // Réinitialiser customType si "autre" n'est pas sélectionné
+      customType: value === "other" ? formData.customType : "", // Réinitialiser customType si "autre" n'est pas sélectionné
     });
   };
   const handleSubmit = (e: FormEvent) => {
@@ -137,12 +152,12 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   return (
     <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
-        <Modal.Title>Add Violation</Modal.Title>
+        <Modal.Title>{translate("Add Violation")}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
           <Form.Group controlId="type">
-            <Form.Label>Type Violation</Form.Label>
+            <Form.Label>{translate("Violation type")}</Form.Label>
             <Select
               options={violationOptions}
               onChange={handleViolationTypeChange}
@@ -151,9 +166,9 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               isClearable
             />
           </Form.Group>
-          {formData.type === "autre" && (
+          {formData.type === "other" && (
             <Form.Group controlId="customType">
-              <Form.Label>Custom Violation Type</Form.Label>
+              <Form.Label>{translate("Custom Violation Type")}</Form.Label>
               <Form.Control
                 type="text"
                 name="customType"
@@ -164,7 +179,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             </Form.Group>
           )}
           <Form.Group>
-            <Form.Label>Driver</Form.Label>
+            <Form.Label>{translate("Driver")}</Form.Label>
             <Select
               options={conducteursOptions}
               onChange={handleSelectChange}
@@ -176,7 +191,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="vehicule">
-            <Form.Label>Vehicule</Form.Label>
+            <Form.Label>{translate("Vehicule")}</Form.Label>
             <Select
               options={vehicleOptions}
               name="vehicule"
@@ -184,10 +199,12 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
                 (option) => option.value === formData.vehicule
               )}
               onChange={handleVehiculeSelectChange}
+              isClearable
+
             />
           </Form.Group>
           <Form.Group controlId="date">
-            <Form.Label>Date Violation</Form.Label>
+            <Form.Label>{translate("Date Violation")}</Form.Label>
             <Form.Control
               type="date"
               name="date"
@@ -207,7 +224,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="description">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>{translate("Description")}</Form.Label>
             <Form.Control
               as="textarea"
               name="description"
@@ -220,10 +237,10 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
+               {translate("Close")}
           </Button>
           <Button variant="primary" type="submit">
-            Add
+            {translate("Add")}
           </Button>
         </Modal.Footer>
       </Form>
