@@ -16,7 +16,7 @@ export function Extinguisher() {
 
     
     // Function to handle search
-  const searchOptions = ['Id', 'Client', 'Véhicule'];
+  const searchOptions = ['Id', 'Type', 'Vehicle'];
   const handleSearch = (term: string, type: string) => {
   };
 
@@ -48,57 +48,58 @@ export function Extinguisher() {
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
-                            <Form.Group controlId="formDate">
-                                <Form.Label>Date de la demande</Form.Label>
-                                <Form.Control type="date" />
-                            </Form.Group>
 
                             <Form.Group controlId="formPriority">
-                                <Form.Label></Form.Label>
+                                <Form.Label> Type</Form.Label>
                                 <Form.Control as="select">
-                                    <option>Priorité</option>
-                                    <option>Normal</option>
-                                    <option>Urgent</option>
+                                    <option  style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}>Select type </option> 
+                                    <option>Feux classe A : secs, feux de bois de papier</option>
+                                    <option>Feux classe B : liquides inflammables</option>
+                                    <option>Feux classe C : gaz inflammables</option>
+                                    <option>Feux classe D : métaux combustibles</option>
+                                    <option>Feux équipement électrique </option>
+                                    <option>Feux classe F : huiles et graisses</option>
                                 </Form.Control>
                             </Form.Group>
 
-                            <Form.Group controlId="formVehicle">
-                                <Form.Label>Véhicule</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le véhicule" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formMileage">
-                                <Form.Label>Kilométrage</Form.Label>
-                                <Form.Control type="number" placeholder="Entrez le kilométrage" />
-                            </Form.Group>
-
                             <Form.Group controlId="formSubject">
-                                <Form.Label>Objet</Form.Label>
+                                <Form.Label>Volume</Form.Label>
                                 <Form.Control type="text" placeholder="Entrez l'objet de la demande" />
                             </Form.Group>
 
-                            <Form.Group controlId="formClient">
-                                <Form.Label>Client</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du client" />
+                            <Form.Group controlId="formSubject">
+                                <Form.Label>Location</Form.Label>
+                                <Form.Control type="text" placeholder="Entrez l'objet de la demande" />
                             </Form.Group>
 
-                            <Form.Group controlId="formClientPhone">
-                                <Form.Label>Tél Client</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le numéro de téléphone du client" />
+                            <Form.Group controlId="formDate">
+                                <Form.Label>Purchase Date</Form.Label>
+                                <Form.Control type="date" />
+                            </Form.Group>
+
+                            <Form.Group controlId="formDate">
+                                <Form.Label>Expiration Date</Form.Label>
+                                <Form.Control type="date" />
                             </Form.Group>
 
                             <Form.Group controlId="formReceptionistName">
-                                <Form.Label>Nom du Réceptionniste</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du réceptionniste" />
+                                <Form.Label>Cost</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the cost" />
                             </Form.Group>
+
+                            <Form.Group controlId="formVehicle">
+                                <Form.Label>Vehicle</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the vehicle" />
+                            </Form.Group>
+
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
-                            Annuler
+                        Cancel
                         </Button>
                         <Button variant="primary" onClick={handleClose}>
-                            Sauvegarder la demande
+                        Save
                         </Button>
                     </Modal.Footer>
                 </Modal>
