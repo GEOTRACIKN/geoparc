@@ -445,7 +445,11 @@ const handleClick = () => {
               <tr>
                 <td colSpan={6} align="left" >
                   <div className="text-nowrap">
-                    <span>Affichage 1 à {limit} sur {total} </span>
+                       
+                        <span>  {translate("Displaying")} {limit} {translate("on")}{" "}</span>
+                    {total}
+                  
+                  
                   </div>
                 </td>
                 <td colSpan={3} align="right" >
