@@ -234,6 +234,43 @@ export function Extinguisher() {
                             </td>
 
                         </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                            <td>003</td>
+                            <td>Feux classe B : liquides inflammables</td>
+                            <td>1100</td>
+                            <td>-</td>
+                            <td>2020-07-01 	</td>
+                            <td>2020-07-31</td>
+                            <td>3100.00</td>
+                            <td>19953-114-31 Ford US Fiesta</td>
+                            <td> 
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
                     </tbody>
                 </Table>
             </div>
