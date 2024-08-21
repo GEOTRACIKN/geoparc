@@ -9,14 +9,14 @@ import AdvancedSearch from "../components/AdvancedSearch";
 export function PharmacyBox() {
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchType, setSearchType] = useState('Id');
+    const [searchType, setSearchType] = useState('Type');
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     
     // Function to handle search
-  const searchOptions = ['Id', 'Client', 'Véhicule'];
+  const searchOptions = ['Type', 'product', 'Vehicle'];
   const handleSearch = (term: string, type: string) => {
   };
 
@@ -148,14 +148,12 @@ export function PharmacyBox() {
                                     <label className="form-check-label"></label>
                                 </div>
                             </th>
-                            <th>Id</th>
-                            <th>Date</th>
-                            <th>Client</th>
-                            <th>Véhicule</th>
-                            <th>Odométre</th>
-                            <th>Priorité</th>
-                            <th>Etat</th>
-                            <th>Date Maj</th>
+                            <th>Type</th>
+                            <th>product</th>
+                            <th>Purchase Date</th>
+                            <th>Expiration Date</th>
+                            <th>Cost</th>
+                            <th>Vehicle</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -166,14 +164,337 @@ export function PharmacyBox() {
                                     <input type="checkbox" className="form-check-input" />
                                 </div>
                             </td>
-                            <td>1</td>
-                            <td>2018-09-02</td>
-                            <td>EEGH</td>
-                            <td>Nissan Micra 02891-117-31</td>
-                            <td>10427 Km</td>
-                            <td>Normal</td>
-                            <td>Cloturée</td>
-                            <td>2023-10-5</td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Alcol</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>200.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Coton</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>150.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Compresses stériles</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>100.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Bandages</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>250.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Pansements adhésifs</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>210.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Antiseptiques</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>550.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Gants médicaux</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>25.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Pince à épiler</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>750.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Ciseaux</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>300.00</td>
+                            <td>06060-506-42 Man TGA419</td>
+                            <td>
+                                <div className="d-flex align-items-center list-action">
+                                    <Link
+                                        to={``}
+                                        className="badge badge-success mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Détail"
+                                    >
+                                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                    </Link>
+                                    <a
+                                        className="badge bg-warning mr-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="Delete"
+                                    >
+                                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr className={""}>
+                            <td>
+                                <div className="form-check form-check-inline">
+                                    <input type="checkbox" className="form-check-input" />
+                                </div>
+                            </td>
+                             	 	 	 	 	
+                            <td>Standard</td>
+                            <td>Thermomètre</td>
+                            <td>2018-11-14</td>
+                            <td>2019-02-14</td>
+                            <td>1500.00</td>
+                            <td>06060-506-42 Man TGA419</td>
                             <td>
                                 <div className="d-flex align-items-center list-action">
                                     <Link
