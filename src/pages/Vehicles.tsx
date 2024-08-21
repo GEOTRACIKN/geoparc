@@ -116,7 +116,7 @@ const clearSearchTerm = () => {
           {model && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("vehicule_type")} style={{ color: "#140A57" }}>
-                Modèle
+                  {translate("Model")}
                 {sortColumn === "vehicule_type" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -124,7 +124,7 @@ const clearSearchTerm = () => {
           {imatriculation && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("immatriculation_vehicule")} style={{ color: "#140A57" }}>
-                Immatriculation
+                {translate("Immatriculation")}
                 {sortColumn === "immatriculation_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -132,7 +132,7 @@ const clearSearchTerm = () => {
           {state && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
-                État
+                        {translate("Sate")}
                 {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -140,7 +140,8 @@ const clearSearchTerm = () => {
           {assignment && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               <span onClick={() => handleSort("affectation")} style={{ color: "#140A57" }}>
-                Affectation
+
+                {translate("Assignment")}
                 {sortColumn === "affectation" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span>
             </th>
@@ -148,7 +149,8 @@ const clearSearchTerm = () => {
           {conducteur && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               {/* <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}> */}
-                Conducteur
+                
+                {translate("Driver")}
                 {/* {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span> */}
             </th>
@@ -156,7 +158,7 @@ const clearSearchTerm = () => {
           {trailer && (
             <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
               {/* <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}> */}
-                Remorque
+                    {translate("Trailer")}
                 {/* {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
               </span> */}
             </th>
