@@ -841,5 +841,24 @@
     .navbar-list li>.dropdown { 
         line-height: 51px !important; 
     }
+
+
+
+.sparks-info {
+    min-width: 70px
+}
+
+.sparks-info span {
+    font-size: 18px;
+    line-height: 20px;
+    margin: 0;
+    text-transform: none
+}
+
+.sparks-info .sparkline {
+    display: block;
+    float: right;
+    margin: 3px 0 0 20px
+}
     
     

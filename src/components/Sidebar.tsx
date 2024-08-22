@@ -310,7 +310,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                 {/* HSE section */}
                 <li>
                   <Nav.Link
-                    to="/hse"
+                    to="/hse-dashboard"
                     className={activeCollapsed}
                     onClick={(e) => {
                       e.preventDefault();
@@ -347,6 +347,44 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                       }`}
                     data-parent="#iq-sidebar-toggle"
                   >
+                    <li>
+                      <Nav.Link
+                        to="/hse-dashboard"
+                        className="svg-icon"
+                        as={NavLink}
+                      >
+                        <span style={{ position: 'relative', display: 'inline-block', width: '24px', height: '24px' }}>
+                          <i className="fas fa-shield-alt" style={{ fontSize: '24px', position: 'relative', zIndex: 1 }}></i>
+                          <i
+                            className="fas fa-plus"
+                            style={{
+                              fontSize: '12px',
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              zIndex: 2,
+                              color: '#ffffff',
+                            }}
+                          ></i>
+                          <i
+                            className="fas fa-leaf"
+                            style={{
+                              fontSize: '12px',
+                              position: 'absolute',
+                              bottom: 0,
+                              right: 0,
+                              zIndex: 3,
+                              color: '#228B22',
+                            }}
+                          ></i>
+                        </span>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("HSE dashboard")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+
                     <li>
                       <Nav.Link
                         to="/warnings"
@@ -397,8 +435,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                   </ul>
                 </li>
-                  {/* GMAO Atelier section */}
-                  <li>
+                {/* GMAO Atelier section */}
+                <li>
                   <Nav.Link
                     to="/"
                     className={activeCollapsed}
@@ -443,7 +481,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         className="svg-icon"
                         as={NavLink}
                       >
-                       
+
                         <span className={` ${activeMenuText}`}>
                           {translate("Reception")}
                         </span>
@@ -457,7 +495,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-                       <span className={` ${activeMenuText}`}>
+                        <span className={` ${activeMenuText}`}>
                           {translate("Garage")}
                         </span>
                       </Nav.Link>
@@ -470,7 +508,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-                      
+
                         <span className={` ${activeMenuText}`}>
                           {translate("Planification d'entretiens")}
                         </span>
@@ -484,7 +522,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-                      
+
                         <span className={` ${activeMenuText}`}>
                           {translate("Entretiens")}
                         </span>
@@ -498,7 +536,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-                      
+
                         <span className={` ${activeMenuText}`}>
                           {translate("Changements de pneu")}
                         </span>
@@ -512,7 +550,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-                      
+
                         <span className={` ${activeMenuText}`}>
                           {translate("Changements de peice")}
                         </span>

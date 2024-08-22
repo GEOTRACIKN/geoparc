@@ -36,6 +36,7 @@ import axios from "axios";
 import { Driver } from "./pages/Driver";
 import { Extinguisher } from "./pages/Extinguisher";
 import { PharmacyBox } from "./pages/pharmacy_box";
+import DashboardKPI from "./pages/DashboardKPI";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -127,6 +128,7 @@ function App() {
           <Route path="/extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
           <Route path="/pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+          <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
 
           
      
