@@ -5,6 +5,7 @@ import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewWaring from "../components/NewWarning";
 import ModalEditWarning from "../components/EditWarning";
+import { Bounce, toast } from "react-toastify";
 
 //?apikey=u3I84lt6B1sHE7z8MNwS
 
@@ -27,7 +28,7 @@ export function Warnings() {
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Warnings, setWarnings] = useState<Warning[]>([]);
-  const id_user =  localStorage.getItem("GeopUserID");
+  const id_user = localStorage.getItem("GeopUserID");
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -44,7 +45,7 @@ export function Warnings() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  
+
 
   const getCountWarning = async () => {
     try {
@@ -64,18 +65,18 @@ export function Warnings() {
 
   const getWarnings = async () => {
     try {
-        setLoading(true);
-        const response = await fetch(
-            `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
-        );
-        const data = await response.json();
-        setWarnings(data);
+      setLoading(true);
+      const response = await fetch(
+        `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+      );
+      const data = await response.json();
+      setWarnings(data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   const deleteWarning = async () => {
     if (warningToDelete !== null) {
@@ -83,7 +84,7 @@ export function Warnings() {
         const response = await fetch(
           `${backendUrl}/api/geop/delete_warning/${id_user}/${warningToDelete}`,
           {
-            method: "DELETE",
+            method: "PUT",
           }
         );
         if (response.ok) {
@@ -96,18 +97,53 @@ export function Warnings() {
             )
           );
           handleCloseDeleteModal();
+          // Notification de succès
+          toast.success("Warning supprimé avec succès !", {
+            position: "bottom-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         } else {
           console.error("Erreur lors de la suppression de l'avertissement");
+          // Notification d'erreur
+          toast.error("Erreur lors de la suppression du warning", {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         }
       } catch (error) {
         console.error(
           "Erreur lors de la suppression de l'avertissement",
           error
         );
+        // Notification d'erreur
+        toast.error("Erreur lors de la suppression du warning", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
   };
-
   useEffect(() => {
     getCountWarning();
     getWarnings();
@@ -158,7 +194,7 @@ export function Warnings() {
     setSortColumn(currentColumn);
     setSort(newSortOrder);
     getWarnings();
-};
+  };
 
 
   const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
@@ -429,7 +465,7 @@ export function Warnings() {
       <ModalNewWaring
         show={show}
         handleClose={handleClose}
-        refreshwarning={() => getWarnings()}
+        refreshWarning={() => getWarnings()}
       ></ModalNewWaring>
       <ModalEditWarning
         show={showEditModal}
