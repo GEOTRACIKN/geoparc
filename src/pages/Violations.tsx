@@ -5,6 +5,7 @@ import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
 import ModalEditVilation from "../components/EditViolations";
+import { Bounce, toast } from "react-toastify";
 
 interface Violations {
   id_violation: number;
@@ -181,7 +182,22 @@ export function Violations() {
             method: "DELETE",
           }
         );
+
         if (response.ok) {
+          // Afficher une notification de succès
+          toast.success("Violation supprimée avec succès.", {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+
+          // Actualiser les violations après la suppression
           getViolation();
           getCountViolation();
 
@@ -190,15 +206,41 @@ export function Violations() {
               (violation) => violation.id_violation !== violationToDelete
             )
           );
+
           handleCloseDeleteModal();
         } else {
-          console.error("Erreur lors de la suppression de l'avertissement");
+          // Afficher une notification d'erreur si la suppression échoue
+          toast.error("Erreur lors de la suppression de la violation.", {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+          console.error("Erreur lors de la suppression de la violation");
         }
       } catch (error) {
-        console.error(
-          "Erreur lors de la suppression de l'avertissement",
-          error
+        // Afficher une notification d'erreur en cas d'exception
+        toast.error(
+          `Erreur lors de la suppression de la violation: ${error instanceof Error ? error.message : "Erreur inattendue"
+          }`,
+          {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          }
         );
+        console.error("Erreur lors de la suppression de la violation", error);
       }
     }
   };
@@ -215,9 +257,6 @@ export function Violations() {
         <div className="col-md-6 col-sm-12 text-right">
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
             <i className="las la-plus mr-3"></i>Add violation
-          </Button>
-          <Button variant="outline-info" className="mt-2 mr-1">
-            <i className="las la-file-excel mr-3"></i>Import violation
           </Button>
         </div>
       </div>
@@ -326,11 +365,11 @@ export function Violations() {
               )}
               {selectedColumns.driver && (
                 <th
-                className="sorting"
+                  className="sorting"
 
-                   onClick={() => handleSortingColumn("driver")}
-                  >
-                     {translate("driver")}
+                  onClick={() => handleSortingColumn("driver")}
+                >
+                  {translate("driver")}
                 </th>
               )}
               {selectedColumns.vehicule && (
@@ -354,7 +393,7 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("cost")}
                 >
-                 {translate("Cost")}
+                  {translate("Cost")}
                 </th>
               )}
               {selectedColumns.description && (
@@ -386,12 +425,12 @@ export function Violations() {
                 {selectedColumns.description && <td>{violation.description}</td>}
                 <td>
                   <div className="d-flex align-items-center list-action">
-                    <a className="badge badge-success mr-2" title="Détail">
+                    {/* <a className="badge badge-success mr-2" title="Détail">
                       <i
                         className="fa fa-eye"
                         style={{ fontSize: "1.2em", cursor: "pointer" }}
                       ></i>
-                    </a>
+                    </a> */}
                     <a
                       className="badge bg-primary mr-2"
                       title="Edit"
@@ -399,16 +438,20 @@ export function Violations() {
                       <i
                         className="las la-edit"
                         style={{ fontSize: "1.2em", cursor: "pointer" }}
+                        onClick={() => handleEditViolation(violation.id_violation)}
+
                       ></i>
                     </a>
                     <a
                       className="badge bg-warning mr-2"
                       title="Delete"
                       style={{ cursor: "pointer" }}
+
                     >
                       <i
                         className="ri-delete-bin-line mr-0"
                         style={{ fontSize: "1.2em" }}
+                        onClick={() => handleShowDeleteModal(violation.id_violation)}
                       ></i>
                     </a>
                   </div>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
-import AdvancedSearch from "../components/AdvancedSearch";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
 
@@ -23,7 +22,6 @@ type Vehicles = {
 export function Vehicleschecks() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const userID = localStorage.getItem("GeopUserID");
-  let currentPage = 1;
   const { translate } = useTranslate();
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -34,6 +32,8 @@ export function Vehicleschecks() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedvehiclecheckID, setSelectedvehiclecheckID] = useState<string | null>(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
 
 
 
@@ -106,21 +106,6 @@ export function Vehicleschecks() {
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns));  // Save selected columns to localStorage
   };
 
-  const clearSearchTerm = () => {
-    setSearchTerm('');
-    // Call getVehicleschecks with empty search term to reset table data
-    getVehicleschecks(currentPage, limit);
-  };
-
-  // Function to handle search
-  const searchOptions = ['Checker', 'Driver_out', 'Driver_in', 'tractor_number'];
-  const handleSearch = (term: string, type: string) => {
-    setSearchTerm(term);
-    setSearchType(type);
-    getVehicleschecks(currentPage, limit);
-  };
-
-  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Les options de taille de page mises à jour
 
   //------- Partie Delete -------
   const handleConfirmDelete = async () => {
@@ -183,11 +168,6 @@ export function Vehicleschecks() {
     setShowDeleteModal(true);
   };
 
-  // Function to handle the download modal
-  const handleDownloadClick = () => {
-    setShowDownloadModal(true);
-  };
-
   const convertValue = (value: any) => {
     if (!value) {
       return "Not mentioned";
@@ -234,6 +214,12 @@ const onDownloadConfirm = (format: string) => {
 };
 
 
+const handleSelectChange = (event: any) => {
+  const newValue = event.target.value;
+  setLimit(parseInt(newValue));
+  setCurrentPage(1);
+};
+
   return (
     <>
       <div className="row">
@@ -260,39 +246,27 @@ const onDownloadConfirm = (format: string) => {
       </div>
       <div className="row">
         <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
-          <AdvancedSearch
-            searchOptions={searchOptions}
-            onSearch={handleSearch}
-            clearSearchTerm={clearSearchTerm}
-            placeholderText={`${searchType}`}
-          />
+         
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
           {/* Dropdown Pour le Show du tableau */}
-          <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
-              <i className="fas fa-list-alt"></i>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {options.map((option) => (
-                <Dropdown.Item key={option}>
-                  <div className="form-check">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id={`checkbox-${option}`}
-                      checked={limit === option}
-                      onChange={() => setLimit(option)}
-                    />
-                    <label className="form-check-label" htmlFor={`checkbox-${option}`}>
-                      {option}
-                    </label>
-                  </div>
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-
-          </Dropdown>
+          <div className="dataTables_length">
+            <label style={{ marginBottom: "0" }}>
+              {translate("Show")}
+              <select
+                className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                style={{ width: "66px" }}
+                onChange={handleSelectChange}
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
+              </select>
+            </label>
+          </div>
           {/* Dropdown Pour le filtrage du tableau */}
           <Dropdown>
             <Dropdown.Toggle variant="" id="dropdown-basic" title="Colonnes dʼaffichage">

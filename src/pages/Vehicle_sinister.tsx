@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
-import AdvancedSearch from "../components/AdvancedSearch";
 import NewSinisterModal from "../components/NewSinisterModal";
 import EditSinisterModal from "../components/EditSinisterModal";
 
@@ -242,12 +241,7 @@ export function VehicleSinister() {
           className="col-md-4"
           style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
         >
-          <AdvancedSearch
-            searchOptions={searchOptions}
-            onSearch={handleSearch}
-            clearSearchTerm={clearSearchTerm}
-            placeholderText={`${searchType}`}
-          />
+      
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
           <Dropdown>

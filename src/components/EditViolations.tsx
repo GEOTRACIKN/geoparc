@@ -2,12 +2,13 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Bounce, toast } from "react-toastify";
 
 interface ModalEditViolationProps {
   show: boolean;
   handleClose: () => void;
   refreshviolation?: () => void; // Optional prop
-  violationId:  number | null; //violation id 
+  violationId: number | null; //violation id 
 
 }
 type Driver = {
@@ -20,8 +21,8 @@ type Vehicle = {
   id_groupe: number;
   immatriculation_vehicule: string;
 };
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
-  const geopuserID = localStorage.getItem("GeopUserID");
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
 const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   show,
   handleClose,
@@ -31,9 +32,9 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   const [formData, setFormData] = useState({
     conducteur: 0,
     type: "",
-    vehicule:"",
+    vehicule: "",
     date: "",
-    cost:0,
+    cost: 0,
     description: "",
   });
 
@@ -61,24 +62,24 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
         .then((response) => response.json())
         .then((data) => setdrivers(data))
         .catch((error) => console.error("Error fetching Drivers:", error));
-        if (violationId) {
-            fetch(`${backendUrl}/api/geop/violation_form/${violationId}`)
-              .then((response) => response.json())
-              .then((data) => {
-                setFormData({
-                    conducteur: data.id_driver,
-                    type: data.type_violation,
-                    date: formatDate(data.date_violation),
-                  vehicule: data.vehicule,
-                  cost: data.cost,
-                  description: data.description,
-                  
-                });
-              })
-              .catch((error) => console.error("Error fetching violation:", error));
-          }
+      if (violationId) {
+        fetch(`${backendUrl}/api/geop/violation_form/${violationId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            setFormData({
+              conducteur: data.id_driver,
+              type: data.type_violation,
+              date: formatDate(data.date_violation),
+              vehicule: data.vehicule,
+              cost: data.cost,
+              description: data.description,
+
+            });
+          })
+          .catch((error) => console.error("Error fetching violation:", error));
+      }
     }
-   
+
   }, [show, violationId]);
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
@@ -112,11 +113,10 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   };
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-  
-    
+
     fetch(`${backendUrl}/api/geop/update_violation/${violationId}`, {
-        method: "PUT",
-        headers: {
+      method: "PUT",
+      headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -126,14 +126,51 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
         date_violation: formData.date,
         cost: formData.cost,
         description: formData.description,
-      }),    })
-      .then((response) => response.json())
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Si la réponse n'est pas OK, cela signifie qu'il y a eu une erreur
+          throw new Error("Erreur lors de la mise à jour de la violation.");
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log("Violation added successfully:", data);
+        // Afficher une notification de succès si la mise à jour a réussi
+        toast.success("Violation mise à jour avec succès.", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
         if (refreshviolation) refreshviolation();
         handleClose();
       })
-      .catch((error) => console.error("Error adding violation:", error));
+      .catch((error) => {
+        // Afficher une notification d'erreur en cas de problème
+        toast.error(
+          `Erreur lors de la mise à jour de la violation: ${error instanceof Error ? error.message : "Erreur inattendue"
+          }`,
+          {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          }
+        );
+        console.error("Error updating violation:", error);
+      });
   };
 
 
@@ -143,8 +180,8 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
         <Modal.Title>Edit Violation</Modal.Title>
       </Modal.Header>
       <Form>
-      <Modal.Body style={{ maxHeight: 'calc(80vh - 200px)', overflowY: 'auto' }}>
-      <Form.Group controlId="type">
+        <Modal.Body style={{ maxHeight: 'calc(80vh - 200px)', overflowY: 'auto' }}>
+          <Form.Group controlId="type">
             <Form.Label>Type Violation</Form.Label>
             <Form.Control
               type="text"
@@ -167,16 +204,16 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="vehicule">
-          <Form.Label>Vehicule </Form.Label>
-          <Select
-            options={vehicleOptions}
-            name="vehicule"
-            value={vehicleOptions.find(
-              (option) => option.value === formData.vehicule
-            )}
-            onChange={handleVehiculeSelectChange}
-          />
-        </Form.Group>
+            <Form.Label>Vehicule </Form.Label>
+            <Select
+              options={vehicleOptions}
+              name="vehicule"
+              value={vehicleOptions.find(
+                (option) => option.value === formData.vehicule
+              )}
+              onChange={handleVehiculeSelectChange}
+            />
+          </Form.Group>
           <Form.Group controlId="date">
             <Form.Label>Date Violation</Form.Label>
             <Form.Control
@@ -213,7 +250,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" type="submit"  onClick={handleSubmit}>
+          <Button variant="primary" type="submit" onClick={handleSubmit}>
             Update
           </Button>
         </Modal.Footer>

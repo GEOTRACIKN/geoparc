@@ -5,7 +5,6 @@ import {  FaPlus,  FaRedo,  FaCar,  FaShieldAlt,  FaStickyNote,  FaTachometerAlt
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
-import AdvancedSearch from "../components/AdvancedSearch";
 import { ButtonCustomHover } from "../components/ButtonHover";
 import { useNavigate } from 'react-router-dom';
 
@@ -246,12 +245,6 @@ const handleClick = () => {
               <i className="las la-car mr-2"></i>
               {translate("Vehicles")} {total}
             </h4>
-            <AdvancedSearch
-                searchOptions={searchOptions}
-                onSearch={handleSearch}
-                clearSearchTerm={clearSearchTerm}
-                placeholderText={translate(`Entre your search with`) + ' ' + translate(searchType)}
-            />
           </div>
           <div className="col-sm-12 col-md-8">
           <div className="text-right">

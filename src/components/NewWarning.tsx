@@ -8,7 +8,6 @@ interface ModalNewWArningProps {
   show: boolean;
   handleClose: () => void;
   refreshWarning?: () => void; // Optional prop
-  warningIdToUpdate?: number | null; // ID of warning to update, null for new warning
 }
 
 type Driver = {
@@ -24,7 +23,6 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   show,
   handleClose,
   refreshWarning,
-  warningIdToUpdate,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -41,44 +39,18 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
         .then((data) => setDrivers(data))
         .catch((error) => console.error("Error fetching Drivers:", error));
 
-      if (warningIdToUpdate) {
-        fetch(`${backendUrl}/api/geop/warning_form/${warningIdToUpdate}`)
-          .then((response) => response.json())
-          .then((data) => {
-            setFormData({
-              conducteur: data.id_driver,
-              type: data.type_warning,
-              date: data.date,
-              description: data.description,
-            });
-          })
-          .catch((error) =>
-            console.error("Erreur lors de la récupération du warning:", error)
-          );
-      } else {
-        // Reset form if no warning is to be updated
-        setFormData({
-          conducteur: 0,
-          type: "",
-          date: "",
-          description: "",
-        });
-      }
     }
-  }, [show, warningIdToUpdate]);
+  }, [show]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Empêcher la soumission par défaut du formulaire
+    e.preventDefault();
   
-    // Déterminer l'URL de l'API et la méthode en fonction de la présence de warningIdToUpdate
-    const apiUrl = warningIdToUpdate
-      ? `${backendUrl}/api/geop/update_warning/${warningIdToUpdate}/${geopuserID}`
-      : `${backendUrl}/api/geop/Add_warning/${geopuserID}`;
-    const method = warningIdToUpdate ? "PUT" : "POST";
+    // Déterminer l'URL de l'API
+    const apiUrl = `${backendUrl}/api/geop/Add_warning/${geopuserID}`;
   
     try {
       const response = await fetch(apiUrl, {
-        method: method,
+        method: "POST", // "POST" should be in quotes
         headers: {
           "Content-Type": "application/json",
         },
@@ -91,23 +63,18 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
       });
   
       if (response.ok) {
-        // Afficher la notification de succès appropriée
-        toast.success(
-          warningIdToUpdate
-            ? "Warning mis à jour avec succès."
-            : "Warning ajouté avec succès.",
-          {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          }
-        );
+        // Afficher la notification de succès
+        toast.success("Warning ajouté avec succès.", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
   
         if (refreshWarning) {
           refreshWarning(); // Mettre à jour les avertissements dans le composant parent
@@ -121,30 +88,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
         }); // Réinitialiser les champs du formulaire
       } else {
         // Afficher la notification d'erreur appropriée
-        toast.error(
-          warningIdToUpdate
-            ? "Erreur lors de la mise à jour du Warning."
-            : "Erreur lors de l'ajout du Warning.",
-          {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          }
-        );
-      }
-    } catch (error) {
-      // Afficher la notification d'erreur en cas d'exception
-      toast.error(
-        `${warningIdToUpdate ? "Erreur lors de la mise à jour du Warning" : "Erreur lors de l'ajout du Warning"}: ${
-          error instanceof Error ? error.message : "Erreur inattendue"
-        }`,
-        {
+        toast.error("Erreur lors de l'ajout du Warning.", {
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -154,10 +98,24 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
           progress: undefined,
           theme: "light",
           transition: Bounce,
-        }
-      );
+        });
+      }
+    } catch (error) {
+      // Afficher la notification d'erreur en cas d'exception
+      toast.error(`Erreur lors de l'ajout du Warning: ${error instanceof Error ? error.message : "Erreur inattendue"}`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
+  
   
 
 
@@ -182,7 +140,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>
-          {warningIdToUpdate ? "Modifier Warning" : "Ajouter Warning"}
+         Ajouter Warning
         </Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
@@ -233,7 +191,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             Close
           </Button>
           <Button variant="primary" type="submit">
-            {warningIdToUpdate ? "Update" : "Add"}
+            Add
           </Button>
         </Modal.Footer>
       </Form>

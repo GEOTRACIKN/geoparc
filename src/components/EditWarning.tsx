@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Bounce, toast } from "react-toastify";
 
 interface ModalEditWarningProps {
   show: boolean;
@@ -81,26 +82,79 @@ const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
           }),
         }
       );
-
+  
       if (response.ok) {
         const data = await response.json();
         console.log("Warning updated successfully:", data);
+  
+        // Toast de succès
+        toast.success("Warning mis à jour avec succès.", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+  
         if (refreshWarning) {
           refreshWarning();
         }
         handleClose();
       } else {
         console.error("Failed to update warning:", response.statusText);
+  
+        // Toast d'erreur
+        toast.error("Échec de la mise à jour du warning.", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error updating warning:", error.message);
+  
+        // Toast d'erreur avec message d'exception
+        toast.error(`Erreur lors de la mise à jour du warning: ${error.message}`, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       } else {
         console.error("Unexpected error:", error);
+  
+        // Toast d'erreur pour une erreur inattendue
+        toast.error("Erreur inattendue lors de la mise à jour du warning.", {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
   };
-
+  
   const conducteursOptions = drivers.map((driver) => ({
     value: driver.id_conducteur,
     label: driver.nom_conducteur + " " + driver.prenom_conducteur,

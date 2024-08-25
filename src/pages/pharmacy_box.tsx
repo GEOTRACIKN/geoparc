@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import AdvancedSearch from "../components/AdvancedSearch";
 
 
 
@@ -94,12 +93,7 @@ export function PharmacyBox() {
             </div>
             <div className="row">
                 <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
-                    <AdvancedSearch
-                        searchOptions={searchOptions}
-                        onSearch={handleSearch}
-                        clearSearchTerm={clearSearchTerm}
-                        placeholderText={`${searchType}`}
-                    />
+             
                 </div>
                 <div className="col-md-8 d-flex justify-content-end align-items-center">
                     {/* Dropdown Pour le Show du tableau */}

@@ -36,7 +36,7 @@ export function Warnings() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("id_warning");
+  const [typeSearch, setTypeSearch] = useState("ID");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
@@ -51,7 +51,7 @@ export function Warnings() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/warning/count/${id_user}?searchTerm=${search}&searchType=${typeSearch}`
+        `${backendUrl}/api/geop/warning/count/${id_user}?searchTerm=${search}&searchType=${type}`
       );
       const result = await response.json();
       setTotal(result.count);
@@ -67,7 +67,7 @@ export function Warnings() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+        `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
       );
       const data = await response.json();
       setWarnings(data);
@@ -161,28 +161,31 @@ export function Warnings() {
 
   const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
+    let newType = 0; // Définir un type par défaut
+
     switch (selectedValue) {
       case translate("ID Warning"):
-        setTypeSearch("id_warning");
+        newType = 0;
         break;
       case translate("Driver"):
-        setTypeSearch("driver");
+        newType = 1;
         break;
       case translate("Type Warning"):
-        setTypeSearch("Type_Warning");
+        newType = 2;
         break;
       case translate("Description"):
-        setTypeSearch("Description");
+        newType = 3;
         break;
       case translate("Date"):
-        setTypeSearch("Date");
+        newType = 4;
         break;
       default:
         console.log("Unknown selection");
         break;
     }
-    setTypeSearch(selectedValue);
-  };
+    console.log("Selected search type:", selectedValue, "Type set to:", newType);
+    setType(newType);
+    setTypeSearch(selectedValue);  };
 
   const handleAdvancedSearch = (event: any) => {
     setSearch(event.target.value);
@@ -248,9 +251,6 @@ export function Warnings() {
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
             <i className="las la-plus mr-3"></i>Add Warnings
           </Button>
-          <Button variant="outline-info" className="mt-2 mr-1">
-            <i className="las la-file-excel mr-3"></i>Import Warnings
-          </Button>
         </div>
       </div>
       <div className="row">
@@ -267,9 +267,9 @@ export function Warnings() {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("id_warning")}</Dropdown.Item>
-                <Dropdown.Item>{translate("driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Type_Warning")}</Dropdown.Item>
+                <Dropdown.Item>{translate("ID warning")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Type Warning")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Description")}</Dropdown.Item>
                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
               </Dropdown.Menu>
@@ -401,12 +401,6 @@ export function Warnings() {
                 )}
                 <td>
                   <div className="d-flex align-items-center list-action">
-                    <a className="badge badge-success mr-2" title="Détail">
-                      <i
-                        className="fa fa-eye"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a>
                     <a
                       className="badge bg-primary mr-2"
                       title="Edit"

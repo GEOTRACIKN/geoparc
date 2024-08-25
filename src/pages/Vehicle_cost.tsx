@@ -4,7 +4,6 @@ import ReactPaginate from "react-paginate";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useTranslate } from "../components/LanguageProvider";
-import AdvancedSearch from "../components/AdvancedSearch";
 
 
 type Vehicles = {
@@ -105,12 +104,6 @@ export function VehicleCost() {
       </div>
       <div className="row">
       <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
-          <AdvancedSearch
-            searchOptions={searchOptions}
-            onSearch={handleSearch}
-            clearSearchTerm={clearSearchTerm}
-            placeholderText={`${searchType}`}
-          />
         </div>
       <div className="col-md-8 d-flex justify-content-end align-items-right">
           {/* Dropdown Pour le Show du tableau */}
