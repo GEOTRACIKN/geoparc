@@ -17,6 +17,7 @@ interface Drivers {
   email_conducteur: string;
   telephone_conducteur: string;
   id_parc: number;
+  nom_parc:string;
 }
 
 
@@ -539,7 +540,7 @@ export function Drivers() {
                       {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                      {selectedColumns.id_parc && (<td>{driver.id_parc}</td>)}
+                      {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
 
                       <td>
                         <div className="d-flex align-items-center list-action">
