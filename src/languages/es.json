@@ -591,13 +591,14 @@
 "Model": "Modelo",
 "Maintenance": "Mantenimiento",
 "Verified Vehicles": "Vehículos Verificados",
-"Last & first Name": "Nombre y apellido",
+"Last and first name": "Nombre y apellido",
 "Park": "Aparcamiento",
 "Code": "Codigo",
 "Displaying": "Mostrar",
 "Import": "Importar",
 "Validate employees' salaries":"Validar salarios de empleados",
 "on":"en",
-"State":"Estado"
+"State":"Estado",
+"Display columns":"Mostrar columnas"
 
 }

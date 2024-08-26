@@ -48,7 +48,7 @@ export function Drivers() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSeach, setTypeSeach] = useState(translate("Last & first Name"));
+  const [typeSearch, settypeSearch] = useState(translate("Last and first name"));
 
 
   const [show, setShow] = useState(false);
@@ -108,68 +108,18 @@ export function Drivers() {
 
 
 
-  const getDriverslimitValue = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
-    try {
-      setLoading(true);
-
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
-
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/alarm/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
-
-      // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/alarm/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const data = await DriversResponse.json();
-      setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-
-      return data;
-    } catch (error) {
-      console.error(error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    const commentsFormServer = await getDrivers(limit, currentPage, search, type, colum, sort);
+    await getDrivers(limit, currentPage, search, type, colum, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
     getDrivers(limit, currentPage, search, type, colum, sort);
-  }, []);
+}, []);
 
 
   const handleSelectChange = async (event: any) => {
@@ -213,37 +163,44 @@ export function Drivers() {
 
 
 
-  const handleTypeSearch = (event: any) => {
-    const selectedValue = event.target.textContent;
-
+  const handleTypeSearch = (selectedValue: string) => {
+  
+    console.log(selectedValue)
     switch (selectedValue) {
-      case translate("ID Driver"):
+      case translate("ID"):
+        console.log(0)
         setType(0);
         break;
       case translate("Code"):
+        console.log(1)
         setType(1);
         break;
-      case translate("Last & first Name"):
+      case translate("Last and first name"):
+        console.log(2)
         setType(2);
         break;
       case translate("Date of birth"):
+        console.log(3)
         setType(3);
-
         break;
       case translate("Email"):
+        console.log(4)
         setType(4);
         break;
       case translate("Phone"):
+        console.log(5)
         setType(5);
         break;
       case translate("Park"):
+        console.log(6)
         setType(6);
         break;
       default:
         console.log('Unknown selection');
+        console.log(selectedValue)
         break;
     }
-    setTypeSeach(selectedValue);
+    settypeSearch(selectedValue);
     console.log('Selected value:', selectedValue);
   };
 
@@ -338,22 +295,21 @@ export function Drivers() {
     });
   };
 
-  const handleSelect = (eventKey:any) => {
-    setSelectedItem(eventKey);
+  const handleResetSearch  = async () => {
+    setSearch("")
+  
+    await  getDrivers(limit, currentPage, search, type, colum, sort)
   };
 
-
-  const [selectedItem, setSelectedItem] = useState(null);
   const menuItems = [
-    "ID Driver",
-    "Code",
-    "Last & first Name",
-    "Date of birth",
-    "Email",
-    "Phone",
-    "Park"
+    translate("ID"),
+    translate("Code"),
+    translate("Last and first name"),
+    translate("Date of birth"),
+    translate("Email"),
+    translate("Phone"),
+    translate("Park")
   ];
-
 
   return (
     <>
@@ -393,20 +349,28 @@ export function Drivers() {
                   style={{ fontSize: "20" }}
                 ></i>
               </Dropdown.Toggle>
-              <Dropdown.Menu onClick={handleTypeSearch}>
+              <Dropdown.Menu>
                 {menuItems.map((item, index) => (
                   <Dropdown.Item
                     key={index}
+                    onClick={() => handleTypeSearch(item)}
                     eventKey={item}
-                    active={selectedItem === item}
-                    style={{ color: selectedItem === item ? "DodgerBlue" : "black" }}
+                    active={typeSearch === item}
+                    className={typeSearch === item ? "select-active" : ""}
                   >
-                    {translate(item)}
+                    {item}
                   </Dropdown.Item>
                 ))}
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` By ${typeSeach}`} onChange={handleAdvancedSearch} className="form-control" />
+            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+            <Button
+              variant="secondary"
+              onClick={handleResetSearch}
+              className="btn-reset"
+            >
+             <i className="las la-times" style={{color:"#fff"}}></i>
+            </Button>
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
@@ -429,11 +393,11 @@ export function Drivers() {
               </select>
             </label>
           </div>
-          <Dropdown onSelect={handleSelect}>
+          <Dropdown>
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
-              title="Colonnes dʼaffichage"
+              title={translate("Display columns")}
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
@@ -477,7 +441,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Last & first Name")}
+                  {translate("Last and first name")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -521,7 +485,7 @@ export function Drivers() {
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Email")}
-                  </span>
+                </span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -540,7 +504,7 @@ export function Drivers() {
 
               {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
               {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & first Name")}</th>)}
+              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last and first name")}</th>)}
               {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
               {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
               {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
@@ -628,7 +592,7 @@ export function Drivers() {
             {total}
           </span>
         </div>
-        <div  className="col-md-6 d-flex justify-content-end">
+        <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
             previousLabel={translate("previous")}
             nextLabel={translate("next")}

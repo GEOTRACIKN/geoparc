@@ -254,7 +254,6 @@
 "Congratulations, you have successfully modified the user!": "Congratulations, you have successfully modified the user!",
 "Congratulations, you have successfully added a new user!": "Congratulations, you have successfully added a new user!",
 "Deleted Groups": "Deleted Groups",
-
 "Tour Number": "Tour Number",
 "Speed range (km/h)": "Speed range (km/h)",
 "Percentage of time spent per speed range": "Percentage of time spent per speed range",
@@ -496,12 +495,13 @@
 "Trailer": "Trailer",
 "Model": "Model",
 "Verified Vehicles": "Verified Vehicles",
-"Last & first Name": "Last & First Name",
+"Last and first name": "Last and first name",
 "Park": "Park",
 "Code": "Code",
 "Displaying": "Displaying",
 "Import": "Import",
 "Validate employees' salaries":"Validate employees' salaries",
 "on":"on",
-"Status":"Status"
+"Status":"Status",
+"Display columns":"Display columns"
 }

@@ -511,7 +511,7 @@
 "Model": "النموذج",
 "Maintenance": "الصيانة",
 "Verified Vehicles": "المركبات المُتحقَّق منها",
-"Last & first Name": "الإسم واللقب",
+"Last and first name": "الإسم واللقب",
 "Date of birth": "تاريخ الميلاد",
 "Park": "موقف السيارات",
 "Code": "رمز",
@@ -519,5 +519,6 @@
 "Import": "تحميل",
 "Validate employees' salaries":"التحقق من رواتب الموظفين",  
 "on":"على",
-"Status":"الحالة"
+"Status":"الحالة",
+"Display columns":"أعمدة العرض"
 }
