@@ -65,7 +65,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum,
+        colum:searchColum[colum],
         sort
       });
 
@@ -97,7 +97,7 @@ export function Drivers() {
       setpageCount(Math.ceil(total / limitValue));
       setLimit(limitValue)
       setDrivers(data);
-
+      return data;
     } catch (error) {
       console.error(error);
 
@@ -119,7 +119,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum,
+        colum:searchColum[colum],
         sort
       });
 
@@ -176,7 +176,7 @@ export function Drivers() {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getDriverslimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -199,6 +199,18 @@ export function Drivers() {
       [column]: !prevState[column],
     }));
   };
+
+  
+  const searchColum : { [key: string]: number } ={
+    id_conducteur: 0,
+    code_conducteur:1,
+    nom_conducteur:2,
+    date_naissance_conducteur:3,
+    email_conducteur:4,
+    telephone_conducteur:5,
+    id_sousParc:6
+  };
+
 
 
   const handleTypeSearch = (event: any) => {
@@ -246,7 +258,7 @@ export function Drivers() {
   const handleSortingColum = (curentColum: string) => {
 
     setSortColum(curentColum)
-    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getDrivers(limit, currentPage, search, type, colum, sort);
   };
 
@@ -326,12 +338,6 @@ export function Drivers() {
     });
   };
 
-
-  const handleUpdateParckList = () => {
-    handleDriverAssignmentDriver(IdDriver,IdPark,IdUser).catch(error => {
-      console.error('Failed to update driver list:', error);
-    });
-  };
 
 
 
@@ -590,7 +596,7 @@ export function Drivers() {
                   ))) : (
 
                   <tr>
-                    <td colSpan={7}>No drivers available</td>
+                    <td colSpan={9}>No drivers available</td>
                   </tr>
                 )
               )}
