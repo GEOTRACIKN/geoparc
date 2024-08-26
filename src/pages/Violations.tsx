@@ -37,11 +37,11 @@ export function Violations() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("id_violation");
+  const [typeSearch, setTypeSearch] = useState("ID Violation");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
   const [ViolationToEdit, setViolationToEdit] = useState<number | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
+  const [showEditModal, setShowEditModal] = useState(false); 
 
 
   const [show, setShow] = useState(false);
@@ -52,7 +52,7 @@ export function Violations() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/violation/count/${id_user}?searchTerm=${search}&searchType=${typeSearch}`
+        `${backendUrl}/api/geop/violation/count/${id_user}?searchTerm=${search}&searchType=${type}`
       );
       const result = await response.json();
       setTotal(result.count);
@@ -68,7 +68,7 @@ export function Violations() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${backendUrl}/api/geop/violation/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${typeSearch}&sortColumn=${column}&sortOrder=${sort}`
+        `${backendUrl}/api/geop/violation/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
       );
       const data = await response.json();
       setviolation(data);
@@ -94,31 +94,33 @@ export function Violations() {
     setLimit(parseInt(newValue));
     setCurrentPage(1);
   };
-
   const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
+
     switch (selectedValue) {
-      case translate("ID Warning"):
-        setTypeSearch("id_violation");
+      case translate("ID Violation"):
+        setType(0);
         break;
       case translate("Driver"):
-        setTypeSearch("driver");
+        setType(1);
         break;
       case translate("Type Violation"):
-        setTypeSearch("Violation");
+        setType(2);
         break;
       case translate("Description"):
-        setTypeSearch("Description");
+        setType(3);
         break;
       case translate("Date"):
-        setTypeSearch("Date");
+        setType(4);
         break;
       default:
         console.log("Unknown selection");
         break;
     }
     setTypeSearch(selectedValue);
-  };
+
+  }
+
 
   const handleAdvancedSearch = (event: any) => {
     setSearch(event.target.value);
@@ -274,12 +276,12 @@ export function Violations() {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("id_violation")}</Dropdown.Item>
-                <Dropdown.Item>{translate("driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("vehicule")}</Dropdown.Item>
-                <Dropdown.Item>{translate("type_violation")}</Dropdown.Item>
-                <Dropdown.Item>{translate("description")}</Dropdown.Item>
-                <Dropdown.Item>{translate("date_violation")}</Dropdown.Item>
+                <Dropdown.Item>{translate("ID Violation")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Type Violation")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Description")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Date Violation")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             <input
@@ -352,7 +354,7 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("id_violation")}
                 >
-                  {translate("Id")}
+                  {translate("ID")}
                 </th>
               )}
               {selectedColumns.date && (

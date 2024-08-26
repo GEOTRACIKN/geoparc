@@ -36,7 +36,7 @@ export function Warnings() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("ID");
+  const [typeSearch, setTypeSearch] = useState("ID Warning");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
@@ -161,31 +161,30 @@ export function Warnings() {
 
   const handleTypeSearch = (event: any) => {
     const selectedValue = event.target.textContent;
-    let newType = 0; // Définir un type par défaut
 
     switch (selectedValue) {
       case translate("ID Warning"):
-        newType = 0;
+        setType(0);
         break;
       case translate("Driver"):
-        newType = 1;
+        setType(1);
         break;
       case translate("Type Warning"):
-        newType = 2;
+        setType(2);
         break;
       case translate("Description"):
-        newType = 3;
+        setType(3);
         break;
       case translate("Date"):
-        newType = 4;
+        setType(4);
         break;
       default:
         console.log("Unknown selection");
         break;
     }
-    console.log("Selected search type:", selectedValue, "Type set to:", newType);
-    setType(newType);
-    setTypeSearch(selectedValue);  };
+    setTypeSearch(selectedValue);
+
+  }
 
   const handleAdvancedSearch = (event: any) => {
     setSearch(event.target.value);

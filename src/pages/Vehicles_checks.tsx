@@ -33,6 +33,8 @@ export function Vehicleschecks() {
   const [selectedvehiclecheckID, setSelectedvehiclecheckID] = useState<string | null>(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [type, setType] = useState(0);
+
 
 
 
@@ -57,7 +59,7 @@ export function Vehicleschecks() {
   // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
-      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${userID}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${userID}?searchTerm=${searchTerm}&searchType=${type}`,
         { mode: "cors" });
       const totalpages = await total_pages.json();
       const total = totalpages[0].total;
@@ -65,7 +67,7 @@ export function Vehicleschecks() {
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
 
-      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+      const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${type}`,
         { mode: "cors" });
       const data = await res.json();
       setItems(data);
@@ -75,7 +77,7 @@ export function Vehicleschecks() {
   };
   // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
-    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${searchType}`,
+    const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${type}`,
       { mode: "cors" });
     const data = await res.json();
     return data;
@@ -106,6 +108,43 @@ export function Vehicleschecks() {
     localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns));  // Save selected columns to localStorage
   };
 
+  const handleTypeSearch = (event: any) => {
+    const selectedValue = event.target.textContent;
+
+    switch (selectedValue) {
+      case translate("ID"):
+        setType(0);
+        break;
+      case translate("Checker"):
+        setType(1);
+        break;
+      case translate("Outgoing Driver"):
+        setType(2);
+        break;
+      case translate("Incoming Driver"):
+        setType(3);
+        break;
+      case translate("Tractor Registration"):
+        setType(4);
+        break;
+      case translate("Remorque Registration"):
+        setType(5);
+        break;
+      case translate("Maintenance"):
+        setType(6);
+        break;
+      default:
+        console.log("Unknown selection");
+        break;
+    }
+    setSearchType(selectedValue);
+
+  }
+
+  const handleAdvancedSearch = (event: any) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
 
   //------- Partie Delete -------
   const handleConfirmDelete = async () => {
@@ -188,7 +227,7 @@ export function Vehicleschecks() {
     "Matricule Remorque",
     "Maintenance"
   ];
-  
+
   const vehicleData = list_Vehicleschecks.map(vehicleCheck => [
     vehicleCheck.id_verif,
     toTimestamp(vehicleCheck.creation_date),
@@ -199,7 +238,7 @@ export function Vehicleschecks() {
     vehicleCheck.trailer_number,
     convertValue(vehicleCheck.maintenance)
   ]);
-  
+
   const downloadVehicleExcel = () => {
     generateExcelFile("Vehicle_Checks", vehicleHeaders, vehicleData);
   };
@@ -207,18 +246,18 @@ export function Vehicleschecks() {
   const downloadVehiclePDF = () => {
     generatePDFFile("Vehicle_Checks", vehicleHeaders, vehicleData);
   };
-  
-
-const onDownloadConfirm = (format: string) => {
-  handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
-};
 
 
-const handleSelectChange = (event: any) => {
-  const newValue = event.target.value;
-  setLimit(parseInt(newValue));
-  setCurrentPage(1);
-};
+  const onDownloadConfirm = (format: string) => {
+    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+  };
+
+
+  const handleSelectChange = (event: any) => {
+    const newValue = event.target.value;
+    setLimit(parseInt(newValue));
+    setCurrentPage(1);
+  };
 
   return (
     <>
@@ -230,7 +269,7 @@ const handleSelectChange = (event: any) => {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-          <Link to="/Vehicle_check" className="btn btn-primary mt-2 mr-1">
+          <Link to="/vehicle-check" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
             {translate("Add Verification")}
           </Link>
@@ -241,12 +280,36 @@ const handleSelectChange = (event: any) => {
             <i className="las la-download"></i>
             Exporter
           </button>
-        </div>  
+        </div>
 
       </div>
       <div className="row">
         <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
-         
+          <div className="input-group">
+            <Dropdown>
+              <Dropdown.Toggle variant="link" id="dropdown-basic">
+                <i
+                  className="fas fa-chevron-down"
+                  style={{ fontSize: "20px" }}
+                ></i>
+              </Dropdown.Toggle>
+              <Dropdown.Menu onClick={handleTypeSearch}>
+                <Dropdown.Item>{translate("ID")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Checker")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Outgoing Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Incoming Driver")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Tractor Registration")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Remorque Registration")}</Dropdown.Item>
+                <Dropdown.Item>{translate("Maintenance")}</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <input
+              type="text"
+              placeholder={` By ${searchType}`}
+              onChange={handleAdvancedSearch}
+              className="form-control"
+            />
+          </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
           {/* Dropdown Pour le Show du tableau */}
@@ -349,7 +412,7 @@ const handleSelectChange = (event: any) => {
           </Dropdown>
         </div>
       </div>
-      <div className="row m-1">
+      <div className="row m-1 responsive-table">
         <Table>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
@@ -464,8 +527,8 @@ const handleSelectChange = (event: any) => {
       <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
-        onDownloadConfirm={onDownloadConfirm}    
-      />  
+        onDownloadConfirm={onDownloadConfirm}
+      />
     </>
   );
 }
