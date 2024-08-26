@@ -40,7 +40,7 @@ export function Drivers() {
   const [IdDriver, setIdDriver] = useState<number>(0);
   const [IdUser, setIdUser] = useState<number>(0);
   const [IdPark, setIdPark] = useState<number>(0);
-  
+
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);
@@ -48,7 +48,7 @@ export function Drivers() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSeach, setTypeSeach] = useState("ID");
+  const [typeSeach, setTypeSeach] = useState(translate("Last & first Name"));
 
 
   const [show, setShow] = useState(false);
@@ -65,7 +65,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum:searchColum[colum],
+        colum: searchColum[colum],
         sort
       });
 
@@ -119,7 +119,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum:searchColum[colum],
+        colum: searchColum[colum],
         sort
       });
 
@@ -200,15 +200,15 @@ export function Drivers() {
     }));
   };
 
-  
-  const searchColum : { [key: string]: number } ={
+
+  const searchColum: { [key: string]: number } = {
     id_conducteur: 0,
-    code_conducteur:1,
-    nom_conducteur:2,
-    date_naissance_conducteur:3,
-    email_conducteur:4,
-    telephone_conducteur:5,
-    id_sousParc:6
+    code_conducteur: 1,
+    nom_conducteur: 2,
+    date_naissance_conducteur: 3,
+    email_conducteur: 4,
+    telephone_conducteur: 5,
+    id_sousParc: 6
   };
 
 
@@ -226,7 +226,7 @@ export function Drivers() {
       case translate("Last & first Name"):
         setType(2);
         break;
-      case translate("Date of Birth"):
+      case translate("Date of birth"):
         setType(3);
 
         break;
@@ -299,8 +299,8 @@ export function Drivers() {
   };
 
 
-  
-  const handleDriverAssignmentDriver = async (id_conducteur:number,id_parc:number,id_user:any) => {
+
+  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, id_user: any) => {
     try {
 
       setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
@@ -338,8 +338,21 @@ export function Drivers() {
     });
   };
 
+  const handleSelect = (eventKey:any) => {
+    setSelectedItem(eventKey);
+  };
 
 
+  const [selectedItem, setSelectedItem] = useState(null);
+  const menuItems = [
+    "ID Driver",
+    "Code",
+    "Last & first Name",
+    "Date of birth",
+    "Email",
+    "Phone",
+    "Park"
+  ];
 
 
   return (
@@ -381,13 +394,16 @@ export function Drivers() {
                 ></i>
               </Dropdown.Toggle>
               <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Code")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Last & first Name")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date of Birth")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Email")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Phone")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Park")}</Dropdown.Item>
+                {menuItems.map((item, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    eventKey={item}
+                    active={selectedItem === item}
+                    style={{ color: selectedItem === item ? "DodgerBlue" : "black" }}
+                  >
+                    {translate(item)}
+                  </Dropdown.Item>
+                ))}
               </Dropdown.Menu>
             </Dropdown>
             <input type="text" placeholder={` By ${typeSeach}`} onChange={handleAdvancedSearch} className="form-control" />
@@ -413,7 +429,7 @@ export function Drivers() {
               </select>
             </label>
           </div>
-          <Dropdown>
+          <Dropdown onSelect={handleSelect}>
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
@@ -461,7 +477,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Name")}
+                  {translate("Last & first Name")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -475,7 +491,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("date_naissance_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Date de naissance")}
+                  {translate("Date of birth")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -489,7 +505,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("telephone_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Phone ")}
+                  {translate("Phone")}
                 </span>
               </Dropdown.Item>
 
@@ -503,13 +519,15 @@ export function Drivers() {
                   checked={selectedColumns.email_conducteur}
                   onChange={() => handleColumnChange("email_conducteur")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Email")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Email")}
+                  </span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
       </div>
-      <div className="row m-1">
+      <div className="row m-1 table-responsive">
         <Table className="dataTable">
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
@@ -573,7 +591,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur,driver.id_parc,id_user)}
+                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -610,7 +628,7 @@ export function Drivers() {
             {total}
           </span>
         </div>
-        <div className="col-md-6">
+        <div  className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
             previousLabel={translate("previous")}
             nextLabel={translate("next")}
@@ -619,7 +637,7 @@ export function Drivers() {
             marginPagesDisplayed={2}
             pageRangeDisplayed={3}
             onPageChange={handlePageClick}
-            containerClassName={"pagination justify-content-center"}
+            containerClassName={"pagination justify-right"}
             pageClassName={"page-item"}
             pageLinkClassName={"page-link"}
             previousClassName={"page-item"}
@@ -651,10 +669,10 @@ export function Drivers() {
 
         <DriverAssignmentModal
           show={modalAssignmentStatus !== null}
-          onHide={closeAssignmentModal} 
+          onHide={closeAssignmentModal}
           status={modalAssignmentStatus}
           title={titleAssignmentStatus}
-          id_user={IdUser} 
+          id_user={IdUser}
           id_driver={IdDriver}
           id_parc={IdPark}
         />
