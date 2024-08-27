@@ -17,7 +17,7 @@ interface Drivers {
   email_conducteur: string;
   telephone_conducteur: string;
   id_parc: number;
-  nom_parc:string;
+  nom_parc: string;
 }
 
 
@@ -41,25 +41,25 @@ export function Drivers() {
   const [IdDriver, setIdDriver] = useState<number>(0);
   const [IdUser, setIdUser] = useState<number>(0);
   const [IdPark, setIdPark] = useState<number>(0);
+  const [NamePark, setNamePark] = useState<string>("");
 
   const [loading, setLoading] = useState(true); // Add loading state
-  const [pageCount, setpageCount] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
   let [total, settotal] = useState(0);
   const [colum, setSortColum] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
-  const [type, setType] = useState(0);
-  const [typeSearch, settypeSearch] = useState(translate("Last and first name"));
+  const [type, setType] = useState(2);
+  const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
 
 
-  const [show, setShow] = useState(false);
 
 
-  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
+  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
     try {
       setLoading(true);
 
-      // Préparation des données à envoyer
+      // Preparing the data to send
       const bodyData = JSON.stringify({
         limitValue,
         currentPage,
@@ -70,7 +70,7 @@ export function Drivers() {
         sort
       });
 
-      // Récupération du nombre total de pages
+      // Retrieve the total number of pages
       const totalPagesResponse = await fetch(`${backendUrl}/api/geop/driver/totalpage`, {
         method: 'POST',
         headers: {
@@ -84,7 +84,7 @@ export function Drivers() {
       const total = totalPagesJson[0]["count"];
       settotal(total);
 
-      // Récupération des données d'alarmes
+      // Retrieve driver data
       const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, {
         method: 'POST',
         headers: {
@@ -95,7 +95,7 @@ export function Drivers() {
       });
 
       const data = await DriversResponse.json();
-      setpageCount(Math.ceil(total / limitValue));
+      setPageCount(Math.ceil(total / limitValue));
       setLimit(limitValue)
       setDrivers(data);
       return data;
@@ -109,7 +109,6 @@ export function Drivers() {
 
 
 
-  
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -120,7 +119,7 @@ export function Drivers() {
 
   useEffect(() => {
     getDrivers(limit, currentPage, search, type, colum, sort);
-}, []);
+  }, []);
 
 
   const handleSelectChange = async (event: any) => {
@@ -165,7 +164,7 @@ export function Drivers() {
 
 
   const handleTypeSearch = (selectedValue: string) => {
-  
+
     console.log(selectedValue)
     switch (selectedValue) {
       case translate("ID"):
@@ -201,7 +200,7 @@ export function Drivers() {
         console.log(selectedValue)
         break;
     }
-    settypeSearch(selectedValue);
+    setTypeSearch(selectedValue);
     console.log('Selected value:', selectedValue);
   };
 
@@ -258,7 +257,7 @@ export function Drivers() {
 
 
 
-  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, id_user: any) => {
+  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, nom_parc: string,id_user: any) => {
     try {
 
       setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
@@ -266,6 +265,7 @@ export function Drivers() {
       setIdUser(parseInt(id_user || '0', 0));
       setIdDriver(id_conducteur);
       setIdPark(id_parc)
+      setNamePark(nom_parc)
       // Perform deletion logic here...
 
       // After successful deletion, update the vehicle list
@@ -286,9 +286,11 @@ export function Drivers() {
 
   const closeAssignmentModal = () => {
     setModalAssignmentStatus(null);
+    setTitleAssignmentStatus("");
+    setIdUser(0);
+    setIdDriver(0);
+    setIdPark(0);
   };
-
-
 
   const handleUpdateDriverList = () => {
     getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
@@ -296,10 +298,10 @@ export function Drivers() {
     });
   };
 
-  const handleResetSearch  = async () => {
+  const handleResetSearch = async () => {
     setSearch("")
-  
-    await  getDrivers(limit, currentPage, search, type, colum, sort)
+
+    await getDrivers(limit, currentPage, search, type, colum, sort)
   };
 
   const menuItems = [
@@ -370,7 +372,7 @@ export function Drivers() {
               onClick={handleResetSearch}
               className="btn-reset"
             >
-             <i className="las la-times" style={{color:"#fff"}}></i>
+              <i className="las la-times" style={{ color: "#fff" }}></i>
             </Button>
           </div>
         </div>
@@ -556,7 +558,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, id_user)}
+                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc,id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -639,10 +641,9 @@ export function Drivers() {
           title={titleAssignmentStatus}
           id_user={IdUser}
           id_driver={IdDriver}
-          id_parc={IdPark}
-        />
-
-
+          id_parc={IdPark} 
+          updateDriverList={handleUpdateDriverList}
+         />
 
       </div>
     </>
