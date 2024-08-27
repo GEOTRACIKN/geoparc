@@ -7,6 +7,7 @@ import { PropagateLoader } from 'react-spinners';
 import DriverModal from "../components/Driver/DriverModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
 interface Drivers {
   id_conducteur: number;
@@ -51,8 +52,40 @@ export function Drivers() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
+  const [showDownloadModal, setShowDownloadModal] = useState(false); 
 
+  const driverHeaders = [
+    translate("ID"),
+    translate("Code"),
+    translate("Last and first name"),
+    translate("Date of birth"),
+    translate("Phone"),
+    translate("Email"),
+    translate("Park")
+  ];
 
+  const driverData = list_Drivers.map(driver=> [
+    driver.id_conducteur,
+    driver.code_conducteur,
+    driver.nom_conducteur+' '+ driver.prenom_conducteur,
+    toTimestamp(driver.date_naissance_conducteur),
+    driver.telephone_conducteur,
+    driver.email_conducteur,
+    driver.nom_parc,
+  ]);
+  
+  const downloadVehicleExcel = () => {
+    generateExcelFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
+  };
+
+  const downloadVehiclePDF = () => {
+    generatePDFFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
+  };
+
+  const onDownloadConfirm = (format: string) => {
+    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+  };
+  
 
 
   const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
@@ -257,7 +290,7 @@ export function Drivers() {
 
 
 
-  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, nom_parc: string,id_user: any) => {
+  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, nom_parc: string, id_user: any) => {
     try {
 
       setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
@@ -334,9 +367,14 @@ export function Drivers() {
           <Button variant="" className="btn btn-outline-secondary  mt-2 mr-1" onClick={() => handleConfirmSalaryDriver()}>
             <i className="las la-cubes mr-3"></i>{translate("Validate employees' salaries")}
           </Button>
-          <Button variant="" className="btn btn-outline-info mt-2 mr-1" onClick={handleShowCreateTicketModal}>
-            <i className="las la-file-excel mr-3"></i> {translate("Import")} {translate("Driver")}
-          </Button>
+
+          <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            {translate("Export")} {translate("Driver")}
+          </button>
         </div>
       </div>
       <div className="row">
@@ -558,7 +596,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc,id_user)}
+                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -641,11 +679,21 @@ export function Drivers() {
           title={titleAssignmentStatus}
           id_user={IdUser}
           id_driver={IdDriver}
-          id_parc={IdPark} 
+          id_parc={IdPark}
           updateDriverList={handleUpdateDriverList}
-         />
+        />
+
+        <DownloadModal
+          show={showDownloadModal}
+          onHide={() => setShowDownloadModal(false)}
+          onDownloadConfirm={onDownloadConfirm}
+        />
 
       </div>
     </>
   );
 }
+function convertValue(maintenance: any) {
+  throw new Error("Function not implemented.");
+}
+
