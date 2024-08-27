@@ -6,6 +6,7 @@ import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
 import ModalEditVilation from "../components/EditViolations";
 import { Bounce, toast } from "react-toastify";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
 interface Violations {
   id_violation: number;
@@ -42,6 +43,8 @@ export function Violations() {
   const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
   const [ViolationToEdit, setViolationToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); 
+  const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+
 
 
   const [show, setShow] = useState(false);
@@ -247,6 +250,38 @@ export function Violations() {
     }
   };
 
+      //**** Partie Excel ****
+      const ViolationsHeaders = [
+        "ID Warning",
+        "Driver",
+        "Type Warning",
+        "Description",
+        "Date",
+      ];
+    
+      const ViolationsData = list_violation.map(Violations => [
+        Violations.id_violation,
+        `${Violations.conducteur_nom} ${Violations.conducteur_prenom}`, 
+        Violations.type_violation,
+        Violations.description,
+        toTimestamp(Violations.date_violation),
+  
+      ]);
+
+  const downloadViolationsExcel = () => {
+    generateExcelFile("Violations", ViolationsHeaders, ViolationsData);
+  };
+
+  const downloadViolationsPDF = () => {
+    generatePDFFile("Violations", ViolationsHeaders, ViolationsData);
+  };
+
+
+  
+  const onDownloadConfirm = (format: string) => {
+    handleDownloadConfirm(format, downloadViolationsExcel, downloadViolationsPDF);
+  };
+
   return (
     <>
       <div className="row">
@@ -260,6 +295,13 @@ export function Violations() {
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
             <i className="las la-plus mr-3"></i>Add violation
           </Button>
+          <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            Exporter
+          </button>
         </div>
       </div>
       <div className="row">
@@ -371,7 +413,7 @@ export function Violations() {
 
                   onClick={() => handleSortingColumn("driver")}
                 >
-                  {translate("driver")}
+                  {translate("Driver")}
                 </th>
               )}
               {selectedColumns.vehicule && (
@@ -514,6 +556,12 @@ export function Violations() {
           </Button>
         </Modal.Footer>
       </Modal>
+        {/* Le moodal est dans functions */}
+        <DownloadModal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        onDownloadConfirm={onDownloadConfirm}
+      />
     </>
   );
 }

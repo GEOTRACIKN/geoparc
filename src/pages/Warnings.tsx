@@ -6,6 +6,9 @@ import { PropagateLoader } from "react-spinners";
 import ModalNewWaring from "../components/NewWarning";
 import ModalEditWarning from "../components/EditWarning";
 import { Bounce, toast } from "react-toastify";
+import { DownloadModal } from "../functions";
+import { generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+
 
 //?apikey=u3I84lt6B1sHE7z8MNwS
 
@@ -41,6 +44,9 @@ export function Warnings() {
   const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
+  const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+
+
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -237,6 +243,39 @@ export function Warnings() {
     setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
   };
 
+    //**** Partie Excel ****
+    const WarningsHeaders = [
+      translate("IDWarnings"),
+      translate("Driver"),
+      translate("Type Warning"),
+      translate("Description"),
+      translate("Date"),
+    ];
+  
+    const WarningsData = list_Warnings.map(Warnings => [
+      Warnings.id_warning,
+      `${Warnings.conducteur_nom} ${Warnings.conducteur_prenom}`, 
+      Warnings.Type_Warning,
+      Warnings.Description,
+      toTimestamp(Warnings.Date),
+
+    ]);
+
+  const downloadWarningsExcel = () => {
+    generateExcelFile("Warnings", WarningsHeaders, WarningsData);
+  };
+
+  const downloadWarningsPDF = () => {
+    generatePDFFile("Warnings", WarningsHeaders, WarningsData);
+  };
+
+  
+
+  const onDownloadConfirm = (format: string) => {
+    handleDownloadConfirm(format, downloadWarningsExcel, downloadWarningsPDF);
+  };
+
+
   return (
     <>
       <div className="row">
@@ -250,6 +289,13 @@ export function Warnings() {
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
             <i className="las la-plus mr-3"></i>Add Warnings
           </Button>
+          <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            Exporter
+          </button>
         </div>
       </div>
       <div className="row">
@@ -348,6 +394,10 @@ export function Warnings() {
               )}
               {selectedColumns.driver && (
                 <th
+                className="sorting"
+
+                onClick={() => handleSortingColumn("driver")}
+
                 >
                   {translate("Driver")}
                 </th>
@@ -482,6 +532,12 @@ export function Warnings() {
           </Button>
         </Modal.Footer>
       </Modal>
+        {/* Le moodal est dans functions */}
+        <DownloadModal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        onDownloadConfirm={onDownloadConfirm}
+      />
     </>
   );
 }
