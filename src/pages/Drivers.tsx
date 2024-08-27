@@ -40,7 +40,7 @@ export function Drivers() {
   const [IdDriver, setIdDriver] = useState<number>(0);
   const [IdUser, setIdUser] = useState<number>(0);
   const [IdPark, setIdPark] = useState<number>(0);
-  
+
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setpageCount] = useState(0);
   let [total, settotal] = useState(0);
@@ -48,7 +48,7 @@ export function Drivers() {
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
-  const [typeSeach, setTypeSeach] = useState("ID");
+  const [typeSearch, settypeSearch] = useState(translate("Last and first name"));
 
 
   const [show, setShow] = useState(false);
@@ -65,7 +65,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum,
+        colum: searchColum[colum],
         sort
       });
 
@@ -97,86 +97,36 @@ export function Drivers() {
       setpageCount(Math.ceil(total / limitValue));
       setLimit(limitValue)
       setDrivers(data);
-
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-  const getDriverslimitValue = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sortr: string) => {
-    try {
-      setLoading(true);
-
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum,
-        sort
-      });
-
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/alarm/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
-
-      // Récupération des données d'alarmes
-      const DriversResponse = await fetch(`${backendUrl}/api/alarm/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const data = await DriversResponse.json();
-      setpageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-
       return data;
     } catch (error) {
       console.error(error);
-      return [];
+
     } finally {
       setLoading(false);
     }
   };
 
+
+
+  
+
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    const commentsFormServer = await getDrivers(limit, currentPage, search, type, colum, sort);
+    await getDrivers(limit, currentPage, search, type, colum, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
     getDrivers(limit, currentPage, search, type, colum, sort);
-  }, []);
+}, []);
 
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getDriverslimitValue(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -201,37 +151,56 @@ export function Drivers() {
   };
 
 
-  const handleTypeSearch = (event: any) => {
-    const selectedValue = event.target.textContent;
+  const searchColum: { [key: string]: number } = {
+    id_conducteur: 0,
+    code_conducteur: 1,
+    nom_conducteur: 2,
+    date_naissance_conducteur: 3,
+    email_conducteur: 4,
+    telephone_conducteur: 5,
+    id_sousParc: 6
+  };
 
+
+
+  const handleTypeSearch = (selectedValue: string) => {
+  
+    console.log(selectedValue)
     switch (selectedValue) {
-      case translate("ID Driver"):
+      case translate("ID"):
+        console.log(0)
         setType(0);
         break;
       case translate("Code"):
+        console.log(1)
         setType(1);
         break;
-      case translate("Last & first Name"):
+      case translate("Last and first name"):
+        console.log(2)
         setType(2);
         break;
-      case translate("Date of Birth"):
+      case translate("Date of birth"):
+        console.log(3)
         setType(3);
-
         break;
       case translate("Email"):
+        console.log(4)
         setType(4);
         break;
       case translate("Phone"):
+        console.log(5)
         setType(5);
         break;
       case translate("Park"):
+        console.log(6)
         setType(6);
         break;
       default:
         console.log('Unknown selection');
+        console.log(selectedValue)
         break;
     }
-    setTypeSeach(selectedValue);
+    settypeSearch(selectedValue);
     console.log('Selected value:', selectedValue);
   };
 
@@ -246,7 +215,7 @@ export function Drivers() {
   const handleSortingColum = (curentColum: string) => {
 
     setSortColum(curentColum)
-    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getDrivers(limit, currentPage, search, type, colum, sort);
   };
 
@@ -287,8 +256,8 @@ export function Drivers() {
   };
 
 
-  
-  const handleDriverAssignmentDriver = async (id_conducteur:number,id_parc:number,id_user:any) => {
+
+  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, id_user: any) => {
     try {
 
       setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
@@ -326,15 +295,21 @@ export function Drivers() {
     });
   };
 
-
-  const handleUpdateParckList = () => {
-    handleDriverAssignmentDriver(IdDriver,IdPark,IdUser).catch(error => {
-      console.error('Failed to update driver list:', error);
-    });
+  const handleResetSearch  = async () => {
+    setSearch("")
+  
+    await  getDrivers(limit, currentPage, search, type, colum, sort)
   };
 
-
-
+  const menuItems = [
+    translate("ID"),
+    translate("Code"),
+    translate("Last and first name"),
+    translate("Date of birth"),
+    translate("Email"),
+    translate("Phone"),
+    translate("Park")
+  ];
 
   return (
     <>
@@ -374,17 +349,28 @@ export function Drivers() {
                   style={{ fontSize: "20" }}
                 ></i>
               </Dropdown.Toggle>
-              <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("ID Driver")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Code")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Last & first Name")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date of Birth")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Email")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Phone")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Park")}</Dropdown.Item>
+              <Dropdown.Menu>
+                {menuItems.map((item, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => handleTypeSearch(item)}
+                    eventKey={item}
+                    active={typeSearch === item}
+                    className={typeSearch === item ? "select-active" : ""}
+                  >
+                    {item}
+                  </Dropdown.Item>
+                ))}
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` By ${typeSeach}`} onChange={handleAdvancedSearch} className="form-control" />
+            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+            <Button
+              variant="secondary"
+              onClick={handleResetSearch}
+              className="btn-reset"
+            >
+             <i className="las la-times" style={{color:"#fff"}}></i>
+            </Button>
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
@@ -411,7 +397,7 @@ export function Drivers() {
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
-              title="Colonnes dʼaffichage"
+              title={translate("Display columns")}
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
@@ -455,7 +441,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Name")}
+                  {translate("Last and first name")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -469,7 +455,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("date_naissance_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Date de naissance")}
+                  {translate("Date of birth")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -483,7 +469,7 @@ export function Drivers() {
                   onChange={() => handleColumnChange("telephone_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Phone ")}
+                  {translate("Phone")}
                 </span>
               </Dropdown.Item>
 
@@ -497,13 +483,15 @@ export function Drivers() {
                   checked={selectedColumns.email_conducteur}
                   onChange={() => handleColumnChange("email_conducteur")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Email")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Email")}
+                </span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
       </div>
-      <div className="row m-1">
+      <div className="row m-1 table-responsive">
         <Table className="dataTable">
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
@@ -516,7 +504,7 @@ export function Drivers() {
 
               {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
               {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last & first Name")}</th>)}
+              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last and first name")}</th>)}
               {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
               {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
               {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
@@ -567,7 +555,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur,driver.id_parc,id_user)}
+                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -590,7 +578,7 @@ export function Drivers() {
                   ))) : (
 
                   <tr>
-                    <td colSpan={7}>No drivers available</td>
+                    <td colSpan={9}>No drivers available</td>
                   </tr>
                 )
               )}
@@ -604,7 +592,7 @@ export function Drivers() {
             {total}
           </span>
         </div>
-        <div className="col-md-6">
+        <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
             previousLabel={translate("previous")}
             nextLabel={translate("next")}
@@ -613,7 +601,7 @@ export function Drivers() {
             marginPagesDisplayed={2}
             pageRangeDisplayed={3}
             onPageChange={handlePageClick}
-            containerClassName={"pagination justify-content-center"}
+            containerClassName={"pagination justify-right"}
             pageClassName={"page-item"}
             pageLinkClassName={"page-link"}
             previousClassName={"page-item"}
@@ -645,10 +633,10 @@ export function Drivers() {
 
         <DriverAssignmentModal
           show={modalAssignmentStatus !== null}
-          onHide={closeAssignmentModal} 
+          onHide={closeAssignmentModal}
           status={modalAssignmentStatus}
           title={titleAssignmentStatus}
-          id_user={IdUser} 
+          id_user={IdUser}
           id_driver={IdDriver}
           id_parc={IdPark}
         />
