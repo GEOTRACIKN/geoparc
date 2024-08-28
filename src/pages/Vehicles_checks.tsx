@@ -9,7 +9,7 @@ import { Bounce, toast } from "react-toastify";
 
 
 type Vehicles = {
-  id_verif: string;
+  id_verif: number;
   creation_date: string;
   checker: string;
   driver_out: string;
@@ -34,6 +34,9 @@ export function Vehicleschecks() {
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [type, setType] = useState(0);
+  const [selectedvehiclecheck, setSelectedvehiclecheck] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+
 
 
 
@@ -239,18 +242,74 @@ export function Vehicleschecks() {
     convertValue(vehicleCheck.maintenance)
   ]);
 
+ 
   const downloadVehicleExcel = () => {
-    generateExcelFile("Vehicle_Checks", vehicleHeaders, vehicleData);
+    const selectedData = list_Vehicleschecks.filter((vehicleCheck) =>
+      selectedvehiclecheck.includes(vehicleCheck.id_verif)
+    ).map((vehicleCheck) => [
+      vehicleCheck.id_verif,
+      toTimestamp(vehicleCheck.creation_date),
+      vehicleCheck.checker,
+      vehicleCheck.driver_out,
+      vehicleCheck.driver_in,
+      vehicleCheck.tractor_number,
+      vehicleCheck.trailer_number,
+      convertValue(vehicleCheck.maintenance)
+
+    ]);
+  
+    generateExcelFile("Vehicle_Checks", vehicleHeaders, selectedData);
   };
 
   const downloadVehiclePDF = () => {
-    generatePDFFile("Vehicle_Checks", vehicleHeaders, vehicleData);
-  };
+    const selectedData = list_Vehicleschecks.filter((vehicleCheck) =>
+      selectedvehiclecheck.includes(vehicleCheck.id_verif)
+    ).map((vehicleCheck) => [
+      vehicleCheck.id_verif,
+      toTimestamp(vehicleCheck.creation_date),
+      vehicleCheck.checker,
+      vehicleCheck.driver_out,
+      vehicleCheck.driver_in,
+      vehicleCheck.tractor_number,
+      vehicleCheck.trailer_number,
+      convertValue(vehicleCheck.maintenance)
 
+    ]);
+  
+    generatePDFFile("Vehicle_Checks", vehicleHeaders, selectedData);
+  };
 
   const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    if (selectedvehiclecheck.length > 0) {
+      handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    } else {
+      toast.warn("Veuillez sélectionner au moins une vérification ", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
   };
+
+  const handleSelectvehicleCheck = (id: number) => {
+    setSelectedvehiclecheck((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((vehicleCheckId) => vehicleCheckId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      const allWarningIds = list_Vehicleschecks.map((vehicleCheck) => vehicleCheck.id_verif);
+      setSelectedvehiclecheck(allWarningIds);
+    } else {
+      setSelectedvehiclecheck([]);
+    }
+  };
+
 
 
   const handleSelectChange = (event: any) => {
@@ -418,7 +477,12 @@ export function Vehicleschecks() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
+                  <input className="form-check-input" 
+                  type="checkbox"
+                  checked={selectAll} 
+                  onChange={handleSelectAll}
+
+                  />
                   <label className="form-check-label"></label>
                 </div>
               </th>
@@ -438,7 +502,11 @@ export function Vehicleschecks() {
               <tr className={""} key={data.id_verif}>
                 <td>
                   <div className="form-check form-check-inline">
-                    <input type="checkbox" className="form-check-input" />
+                    <input type="checkbox" className="form-check-input"
+                   checked={selectedvehiclecheck.includes(data.id_verif)}
+                   onChange={() => handleSelectvehicleCheck(data.id_verif)}
+
+                    />
                   </div>
                 </td>
                 {selectedColumns.id_verif && <td>{data.id_verif}</td>}

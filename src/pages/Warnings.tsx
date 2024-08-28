@@ -45,6 +45,9 @@ export function Warnings() {
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); // État pour gérer l'affichage du modal d'édition
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+  const [selectedWarnings, setSelectedWarnings] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+
 
 
 
@@ -76,6 +79,8 @@ export function Warnings() {
         `${backendUrl}/api/geop/warning/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
       );
       const data = await response.json();
+      console.log(data); // Ajoutez cette ligne pour vérifier la structure des données
+
       setWarnings(data);
     } catch (error) {
       console.error(error);
@@ -204,8 +209,6 @@ export function Warnings() {
     getWarnings();
   };
 
-
-  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
   const initialColumns = {
     id_warning: true,
     Type_Warning: true,
@@ -243,37 +246,78 @@ export function Warnings() {
     setWarningToEdit(null); // Réinitialise l'ID de l'avertissement à éditer
   };
 
-    //**** Partie Excel ****
-    const WarningsHeaders = [
-      translate("IDWarnings"),
-      translate("Driver"),
-      translate("Type Warning"),
-      translate("Description"),
-      translate("Date"),
-    ];
-  
-    const WarningsData = list_Warnings.map(Warnings => [
-      Warnings.id_warning,
-      `${Warnings.conducteur_nom} ${Warnings.conducteur_prenom}`, 
-      Warnings.Type_Warning,
-      Warnings.Description,
-      toTimestamp(Warnings.Date),
+  //**** Partie Excel ****
+  const WarningsHeaders = [
+    translate("IDWarnings"),
+    translate("Driver"),
+    translate("Type Warning"),
+    translate("Description"),
+    translate("Date"),
+  ];
 
-    ]);
 
   const downloadWarningsExcel = () => {
-    generateExcelFile("Warnings", WarningsHeaders, WarningsData);
+    const selectedData = list_Warnings.filter((warning) =>
+      selectedWarnings.includes(warning.id_warning)
+    ).map((warning) => [
+      warning.id_warning,
+      `${warning.conducteur_nom} ${warning.conducteur_prenom}`,
+      warning.Type_Warning,
+      warning.Description,
+      toTimestamp(warning.Date),
+    ]);
+  
+    generateExcelFile("Warnings", WarningsHeaders, selectedData);
   };
-
-  const downloadWarningsPDF = () => {
-    generatePDFFile("Warnings", WarningsHeaders, WarningsData);
-  };
-
   
 
-  const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadWarningsExcel, downloadWarningsPDF);
+  const downloadWarningsPDF = () => {
+    const selectedData = list_Warnings.filter((warning) =>
+      selectedWarnings.includes(warning.id_warning)
+    ).map((warning) => [
+      warning.id_warning,
+      `${warning.conducteur_nom} ${warning.conducteur_prenom}`,
+      warning.Type_Warning,
+      warning.Description,
+      toTimestamp(warning.Date),
+    ]);
+  
+    generatePDFFile("Warnings", WarningsHeaders, selectedData);
   };
+
+
+
+  const onDownloadConfirm = (format: string) => {
+    if (selectedWarnings.length > 0) {
+      handleDownloadConfirm(format, downloadWarningsExcel, downloadWarningsPDF);
+    } else {
+      toast.warn("Veuillez sélectionner au moins un Warning", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  };
+  
+  const handleSelectWarning = (id: number) => {
+    setSelectedWarnings((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((warningId) => warningId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      const allWarningIds = list_Warnings.map((warning) => warning.id_warning);
+      setSelectedWarnings(allWarningIds);
+    } else {
+      setSelectedWarnings([]);
+    }
+  };
+
 
 
   return (
@@ -381,7 +425,13 @@ export function Warnings() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={selectAll} 
+                    onChange={handleSelectAll}
+
+                    />
                 </div>
               </th>
               {selectedColumns.id_warning && (
@@ -394,9 +444,9 @@ export function Warnings() {
               )}
               {selectedColumns.driver && (
                 <th
-                className="sorting"
+                  className="sorting"
 
-                onClick={() => handleSortingColumn("driver")}
+                  onClick={() => handleSortingColumn("driver")}
 
                 >
                   {translate("Driver")}
@@ -434,7 +484,13 @@ export function Warnings() {
               <tr key={idx}>
                 <td>
                   <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" />
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={selectedWarnings.includes(warning.id_warning)}
+                      onChange={() => handleSelectWarning(warning.id_warning)}
+
+                    />
                   </div>
                 </td>
                 {selectedColumns.id_warning && <td>{warning.id_warning}</td>}
@@ -532,8 +588,8 @@ export function Warnings() {
           </Button>
         </Modal.Footer>
       </Modal>
-        {/* Le moodal est dans functions */}
-        <DownloadModal
+      {/* Le moodal est dans functions */}
+      <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
         onDownloadConfirm={onDownloadConfirm}

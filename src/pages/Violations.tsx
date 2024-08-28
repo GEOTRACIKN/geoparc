@@ -6,7 +6,7 @@ import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/NewViolation"
 import ModalEditVilation from "../components/EditViolations";
 import { Bounce, toast } from "react-toastify";
-import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import { DownloadModal, formatDateToTimestamp, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
 interface Violations {
   id_violation: number;
@@ -43,7 +43,9 @@ export function Violations() {
   const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
   const [ViolationToEdit, setViolationToEdit] = useState<number | null>(null);
   const [showEditModal, setShowEditModal] = useState(false); 
-  const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [selectedViolations, setSelectedViolations] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
 
 
 
@@ -107,14 +109,17 @@ export function Violations() {
       case translate("Driver"):
         setType(1);
         break;
-      case translate("Type Violation"):
+      case translate("Vehicule"):
         setType(2);
         break;
-      case translate("Description"):
+      case translate("Type Violation"):
         setType(3);
         break;
-      case translate("Date"):
+      case translate("Description"):
         setType(4);
+        break;
+      case translate("Date"):
+        setType(5);
         break;
       default:
         console.log("Unknown selection");
@@ -137,8 +142,6 @@ export function Violations() {
     getViolation();
   };
 
-
-  const options = [10, 20, 40, 60, 80, 100, 200, 500]; // Page size options
   const initialColumns = {
     id_violation: true,
     vehicule: true,
@@ -259,28 +262,66 @@ export function Violations() {
         "Date",
       ];
     
-      const ViolationsData = list_violation.map(Violations => [
-        Violations.id_violation,
-        `${Violations.conducteur_nom} ${Violations.conducteur_prenom}`, 
-        Violations.type_violation,
-        Violations.description,
-        toTimestamp(Violations.date_violation),
-  
-      ]);
+
 
   const downloadViolationsExcel = () => {
-    generateExcelFile("Violations", ViolationsHeaders, ViolationsData);
-  };
-
-  const downloadViolationsPDF = () => {
-    generatePDFFile("Violations", ViolationsHeaders, ViolationsData);
-  };
-
-
+    const selectedData = list_violation.filter((Violations) =>
+      selectedViolations.includes(Violations.id_violation)
+    ).map((Violations) => [
+      Violations.id_violation,
+      `${Violations.conducteur_nom} ${Violations.conducteur_prenom}`,
+      Violations.type_violation,
+      Violations.description,
+      formatDateToTimestamp(Violations.date_violation),
+    ]);
   
-  const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadViolationsExcel, downloadViolationsPDF);
+    generateExcelFile("Violations", ViolationsHeaders, selectedData);
   };
+  
+  const downloadViolationsPDF = () => {
+    const selectedData = list_violation.filter((Violations) =>
+      selectedViolations.includes(Violations.id_violation)
+    ).map((Violations) => [
+      Violations.id_violation,
+      `${Violations.conducteur_nom} ${Violations.conducteur_prenom}`,
+      Violations.type_violation,
+      Violations.description,
+      formatDateToTimestamp(Violations.date_violation),
+    ]);
+  
+    generatePDFFile("Violations", ViolationsHeaders, selectedData);
+  };
+  const onDownloadConfirm = (format: string) => {
+    if (selectedViolations.length > 0) {
+      handleDownloadConfirm(format, downloadViolationsExcel, downloadViolationsPDF);
+    } else {
+      toast.warn("Veuillez sélectionner au moins une Violation", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+  const handleSelectViolation = (id: number) => {
+    setSelectedViolations((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((violationId) => violationId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      const allWarningIds = list_violation.map((violation) => violation.id_violation);
+      setSelectedViolations(allWarningIds);
+    } else {
+      setSelectedViolations([]);
+    }
+  };
+
 
   return (
     <>
@@ -388,7 +429,11 @@ export function Violations() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
+                  <input className="form-check-input" 
+                  type="checkbox"
+                  checked={selectAll} 
+                  onChange={handleSelectAll}
+                  />
                 </div>
               </th>
               {selectedColumns.ID && (
@@ -453,12 +498,17 @@ export function Violations() {
               <tr key={idx}>
                 <td>
                   <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" />
+                    <input className="form-check-input"
+                     type="checkbox" 
+                     checked={selectedViolations.includes(violation.id_violation)}
+                     onChange={() => handleSelectViolation(violation.id_violation)}
+
+                     />
                   </div>
                 </td>
                 {selectedColumns.ID && <td>{violation.id_violation}</td>}
                 {selectedColumns.date && (
-                  <td>{new Date(violation.date_violation).toLocaleDateString()}</td>
+                  <td>{formatDateToTimestamp(violation.date_violation)}</td>
                 )}
                 {selectedColumns.driver && (
                   <td>{violation.conducteur_nom} {violation.conducteur_prenom}</td>
@@ -469,12 +519,7 @@ export function Violations() {
                 {selectedColumns.description && <td>{violation.description}</td>}
                 <td>
                   <div className="d-flex align-items-center list-action">
-                    {/* <a className="badge badge-success mr-2" title="Détail">
-                      <i
-                        className="fa fa-eye"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a> */}
+                   
                     <a
                       className="badge bg-primary mr-2"
                       title="Edit"

@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../components/LanguageProvider";
+import { formatDateToTimestamp } from "../utilities/functions";
 
 interface ModalNewViolationProps {
   show: boolean;
@@ -20,7 +21,7 @@ type Vehicle = {
   immatriculation_vehicule: string;
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID =1;
+const geopuserID = 1;
 
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
@@ -35,18 +36,19 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     cost: 0,
     description: "",
     customType: "", // Champ pour gérer le type personnalisé
-
   });
 
   const { translate } = useTranslate();
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const [drivers, setdrivers] = useState<Driver[]>([]);
-  
+
   useEffect(() => {
     if (show) {
       fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
@@ -65,7 +67,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         })
         .catch((error) => console.error("Error fetching vehicles:", error));
     }
-  }, [show])
+  }, [show]);
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
@@ -121,20 +123,25 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+     const dateformat = formatDateToTimestamp(formData.date);
+    const body = {
+      id_driver: formData.conducteur,
+      type_violation: formData.type,
+      vehicule: formData.vehicule,
+      date_violation: dateformat,
+      cost: formData.cost,
+      description: formData.description,
+    };
+
+    // Log the request body to the console
+    console.log("Request Body:", body);
 
     fetch(`${backendUrl}/api/geop/add_violation/${geopuserID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        id_driver: formData.conducteur,
-        type_violation: formData.type,
-        vehicule: formData.vehicule,
-        date_violation: formData.date,
-        cost: formData.cost,
-        description: formData.description,
-      }),
+      body: JSON.stringify(body),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -155,14 +162,18 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         <Modal.Title>{translate("Add Violation")}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
-        <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
+        <Modal.Body
+          style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
+        >
           <Form.Group controlId="type">
             <Form.Label>{translate("Violation type")}</Form.Label>
             <Select
               options={violationOptions}
               onChange={handleViolationTypeChange}
               name="type"
-              value={violationOptions.find((option) => option.value === formData.type)}
+              value={violationOptions.find(
+                (option) => option.value === formData.type
+              )}
               isClearable
             />
           </Form.Group>
@@ -200,19 +211,19 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               )}
               onChange={handleVehiculeSelectChange}
               isClearable
-
             />
           </Form.Group>
           <Form.Group controlId="date">
             <Form.Label>{translate("Date Violation")}</Form.Label>
             <Form.Control
-              type="date"
+              type="datetime-local"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
-              placeholder="Enter Date here"
+              placeholder="Enter Date and Time here"
             />
           </Form.Group>
+
           <Form.Group controlId="cost">
             <Form.Label>Cost</Form.Label>
             <Form.Control
@@ -237,7 +248,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-               {translate("Close")}
+            {translate("Close")}
           </Button>
           <Button variant="primary" type="submit">
             {translate("Add")}
