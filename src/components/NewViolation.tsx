@@ -4,6 +4,7 @@ import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
+import { Bounce, toast } from "react-toastify";
 
 interface ModalNewViolationProps {
   show: boolean;
@@ -121,37 +122,90 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       customType: value === "other" ? formData.customType : "", // Réinitialiser customType si "autre" n'est pas sélectionné
     });
   };
+
+  const initialFormData = {
+    conducteur: 0,
+        type: "",
+        vehicule: "",
+        date: "",
+        cost: 0,
+        description: "",
+        customType: "",
+};
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-     const dateformat = formatDateToTimestamp(formData.date);
+    const dateformat = formatDateToTimestamp(formData.date);
     const body = {
-      id_driver: formData.conducteur,
-      type_violation: formData.type,
-      vehicule: formData.vehicule,
-      date_violation: dateformat,
-      cost: formData.cost,
-      description: formData.description,
+        id_driver: formData.conducteur,
+        type_violation: formData.type,
+        vehicule: formData.vehicule,
+        date_violation: dateformat,
+        cost: formData.cost,
+        description: formData.description,
     };
 
-    // Log the request body to the console
-    console.log("Request Body:", body);
-
     fetch(`${backendUrl}/api/geop/add_violation/${geopuserID}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Violation added successfully:", data);
-        if (refreshviolation) refreshviolation();
-        handleClose();
-      })
-      .catch((error) => console.error("Error adding violation:", error));
-  };
+        .then((response) => {
+            if (!response.ok) {
+                // Si la réponse HTTP n'est pas ok, on déclenche une erreur
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.message === 'violation ajouté avec succès') {
+                toast.success("Violation added successfully!", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
+                setFormData(initialFormData);
+                if (refreshviolation) refreshviolation();
+                handleClose();
+            } else {
+                // Si la réponse ne contient pas le message de succès attendu
+                toast.error("Failed to add violation. Please try again.", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        })
+        .catch((error) => {
+            toast.error("Error adding violation: " + error.message, {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
+            console.error("Error adding violation:", error);
+        });
+};
 
+  
   const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, customType: e.target.value });
   };

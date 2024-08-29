@@ -42,7 +42,7 @@ export function Violations() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [violationToDelete, setViolationToDelete] = useState<number | null>(null);
   const [ViolationToEdit, setViolationToEdit] = useState<number | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false); 
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedViolations, setSelectedViolations] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -253,15 +253,15 @@ export function Violations() {
     }
   };
 
-      //**** Partie Excel ****
-      const ViolationsHeaders = [
-        "ID Warning",
-        "Driver",
-        "Type Warning",
-        "Description",
-        "Date",
-      ];
-    
+  //**** Partie Excel ****
+  const ViolationsHeaders = [
+    "ID Warning",
+    "Driver",
+    "Type Warning",
+    "Description",
+    "Date",
+  ];
+
 
 
   const downloadViolationsExcel = () => {
@@ -274,10 +274,10 @@ export function Violations() {
       Violations.description,
       formatDateToTimestamp(Violations.date_violation),
     ]);
-  
+
     generateExcelFile("Violations", ViolationsHeaders, selectedData);
   };
-  
+
   const downloadViolationsPDF = () => {
     const selectedData = list_violation.filter((Violations) =>
       selectedViolations.includes(Violations.id_violation)
@@ -288,7 +288,7 @@ export function Violations() {
       Violations.description,
       formatDateToTimestamp(Violations.date_violation),
     ]);
-  
+
     generatePDFFile("Violations", ViolationsHeaders, selectedData);
   };
   const onDownloadConfirm = (format: string) => {
@@ -429,10 +429,10 @@ export function Violations() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" 
-                  type="checkbox"
-                  checked={selectAll} 
-                  onChange={handleSelectAll}
+                  <input className="form-check-input"
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
                   />
                 </div>
               </th>
@@ -493,68 +493,72 @@ export function Violations() {
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody className="ligth-body">
-            {list_violation.map((violation, idx) => (
-              <tr key={idx}>
-                <td>
-                  <div className="form-check form-check-inline">
-                    <input className="form-check-input"
-                     type="checkbox" 
-                     checked={selectedViolations.includes(violation.id_violation)}
-                     onChange={() => handleSelectViolation(violation.id_violation)}
-
-                     />
-                  </div>
-                </td>
-                {selectedColumns.ID && <td>{violation.id_violation}</td>}
-                {selectedColumns.date && (
-                  <td>{formatDateToTimestamp(violation.date_violation)}</td>
-                )}
-                {selectedColumns.driver && (
-                  <td>{violation.conducteur_nom} {violation.conducteur_prenom}</td>
-                )}
-                {selectedColumns.vehicule && <td>{violation.vehicule}</td>}
-                {selectedColumns.type && <td>{violation.type_violation}</td>}
-                {selectedColumns.cost && <td>{violation.cost}</td>}
-                {selectedColumns.description && <td>{violation.description}</td>}
-                <td>
-                  <div className="d-flex align-items-center list-action">
-                   
-                    <a
-                      className="badge bg-primary mr-2"
-                      title="Edit"
-                    >
-                      <i
-                        className="las la-edit"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                        onClick={() => handleEditViolation(violation.id_violation)}
-
-                      ></i>
-                    </a>
-                    <a
-                      className="badge bg-warning mr-2"
-                      title="Delete"
-                      style={{ cursor: "pointer" }}
-
-                    >
-                      <i
-                        className="ri-delete-bin-line mr-0"
-                        style={{ fontSize: "1.2em" }}
-                        onClick={() => handleShowDeleteModal(violation.id_violation)}
-                      ></i>
-                    </a>
-                  </div>
+          <tbody className="light-body">
+            {loading ? (
+              <tr style={{ textAlign: "center" }}>
+                <td className="text-center" colSpan={10}>
+                  <p>
+                    <PropagateLoader
+                      color={"#123abc"}
+                      loading={loading}
+                      size={20}
+                    />
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              list_violation.map((violation, idx) => (
+                <tr key={idx}>
+                  <td>
+                    <div className="form-check form-check-inline">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={selectedViolations.includes(violation.id_violation)}
+                        onChange={() => handleSelectViolation(violation.id_violation)}
+                      />
+                    </div>
+                  </td>
+                  {selectedColumns.ID && <td>{violation.id_violation}</td>}
+                  {selectedColumns.date && (
+                    <td>{formatDateToTimestamp(violation.date_violation)}</td>
+                  )}
+                  {selectedColumns.driver && (
+                    <td>
+                      {violation.conducteur_nom} {violation.conducteur_prenom}
+                    </td>
+                  )}
+                  {selectedColumns.vehicule && <td>{violation.vehicule}</td>}
+                  {selectedColumns.type && <td>{violation.type_violation}</td>}
+                  {selectedColumns.cost && <td>{violation.cost}</td>}
+                  {selectedColumns.description && <td>{violation.description}</td>}
+                  <td>
+                    <div className="d-flex align-items-center list-action">
+                      <a
+                        className="badge bg-primary mr-2"
+                        title="Edit"
+                        onClick={() => handleEditViolation(violation.id_violation)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
+                      </a>
+                      <a
+                        className="badge bg-warning mr-2"
+                        title="Delete"
+                        onClick={() => handleShowDeleteModal(violation.id_violation)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </Table>
-
       </div>
       <div className="row justify-content-between">
-        <div className="col-md-4 d-flex align-items-center">
-          {loading && <PropagateLoader color="#000" size={15} />}
-        </div>
         <div className="col-md-8">
           <ReactPaginate
             previousLabel={"<"}
@@ -601,8 +605,8 @@ export function Violations() {
           </Button>
         </Modal.Footer>
       </Modal>
-        {/* Le moodal est dans functions */}
-        <DownloadModal
+      {/* Le moodal est dans functions */}
+      <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
         onDownloadConfirm={onDownloadConfirm}

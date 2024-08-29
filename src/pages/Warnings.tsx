@@ -266,10 +266,10 @@ export function Warnings() {
       warning.Description,
       toTimestamp(warning.Date),
     ]);
-  
+
     generateExcelFile("Warnings", WarningsHeaders, selectedData);
   };
-  
+
 
   const downloadWarningsPDF = () => {
     const selectedData = list_Warnings.filter((warning) =>
@@ -281,7 +281,7 @@ export function Warnings() {
       warning.Description,
       toTimestamp(warning.Date),
     ]);
-  
+
     generatePDFFile("Warnings", WarningsHeaders, selectedData);
   };
 
@@ -297,7 +297,7 @@ export function Warnings() {
       });
     }
   };
-  
+
   const handleSelectWarning = (id: number) => {
     setSelectedWarnings((prev) => {
       if (prev.includes(id)) {
@@ -428,10 +428,10 @@ export function Warnings() {
                   <input
                     className="form-check-input"
                     type="checkbox"
-                    checked={selectAll} 
+                    checked={selectAll}
                     onChange={handleSelectAll}
 
-                    />
+                  />
                 </div>
               </th>
               {selectedColumns.id_warning && (
@@ -479,66 +479,78 @@ export function Warnings() {
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody className="ligth-body" >
-            {list_Warnings.map((warning, idx) => (
-              <tr key={idx}>
-                <td>
-                  <div className="form-check form-check-inline">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      checked={selectedWarnings.includes(warning.id_warning)}
-                      onChange={() => handleSelectWarning(warning.id_warning)}
-
+          <tbody className="light-body">
+            {loading ? (
+              <tr style={{ textAlign: "center" }}>
+                <td className="text-center" colSpan={10}>
+                  <p>
+                    <PropagateLoader
+                      color={"#123abc"}
+                      loading={loading}
+                      size={20}
                     />
-                  </div>
-                </td>
-                {selectedColumns.id_warning && <td>{warning.id_warning}</td>}
-                {selectedColumns.driver && (
-                  <td>
-                    {warning.conducteur_nom} {warning.conducteur_prenom}
-                  </td>
-                )}
-                {selectedColumns.type && <td>{warning.Type_Warning}</td>}
-                {selectedColumns.description && <td>{warning.Description}</td>}
-                {selectedColumns.date && (
-                  <td>{new Date(warning.Date).toLocaleDateString()}</td>
-                )}
-                <td>
-                  <div className="d-flex align-items-center list-action">
-                    <a
-                      className="badge bg-primary mr-2"
-                      title="Edit"
-                      onClick={() => handleEditWarning(warning.id_warning)}
-                    >
-                      <i
-                        className="las la-edit"
-                        style={{ fontSize: "1.2em", cursor: "pointer" }}
-                      ></i>
-                    </a>
-
-                    <a
-                      className="badge bg-warning mr-2"
-                      title="Delete"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleShowDeleteModal(warning.id_warning)}
-                    >
-                      <i
-                        className="ri-delete-bin-line mr-0"
-                        style={{ fontSize: "1.2em" }}
-                      ></i>
-                    </a>
-                  </div>
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              list_Warnings.map((warning, idx) => (
+                <tr key={idx}>
+                  <td>
+                    <div className="form-check form-check-inline">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={selectedWarnings.includes(warning.id_warning)}
+                        onChange={() => handleSelectWarning(warning.id_warning)}
+                      />
+                    </div>
+                  </td>
+                  {selectedColumns.id_warning && <td>{warning.id_warning}</td>}
+                  {selectedColumns.driver && (
+                    <td>
+                      {warning.conducteur_nom} {warning.conducteur_prenom}
+                    </td>
+                  )}
+                  {selectedColumns.type && <td>{warning.Type_Warning}</td>}
+                  {selectedColumns.description && <td>{warning.Description}</td>}
+                  {selectedColumns.date && (
+                    <td>{new Date(warning.Date).toLocaleDateString()}</td>
+                  )}
+                  <td>
+                    <div className="d-flex align-items-center list-action">
+                      <a
+                        className="badge bg-primary mr-2"
+                        title="Edit"
+                        onClick={() => handleEditWarning(warning.id_warning)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <i
+                          className="las la-edit"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
+                      <a
+                        className="badge bg-warning mr-2"
+                        title="Delete"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleShowDeleteModal(warning.id_warning)}
+                      >
+                        <i
+                          className="ri-delete-bin-line mr-0"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
+
         </Table>
       </div>
       <div className="row justify-content-between">
-        <div className="col-md-4 d-flex align-items-center">
-          {loading && <PropagateLoader color="#000" size={15} />}
-        </div>
+   
         <div className="col-md-8">
           <ReactPaginate
             previousLabel={"<"}

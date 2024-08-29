@@ -37,11 +37,6 @@ const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
   useEffect(() => {
     if (show && warningId) {
         
-        const formatDateTime = (dateString: string) => {
-            const date = new Date(dateString);
-            return dateString ? date.toISOString().slice(0, 16) : '';
-          };
-    
           const formatDate = (dateString: string) => {
             const date = new Date(dateString);
             return dateString ? date.toISOString().split('T')[0] : '';

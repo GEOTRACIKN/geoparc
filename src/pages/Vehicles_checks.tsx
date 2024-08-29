@@ -5,6 +5,7 @@ import { useTranslate } from "../components/LanguageProvider";
 import { useState, useEffect } from "react";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
+import { PropagateLoader } from "react-spinners";
 
 
 
@@ -58,10 +59,13 @@ export function Vehicleschecks() {
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  const [loading, setLoading] = useState(true);
+
 
   // getVehicleschecks api 
   const getVehicleschecks = async (currentPage: number, limit: number) => {
     try {
+      setLoading(true);
       const total_pages = await fetch(`${backendUrl}/api/geop/vehiclecheck/totalpage/${userID}?searchTerm=${searchTerm}&searchType=${type}`,
         { mode: "cors" });
       const totalpages = await total_pages.json();
@@ -77,9 +81,14 @@ export function Vehicleschecks() {
     } catch (error) {
       console.error("Erreur lors du chargement des Vehicles Vérifié :", error);
     }
+    finally {
+      setLoading(false);
+    }
   };
   // fetchVehicleschecks api 
   const fetchVehicleschecks = async (currentPage: number, limit: number) => {
+    setLoading(true);
+
     const res = await fetch(`${backendUrl}/api/geop/vehiclecheck/${userID}/${currentPage}/${limit}?searchTerm=${searchTerm}&searchType=${type}`,
       { mode: "cors" });
     const data = await res.json();
@@ -166,14 +175,10 @@ export function Vehicleschecks() {
       if (!response.ok) {
         throw new Error(`Erreur lors de la suppression logique. Statut : ${response.status}`);
       }
-
-      const result = await response.json();
-
       // Fermez le modal après la suppression
       setShowDeleteModal(false);
 
       if (response.ok) {
-
         toast.success("Vehcile check Deleted successfully !", {
           position: "bottom-right",
           autoClose: 2400,
@@ -231,18 +236,6 @@ export function Vehicleschecks() {
     "Maintenance"
   ];
 
-  const vehicleData = list_Vehicleschecks.map(vehicleCheck => [
-    vehicleCheck.id_verif,
-    toTimestamp(vehicleCheck.creation_date),
-    vehicleCheck.checker,
-    vehicleCheck.driver_out,
-    vehicleCheck.driver_in,
-    vehicleCheck.tractor_number,
-    vehicleCheck.trailer_number,
-    convertValue(vehicleCheck.maintenance)
-  ]);
-
- 
   const downloadVehicleExcel = () => {
     const selectedData = list_Vehicleschecks.filter((vehicleCheck) =>
       selectedvehiclecheck.includes(vehicleCheck.id_verif)
@@ -257,7 +250,7 @@ export function Vehicleschecks() {
       convertValue(vehicleCheck.maintenance)
 
     ]);
-  
+
     generateExcelFile("Vehicle_Checks", vehicleHeaders, selectedData);
   };
 
@@ -275,7 +268,7 @@ export function Vehicleschecks() {
       convertValue(vehicleCheck.maintenance)
 
     ]);
-  
+
     generatePDFFile("Vehicle_Checks", vehicleHeaders, selectedData);
   };
 
@@ -477,10 +470,10 @@ export function Vehicleschecks() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" 
-                  type="checkbox"
-                  checked={selectAll} 
-                  onChange={handleSelectAll}
+                  <input className="form-check-input"
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
 
                   />
                   <label className="form-check-label"></label>
@@ -497,56 +490,78 @@ export function Vehicleschecks() {
               <th>{translate("Actions")}</th>
             </tr>
           </thead>
-          <tbody key="#" className="ligth-body">
-            {Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 && list_Vehicleschecks.map((data) => (
-              <tr className={""} key={data.id_verif}>
-                <td>
-                  <div className="form-check form-check-inline">
-                    <input type="checkbox" className="form-check-input"
-                   checked={selectedvehiclecheck.includes(data.id_verif)}
-                   onChange={() => handleSelectvehicleCheck(data.id_verif)}
-
+          <tbody className="light-body">
+            {loading ? (
+              <tr style={{ textAlign: "center" }}>
+                <td className="text-center"  colSpan={10}>
+                <p>
+                    <PropagateLoader
+                      color={"#123abc"}
+                      loading={loading}
+                      size={20}
                     />
-                  </div>
-                </td>
-                {selectedColumns.id_verif && <td>{data.id_verif}</td>}
-                {selectedColumns.creation_date && <td>{toTimestamp(data.creation_date).split(' ')[0]}</td>}
-                {selectedColumns.Checker && <td>{data.checker}</td>}
-                {selectedColumns.Driver_out && <td>{data.driver_out}</td>}
-                {selectedColumns.Driver_in && <td>{data.driver_in}</td>}
-                {selectedColumns.tractor_number && <td>{data.tractor_number}</td>}
-                {selectedColumns.trailer_number && <td>{data.trailer_number}</td>}
-                {selectedColumns.maintenance && (
-                  <td style={{ color: 'orange' }}>
-                    {convertValue(data.maintenance)}
-                  </td>
-                )}
-
-                <td>
-                  <div className="d-flex align-items-center list-action">
-                    <Link
-                      to={`/Detail_vehicle_check/${data.id_verif}`}
-                      className="badge badge-success mr-2"
-                      data-toggle="tooltip"
-                      data-placement="top"
-                      title="Détail"
-                    >
-                      <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
-                    </Link>
-                    <a
-                      className="badge bg-warning mr-2"
-                      data-toggle="tooltip"
-                      data-placement="top"
-                      title="Delete"
-                      onClick={() => handleDeleteClick(data.id_verif)}
-                    >
-                      <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
-                    </a>
-                  </div>
+                  </p>
                 </td>
               </tr>
-            ))}
+            ) : Array.isArray(list_Vehicleschecks) && list_Vehicleschecks.length !== 0 ? (
+              list_Vehicleschecks.map((data) => (
+                <tr className="" key={data.id_verif}>
+                  <td>
+                    <div className="form-check form-check-inline">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedvehiclecheck.includes(data.id_verif)}
+                        onChange={() => handleSelectvehicleCheck(data.id_verif)}
+                      />
+                    </div>
+                  </td>
+                  {selectedColumns.id_verif && <td>{data.id_verif}</td>}
+                  {selectedColumns.creation_date && <td>{toTimestamp(data.creation_date).split(' ')[0]}</td>}
+                  {selectedColumns.Checker && <td>{data.checker}</td>}
+                  {selectedColumns.Driver_out && <td>{data.driver_out}</td>}
+                  {selectedColumns.Driver_in && <td>{data.driver_in}</td>}
+                  {selectedColumns.tractor_number && <td>{data.tractor_number}</td>}
+                  {selectedColumns.trailer_number && <td>{data.trailer_number}</td>}
+                  {selectedColumns.maintenance && (
+                    <td style={{ color: 'orange' }}>
+                      {convertValue(data.maintenance)}
+                    </td>
+                  )}
+                  <td>
+                    <div className="d-flex align-items-center list-action">
+                      <Link
+                        to={`/Detail_vehicle_check/${data.id_verif}`}
+                        className="badge badge-success mr-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Détail"
+                      >
+                        <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                      </Link>
+                      <a
+                        className="badge bg-warning mr-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Delete"
+                        onClick={() => handleDeleteClick(data.id_verif)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr style={{ textAlign: "center" }}>
+                <td colSpan={selectedColumns.length || 10}>
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
+
         </Table>
       </div>
       <div className="row">
