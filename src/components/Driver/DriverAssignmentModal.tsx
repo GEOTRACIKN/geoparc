@@ -125,6 +125,7 @@ const DriverAssignmentModal: React.FC<DriverAssignmentModalProps> = ({
         theme: "light",
         transition: Bounce,
       });
+      
       updateDriverList(); 
      
 
