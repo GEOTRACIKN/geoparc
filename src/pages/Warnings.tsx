@@ -549,12 +549,14 @@ export function Warnings() {
 
         </Table>
       </div>
-      <div className="row justify-content-between">
-   
-        <div className="col-md-8">
+      <div className="row">
+        <div className="col-md-6 d-flex align-items-center">
+          <span>Affichage 1 à {limit} sur {total} </span>
+        </div>
+        <div className="col-md-6">
           <ReactPaginate
-            previousLabel={"<"}
-            nextLabel={">"}
+            previousLabel={"previous"}
+            nextLabel={"next"}
             breakLabel={"..."}
             pageCount={pageCount}
             marginPagesDisplayed={2}

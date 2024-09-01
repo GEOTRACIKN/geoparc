@@ -3,72 +3,55 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
+import ModalNewIntervention from "../components/NewIntervention"
 
 
+interface Intervention {
+    id_intervention: number;
+    date_intervention: string;
+    client: string;
+    vehicule: string;
+    odometre: string;
+    priotité: string;
+    etat: string;
+    date_modifie: string;
 
+
+}
 
 export function Reception() {
-    const { translate } = useTranslate();
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchType, setSearchType] = useState('Id');
+    const { translate } = useTranslate();
+    const [list_intervention, setintervention] = useState<Intervention[]>([]);
+    const id_user = localStorage.getItem("GeopUserID");
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [limit, setLimit] = useState(10);
+
+
+
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const data = [
-        {
-            id: 1,
-            date: "2023-08-01",
-            client: "Client A",
-            vehicle: "Toyota Prius 12345",
-            odometer: "5021 Km",
-            priority: "Urgent",
-            status: "En cours",
-            lastUpdate: "2023-08-05",
-        },
-        {
-            id: 2,
-            date: "2023-07-25",
-            client: "Client B",
-            vehicle: "Ford Fiesta 67890",
-            odometer: "11020 Km",
-            priority: "Normal",
-            status: "Cloturée",
-            lastUpdate: "2023-07-29",
-        },
-        {
-            id: 3,
-            date: "2023-07-15",
-            client: "Client C",
-            vehicle: "Honda Civic 11121",
-            odometer: "7560 Km",
-            priority: "Urgent",
-            status: "En attente",
-            lastUpdate: "2023-07-17",
-        },
-        // Add more objects here to have 10 rows
-    ];
 
-    // Function to handle search
-    const searchOptions = ['Id', 'Client', 'Véhicule'];
-    const handleSearch = (term: string, type: string) => {
+    const getIntervention = async () => {
+        try {
+            const response = await fetch(
+                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}`
+            );
+            const data = await response.json();
+            setintervention(data);
+        } catch (error) {
+            console.error(error);
+        }
     };
-
-    const clearSearchTerm = () => {
-        setSearchTerm('');
-
-    };
-
 
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>
-
-                        {translate("Intervention Requests")}
-                    </h4>
+                    <h4>{translate("Intervention Requests")}</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
@@ -77,106 +60,54 @@ export function Reception() {
                         {translate("New Request")}
                     </Button>
                 </div>
-
-                {/* Modal pour Nouvelle Demande */}
-                <Modal show={show} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>{translate("New Request")}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            <Form.Group controlId="formDate">
-                                <Form.Label>{translate("Request Date")}</Form.Label>
-                                <Form.Control type="date" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formPriority">
-                                <Form.Label></Form.Label>
-                                <Form.Control as="select">
-                                    <option>{translate("Priority")}</option>
-                                    <option>{translate("Normal")}</option>
-                                    <option>{translate("Urgent")}</option>
-                                </Form.Control>
-                            </Form.Group>
-
-                            <Form.Group controlId="formVehicle">
-                                <Form.Label>{translate("Vehicle")}</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le véhicule" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formMileage">
-                                <Form.Label>{translate("Km")}</Form.Label>
-                                <Form.Control type="number" placeholder="Entrez le kilométrage" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formSubject">
-                                <Form.Label>{translate("Subject")}</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez l'objet de la demande" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formClient">
-                                <Form.Label>{translate("Client")}</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du client" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formClientPhone">
-                                <Form.Label>{translate("Client Phone")}</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le numéro de téléphone du client" />
-                            </Form.Group>
-
-                            <Form.Group controlId="formReceptionistName">
-                                <Form.Label>{translate("Receptionist's Name")}</Form.Label>
-                                <Form.Control type="text" placeholder="Entrez le nom du réceptionniste" />
-                            </Form.Group>
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>
-                            {translate("Cancel")}
-                        </Button>
-                        <Button variant="primary" onClick={handleClose}>
-                            {translate("Save Request")}
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-
             </div>
             <div className="row">
-                <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
-                </div>
+                <div
+                    className="col-md-4"
+                    style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+                ></div>
                 <div className="col-md-8 d-flex justify-content-end align-items-center">
                     {/* Dropdown Pour le Show du tableau */}
                     <Dropdown>
-                        <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
+                        <Dropdown.Toggle
+                            variant=""
+                            id="dropdown-basic"
+                            title="Résultats d'affichage"
+                        >
                             <i className="fas fa-list-alt"></i>
                         </Dropdown.Toggle>
-                        <Dropdown.Menu>
-
-                        </Dropdown.Menu>
-
+                        <Dropdown.Menu></Dropdown.Menu>
                     </Dropdown>
                     {/* Dropdown Pour le filtrage du tableau */}
                     <Dropdown>
-                        <Dropdown.Toggle variant="" id="dropdown-basic" title="Colonnes dʼaffichage">
+                        <Dropdown.Toggle
+                            variant=""
+                            id="dropdown-basic"
+                            title="Colonnes dʼaffichage"
+                        >
                             <i className="fas fa-eye"></i>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
-
-                            </Dropdown.Item>
-
+                            <Dropdown.Item
+                                as="button"
+                                style={{ display: "flex", alignItems: "center" }}
+                            ></Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
             </div>
             <div className="row m-1">
-                <Table>
+                <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
                         <tr className="ligth ligth-data">
                             <th>
                                 <div className="form-check form-check-inline">
-                                    <input className="form-check-input" type="checkbox" />
-                                    <label className="form-check-label"></label>
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                    //checked={selectAll}
+                                    // onChange={handleSelectAll}
+                                    />
                                 </div>
                             </th>
                             <th>Id</th>
@@ -190,22 +121,31 @@ export function Reception() {
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {data.map((item, index) => (
+                    <tbody className="light-body">
+                        {list_intervention.map((Intervention, index) => (
                             <tr key={index}>
                                 <td>
                                     <div className="form-check form-check-inline">
-                                        <input type="checkbox" className="form-check-input" />
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                        // checked={selectedViolations.includes(
+                                        //     violation.id_violation
+                                        // )}
+                                        // onChange={() =>
+                                        //     handleSelectViolation(violation.id_violation)
+                                        // }
+                                        />
                                     </div>
                                 </td>
-                                <td>{item.id}</td>
-                                <td>{item.date}</td>
-                                <td>{item.client}</td>
-                                <td>{item.vehicle}</td>
-                                <td>{item.odometer}</td>
-                                <td>{item.priority}</td>
-                                <td>{item.status}</td>
-                                <td>{item.lastUpdate}</td>
+                                <td>{Intervention.id_intervention}</td>
+                                <td>{Intervention.date_intervention}</td>
+                                <td>{Intervention.client}</td>
+                                <td>{Intervention.vehicule}</td>
+                                <td>{Intervention.odometre}</td>
+                                <td>{Intervention.priotité}</td>
+                                <td>{Intervention.etat}</td>
+                                <td>{Intervention.date_modifie}</td>
                                 <td>
                                     <div className="d-flex align-items-center list-action">
                                         <Link
@@ -215,7 +155,10 @@ export function Reception() {
                                             data-placement="top"
                                             title="Détail"
                                         >
-                                            <i className="fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                            <i
+                                                className="fa fa-eye"
+                                                style={{ fontSize: "1.2em" }}
+                                            ></i>
                                         </Link>
                                         <a
                                             className="badge bg-warning mr-2"
@@ -223,7 +166,10 @@ export function Reception() {
                                             data-placement="top"
                                             title="Delete"
                                         >
-                                            <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                            <i
+                                                className="ri-delete-bin-line mr-0"
+                                                style={{ fontSize: "1.2em" }}
+                                            ></i>
                                         </a>
                                     </div>
                                 </td>
@@ -234,7 +180,9 @@ export function Reception() {
             </div>
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>Affichage 1 à {1} sur {1} </span>
+                    <span>
+                        Affichage 1 à {1} sur {1}{" "}
+                    </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -258,9 +206,13 @@ export function Reception() {
                     />
                 </div>
             </div>
+            <ModalNewIntervention
+                show={show}
+                handleClose={handleClose}
+                refreshintervention={() => { getIntervention() }}
+            />
+
 
         </>
     );
-
 }
-
