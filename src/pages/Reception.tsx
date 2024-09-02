@@ -12,7 +12,7 @@ interface Intervention {
     client: string;
     vehicule: string;
     odometre: string;
-    priotité: string;
+    Priority: string;
     etat: string;
     date_modifie: string;
 
@@ -27,8 +27,50 @@ export function Reception() {
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
+    const [type, setType] = useState(0);
+    const [typeSearch, setTypeSearch] = useState("ID Intervention");
+    const [search, setSearch] = useState("");
+    const [column, setSortColumn] = useState("id_intervention");
+    const [sort, setSort] = useState("ASC");
+    const [total, setTotal] = useState(0);
 
 
+
+
+    const initialColumns = {
+        id_intervention: true,
+        date_intervention: true,
+        client: true,
+        vehicule: true,
+        odometre: true,
+        Priority: true,
+        etat: true,
+        date_modifie: true,
+    };
+
+    // Load selected columns from localStorage or use initial state
+    const loadSelectedColumns = () => {
+        const savedColumns = localStorage.getItem("selectedColumns");
+        return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+    };
+
+    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+
+    const handleColumnChange = (column: string) => {
+        const updatedColumns = {
+            ...selectedColumns,
+            [column]: !selectedColumns[column],
+        };
+        setSelectedColumns(updatedColumns);
+        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
+    };
+
+    const handleSortingColumn = (currentColumn: string) => {
+        const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
+        setSortColumn(currentColumn);
+        setSort(newSortOrder);
+        getIntervention();
+    };
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -47,6 +89,49 @@ export function Reception() {
         }
     };
 
+    const handleTypeSearch = (event: any) => {
+        const selectedValue = event.target.textContent;
+
+        switch (selectedValue) {
+            case translate("ID Violation"):
+                setType(0);
+                break;
+            case translate("Driver"):
+                setType(1);
+                break;
+            case translate("Vehicule"):
+                setType(2);
+                break;
+            case translate("Type Violation"):
+                setType(3);
+                break;
+            case translate("Description"):
+                setType(4);
+                break;
+            case translate("Date"):
+                setType(5);
+                break;
+            default:
+                console.log("Unknown selection");
+                break;
+        }
+        setTypeSearch(selectedValue);
+
+    }
+
+    const handleAdvancedSearch = (event: any) => {
+        setSearch(event.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleSelectChange = (event: any) => {
+        const newValue = event.target.value;
+        setLimit(parseInt(newValue));
+        setCurrentPage(1);
+    };
+
+
+
     return (
         <>
             <div className="row">
@@ -56,46 +141,86 @@ export function Reception() {
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-
                         {translate("New Request")}
                     </Button>
                 </div>
             </div>
-            <div className="row">
-                <div
-                    className="col-md-4"
-                    style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
-                ></div>
-                <div className="col-md-8 d-flex justify-content-end align-items-center">
-                    {/* Dropdown Pour le Show du tableau */}
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            variant=""
-                            id="dropdown-basic"
-                            title="Résultats d'affichage"
-                        >
-                            <i className="fas fa-list-alt"></i>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu></Dropdown.Menu>
-                    </Dropdown>
-                    {/* Dropdown Pour le filtrage du tableau */}
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            variant=""
-                            id="dropdown-basic"
-                            title="Colonnes dʼaffichage"
-                        >
-                            <i className="fas fa-eye"></i>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            <Dropdown.Item
-                                as="button"
-                                style={{ display: "flex", alignItems: "center" }}
-                            ></Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                <div className="row">
+                    <div
+                        className="col-md-4"
+                        style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+                    >
+                        <div className="input-group">
+                            <Dropdown>
+                                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                                    <i
+                                        className="fas fa-chevron-down"
+                                        style={{ fontSize: "20px" }}
+                                    ></i>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu onClick={handleTypeSearch}>
+                                    <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
+                                    <Dropdown.Item>{translate("Client")}</Dropdown.Item>
+                                    <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
+                                    <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
+                                    <Dropdown.Item>{translate("Status")}</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <input
+                                type="text"
+                                placeholder={` By ${typeSearch}`}
+                                onChange={handleAdvancedSearch}
+                                className="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-8 d-flex justify-content-end align-items-center">
+                        <div className="dataTables_length">
+                            <label style={{ marginBottom: "0" }}>
+                                {translate("Show")}
+                                <select
+                                    className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                                    style={{ width: "66px" }}
+                                    onChange={handleSelectChange}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </label>
+                        </div>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="link"
+                                id="dropdown-basic"
+                                title="Display Columns"
+                            >
+                                <i className="las la-eye"></i>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                {Object.keys(initialColumns).map((col, idx) => (
+                                    <Dropdown.Item
+                                        key={idx}
+                                        as="button"
+                                        style={{ display: "flex", alignItems: "center" }}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            className="form-check-input"
+                                            checked={selectedColumns[col as keyof typeof initialColumns]}
+                                            onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
+                                        />
+                                        <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
                 </div>
-            </div>
+        
             <div className="row m-1">
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
@@ -110,15 +235,53 @@ export function Reception() {
                                     />
                                 </div>
                             </th>
-                            <th>Id</th>
-                            <th>{translate("Date")}</th>
-                            <th>{translate("Client")}</th>
-                            <th>{translate("Vehicle")}</th>
-                            <th>{translate("Odometer")}</th>
-                            <th>{translate("Priority")}</th>
-                            <th>{translate("Status")}</th>
-                            <th>{translate("Last Updated Date")}</th>
-                            <th>{translate("Actions")}</th>
+                            {selectedColumns.id_intervention && (
+                                <th
+                                    className="sorting"
+                                    onClick={() => handleSortingColumn("id_intervention")}
+                                >
+                                    {translate("ID")}
+                                </th>
+                            )}
+                            {selectedColumns.date_intervention && (
+                                <th
+                                    className="sorting"
+                                    onClick={() => handleSortingColumn("date_intervention")}
+                                >
+                                    {translate("Date Intervention")}
+                                </th>
+                            )}
+                            {selectedColumns.client && (
+                                <th className="sorting" onClick={() => handleSortingColumn("client")}>
+                                    {translate("Client")}
+                                </th>
+                            )}
+                            {selectedColumns.vehicule && (
+                                <th className="sorting" onClick={() => handleSortingColumn("vehicule")}>
+                                    {translate("Vehicle")}
+                                </th>
+                            )}
+                            {selectedColumns.odometre && (
+                                <th className="sorting" onClick={() => handleSortingColumn("odometre")}>
+                                    {translate("Odometer")}
+                                </th>
+                            )}
+                            {selectedColumns.Priority && (
+                                <th className="sorting" onClick={() => handleSortingColumn("Priority")}>
+                                    {translate("Priority")}
+                                </th>
+                            )}
+                            {selectedColumns.etat && (
+                                <th className="sorting" onClick={() => handleSortingColumn("etat")}>
+                                    {translate("Status")}
+                                </th>
+                            )}
+                            {selectedColumns.date_modifie && (
+                                <th className="sorting" onClick={() => handleSortingColumn("date_modifie")}>
+                                    {translate("Modified Date")}
+                                </th>
+                            )}
+                            <th>{translate("Action")}</th>
                         </tr>
                     </thead>
                     <tbody className="light-body">
@@ -138,14 +301,15 @@ export function Reception() {
                                         />
                                     </div>
                                 </td>
-                                <td>{Intervention.id_intervention}</td>
-                                <td>{Intervention.date_intervention}</td>
-                                <td>{Intervention.client}</td>
-                                <td>{Intervention.vehicule}</td>
-                                <td>{Intervention.odometre}</td>
-                                <td>{Intervention.priotité}</td>
-                                <td>{Intervention.etat}</td>
-                                <td>{Intervention.date_modifie}</td>
+                                {selectedColumns.id_intervention && <td>{Intervention.id_intervention}</td>}
+                                {selectedColumns.date_intervention && <td>{Intervention.date_intervention}</td>}
+                                {selectedColumns.client && <td>{Intervention.client}</td>}
+                                {selectedColumns.vehicule && <td>{Intervention.vehicule}</td>}
+                                {selectedColumns.odometre && <td>{Intervention.odometre}</td>}
+                                {selectedColumns.Priority && <td>{Intervention.Priority}</td>}
+                                {selectedColumns.etat && <td>{Intervention.etat}</td>}
+                                {selectedColumns.date_modifie && <td>{Intervention.date_modifie}</td>}
+
                                 <td>
                                     <div className="d-flex align-items-center list-action">
                                         <Link
@@ -180,9 +344,7 @@ export function Reception() {
             </div>
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>
-                        Affichage 1 à {1} sur {1}{" "}
-                    </span>
+                    <span>Affichage 1 à {limit} sur {total} </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
