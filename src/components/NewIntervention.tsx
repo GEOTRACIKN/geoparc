@@ -19,12 +19,27 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     refreshintervention,
 }) => {
     const [formData, setFormData] = useState({
+        date: "",
+        priority: "",
+        vehicle: "",
+        mileage: "",
+        subject: "",
+        client: "",
+        clientPhone: "",
+        receptionistName: "",
+        service: "", // Nouveau champ pour le service
 
     });
 
     const { translate } = useTranslate();
 
-
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [id]: value,
+        }));
+    };
 
     return (
         <Modal show={show} onHide={handleClose} responsive>
@@ -91,6 +106,18 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                             type="text"
                             placeholder="Entrez le nom du réceptionniste"
                         />
+                    </Form.Group>
+
+                    <Form.Group controlId="service">
+                        <Form.Label>{translate("Service")}</Form.Label>
+                        <Form.Control as="select" value={formData.service} onChange={handleChange}>
+                            <option>{translate("Select Service")}</option>
+                            <option value="Garage">{translate("Garage")}</option>
+                            <option value="Planification d'entretien">{translate("Planification d'entretien")}</option>
+                            <option value="Entretiens">{translate("Entretiens")}</option>
+                            <option value="Changement De Pneu">{translate("Changement De Pneu")}</option>
+                            <option value="Changement de Pièce">{translate("Changement de Pièce")}</option>
+                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>

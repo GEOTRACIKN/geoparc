@@ -235,7 +235,7 @@ export function Vehiclecheck() {
     };
 
     const goToVehicleChecks = () => {
-        navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
+        navigate("/vehicles-checks"); // Naviguer vers la page Vehicle_checks
     };
 
     const convertValue = (value: any) => {
@@ -285,7 +285,7 @@ export function Vehiclecheck() {
                         theme: "light",
                         transition: Bounce,
                     });
-                    navigate("/vehicles_checks");
+                    navigate("/vehicles-checks");
                 } else {
                     throw new Error("Erreur lors de l'ajout de la vérification.");
                 }

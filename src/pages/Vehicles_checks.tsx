@@ -531,7 +531,7 @@ export function Vehicleschecks() {
                   <td>
                     <div className="d-flex align-items-center list-action">
                       <Link
-                        to={`/Detail_vehicle_check/${data.id_verif}`}
+                        to={`/Detail-vehicle-check/${data.id_verif}`}
                         className="badge badge-success mr-2"
                         data-toggle="tooltip"
                         data-placement="top"

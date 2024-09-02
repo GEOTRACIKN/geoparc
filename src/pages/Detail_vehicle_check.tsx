@@ -154,7 +154,7 @@ export function DetailVehicleCheck() {
 
 
   const goToVehicleChecks = () => {
-    navigate("/vehicles_checks"); // Naviguer vers la page Vehicle_checks
+    navigate("/vehicles-checks"); // Naviguer vers la page Vehicle_checks
   };
 
   // Function to handle the download modal
