@@ -11,7 +11,7 @@ interface ModalNewInterventionnProps {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = 1;
+const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     show,

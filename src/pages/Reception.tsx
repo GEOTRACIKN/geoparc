@@ -1,23 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
 import ModalNewIntervention from "../components/NewIntervention"
+import { formatDateToTimestamp } from "../utilities/functions";
+import ModalShowIntervention from "../components/ShowIntervention";
 
 
 interface Intervention {
     id_intervention: number;
     date_intervention: string;
-    client: string;
+    priority: string;
+    statut: string;
     vehicule: string;
-    odometre: string;
-    Priority: string;
-    etat: string;
-    date_modifie: string;
-
-
+    km: number;
+    subject: string;
+    client: string;
+    phone_client: string;
+    receptionist_name: string;
+    service: number;
 }
+
 
 export function Reception() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -33,19 +37,18 @@ export function Reception() {
     const [column, setSortColumn] = useState("id_intervention");
     const [sort, setSort] = useState("ASC");
     const [total, setTotal] = useState(0);
-
+    const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
 
 
 
     const initialColumns = {
-        id_intervention: true,
-        date_intervention: true,
-        client: true,
+        ID: true,
+        Date: true,
+        priority: true,
+        statut: true,
         vehicule: true,
-        odometre: true,
-        Priority: true,
-        etat: true,
-        date_modifie: true,
+        km: true,
+        client: true,
     };
 
     // Load selected columns from localStorage or use initial state
@@ -74,20 +77,30 @@ export function Reception() {
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
+    const handleShow = (id_intervention?: number) => {
+        setSelectedInterventionId(id_intervention ?? null);
+        setShow(true);
+    };
+    
 
     const getIntervention = async () => {
         try {
             const response = await fetch(
                 `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}`
             );
+
             const data = await response.json();
+            console.log('Intervention data:', data);
+
             setintervention(data);
         } catch (error) {
             console.error(error);
         }
     };
+    useEffect(() => {
+        getIntervention();
+    }, [currentPage, limit]);  // Assurez-vous que les dépendances sont correctes
+
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -129,7 +142,9 @@ export function Reception() {
         setLimit(parseInt(newValue));
         setCurrentPage(1);
     };
-
+    const handlePageClick = (data: any) => {
+        setCurrentPage(data.selected + 1);
+    };
 
 
     return (
@@ -139,88 +154,88 @@ export function Reception() {
                     <h4>{translate("Intervention Requests")}</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShow} className="btn btn-primary mt-2 mr-1">
+                    <Button onClick={() => handleShow((undefined))} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
                         {translate("New Request")}
                     </Button>
                 </div>
             </div>
-                <div className="row">
-                    <div
-                        className="col-md-4"
-                        style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
-                    >
-                        <div className="input-group">
-                            <Dropdown>
-                                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                                    <i
-                                        className="fas fa-chevron-down"
-                                        style={{ fontSize: "20px" }}
-                                    ></i>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu onClick={handleTypeSearch}>
-                                    <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Client")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Status")}</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                            <input
-                                type="text"
-                                placeholder={` By ${typeSearch}`}
-                                onChange={handleAdvancedSearch}
-                                className="form-control"
-                            />
-                        </div>
-                    </div>
-                    <div className="col-md-8 d-flex justify-content-end align-items-center">
-                        <div className="dataTables_length">
-                            <label style={{ marginBottom: "0" }}>
-                                {translate("Show")}
-                                <select
-                                    className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                                    style={{ width: "66px" }}
-                                    onChange={handleSelectChange}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
-                                    <option value="500">500</option>
-                                </select>
-                            </label>
-                        </div>
+            <div className="row">
+                <div
+                    className="col-md-4"
+                    style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+                >
+                    <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle
-                                variant="link"
-                                id="dropdown-basic"
-                                title="Display Columns"
-                            >
-                                <i className="las la-eye"></i>
+                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                                <i
+                                    className="fas fa-chevron-down"
+                                    style={{ fontSize: "20px" }}
+                                ></i>
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {Object.keys(initialColumns).map((col, idx) => (
-                                    <Dropdown.Item
-                                        key={idx}
-                                        as="button"
-                                        style={{ display: "flex", alignItems: "center" }}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            className="form-check-input"
-                                            checked={selectedColumns[col as keyof typeof initialColumns]}
-                                            onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
-                                        />
-                                        <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
-                                    </Dropdown.Item>
-                                ))}
+                            <Dropdown.Menu onClick={handleTypeSearch}>
+                                <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Client")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Status")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
+                        <input
+                            type="text"
+                            placeholder={` By ${typeSearch}`}
+                            onChange={handleAdvancedSearch}
+                            className="form-control"
+                        />
                     </div>
                 </div>
-        
+                <div className="col-md-8 d-flex justify-content-end align-items-center">
+                    <div className="dataTables_length">
+                        <label style={{ marginBottom: "0" }}>
+                            {translate("Show")}
+                            <select
+                                className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                                style={{ width: "66px" }}
+                                onChange={handleSelectChange}
+                            >
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                                <option value="500">500</option>
+                            </select>
+                        </label>
+                    </div>
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            variant="link"
+                            id="dropdown-basic"
+                            title="Display Columns"
+                        >
+                            <i className="las la-eye"></i>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {Object.keys(initialColumns).map((col, idx) => (
+                                <Dropdown.Item
+                                    key={idx}
+                                    as="button"
+                                    style={{ display: "flex", alignItems: "center" }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        checked={selectedColumns[col as keyof typeof initialColumns]}
+                                        onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
+                                    />
+                                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+            </div>
+
             <div className="row m-1">
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
@@ -235,20 +250,20 @@ export function Reception() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.id_intervention && (
+                            {selectedColumns.ID && (
                                 <th
                                     className="sorting"
-                                    onClick={() => handleSortingColumn("id_intervention")}
+                                    onClick={() => handleSortingColumn("ID")}
                                 >
                                     {translate("ID")}
                                 </th>
                             )}
-                            {selectedColumns.date_intervention && (
+                            {selectedColumns.Date && (
                                 <th
                                     className="sorting"
-                                    onClick={() => handleSortingColumn("date_intervention")}
+                                    onClick={() => handleSortingColumn("Date")}
                                 >
-                                    {translate("Date Intervention")}
+                                    {translate("Date")}
                                 </th>
                             )}
                             {selectedColumns.client && (
@@ -276,11 +291,7 @@ export function Reception() {
                                     {translate("Status")}
                                 </th>
                             )}
-                            {selectedColumns.date_modifie && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_modifie")}>
-                                    {translate("Modified Date")}
-                                </th>
-                            )}
+
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -302,13 +313,12 @@ export function Reception() {
                                     </div>
                                 </td>
                                 {selectedColumns.id_intervention && <td>{Intervention.id_intervention}</td>}
-                                {selectedColumns.date_intervention && <td>{Intervention.date_intervention}</td>}
+                                {selectedColumns.date_intervention && <td>{formatDateToTimestamp(Intervention.date_intervention)}</td>}
                                 {selectedColumns.client && <td>{Intervention.client}</td>}
                                 {selectedColumns.vehicule && <td>{Intervention.vehicule}</td>}
-                                {selectedColumns.odometre && <td>{Intervention.odometre}</td>}
-                                {selectedColumns.Priority && <td>{Intervention.Priority}</td>}
-                                {selectedColumns.etat && <td>{Intervention.etat}</td>}
-                                {selectedColumns.date_modifie && <td>{Intervention.date_modifie}</td>}
+                                {selectedColumns.odometre && <td>{Intervention.km}</td>}
+                                {selectedColumns.Priority && <td>{Intervention.priority}</td>}
+                                {selectedColumns.etat && <td>{Intervention.statut}</td>}
 
                                 <td>
                                     <div className="d-flex align-items-center list-action">
@@ -318,6 +328,8 @@ export function Reception() {
                                             data-toggle="tooltip"
                                             data-placement="top"
                                             title="Détail"
+                                            onClick={() =>handleShow(Intervention.id_intervention)}
+
                                         >
                                             <i
                                                 className="fa fa-eye"
@@ -354,7 +366,7 @@ export function Reception() {
                         pageCount={1}
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
-                        // onPageChange={}
+                        onPageChange={handlePageClick}
                         containerClassName={"pagination justify-content-end"}
                         pageClassName={"page-item"}
                         pageLinkClassName={"page-link"}
@@ -372,6 +384,12 @@ export function Reception() {
                 show={show}
                 handleClose={handleClose}
                 refreshintervention={() => { getIntervention() }}
+            />
+            <ModalShowIntervention
+                show={show}
+                handleClose={handleClose}
+                id_intervention={selectedInterventionId}
+
             />
 
 
