@@ -75,13 +75,19 @@ export function Reception() {
         getIntervention();
     };
 
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = (id_intervention?: number) => {
-        setSelectedInterventionId(id_intervention ?? null);
-        setShow(true);
+    const [showNewInterventionModal, setShowNewInterventionModal] = useState(false);
+    const [showShowInterventionModal, setShowShowInterventionModal] = useState(false);
+
+    const handleShowNewInterventionModal = () => setShowNewInterventionModal(true);
+    const handleCloseNewInterventionModal = () => setShowNewInterventionModal(false);
+
+    const handleShowShowInterventionModal = (id: number) => {
+        setSelectedInterventionId(id);
+        setShowShowInterventionModal(true);
     };
-    
+    const handleCloseShowInterventionModal = () => setShowShowInterventionModal(false);
+
+
 
     const getIntervention = async () => {
         try {
@@ -154,7 +160,7 @@ export function Reception() {
                     <h4>{translate("Intervention Requests")}</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={() => handleShow((undefined))} className="btn btn-primary mt-2 mr-1">
+                    <Button onClick={handleShowNewInterventionModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
                         {translate("New Request")}
                     </Button>
@@ -328,7 +334,8 @@ export function Reception() {
                                             data-toggle="tooltip"
                                             data-placement="top"
                                             title="Détail"
-                                            onClick={() =>handleShow(Intervention.id_intervention)}
+                                            onClick={() => handleShowShowInterventionModal(Intervention.id_intervention)}
+
 
                                         >
                                             <i
@@ -380,18 +387,8 @@ export function Reception() {
                     />
                 </div>
             </div>
-            <ModalNewIntervention
-                show={show}
-                handleClose={handleClose}
-                refreshintervention={() => { getIntervention() }}
-            />
-            <ModalShowIntervention
-                show={show}
-                handleClose={handleClose}
-                id_intervention={selectedInterventionId}
-
-            />
-
+            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} />
+            <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal}  id_intervention={selectedInterventionId} />
 
         </>
     );

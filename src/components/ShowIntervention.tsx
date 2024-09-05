@@ -6,8 +6,8 @@ import { formatDateToTimestamp } from "../utilities/functions";
 
 interface ModalShowInterventionnProps {
     show: boolean;
-    handleClose: () => void;
-    id_intervention: number | null; // Accepte également null
+    onHide: () => void;
+    id_intervention: number | null;
 
 }
 
@@ -16,7 +16,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     show,
-    handleClose,
+    onHide,
     id_intervention,
 
 }) => {
@@ -33,6 +33,14 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     });
 
     const { translate } = useTranslate();
+
+    const serviceMapping: { [key: number]: string } = {
+        1: "Garage",
+        2: "Planification d'entretien",
+        3: "Entretien",
+        4: "Changement de Pneu",
+        5: "Changement de Pièce",
+    };
 
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
@@ -63,7 +71,7 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
                     client: intervention.client,
                     clientPhone: intervention.phone_client,
                     receptionistName: intervention.receptionist_name,
-                    service: intervention.service
+                    service: intervention.service.toString(),
                 });
             } else {
                 console.warn('No intervention data found for the provided ID.');
@@ -89,7 +97,7 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={handleClose} responsive>
+        <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show Request")}</Modal.Title>
             </Modal.Header>
@@ -179,16 +187,16 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
                         <Form.Label>{translate("Service")}</Form.Label>
                         <Form.Control as="select" value={formData.service} disabled>
                             <option value="">{translate("Select Service")}</option>
-                            <option value="Garage">{translate("Garage")}</option>
-                            <option value="Planification d'entretien">{translate("Planification d'entretien")}</option>
-                            <option value="Entretiens">{translate("Entretiens")}</option>
-                            <option value="Changement De Pneu">{translate("Changement De Pneu")}</option>
-                            <option value="Changement de Pièce">{translate("Changement de Pièce")}</option>
+                            {Object.entries(serviceMapping).map(([key, label]) => (
+                                <option key={key} value={key}>
+                                    {label}
+                                </option>
+                            ))}
                         </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
                   
