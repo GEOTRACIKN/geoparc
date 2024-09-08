@@ -6,6 +6,8 @@ import { useTranslate } from "../components/LanguageProvider";
 import ModalNewIntervention from "../components/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowIntervention from "../components/ShowIntervention";
+import { PropagateLoader } from "react-spinners";
+import ModalEditIntervention from "../components/EditIntervention";
 
 
 interface Intervention {
@@ -38,6 +40,9 @@ export function Reception() {
     const [sort, setSort] = useState("ASC");
     const [total, setTotal] = useState(0);
     const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true); // Add loading state
+    const [pageCount, setPageCount] = useState(0);
+
 
 
 
@@ -76,10 +81,17 @@ export function Reception() {
     };
 
     const [showNewInterventionModal, setShowNewInterventionModal] = useState(false);
+    const [showEditInterventionModal, setShowEditInterventionModal] = useState(false);
     const [showShowInterventionModal, setShowShowInterventionModal] = useState(false);
 
     const handleShowNewInterventionModal = () => setShowNewInterventionModal(true);
     const handleCloseNewInterventionModal = () => setShowNewInterventionModal(false);
+
+    const handleEditInterventionModal = (id: number) => {
+        setSelectedInterventionId(id);
+        setShowEditInterventionModal(true);
+    };   
+    const handleCloseEditInterventionModal = () => setShowEditInterventionModal(false);
 
     const handleShowShowInterventionModal = (id: number) => {
         setSelectedInterventionId(id);
@@ -87,7 +99,25 @@ export function Reception() {
     };
     const handleCloseShowInterventionModal = () => setShowShowInterventionModal(false);
 
-
+    const getCountIntervention = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `${backendUrl}/api/geop/intervention/count/${id_user}`
+            );
+            const result = await response.json();
+    
+            // Assurez-vous que result est bien un nombre
+            setTotal(result); // Accède directement au nombre
+            setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
+    
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
     const getIntervention = async () => {
         try {
@@ -102,10 +132,16 @@ export function Reception() {
         } catch (error) {
             console.error(error);
         }
+        finally {
+            setLoading(false);
+        }
     };
     useEffect(() => {
+        getCountIntervention();
         getIntervention();
     }, [currentPage, limit]);  // Assurez-vous que les dépendances sont correctes
+
+   
 
 
     const handleTypeSearch = (event: any) => {
@@ -157,12 +193,12 @@ export function Reception() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Intervention Requests")}</h4>
+                    <h4>{translate("Intervention Requests")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewInterventionModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
+                        {translate("New Request")} 
                     </Button>
                 </div>
             </div>
@@ -246,19 +282,19 @@ export function Reception() {
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
                         <tr className="ligth ligth-data">
-                            <th>
+                            <th className="text-center">
                                 <div className="form-check form-check-inline">
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
-                                    //checked={selectAll}
+                                    // checked={selectAll}
                                     // onChange={handleSelectAll}
                                     />
                                 </div>
                             </th>
                             {selectedColumns.ID && (
                                 <th
-                                    className="sorting"
+                                    className="sorting "
                                     onClick={() => handleSortingColumn("ID")}
                                 >
                                     {translate("ID")}
@@ -266,101 +302,174 @@ export function Reception() {
                             )}
                             {selectedColumns.Date && (
                                 <th
-                                    className="sorting"
+                                    className="sorting "
                                     onClick={() => handleSortingColumn("Date")}
                                 >
                                     {translate("Date")}
                                 </th>
                             )}
                             {selectedColumns.client && (
-                                <th className="sorting" onClick={() => handleSortingColumn("client")}>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("client")}
+                                >
                                     {translate("Client")}
                                 </th>
                             )}
                             {selectedColumns.vehicule && (
-                                <th className="sorting" onClick={() => handleSortingColumn("vehicule")}>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("vehicule")}
+                                >
                                     {translate("Vehicle")}
                                 </th>
                             )}
                             {selectedColumns.odometre && (
-                                <th className="sorting" onClick={() => handleSortingColumn("odometre")}>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("odometre")}
+                                >
                                     {translate("Odometer")}
                                 </th>
                             )}
                             {selectedColumns.Priority && (
-                                <th className="sorting" onClick={() => handleSortingColumn("Priority")}>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("Priority")}
+                                >
                                     {translate("Priority")}
                                 </th>
                             )}
                             {selectedColumns.etat && (
-                                <th className="sorting" onClick={() => handleSortingColumn("etat")}>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("etat")}
+                                >
                                     {translate("Status")}
                                 </th>
                             )}
-
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
                     <tbody className="light-body">
-                        {list_intervention.map((Intervention, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <div className="form-check form-check-inline">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                        // checked={selectedViolations.includes(
-                                        //     violation.id_violation
-                                        // )}
-                                        // onChange={() =>
-                                        //     handleSelectViolation(violation.id_violation)
-                                        // }
+                        {loading ? (
+                            <tr style={{ textAlign: "center" }}>
+                                <td className="text-center" colSpan={10}>
+                                    <p>
+                                        <PropagateLoader
+                                            color={"#123abc"}
+                                            loading={loading}
+                                            size={20}
                                         />
-                                    </div>
-                                </td>
-                                {selectedColumns.id_intervention && <td>{Intervention.id_intervention}</td>}
-                                {selectedColumns.date_intervention && <td>{formatDateToTimestamp(Intervention.date_intervention)}</td>}
-                                {selectedColumns.client && <td>{Intervention.client}</td>}
-                                {selectedColumns.vehicule && <td>{Intervention.vehicule}</td>}
-                                {selectedColumns.odometre && <td>{Intervention.km}</td>}
-                                {selectedColumns.Priority && <td>{Intervention.priority}</td>}
-                                {selectedColumns.etat && <td>{Intervention.statut}</td>}
-
-                                <td>
-                                    <div className="d-flex align-items-center list-action">
-                                        <Link
-                                            to={``}
-                                            className="badge badge-success mr-2"
-                                            data-toggle="tooltip"
-                                            data-placement="top"
-                                            title="Détail"
-                                            onClick={() => handleShowShowInterventionModal(Intervention.id_intervention)}
-
-
-                                        >
-                                            <i
-                                                className="fa fa-eye"
-                                                style={{ fontSize: "1.2em" }}
-                                            ></i>
-                                        </Link>
-                                        <a
-                                            className="badge bg-warning mr-2"
-                                            data-toggle="tooltip"
-                                            data-placement="top"
-                                            title="Delete"
-                                        >
-                                            <i
-                                                className="ri-delete-bin-line mr-0"
-                                                style={{ fontSize: "1.2em" }}
-                                            ></i>
-                                        </a>
-                                    </div>
+                                    </p>
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            list_intervention.map((Intervention, index) => (
+                                <tr key={index}>
+                                    <td className="text-center">
+                                        <div className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                            // checked={selectedViolations.includes(violation.id_violation)}
+                                            // onChange={() => handleSelectViolation(violation.id_violation)}
+                                            />
+                                        </div>
+                                    </td>
+                                    {selectedColumns.id_intervention && (
+                                        <td>
+                                            {Intervention.id_intervention}
+                                        </td>
+                                    )}
+                                    {selectedColumns.date_intervention && (
+                                        <td>
+                                            {formatDateToTimestamp(
+                                                Intervention.date_intervention
+                                            )}
+                                        </td>
+                                    )}
+                                    {selectedColumns.client && (
+                                        <td>
+                                            {Intervention.client}
+                                        </td>
+                                    )}
+                                    {selectedColumns.vehicule && (
+                                        <td>
+                                            {Intervention.vehicule}
+                                        </td>
+                                    )}
+                                    {selectedColumns.odometre && (
+                                        <td>
+                                            {Intervention.km}
+                                        </td>
+                                    )}
+                                    {selectedColumns.Priority && (
+                                        <td>
+                                            {Intervention.priority}
+                                        </td>
+                                    )}
+                                    {selectedColumns.etat && (
+                                        <td>
+                                            {Intervention.statut}
+                                        </td>
+                                    )}
+                                    <td className="text-center">
+                                        <div className="d-flex justify-content-center align-items-center list-action">
+                                            <Link
+                                                to={``}
+                                                className="badge badge-success mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Détail"
+                                                onClick={() =>
+                                                    handleShowShowInterventionModal(
+                                                        Intervention.id_intervention
+                                                    )
+                                                }
+                                            >
+                                                <i
+                                                    className="fa fa-eye"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </Link>
+                                            <Link
+                                                to={``}
+                                                className="badge badge-primary mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Edit"
+                                                onClick={() =>
+                                                    handleEditInterventionModal(
+                                                        Intervention.id_intervention
+                                                    )
+                                                }
+                                            >
+                                                <i
+                                                    className="fa fa-edit"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </Link>
+                                            <a
+                                                className="badge bg-warning mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Delete"
+                                            >
+                                                <i
+                                                    className="ri-delete-bin-line mr-0"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </Table>
             </div>
+
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
                     <span>Affichage 1 à {limit} sur {total} </span>
@@ -370,7 +479,7 @@ export function Reception() {
                         previousLabel={"previous"}
                         nextLabel={"next"}
                         breakLabel={"..."}
-                        pageCount={1}
+                        pageCount={pageCount}
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
                         onPageChange={handlePageClick}
@@ -388,7 +497,8 @@ export function Reception() {
                 </div>
             </div>
             <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} />
-            <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal}  id_intervention={selectedInterventionId} />
+            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal}  id_intervention={selectedInterventionId}/>
+            <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal} id_intervention={selectedInterventionId} />
 
         </>
     );

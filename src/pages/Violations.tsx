@@ -427,7 +427,7 @@ export function Violations() {
         <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
-              <th>
+              <th className="text-center">
                 <div className="form-check form-check-inline">
                   <input className="form-check-input"
                     type="checkbox"
@@ -486,11 +486,14 @@ export function Violations() {
                 </th>
               )}
               {selectedColumns.description && (
-                <th>
+                <th
+                className="sorting"
+
+                >
                   {translate("Description")}
                 </th>
               )}
-              <th>{translate("Actions")}</th>
+              <th >{translate("Actions")}</th>
             </tr>
           </thead>
           <tbody className="light-body">
@@ -509,7 +512,7 @@ export function Violations() {
             ) : (
               list_violation.map((violation, idx) => (
                 <tr key={idx}>
-                  <td>
+                  <td  className="text-center">
                     <div className="form-check form-check-inline">
                       <input
                         className="form-check-input"
