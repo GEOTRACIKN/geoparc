@@ -40,7 +40,7 @@ export function Reception() {
     const [sort, setSort] = useState("ASC");
     const [total, setTotal] = useState(0);
     const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
 
 
@@ -103,7 +103,7 @@ export function Reception() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/count/${id_user}`
+                `${backendUrl}/api/geop/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
     
@@ -122,7 +122,7 @@ export function Reception() {
     const getIntervention = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}`
+                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
@@ -139,7 +139,7 @@ export function Reception() {
     useEffect(() => {
         getCountIntervention();
         getIntervention();
-    }, [currentPage, limit]);  // Assurez-vous que les dépendances sont correctes
+    }, [currentPage, limit ,search, type, column, sort]);  // Assurez-vous que les dépendances sont correctes
 
    
 
@@ -148,23 +148,20 @@ export function Reception() {
         const selectedValue = event.target.textContent;
 
         switch (selectedValue) {
-            case translate("ID Violation"):
+            case translate("ID Intervention"):
                 setType(0);
                 break;
-            case translate("Driver"):
+            case translate("Client"):
                 setType(1);
                 break;
             case translate("Vehicule"):
                 setType(2);
                 break;
-            case translate("Type Violation"):
+            case translate("Priority"):
                 setType(3);
                 break;
-            case translate("Description"):
+            case translate("Status"):
                 setType(4);
-                break;
-            case translate("Date"):
-                setType(5);
                 break;
             default:
                 console.log("Unknown selection");

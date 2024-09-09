@@ -599,6 +599,15 @@
 "Validate employees' salaries":"Validar salarios de empleados",
 "on":"en",
 "State":"Estado",
-"Display columns":"Mostrar columnas"
+"Display columns":"Mostrar columnas",
+"Intervention Requests":"Solicitudes de intervención",
+"Client":"cliente",
+"Priority":"prioridad",
+"New Request":"Nueva solicitud",
+"Request Date":"fecha de solicitud",
+"Subject":"Sujeto",
+"Client Phone":"Telefónicas de los clientes",
+"Receptionist Name":"Nombre del recepcionista",
+"Service":"Servicio"
 
 }

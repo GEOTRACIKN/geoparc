@@ -520,5 +520,14 @@
 "Validate employees' salaries":"التحقق من رواتب الموظفين",  
 "on":"على",
 "Status":"الحالة",
-"Display columns":"أعمدة العرض"
+"Display columns":"أعمدة العرض",
+"Intervention Requests":"طلب التدخل",
+"Client":"عميل",
+"Priority":"أولوية",
+"New Request":"طلب جديد",
+"Request Date":"تاريخ الطلب",
+"Subject":"موضوع",
+"Client Phone":"هاتف العميل",
+"Receptionist Name":"اسم موظف الاستقبال",
+"Service":"خدمة"
 }

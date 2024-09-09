@@ -503,5 +503,14 @@
 "Validate employees' salaries":"Validate employees' salaries",
 "on":"on",
 "Status":"Status",
-"Display columns":"Display columns"
+"Display columns":"Display columns",
+"Intervention Requests":"Intervention Requests",
+"Client":"Client",
+"Priority":"Priority",
+"New Request":"New Request",
+"Request Date":"Request Date",
+"Subject":"Subject",
+"Client Phone":"Client Phone",
+"Receptionist Name":"Receptionist Name",
+"Service":"Service"
 }

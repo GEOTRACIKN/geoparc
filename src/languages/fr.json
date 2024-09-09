@@ -510,5 +510,14 @@
 "Validate employees' salaries":"Valider les salaires des employés",
 "on":"sur",
 "Status":"État",
-"Display columns":"Colonnes dʼaffichage"
+"Display columns":"Colonnes dʼaffichage",
+"Intervention Requests":"Demandes d'intervention",
+"Client":"Client",
+"Priority":"priorité",
+"New Request":"Nouvelle demande",
+"Request Date":"Date de la demande",
+"Subject":"Sujet",
+"Client Phone":"Téléphone du client",
+"Receptionist Name":"Nom du réceptionniste",
+"Service":"Service"
 }

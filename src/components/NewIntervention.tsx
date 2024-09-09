@@ -13,6 +13,7 @@ interface ModalNewInterventionnProps {
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
+console.log('geopuserID' , geopuserID);
 
 const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     show,
@@ -224,7 +225,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="receptionistName">
-                        <Form.Label>{translate("Receptionist's Name")}</Form.Label>
+                        <Form.Label>{translate("Receptionist Name")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Entrez le nom du réceptionniste"
