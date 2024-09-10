@@ -608,6 +608,22 @@
 "Subject":"Sujeto",
 "Client Phone":"Telefónicas de los clientes",
 "Receptionist Name":"Nombre del recepcionista",
-"Service":"Servicio"
+"Service":"Servicio",
+"Speed":"Velocidad",
+"overspeed" : "exceso de velocidad",
+"Insufficient Break" : "descanso insuficiente",
+"Night Driving" : "conducción nocturna",
+ "Overtime Driving" : "conducción en horas extras",
+ "Other" : "otro",
+ "Add Violation" : "Agregar infracción",
+ "Violation type" : "Tipo de infracción",
+ "Date Violation" : "Fecha de la infracción",
+  "Cost" : "Costo",
+  "Violations" : "Infracciones",
+  "Export" : "Exportar",
+"Add Warning" : "Agregar advertencia",
+ "Warnings" : "Advertencias",
+  "Type Warning" : "Tipo de advertencia",
+  "Date Warning" : "Fecha de advertencia"
 
 }

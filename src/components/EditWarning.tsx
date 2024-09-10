@@ -8,7 +8,7 @@ interface ModalEditWarningProps {
   show: boolean;
   handleClose: () => void;
   warningId: number | null;
-  refreshWarning?: () => void; // Prop optionnelle
+  onSuccess?: () => void;
 }
 
 type Driver = {
@@ -24,7 +24,7 @@ const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
   show,
   handleClose,
   warningId,
-  refreshWarning
+  onSuccess
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -95,9 +95,10 @@ const ModalEditWarning: React.FC<ModalEditWarningProps> = ({
           transition: Bounce,
         });
   
-        if (refreshWarning) {
-          refreshWarning();
-        }
+            // Rafraîchir les données
+            if (onSuccess) {
+              onSuccess(); // Appel du callback pour rafraîchir le tableau
+          }
         handleClose();
       } else {
         console.error("Failed to update warning:", response.statusText);

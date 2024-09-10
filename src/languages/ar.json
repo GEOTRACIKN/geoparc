@@ -529,5 +529,21 @@
 "Subject":"موضوع",
 "Client Phone":"هاتف العميل",
 "Receptionist Name":"اسم موظف الاستقبال",
-"Service":"خدمة"
+"Service":"خدمة",
+"Speed":"سرعة ",
+"overspeed" : "تجاوز السرعة",
+"Insufficient Break" : "استراحة غير كافية",
+"Night Driving" : "القيادة الليلية",
+"Overtime Driving" : "القيادة في وقت إضافي",
+"Other" : "آخر",
+"Add Violation" : "إضافة مخالفة",
+"Violation type" : "نوع المخالفة",
+"Date Violation" : "تاريخ المخالفة",
+"Cost" : "تكلفة",
+"Violations" : "انتهاكات",
+"Export" : "تصدير",
+"Add Warning" : "إضافة تحذير",
+"Warnings" : "تحذيرات",
+"Type Warning" : "نوع التحذير",
+ "Date Warning" : "تاريخ التحذير"
 }

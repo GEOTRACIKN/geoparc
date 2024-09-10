@@ -317,7 +317,11 @@ export function Warnings() {
       setSelectedWarnings([]);
     }
   };
-
+  
+  const refreshData = () => {
+    getWarnings();
+    getCountWarning();
+};
 
 
   return (
@@ -331,14 +335,14 @@ export function Warnings() {
         </div>
         <div className="col-md-6 col-sm-12 text-right">
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
-            <i className="las la-plus mr-3"></i>Add Warnings
+            <i className="las la-plus mr-3"></i>{translate("Add Warning")}
           </Button>
           <button
             className="btn btn-outline-secondary  mt-2 mr-1"
             onClick={() => setShowDownloadModal(true)}
           >
             <i className="las la-download"></i>
-            Exporter
+            {translate("Export")}
           </button>
         </div>
       </div>
@@ -438,7 +442,7 @@ export function Warnings() {
                   className="sorting "
                   onClick={() => handleSortingColumn("id_warning")}
                 >
-                  {translate("ID Warning")}
+                  {translate("ID")}
                 </th>
               )}
               {selectedColumns.driver && (
@@ -598,13 +602,13 @@ export function Warnings() {
       <ModalNewWaring
         show={show}
         handleClose={handleClose}
-        refreshWarning={() => getWarnings()}
+        onSuccess={refreshData}
       ></ModalNewWaring>
       <ModalEditWarning
         show={showEditModal}
         handleClose={handleCloseEditModal}
         warningId={warningToEdit}
-        refreshWarning={getWarnings} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
+        onSuccess={refreshData}
       />
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>

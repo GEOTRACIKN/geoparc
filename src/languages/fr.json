@@ -519,5 +519,21 @@
 "Subject":"Sujet",
 "Client Phone":"Téléphone du client",
 "Receptionist Name":"Nom du réceptionniste",
-"Service":"Service"
+"Service":"Service",
+"Speed":"Vitesse",
+"overspeed" : "survitesse",
+"Insufficient Break" : "pause insuffisante",
+"Night Driving" : "conduite de nuit",
+"Overtime Driving" : "conduite en heures supplémentaires",
+"Other" : "autre",
+"Add Violation" : "Ajouter une infraction",
+"Violation type" : "Type d'infraction",
+"Date Violation" : "Date de l'infraction",
+"Cost" : "Coût",
+ "Violations" : "Infractions",
+  "Export" : "Exporter",
+  "Add Warning" : "Ajouter un avertissement",
+ "Warnings" : "Avertissements",
+ "Type Warning" : "Type d'avertissement",
+ "Date Warning" : "Date d'avertissement"
 }

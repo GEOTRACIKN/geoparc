@@ -9,7 +9,7 @@ import { Bounce, toast } from "react-toastify";
 interface ModalNewViolationProps {
   show: boolean;
   handleClose: () => void;
-  refreshviolation?: () => void;
+  onSuccess?: () => void;
 }
 type Driver = {
   id_conducteur: number;
@@ -27,7 +27,7 @@ const geopuserID = localStorage.getItem("GeopUserID");
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
   handleClose,
-  refreshviolation,
+  onSuccess,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -104,12 +104,12 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   // Pour le champ de type de violation
   const violationOptions = [
-    { value: "speed", label: "speed" },
-    { value: "overspeed", label: "overspeed" },
-    { value: "insufficient_break", label: "Insufficient Break" },
-    { value: "night_driving", label: "Night Driving" },
-    { value: "overtime_driving", label: "Overtime Driving" },
-    { value: "other", label: "Other" },
+    { value: "speed", label: translate("Speed")}, 
+    { value: "overspeed", label: translate("Speed") },
+    { value: "insufficient_break", label: translate("Insufficient Break") },
+    { value: "night_driving", label: translate("Night Driving")},
+    { value: "overtime_driving", label: translate("Overtime Driving") },
+    { value: "other", label: translate("Other")},
   ];
 
   const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
@@ -125,87 +125,90 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   const initialFormData = {
     conducteur: 0,
-        type: "",
-        vehicule: "",
-        date: "",
-        cost: 0,
-        description: "",
-        customType: "",
-};
+    type: "",
+    vehicule: "",
+    date: "",
+    cost: 0,
+    description: "",
+    customType: "",
+  };
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const dateformat = formatDateToTimestamp(formData.date);
     const body = {
-        id_driver: formData.conducteur,
-        type_violation: formData.type,
-        vehicule: formData.vehicule,
-        date_violation: dateformat,
-        cost: formData.cost,
-        description: formData.description,
+      id_driver: formData.conducteur,
+      type_violation: formData.type,
+      vehicule: formData.vehicule,
+      date_violation: dateformat,
+      cost: formData.cost,
+      description: formData.description,
     };
 
     fetch(`${backendUrl}/api/geop/add_violation/${geopuserID}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     })
-        .then((response) => {
-            if (!response.ok) {
-                // Si la réponse HTTP n'est pas ok, on déclenche une erreur
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            if (data.message === 'violation ajouté avec succès') {
-                toast.success("Violation added successfully!", {
-                    position: "bottom-right",
-                    autoClose: 2400,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Bounce,
-                });
-                setFormData(initialFormData);
-                if (refreshviolation) refreshviolation();
-                handleClose();
-            } else {
-                // Si la réponse ne contient pas le message de succès attendu
-                toast.error("Failed to add violation. Please try again.", {
-                    position: "bottom-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Bounce,
-                });
-            }
-        })
-        .catch((error) => {
-            toast.error("Error adding violation: " + error.message, {
-                position: "bottom-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
-            console.error("Error adding violation:", error);
+      .then((response) => {
+        if (!response.ok) {
+          // Si la réponse HTTP n'est pas ok, on déclenche une erreur
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.message === 'violation ajouté avec succès') {
+          toast.success("Violation added successfully!", {
+            position: "bottom-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+          setFormData(initialFormData);
+          // Rafraîchir les données
+          if (onSuccess) {
+            onSuccess(); // Appel du callback pour rafraîchir le tableau
+          }
+          handleClose();
+        } else {
+          // Si la réponse ne contient pas le message de succès attendu
+          toast.error("Failed to add violation. Please try again.", {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        }
+      })
+      .catch((error) => {
+        toast.error("Error adding violation: " + error.message, {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
         });
-};
+        console.error("Error adding violation:", error);
+      });
+  };
 
-  
+
   const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, customType: e.target.value });
   };
@@ -256,7 +259,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="vehicule">
-            <Form.Label>{translate("Vehicule")}</Form.Label>
+            <Form.Label>{translate("Vehicles")}</Form.Label>
             <Select
               options={vehicleOptions}
               name="vehicule"
@@ -279,7 +282,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           </Form.Group>
 
           <Form.Group controlId="cost">
-            <Form.Label>Cost</Form.Label>
+            <Form.Label>{translate("Cost")}</Form.Label>
             <Form.Control
               type="text"
               name="cost"

@@ -3,11 +3,13 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Bounce, toast } from "react-toastify";
+import { useTranslate } from "../components/LanguageProvider";
+
 
 interface ModalNewWArningProps {
   show: boolean;
   handleClose: () => void;
-  refreshWarning?: () => void; // Optional prop
+  onSuccess?: () => void;
 }
 
 type Driver = {
@@ -19,10 +21,11 @@ type Driver = {
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
+
 const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
   show,
   handleClose,
-  refreshWarning,
+  onSuccess,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -31,6 +34,8 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     description: "",
   });
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const { translate } = useTranslate();
+
 
   useEffect(() => {
     if (show) {
@@ -44,10 +49,10 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     // Déterminer l'URL de l'API
     const apiUrl = `${backendUrl}/api/geop/Add_warning/${geopuserID}`;
-  
+
     try {
       const response = await fetch(apiUrl, {
         method: "POST", // "POST" should be in quotes
@@ -61,7 +66,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
           date: formData.date,
         }),
       });
-  
+
       if (response.ok) {
         // Afficher la notification de succès
         toast.success("Warning ajouté avec succès.", {
@@ -75,9 +80,10 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
           theme: "light",
           transition: Bounce,
         });
-  
-        if (refreshWarning) {
-          refreshWarning(); // Mettre à jour les avertissements dans le composant parent
+
+        // Rafraîchir les données
+        if (onSuccess) {
+          onSuccess(); // Appel du callback pour rafraîchir le tableau
         }
         handleClose(); // Fermer le modal
         setFormData({
@@ -115,8 +121,8 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
       });
     }
   };
-  
-  
+
+
 
 
   const conducteursOptions = drivers.map((driver) => ({
@@ -140,13 +146,13 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
     <Modal show={show} onHide={handleClose} responsive>
       <Modal.Header closeButton>
         <Modal.Title>
-         Ajouter Warning
-        </Modal.Title>
+        {translate("Add Warning")}       
+         </Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           <Form.Group controlId="type">
-            <Form.Label>Type Warning</Form.Label>
+            <Form.Label>{translate("Type Warning")}</Form.Label>
             <Form.Control
               type="text"
               name="type"
@@ -156,7 +162,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Driver</Form.Label>
+            <Form.Label>{translate("Driver")}</Form.Label>
             <Select
               options={conducteursOptions}
               onChange={handleSelectChange}
@@ -165,7 +171,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="date">
-            <Form.Label>Date Warning</Form.Label>
+            <Form.Label>{translate("Date Warning")}</Form.Label>
             <Form.Control
               type="date"
               name="date"
@@ -175,7 +181,7 @@ const ModalNewWaring: React.FC<ModalNewWArningProps> = ({
             />
           </Form.Group>
           <Form.Group controlId="description">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>{translate("Description")}</Form.Label>
             <Form.Control
               as="textarea"
               name="description"

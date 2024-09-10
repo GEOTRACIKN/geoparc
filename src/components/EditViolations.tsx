@@ -10,7 +10,7 @@ import { formatDateToTimestamp } from "../utilities/functions";
 interface ModalEditViolationProps {
   show: boolean;
   handleClose: () => void;
-  refreshviolation?: () => void; // Optional prop
+  onSuccess?: () => void; // Optional prop
   violationId: number | null; //violation id 
 
 }
@@ -29,7 +29,7 @@ const geopuserID = localStorage.getItem("GeopUserID");
 const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   show,
   handleClose,
-  refreshviolation,
+  onSuccess,
   violationId,
 }) => {
   const [formData, setFormData] = useState({
@@ -147,7 +147,10 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
           transition: Bounce,
         });
 
-        if (refreshviolation) refreshviolation();
+        // Rafraîchir les données
+        if (onSuccess) {
+          onSuccess(); // Appel du callback pour rafraîchir le tableau
+        }
         handleClose();
       })
       .catch((error) => {

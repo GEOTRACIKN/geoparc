@@ -9,6 +9,8 @@ interface ModalEditInterventionProps {
     show: boolean;
     onHide: () => void;
     id_intervention: number | null;
+    onSuccess?: () => void;
+
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -17,6 +19,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     show,
     onHide,
     id_intervention,
+    onSuccess
 }) => {
     const [formData, setFormData] = useState({
         date: "",
@@ -116,7 +119,10 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                 transition: Bounce,
 
             });
-    
+        // Rafraîchir les données
+        if (onSuccess) {
+            onSuccess(); // Appel du callback pour rafraîchir le tableau
+        }
             onHide(); // Fermer la modal après une mise à jour réussie
         } catch (error) {
             console.error('Erreur lors de la mise à jour des données:', error);

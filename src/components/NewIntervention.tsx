@@ -8,29 +8,29 @@ import { Bounce, toast } from "react-toastify";
 interface ModalNewInterventionnProps {
     show: boolean;
     onHide: () => void;
-    refreshintervention?: () => void;
+    onSuccess?: () => void;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
-console.log('geopuserID' , geopuserID);
+
 
 const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     show,
     onHide,
-    refreshintervention,
+    onSuccess,
 }) => {
     const [formData, setFormData] = useState({
         date: "",
         priority: "",
-        statut : "Demande",
+        statut: "Demande",
         vehicle: "",
         mileage: "",
         subject: "",
         client: "",
         clientPhone: "",
         receptionistName: "",
-        service: 0, // Changer de string à number
+        service: 0,
     });
 
     const { translate } = useTranslate();
@@ -64,13 +64,13 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const formattedDate = formatDateToTimestamp(formData.date);
-    
+
         // Mettre à jour formData avec la date formatée
         const updatedFormData = {
             ...formData,
             date: formattedDate,
         };
-    
+
         try {
             const response = await fetch(`${backendUrl}/api/geop/addnewintervention/${geopuserID}`, {
                 method: "POST",
@@ -79,14 +79,14 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 },
                 body: JSON.stringify(updatedFormData),
             });
-    
+
             if (!response.ok) {
                 throw new Error("Une erreur s'est produite lors de l'ajout de l'intervention.");
             }
-    
+
             const result = await response.json();
             console.log(result);
-    
+
             // Afficher une notification de succès
             toast.success("Intervention added successfully!", {
                 position: "bottom-right",
@@ -100,7 +100,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 transition: Bounce,
 
             });
-    
+
             // Réinitialiser le formulaire
             setFormData({
                 date: "",
@@ -114,18 +114,17 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 receptionistName: "",
                 service: 0,
             });
-    
+
+            // Rafraîchir les données
+            if (onSuccess) {
+                onSuccess(); // Appel du callback pour rafraîchir le tableau
+            }
             // Fermer le modal
             onHide();
-    
-            // Rafraîchir les interventions si la fonction est fournie
-            if (refreshintervention) {
-                refreshintervention();
-            }
-    
+
         } catch (error) {
             console.error(error);
-    
+
             // Afficher une notification d'erreur
             toast.error("Error adding intervention. Please try again.", {
                 position: "bottom-right",
@@ -141,7 +140,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
             });
         }
     };
-    
+
 
     return (
         <Modal show={show} onHide={onHide} responsive>

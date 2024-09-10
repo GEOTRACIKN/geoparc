@@ -139,7 +139,7 @@ export function Reception() {
     useEffect(() => {
         getCountIntervention();
         getIntervention();
-    }, [currentPage, limit ,search, type, column, sort]);  // Assurez-vous que les dépendances sont correctes
+    }, [currentPage, limit ,search, type, column, sort]);
 
    
 
@@ -184,7 +184,12 @@ export function Reception() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-
+     
+    const refreshData = () => {
+        getCountIntervention();
+        getIntervention();
+    };
+    
 
     return (
         <>
@@ -447,17 +452,7 @@ export function Reception() {
                                                     style={{ fontSize: "1.2em" }}
                                                 ></i>
                                             </Link>
-                                            <a
-                                                className="badge bg-warning mr-2"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                title="Delete"
-                                            >
-                                                <i
-                                                    className="ri-delete-bin-line mr-0"
-                                                    style={{ fontSize: "1.2em" }}
-                                                ></i>
-                                            </a>
+                                           
                                         </div>
                                     </td>
                                 </tr>
@@ -493,8 +488,8 @@ export function Reception() {
                     />
                 </div>
             </div>
-            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} />
-            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal}  id_intervention={selectedInterventionId}/>
+            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} onSuccess={refreshData}/>
+            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal}  id_intervention={selectedInterventionId} onSuccess={refreshData}/>
             <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal} id_intervention={selectedInterventionId} />
 
         </>

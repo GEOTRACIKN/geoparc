@@ -512,5 +512,21 @@
 "Subject":"Subject",
 "Client Phone":"Client Phone",
 "Receptionist Name":"Receptionist Name",
-"Service":"Service"
+"Service":"Service",
+"Speed":"Speed",
+"overspeed":"overspeed",
+"Insufficient Break":"Insufficient Break",
+"Night Driving":"Night Driving",
+"Overtime Driving":"Overtime Driving",
+"Other":"Other",
+"Add Violation":"Add Violation",
+"Violation type" : "Violation type",
+"Date Violation" : "Date Violation",
+"Cost" : "Cost",
+ "Violations" : "Violations",
+  "Export" : "Export",
+"Add Warning" : "Add Warning",
+ "Warnings" : "Warnings",
+ "Type Warning" : "Type Warning",
+ "Date Warning" : "Date Warning"
 }
