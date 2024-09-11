@@ -30,6 +30,7 @@ import { Cash_management } from "./pages/Cash_management";
 import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
 import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
+import { InterviewSchedule } from "./pages/Planning_interviews";
 
 
 import axios from "axios";
@@ -129,6 +130,7 @@ function App() {
           <Route path="/pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
+          <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
 
           
      
