@@ -624,6 +624,10 @@
 "Add Warning" : "Agregar advertencia",
  "Warnings" : "Advertencias",
   "Type Warning" : "Tipo de advertencia",
-  "Date Warning" : "Fecha de advertencia"
+  "Date Warning" : "Fecha de advertencia",
+  "Interview date" : "Fecha de entrevista",
+  "Type of interview" : "Tipo de entrevista",
+  "Planned interviews" : "Entrevistas planificadas",
+  "Planning date" : "Fecha de planificación"
 
 }

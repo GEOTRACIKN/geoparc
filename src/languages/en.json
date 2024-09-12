@@ -523,10 +523,17 @@
 "Violation type" : "Violation type",
 "Date Violation" : "Date Violation",
 "Cost" : "Cost",
- "Violations" : "Violations",
-  "Export" : "Export",
+"Violations" : "Violations",
+"Export" : "Export",
 "Add Warning" : "Add Warning",
- "Warnings" : "Warnings",
- "Type Warning" : "Type Warning",
- "Date Warning" : "Date Warning"
+"Warnings" : "Warnings",
+"Type Warning" : "Type Warning",
+"Date Warning" : "Date Warning",
+"Interview date" : "Interview date",
+"Type of interview" : "Type of interview",
+"Planned interviews" : "Planned interviews",
+"Planning date" : "Planning date"
+
+
+
 }

@@ -5,20 +5,20 @@ import { useTranslate } from "./LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 
-interface ModalEditInterventionProps {
+interface ModalEditPlanninginterviewsProps {
     show: boolean;
     onHide: () => void;
-    id_intervention: number | null;
+    id_planning: number | null;
     onSuccess?: () => void;
 
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
+const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = ({
     show,
     onHide,
-    id_intervention,
+    id_planning,
     onSuccess
 }) => {
     const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
         try {
-            const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
+            const url = `${backendUrl}/api/geop//${id_planning}`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,7 +90,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
     const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/updateintervention/${id_intervention}`;
+            const url = `${backendUrl}/api/geop//${id_planning}`;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -146,7 +146,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     return (
         <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Request")}</Modal.Title>
+                <Modal.Title>{translate("Edit ")}</Modal.Title>
             </Modal.Header>
             <Form>
                 <Modal.Body
@@ -255,4 +255,4 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     );
 };
 
-export default ModalEditIntervention;
+export default ModalEditPlanninginterviews;

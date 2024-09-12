@@ -545,5 +545,9 @@
 "Add Warning" : "إضافة تحذير",
 "Warnings" : "تحذيرات",
 "Type Warning" : "نوع التحذير",
- "Date Warning" : "تاريخ التحذير"
+ "Date Warning" : "تاريخ التحذير",
+ "Interview date" : "تاريخ المقابلة",
+ "Type of interview" : "نوع المقابلة",
+ "Planned interviews" : "المقابلات المخطط لها",
+ "Planning date" : "تاريخ التخطيط"
 }

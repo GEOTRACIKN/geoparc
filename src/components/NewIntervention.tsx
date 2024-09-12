@@ -25,7 +25,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         priority: "",
         statut: "Demande",
         vehicle: "",
-        mileage: "",
+        km: "",
         subject: "",
         client: "",
         clientPhone: "",
@@ -107,7 +107,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 priority: "",
                 statut: "",
                 vehicle: "",
-                mileage: "",
+                km: "",
                 subject: "",
                 client: "",
                 clientPhone: "",
@@ -183,12 +183,12 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="mileage">
+                    <Form.Group controlId="km">
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
                             placeholder="Entrez le kilométrage"
-                            value={formData.mileage}
+                            value={formData.km}
                             onChange={handleChange}
                         />
                     </Form.Group>
