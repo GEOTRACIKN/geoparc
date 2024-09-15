@@ -1,113 +1,94 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useTranslate } from "./LanguageProvider";
-import { formatDateToTimestamp } from "../utilities/functions";
+import { useTranslate } from "../LanguageProvider";
+import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 
-interface ModalEditInterventionProps {
+interface ModalNewInterventionnProps {
     show: boolean;
     onHide: () => void;
-    id_intervention: number | null;
     onSuccess?: () => void;
-
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
 
-const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
+
+const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     show,
     onHide,
-    id_intervention,
-    onSuccess
+    onSuccess,
 }) => {
     const [formData, setFormData] = useState({
         date: "",
         priority: "",
+        statut: "Demande",
         vehicle: "",
         km: "",
         subject: "",
         client: "",
         clientPhone: "",
         receptionistName: "",
-        service: "",
+        service: 0,
     });
 
     const { translate } = useTranslate();
 
-    const serviceMapping: { [key: number]: string } = {
-        1: "Garage",
-        2: "Planification d'entretien",
-        3: "Entretien",
-        4: "Changement de Pneu",
-        5: "Changement de Pièce",
+    const serviceOptions: { [key: string]: number } = {
+        "Garage": 1,
+        "Planification d'entretien": 2,
+        "Entretien": 3,
+        "Changement De Pneu": 4,
+        "Changement de Pièce": 5,
     };
 
-    // Fetch data from API and set form data
-    const fetchIntervention = async () => {
-        try {
-            const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            if (data.length > 0) {
-                const intervention = data[0];
-                setFormData({
-                    date: formatDateToTimestamp(intervention.date_intervention), 
-                    priority: intervention.priority,
-                    vehicle: intervention.vehicule,
-                    km: intervention.km,
-                    subject: intervention.subject,
-                    client: intervention.client,
-                    clientPhone: intervention.phone_client,
-                    receptionistName: intervention.receptionist_name,
-                    service: intervention.service.toString(),
-                });
-            } else {
-                console.warn('No intervention data found for the provided ID.');
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération des données:', error);
-        }
-    };
-
-    useEffect(() => {
-        if (show) {
-            fetchIntervention();
-        }
-    }, [show]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [id]: value,
-        }));
+
+        if (id === "service") {
+            // Convertir la valeur sélectionnée en nombre
+            const serviceId = serviceOptions[value] || 0;
+            setFormData(prevState => ({
+                ...prevState,
+                [id]: serviceId,
+            }));
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [id]: value,
+            }));
+        }
     };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const formattedDate = formatDateToTimestamp(formData.date);
 
+        // Mettre à jour formData avec la date formatée
+        const updatedFormData = {
+            ...formData,
+            date: formattedDate,
+        };
 
-    const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/updateintervention/${id_intervention}`;
-            const response = await fetch(url, {
-                method: 'PUT',
+            const response = await fetch(`${backendUrl}/api/geop/gmao/addnewintervention/${geopuserID}`, {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(updatedFormData),
             });
-    
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error("Une erreur s'est produite lors de l'ajout de l'intervention.");
             }
-    
+
             const result = await response.json();
-            console.log('Update successful:', result);
-    
+            console.log(result);
+
             // Afficher une notification de succès
-            toast.success("Intervention updated successfully!", {
+            toast.success("Intervention added successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -119,16 +100,33 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                 transition: Bounce,
 
             });
-        // Rafraîchir les données
-        if (onSuccess) {
-            onSuccess(); // Appel du callback pour rafraîchir le tableau
-        }
-            onHide(); // Fermer la modal après une mise à jour réussie
+
+            // Réinitialiser le formulaire
+            setFormData({
+                date: "",
+                priority: "",
+                statut: "",
+                vehicle: "",
+                km: "",
+                subject: "",
+                client: "",
+                clientPhone: "",
+                receptionistName: "",
+                service: 0,
+            });
+
+            // Rafraîchir les données
+            if (onSuccess) {
+                onSuccess(); // Appel du callback pour rafraîchir le tableau
+            }
+            // Fermer le modal
+            onHide();
+
         } catch (error) {
-            console.error('Erreur lors de la mise à jour des données:', error);
-    
+            console.error(error);
+
             // Afficher une notification d'erreur
-            toast.error("Error updating intervention. Please try again.", {
+            toast.error("Error adding intervention. Please try again.", {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -142,13 +140,14 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
             });
         }
     };
+
 
     return (
         <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Request")}</Modal.Title>
+                <Modal.Title>{translate("New Request")}</Modal.Title>
             </Modal.Header>
-            <Form>
+            <Form onSubmit={handleSubmit}>
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
@@ -163,7 +162,11 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
                     <Form.Group controlId="priority">
                         <Form.Label>{translate("Priority")}</Form.Label>
-                        <Form.Control as="select" value={formData.priority} onChange={handleChange}>
+                        <Form.Control
+                            as="select"
+                            value={formData.priority}
+                            onChange={handleChange}
+                        >
                             <option value="">{translate("Select Priority")}</option>
                             <option value="Normal">{translate("Normal")}</option>
                             <option value="Urgent">{translate("Urgent")}</option>
@@ -174,7 +177,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder={translate("Enter vehicle")}
+                            placeholder="Entrez le véhicule"
                             value={formData.vehicle}
                             onChange={handleChange}
                         />
@@ -184,7 +187,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
-                            placeholder={translate("Enter km")}
+                            placeholder="Entrez le kilométrage"
                             value={formData.km}
                             onChange={handleChange}
                         />
@@ -194,7 +197,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         <Form.Label>{translate("Subject")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder={translate("Enter subject")}
+                            placeholder="Entrez l'objet de la demande"
                             value={formData.subject}
                             onChange={handleChange}
                         />
@@ -204,7 +207,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         <Form.Label>{translate("Client")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder={translate("Enter client name")}
+                            placeholder="Entrez le nom du client"
                             value={formData.client}
                             onChange={handleChange}
                         />
@@ -214,17 +217,17 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         <Form.Label>{translate("Client Phone")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder={translate("Enter client phone")}
+                            placeholder="Entrez le numéro de téléphone du client"
                             value={formData.clientPhone}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
                     <Form.Group controlId="receptionistName">
-                        <Form.Label>{translate("Receptionist's Name")}</Form.Label>
+                        <Form.Label>{translate("Receptionist Name")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder={translate("Enter receptionist's name")}
+                            placeholder="Entrez le nom du réceptionniste"
                             value={formData.receptionistName}
                             onChange={handleChange}
                         />
@@ -232,22 +235,25 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
                     <Form.Group controlId="service">
                         <Form.Label>{translate("Service")}</Form.Label>
-                        <Form.Control as="select" value={formData.service} onChange={handleChange}>
+                        <Form.Control
+                            as="select"
+                            value={Object.keys(serviceOptions).find(key => serviceOptions[key] === formData.service) || ""}
+                            onChange={handleChange}
+                        >
                             <option value="">{translate("Select Service")}</option>
-                            {Object.entries(serviceMapping).map(([key, label]) => (
-                                <option key={key} value={key}>
-                                    {label}
-                                </option>
+                            {Object.entries(serviceOptions).map(([key, value]) => (
+                                <option key={value} value={key}>{translate(key)}</option>
                             ))}
                         </Form.Control>
                     </Form.Group>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
-                    <Button variant="primary" onClick={handleUpdate}>
-                        {translate("Update")}
+                    <Button variant="primary" type="submit">
+                        {translate("Add")}
                     </Button>
                 </Modal.Footer>
             </Form>
@@ -255,4 +261,4 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     );
 };
 
-export default ModalEditIntervention;
+export default ModalNewIntervention;

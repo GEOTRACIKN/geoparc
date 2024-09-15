@@ -2,8 +2,8 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useTranslate } from "../components/LanguageProvider";
-import { formatDateToTimestamp } from "../utilities/functions";
+import { useTranslate } from "../LanguageProvider";
+import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 
 interface ModalNewViolationProps {

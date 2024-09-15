@@ -3,11 +3,11 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewIntervention from "../components/NewIntervention"
+import ModalNewIntervention from "../components/Reception/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
-import ModalShowIntervention from "../components/ShowIntervention";
+import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
-import ModalEditIntervention from "../components/EditIntervention";
+import ModalEditIntervention from "../components/Reception/EditIntervention";
 
 
 interface Intervention {
@@ -103,7 +103,7 @@ export function Reception() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/gmao/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
     
@@ -122,7 +122,7 @@ export function Reception() {
     const getIntervention = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/gmao/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
@@ -366,8 +366,8 @@ export function Reception() {
                                     </p>
                                 </td>
                             </tr>
-                        ) : (
-                            list_intervention.map((Intervention, index) => (
+                        ) :   Array.isArray(list_intervention) && list_intervention.length !== 0 ? (
+                              list_intervention.map((Intervention, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -457,8 +457,14 @@ export function Reception() {
                                     </td>
                                 </tr>
                             ))
-                        )}
-                    </tbody>
+                        ) : (
+                            <tr style={{ textAlign: "center" }}>
+                              <td colSpan={selectedColumns.length || 10}>
+                                No data available
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
                 </Table>
             </div>
 

@@ -507,7 +507,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         as={NavLink}
                       >
                         <span className={` ${activeMenuText}`}>
-                          {translate("Planification d'entretiens")}
+                          {translate("Planned interviews")}
                         </span>
                       </Nav.Link>
                     </li>

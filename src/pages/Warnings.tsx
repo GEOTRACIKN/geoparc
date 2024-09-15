@@ -3,8 +3,8 @@ import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
-import ModalNewWaring from "../components/NewWarning";
-import ModalEditWarning from "../components/EditWarning";
+import ModalNewWaring from "../components/Warning/NewWarning";
+import ModalEditWarning from "../components/Warning/EditWarning";
 import { Bounce, toast } from "react-toastify";
 import { DownloadModal } from "../functions";
 import { generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
@@ -493,7 +493,7 @@ export function Warnings() {
                   </p>
                 </td>
               </tr>
-            ) : (
+            ) :  Array.isArray(list_Warnings) && list_Warnings.length !== 0 ? (
               list_Warnings.map((warning, idx) => (
                 <tr key={idx}>
                   <td className="text-center">
@@ -568,6 +568,12 @@ export function Warnings() {
                   </td>
                 </tr>
               ))
+            ) : (
+              <tr style={{ textAlign: "center" }}>
+                <td colSpan={selectedColumns.length || 10}>
+                  No data available
+                </td>
+              </tr>
             )}
           </tbody>
         </Table>

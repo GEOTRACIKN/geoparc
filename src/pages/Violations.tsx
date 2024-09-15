@@ -3,8 +3,8 @@ import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
-import ModalNewVilation from "../components/NewViolation"
-import ModalEditVilation from "../components/EditViolations";
+import ModalNewVilation from "../components/Violation/NewViolation"
+import ModalEditVilation from "../components/Violation/EditViolations";
 import { Bounce, toast } from "react-toastify";
 import { DownloadModal, formatDateToTimestamp, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
@@ -513,7 +513,7 @@ export function Violations() {
                   </p>
                 </td>
               </tr>
-            ) : (
+            ) :  Array.isArray(list_violation) && list_violation.length !== 0 ? (
               list_violation.map((violation, idx) => (
                 <tr key={idx}>
                   <td  className="text-center">
@@ -561,6 +561,12 @@ export function Violations() {
                   </td>
                 </tr>
               ))
+            ) : (
+              <tr style={{ textAlign: "center" }}>
+                <td colSpan={selectedColumns.length || 10}>
+                  No data available
+                </td>
+              </tr>
             )}
           </tbody>
         </Table>
