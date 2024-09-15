@@ -1,59 +1,49 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
+import { Dropdown, Table} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewIntervention from "../components/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
-import ModalShowIntervention from "../components/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
-import ModalEditIntervention from "../components/EditIntervention";
+import ModalEditPlanninginterviews from "../components/EditPlanning_interviews";
 
 
-interface Intervention {
-    id_intervention: number;
-    date_intervention: string;
-    priority: string;
-    statut: string;
+interface Schedule {
+    id_planning: number;
+    date_entretien: string;
     vehicule: string;
     km: number;
-    subject: string;
-    client: string;
-    phone_client: string;
-    receptionist_name: string;
     service: number;
+    type_entretien: string,
+    interview_date: string,
 }
 
 
-export function Reception() {
+export function InterviewSchedule() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
-    const [list_intervention, setintervention] = useState<Intervention[]>([]);
+    const [list_Schedule, setSchedule] = useState<Schedule[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID Intervention");
+    const [typeSearch, setTypeSearch] = useState("ID Schedule");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_intervention");
+    const [column, setSortColumn] = useState("id_planning");
     const [sort, setSort] = useState("ASC");
     const [total, setTotal] = useState(0);
-    const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
-
-
+    const [selectedPlanninginterviewsId, setSelectedPlanninginterviewsId] = useState<number | null>(null);
 
 
     const initialColumns = {
-        ID: true,
-        Date: true,
-        priority: true,
-        statut: true,
-        vehicule: true,
+        Planningdate: true,
+        vehicle: true,
         km: true,
-        client: true,
+        TypeInterview: true,
+        Interviewdate: true
     };
 
     // Load selected columns from localStorage or use initial state
@@ -77,58 +67,40 @@ export function Reception() {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getIntervention();
+        getSchedule();
     };
 
-    const [showNewInterventionModal, setShowNewInterventionModal] = useState(false);
-    const [showEditInterventionModal, setShowEditInterventionModal] = useState(false);
-    const [showShowInterventionModal, setShowShowInterventionModal] = useState(false);
 
-    const handleShowNewInterventionModal = () => setShowNewInterventionModal(true);
-    const handleCloseNewInterventionModal = () => setShowNewInterventionModal(false);
-
-    const handleEditInterventionModal = (id: number) => {
-        setSelectedInterventionId(id);
-        setShowEditInterventionModal(true);
-    };   
-    const handleCloseEditInterventionModal = () => setShowEditInterventionModal(false);
-
-    const handleShowShowInterventionModal = (id: number) => {
-        setSelectedInterventionId(id);
-        setShowShowInterventionModal(true);
-    };
-    const handleCloseShowInterventionModal = () => setShowShowInterventionModal(false);
-
-    const getCountIntervention = async () => {
+    const getCountSchedule = async () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-    
+
             // Assurez-vous que result est bien un nombre
             setTotal(result); // Accède directement au nombre
             setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
-    
+
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
     };
-    
 
-    const getIntervention = async () => {
+
+    const getSchedule = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
             console.log('Intervention data:', data);
 
-            setintervention(data);
+            setSchedule(data);
         } catch (error) {
             console.error(error);
         }
@@ -137,11 +109,18 @@ export function Reception() {
         }
     };
     useEffect(() => {
-        getCountIntervention();
-        getIntervention();
-    }, [currentPage, limit ,search, type, column, sort]);
+        getCountSchedule();
+        getSchedule();
+    }, [currentPage, limit, search, type, column, sort]);
 
-   
+
+    const [showEditPlanninginterviewsModal, setshowEditPlanninginterviewsModal] = useState(false);
+    const handleCloseEditPlanninginterviewsModal = () => setshowEditPlanninginterviewsModal(false);
+
+    const handleEditPlanninginterviewsModal = (id: number) => {
+        setSelectedPlanninginterviewsId(id);
+        setshowEditPlanninginterviewsModal(true);
+    }; 
 
 
     const handleTypeSearch = (event: any) => {
@@ -151,18 +130,11 @@ export function Reception() {
             case translate("ID Intervention"):
                 setType(0);
                 break;
-            case translate("Client"):
-                setType(1);
-                break;
+
             case translate("Vehicule"):
                 setType(2);
                 break;
-            case translate("Priority"):
-                setType(3);
-                break;
-            case translate("Status"):
-                setType(4);
-                break;
+
             default:
                 console.log("Unknown selection");
                 break;
@@ -184,25 +156,20 @@ export function Reception() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-     
+
     const refreshData = () => {
-        getCountIntervention();
-        getIntervention();
+        getCountSchedule();
+        getSchedule();
     };
-    
+
 
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Intervention Requests")} ({total})</h4>
+                    <h4>{translate("Planned interviews")} ({total})</h4>
                 </div>
-                <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewInterventionModal} className="btn btn-primary mt-2 mr-1">
-                        <i className="las la-plus mr-3"></i>
-                        {translate("New Request")} 
-                    </Button>
-                </div>
+
             </div>
             <div className="row">
                 <div
@@ -219,10 +186,7 @@ export function Reception() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Client")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Status")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -294,60 +258,47 @@ export function Reception() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
+
+                            {selectedColumns.Planningdate && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("ID")}
+                                    onClick={() => handleSortingColumn("Planningdate")}
                                 >
-                                    {translate("ID")}
+                                    {translate("Planning date")}
                                 </th>
                             )}
-                            {selectedColumns.Date && (
+
+                            {selectedColumns.vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Date")}
-                                >
-                                    {translate("Date")}
-                                </th>
-                            )}
-                            {selectedColumns.client && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("client")}
-                                >
-                                    {translate("Client")}
-                                </th>
-                            )}
-                            {selectedColumns.vehicule && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("vehicule")}
+                                    onClick={() => handleSortingColumn("vehicle")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.odometre && (
+                            {selectedColumns.km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("odometre")}
+                                    onClick={() => handleSortingColumn("km")}
                                 >
-                                    {translate("Odometer")}
+                                    {translate("KM")}
                                 </th>
                             )}
-                            {selectedColumns.Priority && (
+                            {selectedColumns.InterviewDate && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Priority")}
+                                    onClick={() => handleSortingColumn("InterviewDate")}
                                 >
-                                    {translate("Priority")}
+                                    {translate("Interview date")}
                                 </th>
                             )}
-                            {selectedColumns.etat && (
+
+                            {selectedColumns.TypeInterview && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("etat")}
+                                    onClick={() => handleSortingColumn("TypeInterview")}
                                 >
-                                    {translate("Status")}
+                                    {translate("Type of interview")}
                                 </th>
                             )}
                             <th>{translate("Action")}</th>
@@ -367,7 +318,7 @@ export function Reception() {
                                 </td>
                             </tr>
                         ) : (
-                            list_intervention.map((Intervention, index) => (
+                            list_Schedule.map((Schedule, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -379,62 +330,48 @@ export function Reception() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.id_intervention && (
+
+                                    {selectedColumns.Planningdate && (
                                         <td>
-                                            {Intervention.id_intervention}
+                                            {formatDateToTimestamp(Schedule.date_entretien)}
                                         </td>
                                     )}
-                                    {selectedColumns.date_intervention && (
+
+                                    {selectedColumns.vehicle && (
                                         <td>
-                                            {formatDateToTimestamp(
-                                                Intervention.date_intervention
+                                            {Schedule.vehicule}
+                                        </td>
+                                    )}
+                                    {selectedColumns.km && (
+                                        <td>
+                                            {Schedule.km}
+                                        </td>
+                                    )}
+                                    {selectedColumns.InterviewDate && (
+                                        <td>
+                                            {Schedule.interview_date ? (
+                                                Schedule.interview_date
+                                            ) : (
+                                                <span style={{ color: "orange" }}>En attente</span>
                                             )}
                                         </td>
                                     )}
-                                    {selectedColumns.client && (
+
+                                    {selectedColumns.TypeInterview && (
                                         <td>
-                                            {Intervention.client}
+                                            {Schedule.type_entretien ? (
+                                                Schedule.type_entretien
+                                            ) : (
+                                                <span style={{ color: "orange" }}>En attente</span>
+                                            )}
                                         </td>
                                     )}
-                                    {selectedColumns.vehicule && (
-                                        <td>
-                                            {Intervention.vehicule}
-                                        </td>
-                                    )}
-                                    {selectedColumns.odometre && (
-                                        <td>
-                                            {Intervention.km}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Priority && (
-                                        <td>
-                                            {Intervention.priority}
-                                        </td>
-                                    )}
-                                    {selectedColumns.etat && (
-                                        <td>
-                                            {Intervention.statut}
-                                        </td>
-                                    )}
+
+
+
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
-                                            <Link
-                                                to={``}
-                                                className="badge badge-success mr-2"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                title="Détail"
-                                                onClick={() =>
-                                                    handleShowShowInterventionModal(
-                                                        Intervention.id_intervention
-                                                    )
-                                                }
-                                            >
-                                                <i
-                                                    className="fa fa-eye"
-                                                    style={{ fontSize: "1.2em" }}
-                                                ></i>
-                                            </Link>
+                                           
                                             <Link
                                                 to={``}
                                                 className="badge badge-primary mr-2"
@@ -442,8 +379,8 @@ export function Reception() {
                                                 data-placement="top"
                                                 title="Edit"
                                                 onClick={() =>
-                                                    handleEditInterventionModal(
-                                                        Intervention.id_intervention
+                                                    handleEditPlanninginterviewsModal(
+                                                        Schedule.id_planning
                                                     )
                                                 }
                                             >
@@ -452,7 +389,21 @@ export function Reception() {
                                                     style={{ fontSize: "1.2em" }}
                                                 ></i>
                                             </Link>
-                                           
+                                            <Link
+                                                to={``}
+                                                className="badge badge-warning mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Mettre à jour l'état"
+                                            // onClick={() =>
+                                            //     //handleUpdateStatus(Schedule.id_planning)
+                                            // }
+                                            >
+                                                <i
+                                                    className="fa fa-sync"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </Link>
                                         </div>
                                     </td>
                                 </tr>
@@ -488,9 +439,7 @@ export function Reception() {
                     />
                 </div>
             </div>
-            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} onSuccess={refreshData}/>
-            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal}  id_intervention={selectedInterventionId} onSuccess={refreshData}/>
-            <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal} id_intervention={selectedInterventionId} />
+            <ModalEditPlanninginterviews show={showEditPlanninginterviewsModal} onHide={handleCloseEditPlanninginterviewsModal}  id_planning={selectedPlanninginterviewsId} onSuccess={refreshData}/>
 
         </>
     );

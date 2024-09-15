@@ -317,7 +317,11 @@ export function Warnings() {
       setSelectedWarnings([]);
     }
   };
-
+  
+  const refreshData = () => {
+    getWarnings();
+    getCountWarning();
+};
 
 
   return (
@@ -331,14 +335,14 @@ export function Warnings() {
         </div>
         <div className="col-md-6 col-sm-12 text-right">
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
-            <i className="las la-plus mr-3"></i>Add Warnings
+            <i className="las la-plus mr-3"></i>{translate("Add Warning")}
           </Button>
           <button
             className="btn btn-outline-secondary  mt-2 mr-1"
             onClick={() => setShowDownloadModal(true)}
           >
             <i className="las la-download"></i>
-            Exporter
+            {translate("Export")}
           </button>
         </div>
       </div>
@@ -423,38 +427,35 @@ export function Warnings() {
         <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
-              <th>
+              <th className="text-center">
                 <div className="form-check form-check-inline">
                   <input
                     className="form-check-input"
                     type="checkbox"
                     checked={selectAll}
                     onChange={handleSelectAll}
-
                   />
                 </div>
               </th>
               {selectedColumns.id_warning && (
                 <th
-                  className="sorting"
+                  className="sorting "
                   onClick={() => handleSortingColumn("id_warning")}
                 >
-                  {translate("ID Warning")}
+                  {translate("ID")}
                 </th>
               )}
               {selectedColumns.driver && (
                 <th
-                  className="sorting"
-
+                  className="sorting "
                   onClick={() => handleSortingColumn("driver")}
-
                 >
                   {translate("Driver")}
                 </th>
               )}
               {selectedColumns.type && (
                 <th
-                  className="sorting"
+                  className="sorting "
                   onClick={() => handleSortingColumn("Type_Warning")}
                 >
                   {translate("Type Warning")}
@@ -462,7 +463,7 @@ export function Warnings() {
               )}
               {selectedColumns.description && (
                 <th
-                  className="sorting"
+                  className="sorting "
                   onClick={() => handleSortingColumn("description")}
                 >
                   {translate("Description")}
@@ -470,7 +471,7 @@ export function Warnings() {
               )}
               {selectedColumns.date && (
                 <th
-                  className="sorting"
+                  className="sorting "
                   onClick={() => handleSortingColumn("date")}
                 >
                   {translate("Date")}
@@ -495,33 +496,54 @@ export function Warnings() {
             ) : (
               list_Warnings.map((warning, idx) => (
                 <tr key={idx}>
-                  <td>
+                  <td className="text-center">
                     <div className="form-check form-check-inline">
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        checked={selectedWarnings.includes(warning.id_warning)}
-                        onChange={() => handleSelectWarning(warning.id_warning)}
+                        checked={selectedWarnings.includes(
+                          warning.id_warning
+                        )}
+                        onChange={() =>
+                          handleSelectWarning(warning.id_warning)
+                        }
                       />
                     </div>
                   </td>
-                  {selectedColumns.id_warning && <td>{warning.id_warning}</td>}
-                  {selectedColumns.driver && (
-                    <td>
-                      {warning.conducteur_nom} {warning.conducteur_prenom}
+                  {selectedColumns.id_warning && (
+                    <td >
+                      {warning.id_warning}
                     </td>
                   )}
-                  {selectedColumns.type && <td>{warning.Type_Warning}</td>}
-                  {selectedColumns.description && <td>{warning.Description}</td>}
-                  {selectedColumns.date && (
-                    <td>{new Date(warning.Date).toLocaleDateString()}</td>
+                  {selectedColumns.driver && (
+                    <td >
+                      {warning.conducteur_nom}{" "}
+                      {warning.conducteur_prenom}
+                    </td>
                   )}
-                  <td>
-                    <div className="d-flex align-items-center list-action">
+                  {selectedColumns.type && (
+                    <td >
+                      {warning.Type_Warning}
+                    </td>
+                  )}
+                  {selectedColumns.description && (
+                    <td >
+                      {warning.Description}
+                    </td>
+                  )}
+                  {selectedColumns.date && (
+                    <td >
+                      {new Date(warning.Date).toLocaleDateString()}
+                    </td>
+                  )}
+                  <td className="text-center">
+                    <div className="d-flex justify-content-center align-items-center list-action">
                       <a
                         className="badge bg-primary mr-2"
                         title="Edit"
-                        onClick={() => handleEditWarning(warning.id_warning)}
+                        onClick={() =>
+                          handleEditWarning(warning.id_warning)
+                        }
                         style={{ cursor: "pointer" }}
                       >
                         <i
@@ -533,7 +555,9 @@ export function Warnings() {
                         className="badge bg-warning mr-2"
                         title="Delete"
                         style={{ cursor: "pointer" }}
-                        onClick={() => handleShowDeleteModal(warning.id_warning)}
+                        onClick={() =>
+                          handleShowDeleteModal(warning.id_warning)
+                        }
                       >
                         <i
                           className="ri-delete-bin-line mr-0"
@@ -546,9 +570,9 @@ export function Warnings() {
               ))
             )}
           </tbody>
-
         </Table>
       </div>
+
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>Affichage 1 à {limit} sur {total} </span>
@@ -578,13 +602,13 @@ export function Warnings() {
       <ModalNewWaring
         show={show}
         handleClose={handleClose}
-        refreshWarning={() => getWarnings()}
+        onSuccess={refreshData}
       ></ModalNewWaring>
       <ModalEditWarning
         show={showEditModal}
         handleClose={handleCloseEditModal}
         warningId={warningToEdit}
-        refreshWarning={getWarnings} // Propagez la fonction de rafraîchissement des avertissements si nécessaire
+        onSuccess={refreshData}
       />
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>

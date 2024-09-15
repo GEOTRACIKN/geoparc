@@ -322,6 +322,10 @@ export function Violations() {
     }
   };
 
+  const refreshData = () => {
+    getViolation();
+    getCountViolation();
+};
 
   return (
     <>
@@ -334,14 +338,14 @@ export function Violations() {
         </div>
         <div className="col-md-6 col-sm-12 text-right">
           <Button variant="primary" className="mt-2 mr-1" onClick={handleShow}>
-            <i className="las la-plus mr-3"></i>Add violation
+            <i className="las la-plus mr-3"></i>{translate("Add Violation")}
           </Button>
           <button
             className="btn btn-outline-secondary  mt-2 mr-1"
             onClick={() => setShowDownloadModal(true)}
           >
             <i className="las la-download"></i>
-            Exporter
+            {translate("Export")}
           </button>
         </div>
       </div>
@@ -427,7 +431,7 @@ export function Violations() {
         <Table className="dataTable" responsive>
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
-              <th>
+              <th className="text-center">
                 <div className="form-check form-check-inline">
                   <input className="form-check-input"
                     type="checkbox"
@@ -449,7 +453,7 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("date_violation")}
                 >
-                  {translate("Date and time")}
+                  {translate("Date")}
                 </th>
               )}
               {selectedColumns.driver && (
@@ -466,7 +470,7 @@ export function Violations() {
                   className="sorting"
                   onClick={() => handleSortingColumn("vehicule")}
                 >
-                  {translate("Vehicule")}
+                  {translate("Vehicles")}
                 </th>
               )}
               {selectedColumns.type && (
@@ -486,11 +490,14 @@ export function Violations() {
                 </th>
               )}
               {selectedColumns.description && (
-                <th>
+                <th
+                className="sorting"
+
+                >
                   {translate("Description")}
                 </th>
               )}
-              <th>{translate("Actions")}</th>
+              <th >{translate("Actions")}</th>
             </tr>
           </thead>
           <tbody className="light-body">
@@ -509,7 +516,7 @@ export function Violations() {
             ) : (
               list_violation.map((violation, idx) => (
                 <tr key={idx}>
-                  <td>
+                  <td  className="text-center">
                     <div className="form-check form-check-inline">
                       <input
                         className="form-check-input"
@@ -584,13 +591,13 @@ export function Violations() {
           />
         </div>
       </div>
-      <ModalNewVilation show={show} handleClose={handleClose} refreshviolation={() => { getViolation() }}></ModalNewVilation>
+      <ModalNewVilation show={show} handleClose={handleClose} onSuccess={refreshData}></ModalNewVilation>
 
       <ModalEditVilation
         show={showEditModal}
         handleClose={handleCloseEditModal}
         violationId={ViolationToEdit}
-        refreshviolation={getViolation} // Propagez la fonction de rafraîchissement si nécessaire
+        onSuccess={refreshData}
       />
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>
