@@ -15,7 +15,7 @@ interface Schedule {
     km: number;
     service: number;
     type_entretien: string,
-    interview_date: string,
+    date_dentretien: string,
 }
 
 
@@ -400,8 +400,8 @@ export function InterviewSchedule() {
                                     )}
                                     {selectedColumns.InterviewDate && (
                                         <td>
-                                            {Schedule.interview_date ? (
-                                                Schedule.interview_date
+                                            {Schedule.date_dentretien ? (
+                                                formatDateToTimestamp(Schedule.date_dentretien)
                                             ) : (
                                                 <span style={{ color: "orange" }}>En attente</span>
                                             )}

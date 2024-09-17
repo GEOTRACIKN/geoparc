@@ -3,7 +3,7 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewIntervention from "../components/NewIntervention"
+import ModalNewIntervention from "../components/Reception/NewIntervention"
 
 
 interface Intervention {
@@ -364,15 +364,11 @@ export function Garage() {
                         nextLinkClassName={"page-link"}
                         breakClassName={"page-item"}
                         breakLinkClassName={"page-link"}
-                        activeClassName={"active"}
+                         activeClassName={"active"}
                     />
                 </div>
             </div>
-            <ModalNewIntervention
-                show={show}
-                handleClose={handleClose}
-                refreshintervention={() => { getIntervention() }}
-            />
+          
 
 
         </>
