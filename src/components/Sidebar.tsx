@@ -492,7 +492,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                         to="/garage"
                         className="svg-icon"
                         as={NavLink}
-                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+                        // style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
                         <span className={` ${activeMenuText}`}>
