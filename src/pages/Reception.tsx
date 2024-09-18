@@ -37,7 +37,7 @@ export function Reception() {
     const [typeSearch, setTypeSearch] = useState("ID Intervention");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_intervention");
-    const [sort, setSort] = useState("ASC");
+    const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -126,7 +126,7 @@ export function Reception() {
             );
 
             const data = await response.json();
-            console.log('Intervention data:', data);
+
 
             setintervention(data);
         } catch (error) {

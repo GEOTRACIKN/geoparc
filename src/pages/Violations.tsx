@@ -35,7 +35,7 @@ export function Violations() {
   const [pageCount, setPageCount] = useState(0);
   const [total, setTotal] = useState(0);
   const [column, setSortColumn] = useState("id_violation");
-  const [sort, setSort] = useState("ASC");
+  const [sort, setSort] = useState("desc");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("ID Violation");

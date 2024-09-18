@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../LanguageProvider";
 import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
 
 interface ModalEditPlanninginterviewsProps {
     show: boolean;
@@ -71,6 +72,34 @@ const ModalEditPlanninginterviews: React.FC<
         }));
     };
 
+    // Pour le champ de type de violation
+    const Type_entretiens = [
+        { value: "Lavage", label: translate("Lavage") },
+        { value: "Vidange d'huile", label: translate("Vidange d'huile") },
+        { value: "Changement filtres", label: translate("Changement filtres") },
+        { value: "Vidange + filtre a air", label: translate("Vidange + filtre a air") },
+        { value: "Vidange + filtre a l'huile", label: translate("Vidange + filtre a l'huile") },
+        { value: "Vidange + changement de filtre", label: translate("Vidange + changement de filtre") },
+        { value: "Alignement des roues", label: translate("Alignement des roues") },
+        { value: "Permutation des pneumatiques", label: translate("Permutation des pneumatiques") },
+        { value: "Réglage moteur", label: translate("Réglage moteur") },
+        { value: "Réglage des freins", label: translate("Réglage des freins") },
+        { value: "Réglage electrique", label: translate("Réglage electrique") },
+        { value: "Controle", label: translate("Controle") },
+        { value: "Autres", label: translate("Autres") },
+    ];
+    const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+
+        setFormData({
+            ...formData,
+            [name]: value,
+            type_entretien: selectedOption ? selectedOption.value : "", // Met à jour l'état avec l'option sélectionnée
+        });
+    };
+
+
     const handleUpdate = async () => {
         try {
             // Formater la date avant de l'envoyer
@@ -81,7 +110,7 @@ const ModalEditPlanninginterviews: React.FC<
                 ...formData,
                 date_dentretien: formattedDate,
             };
-            const url = `${backendUrl}/api/geop/gmao/editplanninginterview/${id_planning}`;
+            const url = `${backendUrl}/api/geop/gmao/updateplanninginterview/${id_planning}`;
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
@@ -179,13 +208,15 @@ const ModalEditPlanninginterviews: React.FC<
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="type_entretien">
-                        <Form.Label>{translate("Type of interview")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder={translate("Enter Type of interview")}
-                            value={formData.type_entretien}
-                            onChange={handleChange}
+                    <Form.Group controlId="type">
+                        <Form.Label>{translate("Violation type")}</Form.Label>
+                        <Select
+                            options={Type_entretiens}
+                            onChange={handleViolationTypeChange}
+                            name="type"
+                            value={Type_entretiens.find((option) => option.value === formData.type_entretien)}
+
+                            isClearable
                         />
                     </Form.Group>
                 </Modal.Body>

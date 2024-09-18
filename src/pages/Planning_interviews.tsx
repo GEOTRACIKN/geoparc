@@ -6,6 +6,7 @@ import { useTranslate } from "../components/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";
+import { Bounce, toast } from "react-toastify";
 
 
 interface Schedule {
@@ -31,7 +32,7 @@ export function InterviewSchedule() {
     const [typeSearch, setTypeSearch] = useState("ID Schedule");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_planning");
-    const [sort, setSort] = useState("ASC");
+    const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -169,35 +170,84 @@ export function InterviewSchedule() {
         getSchedule();
     };
 
-        // Modal for confirmation of closing the interview
-        const handleShowConfirmModal = (id: number) => {
-            setSelectedInterviewId(id); // Set the selected interview ID
-            setShowConfirmModal(true); // Show the modal
-        };
-    
-        const handleCloseConfirmModal = () => {
-            setShowConfirmModal(false); // Close the modal without action
-        };
-    
-        const handleConfirmClosure = async () => {
-            if (selectedInterviewId) {
-                try {
-                    // Add your closure logic here (e.g., updating the interview status in the backend)
-                    await fetch(`${backendUrl}/api/interview/close/${selectedInterviewId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ user_id: id_user }), // Pass necessary data
+    // Modal for confirmation of closing the interview
+    const handleShowConfirmModal = (id: number) => {
+        setSelectedInterviewId(id); // Set the selected interview ID
+        setShowConfirmModal(true); // Show the modal
+    };
+
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false); // Close the modal without action
+    };
+
+
+    const handleUpdateState = async () => {
+        if (selectedInterviewId) {
+            try {
+                // Effectuer la mise à jour de l'état de l'entretien via l'API
+                const response = await fetch(`${backendUrl}/api/geop/gmao/InterviewSchedule/updatestate/${selectedInterviewId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        statut: "Cloturé", // Le statut que vous souhaitez mettre à jour
+                    }),
+                });
+
+                // Vérifier si la requête a réussi
+                if (response.ok) {
+                    // Afficher une notification de succès
+                    toast.success("Statut de l'entretien mis à jour avec succès!", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+
                     });
-                    refreshData(); // Refresh the data after closure
-                } catch (error) {
-                    console.error("Error closing interview:", error);
-                } finally {
-                    setShowConfirmModal(false); // Close the modal after the operation
+
+                    refreshData(); // Rafraîchir les données après la mise à jour
+                } else {
+                    // Afficher une notification d'erreur si la requête a échoué
+                    toast.error("Erreur lors de la mise à jour du statut de l'entretien.", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+
+                    });
                 }
+            } catch (error) {
+                console.error("Erreur lors de la clôture de l'entretien:", error);
+
+                // Afficher une notification d'erreur en cas d'exception
+                toast.error("Une erreur s'est produite. Veuillez réessayer.", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+
+                });
+            } finally {
+                setShowConfirmModal(false); // Fermer la modal après l'opération
             }
-        };
+        }
+    };
 
 
     return (
@@ -508,7 +558,7 @@ export function InterviewSchedule() {
                     <Button variant="secondary" onClick={handleCloseConfirmModal}>
                         {translate("Non")}
                     </Button>
-                    <Button variant="primary" onClick={handleConfirmClosure}>
+                    <Button variant="primary" onClick={handleUpdateState}>
                         {translate("Oui")}
                     </Button>
                 </Modal.Footer>
