@@ -3,8 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Bounce, toast } from "react-toastify";
-import { useTranslate } from "../components/LanguageProvider";
-import { formatDateToTimestamp } from "../utilities/functions";
+import { useTranslate } from "../LanguageProvider";
+import { formatDateToTimestamp } from "../../utilities/functions";
 
 
 interface ModalEditViolationProps {

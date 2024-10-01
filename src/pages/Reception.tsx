@@ -3,11 +3,11 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewIntervention from "../components/NewIntervention"
+import ModalNewIntervention from "../components/Reception/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
-import ModalShowIntervention from "../components/ShowIntervention";
+import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
-import ModalEditIntervention from "../components/EditIntervention";
+import ModalEditIntervention from "../components/Reception/EditIntervention";
 
 
 interface Intervention {
@@ -37,7 +37,7 @@ export function Reception() {
     const [typeSearch, setTypeSearch] = useState("ID Intervention");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_intervention");
-    const [sort, setSort] = useState("ASC");
+    const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -90,7 +90,7 @@ export function Reception() {
     const handleEditInterventionModal = (id: number) => {
         setSelectedInterventionId(id);
         setShowEditInterventionModal(true);
-    };   
+    };
     const handleCloseEditInterventionModal = () => setShowEditInterventionModal(false);
 
     const handleShowShowInterventionModal = (id: number) => {
@@ -103,30 +103,30 @@ export function Reception() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/gmao/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-    
+
             // Assurez-vous que result est bien un nombre
             setTotal(result); // Accède directement au nombre
             setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
-    
+
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
     };
-    
+
 
     const getIntervention = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/gmao/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
-            console.log('Intervention data:', data);
+
 
             setintervention(data);
         } catch (error) {
@@ -139,9 +139,9 @@ export function Reception() {
     useEffect(() => {
         getCountIntervention();
         getIntervention();
-    }, [currentPage, limit ,search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort]);
 
-   
+
 
 
     const handleTypeSearch = (event: any) => {
@@ -184,12 +184,12 @@ export function Reception() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-     
+
     const refreshData = () => {
         getCountIntervention();
         getIntervention();
     };
-    
+
 
     return (
         <>
@@ -200,7 +200,7 @@ export function Reception() {
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewInterventionModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Request")} 
+                        {translate("New Request")}
                     </Button>
                 </div>
             </div>
@@ -366,7 +366,7 @@ export function Reception() {
                                     </p>
                                 </td>
                             </tr>
-                        ) : (
+                        ) : Array.isArray(list_intervention) && list_intervention.length !== 0 ? (
                             list_intervention.map((Intervention, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
@@ -411,11 +411,25 @@ export function Reception() {
                                             {Intervention.priority}
                                         </td>
                                     )}
-                                    {selectedColumns.etat && (
-                                        <td>
-                                            {Intervention.statut}
-                                        </td>
-                                    )}
+                                    <td
+                                        style={{                
+                                            display: "flex", // Pour aligner l'icône avec le texte
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        {Intervention.statut === "Cloturé" ? (
+                                            <>
+                                                <i className="fas fa-check-circle" style={{ marginRight: "5px" , color: "#28a745"}}></i> {/* Icône pour Clôturé */}
+                                                Clôturé
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i> {/* Icône pour Demande */}
+                                                Demande
+                                            </>
+                                        )}
+                                    </td>
+
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
                                             <Link
@@ -452,11 +466,17 @@ export function Reception() {
                                                     style={{ fontSize: "1.2em" }}
                                                 ></i>
                                             </Link>
-                                           
+
                                         </div>
                                     </td>
                                 </tr>
                             ))
+                        ) : (
+                            <tr style={{ textAlign: "center" }}>
+                                <td colSpan={selectedColumns.length || 10}>
+                                    No data available
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </Table>
@@ -488,8 +508,8 @@ export function Reception() {
                     />
                 </div>
             </div>
-            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} onSuccess={refreshData}/>
-            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal}  id_intervention={selectedInterventionId} onSuccess={refreshData}/>
+            <ModalNewIntervention show={showNewInterventionModal} onHide={handleCloseNewInterventionModal} onSuccess={refreshData} />
+            <ModalEditIntervention show={showEditInterventionModal} onHide={handleCloseEditInterventionModal} id_intervention={selectedInterventionId} onSuccess={refreshData} />
             <ModalShowIntervention show={showShowInterventionModal} onHide={handleCloseShowInterventionModal} id_intervention={selectedInterventionId} />
 
         </>

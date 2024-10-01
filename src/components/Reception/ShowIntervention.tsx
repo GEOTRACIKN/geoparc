@@ -1,31 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useTranslate } from "./LanguageProvider";
-import { formatDateToTimestamp } from "../utilities/functions";
-import { Bounce, toast } from "react-toastify";
+import { useTranslate } from "../LanguageProvider";
+import { formatDateToTimestamp } from "../../utilities/functions";
 
-interface ModalEditPlanninginterviewsProps {
+interface ModalShowInterventionnProps {
     show: boolean;
     onHide: () => void;
-    id_planning: number | null;
-    onSuccess?: () => void;
+    id_intervention: number | null;
 
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = ({
+
+const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     show,
     onHide,
-    id_planning,
-    onSuccess
+    id_intervention,
+
 }) => {
     const [formData, setFormData] = useState({
         date: "",
         priority: "",
         vehicle: "",
-        km: "",
+        mileage: "",
         subject: "",
         client: "",
         clientPhone: "",
@@ -46,19 +45,28 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
         try {
-            const url = `${backendUrl}/api/geop//${id_planning}`;
+            const url = `${backendUrl}/api/geop/gmao/showintervention/${id_intervention}`;
+            console.log('Request URL:', url);
+    
             const response = await fetch(url);
+    
+            // Vérifiez le statut de la réponse
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+    
             const data = await response.json();
+    
+            console.log('Data:', data);
+            console.log('Data length:', data.length);
+    
             if (data.length > 0) {
                 const intervention = data[0];
                 setFormData({
                     date: formatDateToTimestamp(intervention.date_intervention), 
                     priority: intervention.priority,
                     vehicle: intervention.vehicule,
-                    km: intervention.km,
+                    mileage: intervention.km,
                     subject: intervention.subject,
                     client: intervention.client,
                     clientPhone: intervention.phone_client,
@@ -72,6 +80,7 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
             console.error('Erreur lors de la récupération des données:', error);
         }
     };
+    
 
     useEffect(() => {
         if (show) {
@@ -87,66 +96,10 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
         }));
     };
 
-
-    const handleUpdate = async () => {
-        try {
-            const url = `${backendUrl}/api/geop//${id_planning}`;
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const result = await response.json();
-            console.log('Update successful:', result);
-    
-            // Afficher une notification de succès
-            toast.success("Intervention updated successfully!", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-
-            });
-        // Rafraîchir les données
-        if (onSuccess) {
-            onSuccess(); // Appel du callback pour rafraîchir le tableau
-        }
-            onHide(); // Fermer la modal après une mise à jour réussie
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour des données:', error);
-    
-            // Afficher une notification d'erreur
-            toast.error("Error updating intervention. Please try again.", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-
-            });
-        }
-    };
-
     return (
         <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit ")}</Modal.Title>
+                <Modal.Title>{translate("Show Request")}</Modal.Title>
             </Modal.Header>
             <Form>
                 <Modal.Body
@@ -157,13 +110,13 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                         <Form.Control
                             type="datetime-local"
                             value={formData.date}
-                            onChange={handleChange}
+                            readOnly // Rend le champ non modifiable
                         />
                     </Form.Group>
 
                     <Form.Group controlId="priority">
                         <Form.Label>{translate("Priority")}</Form.Label>
-                        <Form.Control as="select" value={formData.priority} onChange={handleChange}>
+                        <Form.Control as="select" value={formData.priority} disabled >
                             <option value="">{translate("Select Priority")}</option>
                             <option value="Normal">{translate("Normal")}</option>
                             <option value="Urgent">{translate("Urgent")}</option>
@@ -176,18 +129,18 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                             type="text"
                             placeholder={translate("Enter vehicle")}
                             value={formData.vehicle}
-                            onChange={handleChange}
-                        />
+                            readOnly               
+                                 />
                     </Form.Group>
 
-                    <Form.Group controlId="km">
+                    <Form.Group controlId="mileage">
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
-                            placeholder={translate("Enter km")}
-                            value={formData.km}
-                            onChange={handleChange}
-                        />
+                            placeholder={translate("Enter mileage")}
+                            value={formData.mileage}
+                            readOnly  
+                                                  />
                     </Form.Group>
 
                     <Form.Group controlId="subject">
@@ -196,7 +149,7 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                             type="text"
                             placeholder={translate("Enter subject")}
                             value={formData.subject}
-                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
 
@@ -206,7 +159,7 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                             type="text"
                             placeholder={translate("Enter client name")}
                             value={formData.client}
-                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
 
@@ -216,7 +169,7 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                             type="text"
                             placeholder={translate("Enter client phone")}
                             value={formData.clientPhone}
-                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
 
@@ -226,13 +179,13 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                             type="text"
                             placeholder={translate("Enter receptionist's name")}
                             value={formData.receptionistName}
-                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
 
                     <Form.Group controlId="service">
                         <Form.Label>{translate("Service")}</Form.Label>
-                        <Form.Control as="select" value={formData.service} onChange={handleChange}>
+                        <Form.Control as="select" value={formData.service} disabled>
                             <option value="">{translate("Select Service")}</option>
                             {Object.entries(serviceMapping).map(([key, label]) => (
                                 <option key={key} value={key}>
@@ -246,13 +199,11 @@ const ModalEditPlanninginterviews: React.FC<ModalEditPlanninginterviewsProps> = 
                     <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
-                    <Button variant="primary" onClick={handleUpdate}>
-                        {translate("Update")}
-                    </Button>
+                  
                 </Modal.Footer>
             </Form>
         </Modal>
     );
 };
 
-export default ModalEditPlanninginterviews;
+export default ModalShowIntervention;

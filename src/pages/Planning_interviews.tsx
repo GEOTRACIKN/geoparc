@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Table} from "react-bootstrap";
+import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
-import ModalEditPlanninginterviews from "../components/EditPlanning_interviews";
+import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";
+import { Bounce, toast } from "react-toastify";
 
 
 interface Schedule {
     id_planning: number;
-    date_entretien: string;
+    date_planification: string;
     vehicule: string;
     km: number;
     service: number;
     type_entretien: string,
-    interview_date: string,
+    date_dentretien: string,
 }
 
 
@@ -31,14 +32,17 @@ export function InterviewSchedule() {
     const [typeSearch, setTypeSearch] = useState("ID Schedule");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_planning");
-    const [sort, setSort] = useState("ASC");
+    const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
     const [selectedPlanninginterviewsId, setSelectedPlanninginterviewsId] = useState<number | null>(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
+    const [selectedInterviewId, setSelectedInterviewId] = useState<number | null>(null); // To keep track of the interview being closed
 
 
     const initialColumns = {
+        IDPlanning: true,
         Planningdate: true,
         vehicle: true,
         km: true,
@@ -75,7 +79,7 @@ export function InterviewSchedule() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/gmao/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
 
@@ -94,7 +98,7 @@ export function InterviewSchedule() {
     const getSchedule = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/gmao/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
@@ -120,7 +124,7 @@ export function InterviewSchedule() {
     const handleEditPlanninginterviewsModal = (id: number) => {
         setSelectedPlanninginterviewsId(id);
         setshowEditPlanninginterviewsModal(true);
-    }; 
+    };
 
 
     const handleTypeSearch = (event: any) => {
@@ -130,11 +134,15 @@ export function InterviewSchedule() {
             case translate("ID Intervention"):
                 setType(0);
                 break;
-
             case translate("Vehicule"):
+                setType(1);
+                break;
+            case translate("Km"):
                 setType(2);
                 break;
-
+            case translate("Type of interview"):
+                setType(3);
+                break;
             default:
                 console.log("Unknown selection");
                 break;
@@ -162,6 +170,85 @@ export function InterviewSchedule() {
         getSchedule();
     };
 
+    // Modal for confirmation of closing the interview
+    const handleShowConfirmModal = (id: number) => {
+        setSelectedInterviewId(id); // Set the selected interview ID
+        setShowConfirmModal(true); // Show the modal
+    };
+
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false); // Close the modal without action
+    };
+
+
+    const handleUpdateState = async () => {
+        if (selectedInterviewId) {
+            try {
+                // Effectuer la mise à jour de l'état de l'entretien via l'API
+                const response = await fetch(`${backendUrl}/api/geop/gmao/InterviewSchedule/updatestate/${selectedInterviewId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        statut: "Cloturé", // Le statut que vous souhaitez mettre à jour
+                    }),
+                });
+
+                // Vérifier si la requête a réussi
+                if (response.ok) {
+                    // Afficher une notification de succès
+                    toast.success("Statut de l'entretien mis à jour avec succès!", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+
+                    });
+
+                    refreshData(); // Rafraîchir les données après la mise à jour
+                } else {
+                    // Afficher une notification d'erreur si la requête a échoué
+                    toast.error("Erreur lors de la mise à jour du statut de l'entretien.", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+
+                    });
+                }
+            } catch (error) {
+                console.error("Erreur lors de la clôture de l'entretien:", error);
+
+                // Afficher une notification d'erreur en cas d'exception
+                toast.error("Une erreur s'est produite. Veuillez réessayer.", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+
+                });
+            } finally {
+                setShowConfirmModal(false); // Fermer la modal après l'opération
+            }
+        }
+    };
+
 
     return (
         <>
@@ -187,6 +274,8 @@ export function InterviewSchedule() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Km")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type of interview")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -258,6 +347,14 @@ export function InterviewSchedule() {
                                     />
                                 </div>
                             </th>
+                            {selectedColumns.IDPlanning && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("IDPlanning")}
+                                >
+                                    {translate("ID")}
+                                </th>
+                            )}
 
                             {selectedColumns.Planningdate && (
                                 <th
@@ -317,7 +414,7 @@ export function InterviewSchedule() {
                                     </p>
                                 </td>
                             </tr>
-                        ) : (
+                        ) : Array.isArray(list_Schedule) && list_Schedule.length !== 0 ? (
                             list_Schedule.map((Schedule, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
@@ -330,10 +427,14 @@ export function InterviewSchedule() {
                                             />
                                         </div>
                                     </td>
-
+                                    {selectedColumns.IDPlanning && (
+                                        <td>
+                                            {Schedule.id_planning}
+                                        </td>
+                                    )}
                                     {selectedColumns.Planningdate && (
                                         <td>
-                                            {formatDateToTimestamp(Schedule.date_entretien)}
+                                            {formatDateToTimestamp(Schedule.date_planification)}
                                         </td>
                                     )}
 
@@ -349,8 +450,8 @@ export function InterviewSchedule() {
                                     )}
                                     {selectedColumns.InterviewDate && (
                                         <td>
-                                            {Schedule.interview_date ? (
-                                                Schedule.interview_date
+                                            {Schedule.date_dentretien ? (
+                                                formatDateToTimestamp(Schedule.date_dentretien)
                                             ) : (
                                                 <span style={{ color: "orange" }}>En attente</span>
                                             )}
@@ -371,7 +472,7 @@ export function InterviewSchedule() {
 
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
-                                           
+
                                             <Link
                                                 to={``}
                                                 className="badge badge-primary mr-2"
@@ -395,9 +496,8 @@ export function InterviewSchedule() {
                                                 data-toggle="tooltip"
                                                 data-placement="top"
                                                 title="Mettre à jour l'état"
-                                            // onClick={() =>
-                                            //     //handleUpdateStatus(Schedule.id_planning)
-                                            // }
+                                                onClick={() => handleShowConfirmModal(Schedule.id_planning)}
+
                                             >
                                                 <i
                                                     className="fa fa-sync"
@@ -408,6 +508,12 @@ export function InterviewSchedule() {
                                     </td>
                                 </tr>
                             ))
+                        ) : (
+                            <tr style={{ textAlign: "center" }}>
+                                <td colSpan={selectedColumns.length || 10}>
+                                    No data available
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </Table>
@@ -439,8 +545,24 @@ export function InterviewSchedule() {
                     />
                 </div>
             </div>
-            <ModalEditPlanninginterviews show={showEditPlanninginterviewsModal} onHide={handleCloseEditPlanninginterviewsModal}  id_planning={selectedPlanninginterviewsId} onSuccess={refreshData}/>
-
+            <ModalEditPlanninginterviews show={showEditPlanninginterviewsModal} onHide={handleCloseEditPlanninginterviewsModal} id_planning={selectedPlanninginterviewsId} onSuccess={refreshData} />
+            {/* Confirmation Modal */}
+            <Modal show={showConfirmModal} onHide={handleCloseConfirmModal} responsive>
+                <Modal.Header closeButton>
+                    <Modal.Title>{translate("Confirmation")}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {translate("Êtes-vous sûr de vouloir clôturer cet entretien ?")}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseConfirmModal}>
+                        {translate("Non")}
+                    </Button>
+                    <Button variant="primary" onClick={handleUpdateState}>
+                        {translate("Oui")}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }
