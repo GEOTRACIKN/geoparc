@@ -368,11 +368,11 @@ export function Garage() {
                     />
                 </div>
             </div>
-            <ModalNewIntervention
+            {/* <ModalNewIntervention
                 show={show}
                 handleClose={handleClose}
                 refreshintervention={() => { getIntervention() }}
-            />
+            /> */}
 
 
         </>
