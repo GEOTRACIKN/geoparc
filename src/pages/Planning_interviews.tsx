@@ -467,12 +467,8 @@ export function InterviewSchedule() {
                                             )}
                                         </td>
                                     )}
-
-
-
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
-
                                             <Link
                                                 to={``}
                                                 className="badge badge-primary mr-2"
