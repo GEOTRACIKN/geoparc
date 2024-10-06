@@ -381,7 +381,7 @@ export function InterviewSchedule() {
                                     {translate("KM")}
                                 </th>
                             )}
-                            {selectedColumns.InterviewDate && (
+                            {selectedColumns.Interviewdate && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("InterviewDate")}
@@ -448,7 +448,7 @@ export function InterviewSchedule() {
                                             {Schedule.km}
                                         </td>
                                     )}
-                                    {selectedColumns.InterviewDate && (
+                                    {selectedColumns.Interviewdate && (
                                         <td>
                                             {Schedule.date_dentretien ? (
                                                 formatDateToTimestamp(Schedule.date_dentretien)
