@@ -415,25 +415,26 @@ export function Reception() {
                                             {Intervention.priority}
                                         </td>
                                     )}
+                                    { selectedColumns.statut && (
                                     <td
                                         style={{
-                                            display: "flex", // Pour aligner l'icône avec le texte
+                                            display: "flex",
                                             alignItems: "center",
                                         }}
                                     >
                                         {Intervention.statut === "Cloturé" ? (
                                             <>
-                                                <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i> {/* Icône pour Clôturé */}
+                                                <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i>
                                                 Clôturé
                                             </>
                                         ) : (
                                             <>
-                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i> {/* Icône pour Demande */}
+                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i>
                                                 Demande
                                             </>
                                         )}
                                     </td>
-
+                                   ) }
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
                                             <Link
