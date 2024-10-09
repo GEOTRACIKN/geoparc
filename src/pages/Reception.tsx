@@ -310,14 +310,8 @@ export function Reception() {
                                     {translate("Date")}
                                 </th>
                             )}
-                            {selectedColumns.client && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("client")}
-                                >
-                                    {translate("Client")}
-                                </th>
-                            )}
+
+
                             {selectedColumns.vehicule && (
                                 <th
                                     className="sorting "
@@ -326,26 +320,34 @@ export function Reception() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.odometre && (
+                            {selectedColumns.km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("odometre")}
+                                    onClick={() => handleSortingColumn("km")}
                                 >
-                                    {translate("Odometer")}
+                                    {translate("km")}
                                 </th>
                             )}
-                            {selectedColumns.Priority && (
+                            {selectedColumns.client && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Priority")}
+                                    onClick={() => handleSortingColumn("client")}
+                                >
+                                    {translate("client")}
+                                </th>
+                            )}
+                            {selectedColumns.priority && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("priority")}
                                 >
                                     {translate("Priority")}
                                 </th>
                             )}
-                            {selectedColumns.etat && (
+                            {selectedColumns.statut && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("etat")}
+                                    onClick={() => handleSortingColumn("statut")}
                                 >
                                     {translate("Status")}
                                 </th>
@@ -379,16 +381,28 @@ export function Reception() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.id_intervention && (
+                                    {selectedColumns.ID && (
                                         <td>
                                             {Intervention.id_intervention}
                                         </td>
                                     )}
-                                    {selectedColumns.date_intervention && (
+                                    {selectedColumns.Date && (
                                         <td>
                                             {formatDateToTimestamp(
                                                 Intervention.date_intervention
                                             )}
+                                        </td>
+                                    )}
+
+
+                                    {selectedColumns.vehicule && (
+                                        <td>
+                                            {Intervention.vehicule}
+                                        </td>
+                                    )}
+                                    {selectedColumns.km && (
+                                        <td>
+                                            {Intervention.km}
                                         </td>
                                     )}
                                     {selectedColumns.client && (
@@ -396,40 +410,31 @@ export function Reception() {
                                             {Intervention.client}
                                         </td>
                                     )}
-                                    {selectedColumns.vehicule && (
-                                        <td>
-                                            {Intervention.vehicule}
-                                        </td>
-                                    )}
-                                    {selectedColumns.odometre && (
-                                        <td>
-                                            {Intervention.km}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Priority && (
+                                    {selectedColumns.priority && (
                                         <td>
                                             {Intervention.priority}
                                         </td>
                                     )}
+                                    { selectedColumns.statut && (
                                     <td
-                                        style={{                
-                                            display: "flex", // Pour aligner l'icône avec le texte
+                                        style={{
+                                            display: "flex",
                                             alignItems: "center",
                                         }}
                                     >
                                         {Intervention.statut === "Cloturé" ? (
                                             <>
-                                                <i className="fas fa-check-circle" style={{ marginRight: "5px" , color: "#28a745"}}></i> {/* Icône pour Clôturé */}
+                                                <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i>
                                                 Clôturé
                                             </>
                                         ) : (
                                             <>
-                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i> {/* Icône pour Demande */}
+                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i>
                                                 Demande
                                             </>
                                         )}
                                     </td>
-
+                                   ) }
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
                                             <Link
