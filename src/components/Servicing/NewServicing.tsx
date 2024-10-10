@@ -21,33 +21,41 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
     onSuccess,
 }) => {
     const [formData, setFormData] = useState({
-        date: "",
-        priority: "",
-        statut: "Demande",
+        
+        invoice_no: "",
+        type_servicing: 0,
         vehicle: "",
+        date_servicing: "",
+        detail: "",
+        cost: "",
+        depreciation: "",
         km: "",
-        subject: "",
-        client: "",
-        clientPhone: "",
-        receptionistName: "",
-        service: 0,
+        next_oil_change: "",
     });
 
     const { translate } = useTranslate();
 
     const serviceOptions: { [key: string]: number } = {
-        "Garage": 1,
-        "Planification d'entretien": 2,
-        "Entretien": 3,
-        "Changement De Pneu": 4,
-        "Changement de Pièce": 5,
+        "Washing": 1,
+        "Oil Change": 2,
+        "Change filters (oil/air)": 3,
+        "Dran + air filter": 4,
+        "Oil change + oil filter": 5,
+        "Oil change + Filter change (oil/air)": 6,
+        "Wheel alignement": 7,
+        "Tire rotation": 8,
+        "Engine tuning": 9,
+        "Brake adjustement": 10,
+        "Electric adjustement": 11,
+        "Control": 12,
+        "Others": 13,
     };
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
 
-        if (id === "service") {
+        if (id === "type_servicing") {
             // Convertir la valeur sélectionnée en nombre
             const serviceId = serviceOptions[value] || 0;
             setFormData(prevState => ({
@@ -63,12 +71,12 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const formattedDate = formatDateToTimestamp(formData.date);
+        const formattedDate = formatDateToTimestamp(formData.date_servicing);
 
         // Mettre à jour formData avec la date formatée
         const updatedFormData = {
             ...formData,
-            date: formattedDate,
+            date_servicing: formattedDate,
         };
 
         try {
@@ -103,16 +111,16 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
 
             // Réinitialiser le formulaire
             setFormData({
-                date: "",
-                priority: "",
-                statut: "",
+                
+                invoice_no: "",
+                type_servicing: 0,
                 vehicle: "",
+                date_servicing: "",
+                detail: "",
+                cost: "",
+                depreciation: "",
                 km: "",
-                subject: "",
-                client: "",
-                clientPhone: "",
-                receptionistName: "",
-                service: 0,
+                next_oil_change: "",
             });
 
             // Rafraîchir les données
@@ -151,27 +159,32 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
-                    <Form.Group controlId="date">
-                        <Form.Label>{translate("Request Date")}</Form.Label>
+                      <Form.Group controlId="invoice_no">
+                        <Form.Label>{translate("invoiceNo")}</Form.Label>
                         <Form.Control
-                            type="datetime-local"
-                            value={formData.date}
+                            type="number"
+                            //placeholder="Entrez le véhicule"
+                            value={formData.invoice_no}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="priority">
-                        <Form.Label>{translate("Priority")}</Form.Label>
+                    <Form.Group controlId="type_servicing">
+                        <Form.Label>{translate("Service")}</Form.Label>
                         <Form.Control
                             as="select"
-                            value={formData.priority}
+                            value={Object.keys(serviceOptions).find(key => serviceOptions[key] === formData.type_servicing) || ""}
                             onChange={handleChange}
                         >
-                            <option value="">{translate("Select Priority")}</option>
-                            <option value="Normal">{translate("Normal")}</option>
-                            <option value="Urgent">{translate("Urgent")}</option>
+                            <option value="">{translate("Select Type of Service")}</option>
+                            {Object.entries(serviceOptions).map(([key, value]) => (
+                                <option key={value} value={key}>{translate(key)}</option>
+                            ))}
                         </Form.Control>
                     </Form.Group>
+                  
+
+                   
 
                     <Form.Group controlId="vehicle">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
@@ -182,9 +195,46 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
+                    <Form.Group controlId="date_servicing">
+                        <Form.Label>{translate("Request Date")}</Form.Label>
+                        <Form.Control
+                            type="datetime-local"
+                            value={formData.date_servicing}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
 
+                    <Form.Group controlId="detail">
+                        <Form.Label>{translate("Detail")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            //placeholder="Entrez le nom du client"
+                            value={formData.detail}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+
+                    <Form.Group controlId="cost">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            //placeholder="Entrez le c"
+                            value={formData.cost}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="depreciation">
+                        <Form.Label>{translate("Depreciation Period (days)")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            //placeholder="Entrez la periode de depreciation (jour)"
+                            value={formData.depreciation}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                   
                     <Form.Group controlId="km">
-                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Label>{translate("km")}</Form.Label>
                         <Form.Control
                             type="number"
                             placeholder="Entrez le kilométrage"
@@ -193,59 +243,21 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="subject">
-                        <Form.Label>{translate("Subject")}</Form.Label>
+                    <Form.Group controlId="next_oil_change">
+                        <Form.Label>{translate("Nex oil change")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Entrez l'objet de la demande"
-                            value={formData.subject}
+                            placeholder="Enter next oil change"
+                            value={formData.next_oil_change}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="client">
-                        <Form.Label>{translate("Client")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Entrez le nom du client"
-                            value={formData.client}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                   
 
-                    <Form.Group controlId="clientPhone">
-                        <Form.Label>{translate("Client Phone")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Entrez le numéro de téléphone du client"
-                            value={formData.clientPhone}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
 
-                    <Form.Group controlId="receptionistName">
-                        <Form.Label>{translate("Receptionist Name")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Entrez le nom du réceptionniste"
-                            value={formData.receptionistName}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
 
-                    <Form.Group controlId="service">
-                        <Form.Label>{translate("Service")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={Object.keys(serviceOptions).find(key => serviceOptions[key] === formData.service) || ""}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Service")}</option>
-                            {Object.entries(serviceOptions).map(([key, value]) => (
-                                <option key={value} value={key}>{translate(key)}</option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+                   
 
                 </Modal.Body>
                 <Modal.Footer>

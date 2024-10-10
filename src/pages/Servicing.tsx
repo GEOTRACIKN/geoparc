@@ -12,16 +12,16 @@ import ModalEditServicing from "../components/Servicing/EditServicing";
 
 interface Servicing {
     id_servicing: number;
+    invoice_no: number;
+    type_servicing: string;
+    vehicle: string;
     date_servicing: string;
-    priority: string;
-    statut: string;
-    vehicule: string;
+    place: string;
+    cost: number;
+    depreciation: number;
     km: number;
-    subject: string;
-    client: string;
-    phone_client: string;
-    receptionist_name: string;
-    service: number;
+    next_oil_change: string;
+    
 }
 
 
@@ -47,15 +47,19 @@ export function Servicing() {
 
 
 
-
+   ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
+        InvoiceNo: true,
+        Servicing: true,
+        Vehicle: true,
         Date: true,
-        priority: true,
-        statut: true,
-        vehicule: true,
-        km: true,
-        client: true,
+        Place: true,
+        Cost: true,
+        Depreciation: true,
+        Km: true,
+        NextOilChange: true,
+    
     };
 
     // Load selected columns from localStorage or use initial state
@@ -146,7 +150,6 @@ export function Servicing() {
 
 
 
-
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
 
@@ -154,18 +157,22 @@ export function Servicing() {
             case translate("ID Servicing"):
                 setType(0);
                 break;
-            case translate("Client"):
+            case translate("Servicing"):
                 setType(1);
                 break;
-            case translate("Vehicule"):
+            case translate("Date"):
                 setType(2);
                 break;
-            case translate("Priority"):
+            case translate("Cost"):
                 setType(3);
                 break;
-            case translate("Status"):
+            case translate("Vehicule"):
                 setType(4);
                 break;
+            case translate("Place"):
+                setType(5);
+                break;
+                       
             default:
                 console.log("Unknown selection");
                 break;
@@ -222,10 +229,11 @@ export function Servicing() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID Servicing")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Client")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Status")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Servicing")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Place")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -297,6 +305,7 @@ export function Servicing() {
                                     />
                                 </div>
                             </th>
+                         
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
@@ -313,46 +322,39 @@ export function Servicing() {
                                     {translate("Date")}
                                 </th>
                             )}
-                            {selectedColumns.client && (
+                            {selectedColumns.Servicing && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("client")}
+                                    onClick={() => handleSortingColumn("Servicing")}
                                 >
-                                    {translate("Client")}
+                                    {translate("Servicing")}
                                 </th>
                             )}
-                            {selectedColumns.vehicule && (
+                            {selectedColumns.Vehicule && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicule")}
+                                    onClick={() => handleSortingColumn("Vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.odometre && (
+                            {selectedColumns.Cost && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("odometre")}
+                                    onClick={() => handleSortingColumn("Cost")}
                                 >
-                                    {translate("Odometer")}
+                                    {translate("Cost")}
                                 </th>
                             )}
-                            {selectedColumns.Priority && (
+                            {selectedColumns.Place && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Priority")}
+                                    onClick={() => handleSortingColumn("Place")}
                                 >
-                                    {translate("Priority")}
+                                    {translate("Place")}
                                 </th>
                             )}
-                            {selectedColumns.etat && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("etat")}
-                                >
-                                    {translate("Status")}
-                                </th>
-                            )}
+                         
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -395,24 +397,24 @@ export function Servicing() {
                                             )}
                                         </td>
                                     )}
-                                    {selectedColumns.client && (
+                                    {selectedColumns.type_servicing && (
                                         <td>
-                                            {Servicing.client}
+                                            {Servicing.type_servicing}
                                         </td>
                                     )}
-                                    {selectedColumns.vehicule && (
+                                    {selectedColumns.vehicle && (
                                         <td>
-                                            {Servicing.vehicule}
+                                            {Servicing.vehicle}
                                         </td>
                                     )}
-                                    {selectedColumns.odometre && (
+                                    {selectedColumns.cost && (
                                         <td>
-                                            {Servicing.km}
+                                            {Servicing.cost}
                                         </td>
                                     )}
-                                    {selectedColumns.Priority && (
+                                    {selectedColumns.place && (
                                         <td>
-                                            {Servicing.priority}
+                                            {Servicing.place}
                                         </td>
                                     )}
                                     <td
@@ -421,17 +423,7 @@ export function Servicing() {
                                             alignItems: "center",
                                         }}
                                     >
-                                        {Servicing.statut === "Cloturé" ? (
-                                            <>
-                                                <i className="fas fa-check-circle" style={{ marginRight: "5px" , color: "#28a745"}}></i> {/* Icône pour Clôturé */}
-                                                Clôturé
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i> {/* Icône pour Demande */}
-                                                Demande
-                                            </>
-                                        )}
+                                       
                                     </td>
 
                                     <td className="text-center">
