@@ -22,15 +22,15 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         
-        invoice_no: "",
+        invoice_no_servicing: "",
         type_servicing: 0,
-        vehicle: "",
+        type_vehicule: "",
         date_servicing: "",
-        detail: "",
-        cost: "",
-        depreciation: "",
-        km: "",
-        next_oil_change: "",
+        place_servicing: "",
+        cost_servicing: "",
+        depreciation_servicing: "",
+        km_servicing: "",
+        next_oil_change_servicing: "",
     });
 
     const { translate } = useTranslate();
@@ -112,15 +112,15 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
             // Réinitialiser le formulaire
             setFormData({
                 
-                invoice_no: "",
+                invoice_no_servicing: "",
                 type_servicing: 0,
-                vehicle: "",
+                type_vehicule: "",
                 date_servicing: "",
-                detail: "",
-                cost: "",
-                depreciation: "",
-                km: "",
-                next_oil_change: "",
+                place_servicing: "",
+                cost_servicing: "",
+                depreciation_servicing: "",
+                km_servicing: "",
+                next_oil_change_servicing: "",
             });
 
             // Rafraîchir les données
@@ -159,12 +159,12 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
-                      <Form.Group controlId="invoice_no">
-                        <Form.Label>{translate("invoiceNo")}</Form.Label>
+                      <Form.Group controlId="invoice_no_servicing">
+                        <Form.Label>{translate("invoice no servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le véhicule"
-                            value={formData.invoice_no}
+                            value={formData.invoice_no_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -186,12 +186,12 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
 
                    
 
-                    <Form.Group controlId="vehicle">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Group controlId="type_vehicule">
+                        <Form.Label>{translate("type vehicule")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Entrez le véhicule"
-                            value={formData.vehicle}
+                            value={formData.type_vehicule}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -204,51 +204,51 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="detail">
-                        <Form.Label>{translate("Detail")}</Form.Label>
+                    <Form.Group controlId="place_servicing">
+                        <Form.Label>{translate("place servicing")}</Form.Label>
                         <Form.Control
                             type="text"
                             //placeholder="Entrez le nom du client"
-                            value={formData.detail}
+                            value={formData.place_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="cost">
-                        <Form.Label>{translate("Cost")}</Form.Label>
+                    <Form.Group controlId="cost_servicing">
+                        <Form.Label>{translate("cost servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le c"
-                            value={formData.cost}
+                            value={formData.cost_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="depreciation">
-                        <Form.Label>{translate("Depreciation Period (days)")}</Form.Label>
+                    <Form.Group controlId="depreciation_servicing">
+                        <Form.Label>{translate("Depreciation servicing Period (days)")}</Form.Label>
                         <Form.Control
                             type="number"
-                            //placeholder="Entrez la periode de depreciation (jour)"
-                            value={formData.depreciation}
+                            //placeholder="Entrez la periode de depreciation_servicing (jour)"
+                            value={formData.depreciation_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
                    
-                    <Form.Group controlId="km">
-                        <Form.Label>{translate("km")}</Form.Label>
+                    <Form.Group controlId="km_servicing">
+                        <Form.Label>{translate("Km servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             placeholder="Entrez le kilométrage"
-                            value={formData.km}
+                            value={formData.km_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="next_oil_change">
-                        <Form.Label>{translate("Nex oil change")}</Form.Label>
+                    <Form.Group controlId="next_oil_change_servicing">
+                        <Form.Label>{translate("Next oil change")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter next oil change"
-                            value={formData.next_oil_change}
+                            value={formData.next_oil_change_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>

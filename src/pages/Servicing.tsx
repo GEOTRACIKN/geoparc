@@ -12,15 +12,16 @@ import ModalEditServicing from "../components/Servicing/EditServicing";
 
 interface Servicing {
     id_servicing: number;
-    invoice_no: number;
+    invoice_no_servicing: number;
     type_servicing: string;
-    vehicle: string;
+    id_vehicule: string;
+    type_vehicule: string;
     date_servicing: string;
-    place: string;
-    cost: number;
-    depreciation: number;
-    km: number;
-    next_oil_change: string;
+    place_servicing: string;
+    cost_servicing: number;
+    depreciation_servicing: number;
+    km_servicing: number;
+    next_oil_change_servicing: string;
     
 }
 
@@ -51,7 +52,7 @@ export function Servicing() {
     const initialColumns = {
         ID: true,
         InvoiceNo: true,
-        Servicing: true,
+        Type: true,
         Vehicle: true,
         Date: true,
         Place: true,
@@ -133,9 +134,11 @@ export function Servicing() {
             );
 
             const data = await response.json();
+            console.log("Fetched data:", data);
 
 
             setServicing(data);
+            console.log("Updated servicing list:", data);
         } catch (error) {
             console.error(error);
         }
@@ -145,8 +148,11 @@ export function Servicing() {
     };
     useEffect(() => {
         getCountServicing();
+        
         getServicing();
     }, [currentPage, limit, search, type, column, sort]);
+   
+    
 
 
 
@@ -229,7 +235,7 @@ export function Servicing() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID Servicing")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Servicing")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type Servicing")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
@@ -314,6 +320,14 @@ export function Servicing() {
                                     {translate("ID")}
                                 </th>
                             )}
+                            {selectedColumns.InvoiceNo && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("InvoiceNo")}
+                                >
+                                    {translate("InvoiceNo")}
+                                </th>
+                            )}
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
@@ -322,22 +336,24 @@ export function Servicing() {
                                     {translate("Date")}
                                 </th>
                             )}
-                            {selectedColumns.Servicing && (
+                            
+                            {selectedColumns.Type && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Servicing")}
+                                    onClick={() => handleSortingColumn("Type")}
                                 >
-                                    {translate("Servicing")}
+                                    {translate("Type Servicing")}
                                 </th>
                             )}
-                            {selectedColumns.Vehicule && (
+                             {selectedColumns.Km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Vehicule")}
+                                    onClick={() => handleSortingColumn("Km")}
                                 >
-                                    {translate("Vehicle")}
+                                    {translate("Km")}
                                 </th>
                             )}
+                            
                             {selectedColumns.Cost && (
                                 <th
                                     className="sorting "
@@ -352,6 +368,30 @@ export function Servicing() {
                                     onClick={() => handleSortingColumn("Place")}
                                 >
                                     {translate("Place")}
+                                </th>
+                            )}
+                             {selectedColumns.NextOilChange && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("NextOilChange")}
+                                >
+                                    {translate("Next Oil Change")}
+                                </th>
+                            )}
+                             {selectedColumns.Depreciation && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("Depreciation")}
+                                >
+                                    {translate("Depreciation ")}
+                                </th>
+                            )}
+                            {selectedColumns.Vehicle && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("Vehicle")}
+                                >
+                                    {translate("Vehicle")}
                                 </th>
                             )}
                          
@@ -384,47 +424,75 @@ export function Servicing() {
                                             />
                                         </div>
                                     </td>
-                                    Servicing
-                                    {selectedColumns.id_servicing && (
+                                    
+                                    {selectedColumns.ID && (
                                         <td>
+                                            
                                             {Servicing.id_servicing}
                                         </td>
                                     )}
-                                    {selectedColumns.date_servicing && (
+                                    {selectedColumns.InvoiceNo && (
+                                        <td>
+                                            
+                                            {Servicing.invoice_no_servicing}
+                                        </td>
+                                    )}
+                                    {selectedColumns.Date && (
                                         <td>
                                             {formatDateToTimestamp(
                                                 Servicing.date_servicing
                                             )}
                                         </td>
                                     )}
-                                    {selectedColumns.type_servicing && (
+                                    {selectedColumns.Type && (
                                         <td>
                                             {Servicing.type_servicing}
                                         </td>
                                     )}
-                                    {selectedColumns.vehicle && (
+                                   
+                                     {selectedColumns.Km && (
                                         <td>
-                                            {Servicing.vehicle}
+                                            {Servicing.km_servicing}
                                         </td>
                                     )}
-                                    {selectedColumns.cost && (
+                                    {selectedColumns.Cost && (
                                         <td>
-                                            {Servicing.cost}
+                                            {Servicing.cost_servicing}
                                         </td>
                                     )}
-                                    {selectedColumns.place && (
+                                    
+                                    {selectedColumns.Place && (
                                         <td>
-                                            {Servicing.place}
+                                            {Servicing.place_servicing}
                                         </td>
                                     )}
-                                    <td
-                                        style={{                
-                                            display: "flex", // Pour aligner l'icône avec le texte
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                       
-                                    </td>
+                                    {selectedColumns.NextOilChange && (
+                                        <td>
+                                            {Servicing.next_oil_change_servicing}
+                                        </td>
+                                    )}
+                                    {selectedColumns.Depreciation && (
+                                        <td>
+                                            {Servicing.depreciation_servicing}
+                                        </td>
+                                    )}
+                                    
+                                     {selectedColumns.Vehicle && (
+                                        <td>
+                                            {Servicing.type_vehicule}
+                                        </td>
+                                    )}
+                                    {/* 
+                                        <td
+                                            style={{                
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <Icon />
+                                        </td>
+                                        */}
+
 
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">

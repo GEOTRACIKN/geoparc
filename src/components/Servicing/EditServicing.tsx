@@ -20,17 +20,18 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     onHide,
     id_servicing,
     onSuccess
+    
 }) => {
     const [formData, setFormData] = useState({
-        invoice_no: "",
+        invoice_no_servicing: "",
         type_servicing: 0,
-        vehicle: "",
+        vehicule_servicing: "",
         date_servicing: "",
-        detail: "",
-        cost: "",
-        depreciation: "",
-        km: "",
-        next_oil_change: "",
+        place_servicing: "",
+        cost_servicing: "",
+        depreciation_servicing: "",
+        km_servicing: "",
+        next_oil_change_servicing: "",
     });
 
     const { translate } = useTranslate();
@@ -63,15 +64,15 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
             if (data.length > 0) {
                 const servicing = data[0];
                 setFormData({
-                    invoice_no: servicing.invoice_no,
+                    invoice_no_servicing: servicing.invoice_no_servicing,
                     type_servicing: servicing.type_servicing.toString(),
-                    vehicle: servicing.vehicle,
+                    vehicule_servicing: servicing.vehicule_servicing,
                     date_servicing: formatDateToTimestamp(servicing.date_servicing), 
-                    detail: servicing.detail,
-                    cost: servicing.cost,
-                    depreciation: servicing.depreciation,
-                    km: servicing.km,
-                    next_oil_change: servicing.next_oil_change,
+                    place_servicing: servicing.place_servicing,
+                    cost_servicing: servicing.cost_servicing,
+                    depreciation_servicing: servicing.depreciation_servicing,
+                    km_servicing: servicing.km_servicing,
+                    next_oil_change_servicing: servicing.next_oil_change_servicing,
                    
                 });
             } else {
@@ -99,7 +100,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
     const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/updateservicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/gmao/update_servicing/${id_servicing}`;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -163,12 +164,12 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                 >
 
 
-        <Form.Group controlId="invoice_no">
-                        <Form.Label>{translate("invoiceNo")}</Form.Label>
+        <Form.Group controlId="invoice_no_servicing">
+                        <Form.Label>{translate("invoice_no_servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le véhicule"
-                            value={formData.invoice_no}
+                            value={formData.invoice_no_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -191,12 +192,12 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
                    
 
-                    <Form.Group controlId="vehicle">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Group controlId="vehicule_servicing">
+                        <Form.Label>{translate("vehicule_servicing")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Entrez le véhicule"
-                            value={formData.vehicle}
+                            value={formData.vehicule_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -209,51 +210,51 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="detail">
-                        <Form.Label>{translate("Detail")}</Form.Label>
+                    <Form.Group controlId="place_servicing">
+                        <Form.Label>{translate("place_servicing")}</Form.Label>
                         <Form.Control
                             type="text"
                             //placeholder="Entrez le nom du client"
-                            value={formData.detail}
+                            value={formData.place_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="cost">
-                        <Form.Label>{translate("Cost")}</Form.Label>
+                    <Form.Group controlId="cost_servicing">
+                        <Form.Label>{translate("cost_servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le c"
-                            value={formData.cost}
+                            value={formData.cost_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="depreciation">
-                        <Form.Label>{translate("Depreciation Period (days)")}</Form.Label>
+                    <Form.Group controlId="depreciation_servicing">
+                        <Form.Label>{translate("depreciation_servicing Period (days)")}</Form.Label>
                         <Form.Control
                             type="number"
-                            //placeholder="Entrez la periode de depreciation (jour)"
-                            value={formData.depreciation}
+                            //placeholder="Entrez la periode de depreciation_servicing (jour)"
+                            value={formData.depreciation_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
                    
-                    <Form.Group controlId="km">
-                        <Form.Label>{translate("km")}</Form.Label>
+                    <Form.Group controlId="km_servicing">
+                        <Form.Label>{translate("km_servicing")}</Form.Label>
                         <Form.Control
                             type="number"
                             placeholder="Entrez le kilométrage"
-                            value={formData.km}
+                            value={formData.km_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="next_oil_change">
+                    <Form.Group controlId="next_oil_change_servicing">
                         <Form.Label>{translate("Nex oil change")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter next oil change"
-                            value={formData.next_oil_change}
+                            value={formData.next_oil_change_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
