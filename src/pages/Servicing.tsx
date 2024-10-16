@@ -179,16 +179,16 @@ export function Servicing() {
             case translate("ID Servicing"):
                 setType(0);
                 break;
-            case translate("Servicing"):
+            case translate("Date"):
                 setType(1);
                 break;
-            case translate("Date"):
+            case translate("Vehicle"):
                 setType(2);
                 break;
-            case translate("Cost"):
+            case translate("Place"):
                 setType(3);
                 break;
-            case translate("Vehicule"):
+            case translate("Cost"):
                 setType(4);
                 break;
             case translate("Place"):
@@ -251,11 +251,11 @@ export function Servicing() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID Servicing")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type Servicing")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Place")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
+
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
