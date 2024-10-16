@@ -25,7 +25,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     const [formData, setFormData] = useState({
         invoice_no_servicing: "",
         type_servicing: 0,
-        vehicule_servicing: "",
+        type_vehicule: "",
         date_servicing: "",
         place_servicing: "",
         cost_servicing: "",
@@ -55,7 +55,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     // Fetch data from API and set form data
     const fetchServicing = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/editservicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/gmao/showservicing/${id_servicing}`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -66,7 +66,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                 setFormData({
                     invoice_no_servicing: servicing.invoice_no_servicing,
                     type_servicing: servicing.type_servicing.toString(),
-                    vehicule_servicing: servicing.vehicule_servicing,
+                    type_vehicule: servicing.type_vehicule,
                     date_servicing: formatDateToTimestamp(servicing.date_servicing), 
                     place_servicing: servicing.place_servicing,
                     cost_servicing: servicing.cost_servicing,
@@ -100,7 +100,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
     const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/update_servicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/gmao/updateservicing/${id_servicing}`;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -110,6 +110,8 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
             });
     
             if (!response.ok) {
+                const errorData = await response.text(); // ou response.json() si votre serveur renvoie un JSON
+                console.error('Error details:', errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
     
@@ -192,12 +194,12 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
                    
 
-                    <Form.Group controlId="vehicule_servicing">
-                        <Form.Label>{translate("vehicule_servicing")}</Form.Label>
+                    <Form.Group controlId="type_vehicule">
+                        <Form.Label>{translate("type_vehicule")}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Entrez le véhicule"
-                            value={formData.vehicule_servicing}
+                            value={formData.type_vehicule}
                             onChange={handleChange}
                         />
                     </Form.Group>

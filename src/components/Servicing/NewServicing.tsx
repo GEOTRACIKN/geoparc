@@ -5,7 +5,7 @@ import { useTranslate } from "../LanguageProvider";
 import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 
-interface ModalNewServicingnProps {
+interface ModalNewServicingProps {
     show: boolean;
     onHide: () => void;
     onSuccess?: () => void;
@@ -15,7 +15,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
 
-const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
+const ModalNewServicing: React.FC<ModalNewServicingProps> = ({
     show,
     onHide,
     onSuccess,
@@ -71,6 +71,20 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.invoice_no_servicing || !formData.type_servicing || !formData.date_servicing) {
+            toast.error("Please fill in all required fields.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
+            return; // Stop execution if validation fails
+        }
         const formattedDate = formatDateToTimestamp(formData.date_servicing);
 
         // Mettre à jour formData avec la date formatée
@@ -89,11 +103,18 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Response Error:", errorText);
                 throw new Error("Une erreur s'est produite lors de l'ajout de servicing.");
+          
             }
 
             const result = await response.json();
+          
             console.log(result);
+            if (result) {
+                console.log("Response Data:", result); // This should now log your new servicing data
+            }
 
             // Afficher une notification de succès
             toast.success("Servicing added successfully!", {
@@ -113,7 +134,6 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
             setFormData({
                 
                 invoice_no_servicing: "",
-                type_servicing: 0,
                 type_vehicule: "",
                 date_servicing: "",
                 place_servicing: "",
@@ -121,6 +141,7 @@ const ModalNewServicing: React.FC<ModalNewServicingnProps> = ({
                 depreciation_servicing: "",
                 km_servicing: "",
                 next_oil_change_servicing: "",
+                type_servicing: 0,
             });
 
             // Rafraîchir les données

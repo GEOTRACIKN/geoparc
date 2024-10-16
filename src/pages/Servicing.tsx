@@ -13,7 +13,7 @@ import ModalEditServicing from "../components/Servicing/EditServicing";
 interface Servicing {
     id_servicing: number;
     invoice_no_servicing: number;
-    type_servicing: string;
+    type_servicing: number;
     id_vehicule: string;
     type_vehicule: string;
     date_servicing: string;
@@ -61,6 +61,22 @@ export function Servicing() {
         Km: true,
         NextOilChange: true,
     
+    };
+
+    const serviceMapping: { [key: number]: string } = {
+        1: "Washing",
+        2: "Oil Change",
+        3: "Change filters (oil/air)",
+        4: "Drain + air filter",
+        5: "Oil change + oil filter",
+        6: "Oil change + Filter change (oil/air)",
+        7: "Wheel alignment",
+        8: "Tire rotation",
+        9: "Engine tuning",
+        10: "Brake adjustment",
+        11: "Electric adjustment",
+        12: "Control",
+        13: "Others",
     };
 
     // Load selected columns from localStorage or use initial state
@@ -315,7 +331,7 @@ export function Servicing() {
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("ID")}
+                                    onClick={() => handleSortingColumn("id_servicing")}
                                 >
                                     {translate("ID")}
                                 </th>
@@ -323,7 +339,7 @@ export function Servicing() {
                             {selectedColumns.InvoiceNo && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("InvoiceNo")}
+                                    onClick={() => handleSortingColumn("invoice_no_servicing")}
                                 >
                                     {translate("InvoiceNo")}
                                 </th>
@@ -331,7 +347,7 @@ export function Servicing() {
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Date")}
+                                    onClick={() => handleSortingColumn("date_servicing")}
                                 >
                                     {translate("Date")}
                                 </th>
@@ -340,7 +356,7 @@ export function Servicing() {
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Type")}
+                                    onClick={() => handleSortingColumn("type_servicing")}
                                 >
                                     {translate("Type Servicing")}
                                 </th>
@@ -348,7 +364,7 @@ export function Servicing() {
                              {selectedColumns.Km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Km")}
+                                    onClick={() => handleSortingColumn("km_servicing")}
                                 >
                                     {translate("Km")}
                                 </th>
@@ -357,7 +373,7 @@ export function Servicing() {
                             {selectedColumns.Cost && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Cost")}
+                                    onClick={() => handleSortingColumn("cost_servicing")}
                                 >
                                     {translate("Cost")}
                                 </th>
@@ -365,7 +381,7 @@ export function Servicing() {
                             {selectedColumns.Place && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Place")}
+                                    onClick={() => handleSortingColumn("place_servicing")}
                                 >
                                     {translate("Place")}
                                 </th>
@@ -373,7 +389,7 @@ export function Servicing() {
                              {selectedColumns.NextOilChange && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("NextOilChange")}
+                                    onClick={() => handleSortingColumn("next_oil_change_servicing")}
                                 >
                                     {translate("Next Oil Change")}
                                 </th>
@@ -381,7 +397,7 @@ export function Servicing() {
                              {selectedColumns.Depreciation && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Depreciation")}
+                                    onClick={() => handleSortingColumn("depreciation_servicing")}
                                 >
                                     {translate("Depreciation ")}
                                 </th>
@@ -389,7 +405,7 @@ export function Servicing() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Vehicle")}
+                                    onClick={() => handleSortingColumn("vehicle_servicing")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
@@ -425,63 +441,38 @@ export function Servicing() {
                                         </div>
                                     </td>
                                     
-                                    {selectedColumns.ID && (
-                                        <td>
-                                            
-                                            {Servicing.id_servicing}
-                                        </td>
-                                    )}
-                                    {selectedColumns.InvoiceNo && (
-                                        <td>
-                                            
-                                            {Servicing.invoice_no_servicing}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Date && (
-                                        <td>
-                                            {formatDateToTimestamp(
-                                                Servicing.date_servicing
+                                            {selectedColumns.ID && (
+                                                <td>{Servicing.id_servicing}</td>
                                             )}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Type && (
-                                        <td>
-                                            {Servicing.type_servicing}
-                                        </td>
-                                    )}
-                                   
-                                     {selectedColumns.Km && (
-                                        <td>
-                                            {Servicing.km_servicing}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Cost && (
-                                        <td>
-                                            {Servicing.cost_servicing}
-                                        </td>
-                                    )}
-                                    
-                                    {selectedColumns.Place && (
-                                        <td>
-                                            {Servicing.place_servicing}
-                                        </td>
-                                    )}
-                                    {selectedColumns.NextOilChange && (
-                                        <td>
-                                            {Servicing.next_oil_change_servicing}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Depreciation && (
-                                        <td>
-                                            {Servicing.depreciation_servicing}
-                                        </td>
-                                    )}
-                                    
-                                     {selectedColumns.Vehicle && (
-                                        <td>
-                                            {Servicing.type_vehicule}
-                                        </td>
-                                    )}
+                                            {selectedColumns.InvoiceNo && (
+                                                <td>{Servicing.invoice_no_servicing}</td>
+                                            )}
+                                            {selectedColumns.Date && (
+                                                <td>{formatDateToTimestamp(Servicing.date_servicing)}</td>
+                                            )}
+                                            {selectedColumns.Type && (
+                                                <td>
+                                                    {serviceMapping[Servicing.type_servicing]}
+                                                </td>
+                                            )}
+                                            {selectedColumns.Km && (
+                                                <td>{Servicing.km_servicing}</td>
+                                            )}
+                                            {selectedColumns.Cost && (
+                                                <td>{Servicing.cost_servicing}</td>
+                                            )}
+                                            {selectedColumns.Place && (
+                                                <td>{Servicing.place_servicing}</td>
+                                            )}
+                                            {selectedColumns.NextOilChange && (
+                                                <td>{Servicing.next_oil_change_servicing}</td>
+                                            )}
+                                            {selectedColumns.Depreciation && (
+                                                <td>{Servicing.depreciation_servicing}</td>
+                                            )}
+                                            {selectedColumns.Vehicle && (
+                                                <td>{Servicing.type_vehicule}</td>
+                                            )}
                                     {/* 
                                         <td
                                             style={{                
