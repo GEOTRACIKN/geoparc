@@ -45,7 +45,7 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/showintervention/${id_intervention}`;
+            const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
             console.log('Request URL:', url);
     
             const response = await fetch(url);

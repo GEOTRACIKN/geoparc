@@ -79,7 +79,7 @@ export function InterviewSchedule() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/gmao/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
 
@@ -98,7 +98,7 @@ export function InterviewSchedule() {
     const getSchedule = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/gmao/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
@@ -185,7 +185,7 @@ export function InterviewSchedule() {
         if (selectedInterviewId) {
             try {
                 // Effectuer la mise à jour de l'état de l'entretien via l'API
-                const response = await fetch(`${backendUrl}/api/geop/gmao/InterviewSchedule/updatestate/${selectedInterviewId}`, {
+                const response = await fetch(`${backendUrl}/api/geop/InterviewSchedule/updatestate/${selectedInterviewId}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
