@@ -190,7 +190,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     </Form.Group>
                    
                     <Form.Group controlId="km_servicing">
-                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Label>{translate("KM")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le kilométrage"

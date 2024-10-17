@@ -40,14 +40,14 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
         1:"Washing",
         2:"Oil Change",
         3:"Change filters (oil/air)",
-        4:"Dran + air filter",
+        4:"Drain + air filter",
         5:"Oil change + oil filter",
         6:"Oil change + Filter change (oil/air)",
-        7:"Wheel alignement",
+        7:"Wheel alignment",
         8:"Tire rotation",
         9:"Engine tuning",
-        10:"Brake adjustement",
-        11:"Electric adjustement",
+        10:"Brake adjustment",
+        11:"Electric adjustment",
         12:"Control",
         13:"Others",
     };
@@ -183,9 +183,15 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             <option value="">{translate("Select Service")}</option>
                             {Object.entries(serviceMapping).map(([key, label]) => (
                                 <option key={key} value={key}>
-                                    {label}
+                                     {translate(label)}
+                                    
                                 </option>
+
+                                
+
+
                             ))}
+                           
                         </Form.Control>
                     </Form.Group>
 
@@ -242,7 +248,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     </Form.Group>
                    
                     <Form.Group controlId="km_servicing">
-                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Label>{translate("KM")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le kilométrage"
@@ -252,7 +258,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="next_oil_change_servicing">
-                        <Form.Label>{translate("Nex oil change")}</Form.Label>
+                        <Form.Label>{translate("Next oil change (days)")}</Form.Label>
                         <Form.Control
                             type="text"
                             //placeholder="Enter next oil change"

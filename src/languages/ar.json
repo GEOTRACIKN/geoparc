@@ -550,5 +550,37 @@
  "Type of interview" : "نوع المقابلة",
  "Planned interviews" : "المقابلات المخطط لها",
  "Planning date" : "تاريخ التخطيط",
- "Reception" : "الاستقبال"
+ "Reception" : "الاستقبال",
+
+ 
+"Servicing" : "مقابلات",
+"ID Servicing" : "معرف مقابلات",
+"Depreciation servicing Period (days)" : "فترة الاسترداد (أيام)",
+"Next oil change (days)" : "تغيير الزيت التالي (أيام)",
+"Invoice No" : "رقم الفاتورة",
+"InvoiceNo" : "رقم الفاتورة",
+"Place" : "مكان",
+"Select Type of Service" : "اختر نوع الخدمة",
+
+
+
+"Washing": "غسل",
+"Oil Change": "تغيير الزيت",
+"Change filters (oil/air)": "تغيير الفلاتر (زيت/هواء)",
+"Drain + air filter": "تصفية + فلتر الهواء",
+"Oil change + oil filter": "تغيير الزيت + فلتر الزيت",
+"Oil change + Filter change (oil/air)": "تغيير الزيت + تغيير الفلتر (زيت/هواء)",
+"Wheel alignment": "محاذاة العجلات",
+"Tire rotation": "تدوير الإطارات",
+"Engine tuning": "ضبط المحرك",
+"Brake adjustment": "ضبط الفرامل",
+"Electric adjustment": "ضبط كهربائي",
+"Control": "تحكم",
+"Others": "أخرى"
+
+
+
+
+
+
 }

@@ -55,31 +55,28 @@ export function Servicing() {
         Type: true,
         Vehicle: true,
         Date: true,
-        Km: true,
-        Cost: true,
-
         Place: true,
-        
-       
-        NextOilChange: true,
-        Depreciation: true,
+        Cost: true,
+        //Depreciation: true,
+        KM: true,
+        //NextOilChange: true,
     
     };
-
+    
     const serviceMapping: { [key: number]: string } = {
-        1: "Washing",
-        2: "Oil Change",
-        3: "Change filters (oil/air)",
-        4: "Drain + air filter",
-        5: "Oil change + oil filter",
-        6: "Oil change + Filter change (oil/air)",
-        7: "Wheel alignment",
-        8: "Tire rotation",
-        9: "Engine tuning",
-        10: "Brake adjustment",
-        11: "Electric adjustment",
-        12: "Control",
-        13: "Others",
+        1: translate("Washing"),
+        2: translate("Oil Change"),
+        3: translate("Change filters (oil/air)"),
+        4: translate("Drain + air filter"),
+        5: translate("Oil change + oil filter"),
+        6: translate("Oil change + Filter change (oil/air)"),
+        7: translate("Wheel alignment"),
+        8: translate("Tire rotation"),
+        9: translate("Engine tuning"),
+        10: translate("Brake adjustment"),
+        11: translate("Electric adjustment"),
+        12: translate("Control"),
+        13: translate("Others"),
     };
 
     // Load selected columns from localStorage or use initial state
@@ -344,23 +341,7 @@ export function Servicing() {
                                     className="sorting "
                                     onClick={() => handleSortingColumn("invoice_no_servicing")}
                                 >
-                                    {translate("InvoiceNo")}
-                                </th>
-                            )}
-                            {selectedColumns.Type && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("type_servicing")}
-                                >
-                                    {translate("Type Servicing")}
-                                </th>
-                            )}
-                             {selectedColumns.Vehicle && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("vehicle_servicing")}
-                                >
-                                    {translate("Vehicle")}
+                                    {translate("Invoice No")}
                                 </th>
                             )}
                             {selectedColumns.Date && (
@@ -371,14 +352,29 @@ export function Servicing() {
                                     {translate("Date")}
                                 </th>
                             )}
+                            {selectedColumns.Vehicle && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("vehicle_servicing")}
+                                >
+                                    {translate("Vehicle")}
+                                </th>
+                            )}
                             
-                            
+                            {selectedColumns.Type && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("type_servicing")}
+                                >
+                                    {translate("Service")}
+                                </th>
+                            )}
                              {selectedColumns.Km && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("km_servicing")}
                                 >
-                                    {translate("Km")}
+                                    {translate("KM")}
                                 </th>
                             )}
                             
@@ -398,23 +394,9 @@ export function Servicing() {
                                     {translate("Place")}
                                 </th>
                             )}
-                             {selectedColumns.NextOilChange && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("next_oil_change_servicing")}
-                                >
-                                    {translate("Next Oil Change")}
-                                </th>
-                            )}
-                             {selectedColumns.Depreciation && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("depreciation_servicing")}
-                                >
-                                    {translate("Depreciation ")}
-                                </th>
-                            )}
-                           
+                            
+                             
+                            
                          
                             <th>{translate("Action")}</th>
                         </tr>
@@ -454,6 +436,10 @@ export function Servicing() {
                                             )}
                                             {selectedColumns.Date && (
                                                 <td>{formatDateToTimestamp(Servicing.date_servicing)}</td>
+
+                                            )}
+                                             {selectedColumns.Vehicle && (
+                                                <td>{Servicing.type_vehicule}</td>
                                             )}
                                             {selectedColumns.Type && (
                                                 <td>
@@ -469,16 +455,19 @@ export function Servicing() {
                                             {selectedColumns.Place && (
                                                 <td>{Servicing.place_servicing}</td>
                                             )}
-                                            {selectedColumns.NextOilChange && (
-                                                <td>{Servicing.next_oil_change_servicing}</td>
-                                            )}
-                                            {selectedColumns.Depreciation && (
-                                                <td>{Servicing.depreciation_servicing}</td>
-                                            )}
-                                            {selectedColumns.Vehicle && (
-                                                <td>{Servicing.type_vehicule}</td>
-                                            )}
-                                   
+                                          
+                                            
+                                           
+                                    {/* 
+                                        <td
+                                            style={{                
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <Icon />
+                                        </td>
+                                        */}
 
 
                                     <td className="text-center">
@@ -539,8 +528,8 @@ export function Servicing() {
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
-                        previousLabel={"previous"}
-                        nextLabel={"next"}
+                        previousLabel={translate("previous")}
+                        nextLabel={translate("next")}
                         breakLabel={"..."}
                         pageCount={pageCount}
                         marginPagesDisplayed={2}
@@ -567,3 +556,4 @@ export function Servicing() {
         </>
     );
 }
+                  
