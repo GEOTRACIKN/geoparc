@@ -53,7 +53,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
     // Fetch data from API and set form data
     const fetchServicing = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/showservicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/showservicing/${id_servicing}`;
             console.log('Request URL:', url);
     
             const response = await fetch(url);
