@@ -55,11 +55,14 @@ export function Servicing() {
         Type: true,
         Vehicle: true,
         Date: true,
-        Place: true,
-        Cost: true,
-        Depreciation: true,
         Km: true,
+        Cost: true,
+
+        Place: true,
+        
+       
         NextOilChange: true,
+        Depreciation: true,
     
     };
 
@@ -344,6 +347,22 @@ export function Servicing() {
                                     {translate("InvoiceNo")}
                                 </th>
                             )}
+                            {selectedColumns.Type && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("type_servicing")}
+                                >
+                                    {translate("Type Servicing")}
+                                </th>
+                            )}
+                             {selectedColumns.Vehicle && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("vehicle_servicing")}
+                                >
+                                    {translate("Vehicle")}
+                                </th>
+                            )}
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
@@ -353,14 +372,7 @@ export function Servicing() {
                                 </th>
                             )}
                             
-                            {selectedColumns.Type && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("type_servicing")}
-                                >
-                                    {translate("Type Servicing")}
-                                </th>
-                            )}
+                            
                              {selectedColumns.Km && (
                                 <th
                                     className="sorting "
@@ -402,14 +414,7 @@ export function Servicing() {
                                     {translate("Depreciation ")}
                                 </th>
                             )}
-                            {selectedColumns.Vehicle && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("vehicle_servicing")}
-                                >
-                                    {translate("Vehicle")}
-                                </th>
-                            )}
+                           
                          
                             <th>{translate("Action")}</th>
                         </tr>
@@ -473,16 +478,7 @@ export function Servicing() {
                                             {selectedColumns.Vehicle && (
                                                 <td>{Servicing.type_vehicule}</td>
                                             )}
-                                    {/* 
-                                        <td
-                                            style={{                
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}
-                                        >
-                                            <Icon />
-                                        </td>
-                                        */}
+                                   
 
 
                                     <td className="text-center">

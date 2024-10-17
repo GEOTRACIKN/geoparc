@@ -115,7 +115,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
                       <Form.Group controlId="invoice_no_servicing">
-                        <Form.Label>{translate("invoiceNo")}</Form.Label>
+                        <Form.Label>{translate("Invoice No")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le véhicule"
@@ -143,10 +143,10 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                    
 
                     <Form.Group controlId="type_vehicule">
-                        <Form.Label>{translate("type_vehicule")}</Form.Label>
+                        <Form.Label>{translate("Vehicle Type")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Entrez le véhicule"
+                            //placeholder="Entrez le véhicule"
                             value={formData.type_vehicule}
                             onChange={handleChange}
                         />
@@ -161,7 +161,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="place_servicing">
-                        <Form.Label>{translate("place_servicing")}</Form.Label>
+                        <Form.Label>{translate("Place")}</Form.Label>
                         <Form.Control
                             type="text"
                             //placeholder="Entrez le nom du client"
@@ -171,7 +171,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="cost_servicing">
-                        <Form.Label>{translate("cost_servicing")}</Form.Label>
+                        <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez le c"
@@ -180,7 +180,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         />
                     </Form.Group>
                     <Form.Group controlId="depreciation_servicing">
-                        <Form.Label>{translate("depreciation_servicing Period (days)")}</Form.Label>
+                        <Form.Label>{translate("Depreciation servicing Period (days)")}</Form.Label>
                         <Form.Control
                             type="number"
                             //placeholder="Entrez la periode de depreciation_servicing (jour)"
@@ -190,10 +190,10 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     </Form.Group>
                    
                     <Form.Group controlId="km_servicing">
-                        <Form.Label>{translate("km_servicing")}</Form.Label>
+                        <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
-                            placeholder="Entrez le kilométrage"
+                            //placeholder="Entrez le kilométrage"
                             value={formData.km_servicing}
                             onChange={handleChange}
                         />
@@ -203,7 +203,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Nex oil change")}</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Enter next oil change"
+                            //placeholder="Enter next oil change"
                             value={formData.next_oil_change_servicing}
                             onChange={handleChange}
                         />
