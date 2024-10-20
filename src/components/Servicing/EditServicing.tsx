@@ -55,7 +55,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     // Fetch data from API and set form data
     const fetchServicing = async () => {
         try {
-            const url = `${backendUrl}/api/geop/showservicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/gmao/showservicing/${id_servicing}`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -100,7 +100,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
     const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/updateservicing/${id_servicing}`;
+            const url = `${backendUrl}/api/geop/gmao/updateservicing/${id_servicing}`;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {

@@ -127,7 +127,7 @@ export function Servicing() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/servicing/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/gmao/servicing/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
 
@@ -146,7 +146,7 @@ export function Servicing() {
     const getServicing = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/servicing/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/gmao/servicing/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();

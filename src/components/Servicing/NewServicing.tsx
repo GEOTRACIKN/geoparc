@@ -96,7 +96,7 @@ const ModalNewServicing: React.FC<ModalNewServicingProps> = ({
         };
 
         try {
-            const response = await fetch(`${backendUrl}/api/geop/addnewservicing/${geopuserID}`, {
+            const response = await fetch(`${backendUrl}/api/geop/gmao/addnewservicing/${geopuserID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
