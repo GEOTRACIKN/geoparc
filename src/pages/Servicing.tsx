@@ -229,12 +229,14 @@ export function Servicing() {
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Servicing")} ({total})</h4>
                 </div>
-                <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewServicingModal} className="btn btn-primary mt-2 mr-1">
-                        <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
-                    </Button>
-                </div>
+                {/* 
+<div className="col-md-6 col-sm-12 text-right">
+    <Button onClick={handleShowNewServicingModal} className="btn btn-primary mt-2 mr-1">
+        <i className="las la-plus mr-3"></i>
+        {translate("New Request")}
+    </Button>
+</div>
+*/}
             </div>
             <div className="row">
                 <div

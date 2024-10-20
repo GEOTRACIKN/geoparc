@@ -10,6 +10,7 @@ interface ModalEditServicingProps {
     onHide: () => void;
     id_servicing: number | null;
     onSuccess?: () => void;
+    isEditable?: boolean;
 
 }
 
@@ -19,7 +20,8 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     show,
     onHide,
     id_servicing,
-    onSuccess
+    onSuccess,
+    isEditable = false // Default to true
     
 }) => {
     const [formData, setFormData] = useState({
@@ -64,16 +66,15 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
             if (data.length > 0) {
                 const servicing = data[0];
                 setFormData({
-                    invoice_no_servicing: servicing.invoice_no_servicing,
-                    type_servicing: servicing.type_servicing.toString(),
-                    type_vehicule: servicing.type_vehicule,
-                    date_servicing: formatDateToTimestamp(servicing.date_servicing), 
-                    place_servicing: servicing.place_servicing,
-                    cost_servicing: servicing.cost_servicing,
-                    depreciation_servicing: servicing.depreciation_servicing,
-                    km_servicing: servicing.km_servicing,
-                    next_oil_change_servicing: servicing.next_oil_change_servicing,
-                   
+                    invoice_no_servicing: servicing.invoice_no_servicing || "",
+                    type_servicing: servicing.type_servicing ? servicing.type_servicing.toString() : "",
+                    type_vehicule: servicing.type_vehicule || "",
+                    date_servicing: servicing.date_servicing ? formatDateToTimestamp(servicing.date_servicing) : "",
+                    place_servicing: servicing.place_servicing || "",
+                    cost_servicing: servicing.cost_servicing || "",
+                    depreciation_servicing: servicing.depreciation_servicing || "",
+                    km_servicing: servicing.km_servicing || "",
+                    next_oil_change_servicing: servicing.next_oil_change_servicing || "",
                 });
             } else {
                 console.warn('No servicing data found for the provided ID.');
@@ -106,7 +107,16 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    // Convert empty strings to null for optional fields
+                    invoice_no_servicing: formData.invoice_no_servicing || null,
+                    type_servicing: formData.type_servicing || null,
+                    cost_servicing: formData.cost_servicing || null,
+                    depreciation_servicing: formData.depreciation_servicing || null,
+                    km_servicing: formData.km_servicing || null,
+                    next_oil_change_servicing: formData.next_oil_change_servicing || null,
+                }),
             });
     
             if (!response.ok) {
@@ -204,6 +214,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                         <Form.Label>{translate("Vehicle Type")}</Form.Label>
                         <Form.Control
                             type="text"
+                            readOnly={!isEditable}
                             //placeholder="Entrez le véhicule"
                             value={formData.type_vehicule}
                             onChange={handleChange}
@@ -213,6 +224,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                         <Form.Label>{translate("Request Date")}</Form.Label>
                         <Form.Control
                             type="datetime-local"
+                            readOnly={!isEditable}
                             value={formData.date_servicing}
                             onChange={handleChange}
                         />
@@ -251,6 +263,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                         <Form.Label>{translate("KM")}</Form.Label>
                         <Form.Control
                             type="number"
+                            readOnly={!isEditable}
                             //placeholder="Entrez le kilométrage"
                             value={formData.km_servicing}
                             onChange={handleChange}

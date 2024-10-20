@@ -8,6 +8,8 @@ interface ModalShowServicingnProps {
     show: boolean;
     onHide: () => void;
     id_servicing: number | null;
+    isEditable?: boolean;
+
 
 }
 
@@ -18,6 +20,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
     show,
     onHide,
     id_servicing,
+    isEditable = false // Default to true
+
 
 }) => {
     const [formData, setFormData] = useState({
@@ -71,18 +75,17 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
             if (data.length > 0) {
                 const servicing = data[0];
                 setFormData({
-                    invoice_no_servicing: servicing.invoice_no_servicing,
-                    type_servicing: servicing.type_servicing.toString(),
-                    type_vehicule: servicing.type_vehicule,
-                    date_servicing: formatDateToTimestamp(servicing.date_servicing), 
-                    place_servicing: servicing.place_servicing,
-                    cost_servicing: servicing.cost_servicing,
-                    depreciation_servicing: servicing.depreciation_servicing,
-                    km_servicing: servicing.km_servicing,
-                    next_oil_change_servicing: servicing.next_oil_change_servicing,
-                   
+                    invoice_no_servicing: servicing.invoice_no_servicing || "",
+                    type_servicing: servicing.type_servicing ? servicing.type_servicing.toString() : "",
+                    type_vehicule: servicing.type_vehicule || "",
+                    date_servicing: servicing.date_servicing ? formatDateToTimestamp(servicing.date_servicing) : "",
+                    place_servicing: servicing.place_servicing || "",
+                    cost_servicing: servicing.cost_servicing || "",
+                    depreciation_servicing: servicing.depreciation_servicing || "",
+                    km_servicing: servicing.km_servicing || "",
+                    next_oil_change_servicing: servicing.next_oil_change_servicing || "",
                 });
-            } else {
+            }else {
                 console.warn('No servicing data found for the provided ID.');
             }
         } catch (error) {
@@ -118,24 +121,22 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Invoice No")}</Form.Label>
                         <Form.Control
                             type="number"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez le véhicule"
                             value={formData.invoice_no_servicing}
                             onChange={handleChange}
                         />
                     </Form.Group>
-
+                   
                     <Form.Group controlId="type_servicing">
-                        <Form.Label>{translate("Service")}</Form.Label>
-                        
-                        <Form.Control as="select" value={formData.type_servicing} onChange={handleChange}>
-                            <option value="">{translate("Select Service")}</option>
-                            {Object.entries(serviceMapping).map(([key, label]) => (
-                                <option key={key} value={key}>
-                                    {label}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+    <Form.Label>{translate("Service")}</Form.Label>
+    <Form.Control
+        type="text"
+        value={serviceMapping[Number(formData.type_servicing)] || ""}
+        readOnly
+    />
+</Form.Group>
 
                 
                   
@@ -146,6 +147,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Vehicle Type")}</Form.Label>
                         <Form.Control
                             type="text"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez le véhicule"
                             value={formData.type_vehicule}
                             onChange={handleChange}
@@ -155,6 +158,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Request Date")}</Form.Label>
                         <Form.Control
                             type="datetime-local"
+                            readOnly={!isEditable}
+
                             value={formData.date_servicing}
                             onChange={handleChange}
                         />
@@ -164,6 +169,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Place")}</Form.Label>
                         <Form.Control
                             type="text"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez le nom du client"
                             value={formData.place_servicing}
                             onChange={handleChange}
@@ -174,6 +181,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
                             type="number"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez le c"
                             value={formData.cost_servicing}
                             onChange={handleChange}
@@ -183,6 +192,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Depreciation servicing Period (days)")}</Form.Label>
                         <Form.Control
                             type="number"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez la periode de depreciation_servicing (jour)"
                             value={formData.depreciation_servicing}
                             onChange={handleChange}
@@ -193,6 +204,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("KM")}</Form.Label>
                         <Form.Control
                             type="number"
+                            readOnly={!isEditable}
+
                             //placeholder="Entrez le kilométrage"
                             value={formData.km_servicing}
                             onChange={handleChange}
@@ -203,6 +216,8 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                         <Form.Label>{translate("Nex oil change")}</Form.Label>
                         <Form.Control
                             type="text"
+                            readOnly={!isEditable}
+
                             //placeholder="Enter next oil change"
                             value={formData.next_oil_change_servicing}
                             onChange={handleChange}
