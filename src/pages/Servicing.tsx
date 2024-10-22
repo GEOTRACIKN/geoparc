@@ -39,6 +39,8 @@ export function Servicing() {
     const [column, setSortColumn] = useState("id_servicing");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
+
     
     
     const [selectedServicingId, setSelectedServicingId] = useState<number | null>(null);
@@ -119,6 +121,17 @@ export function Servicing() {
         setShowShowServicingModal(true);
     };
     const handleCloseShowServicingModal = () => setShowShowServicingModal(false);
+
+
+    const handleShowConfirmModal = (id: number) => {
+        setSelectedServicingId(id); // Set the selected interview ID
+        setShowConfirmModal(true); // Show the modal
+    };
+
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false); // Close the modal without action
+    };
+
 
     const getCountServicing = async () => {
         try {
@@ -329,14 +342,7 @@ export function Servicing() {
                                     {translate("ID")}
                                 </th>
                             )}
-                            {selectedColumns.InvoiceNo && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("invoice_no_servicing")}
-                                >
-                                    {translate("Invoice No")}
-                                </th>
-                            )}
+                           
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
@@ -353,6 +359,22 @@ export function Servicing() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
+                             {selectedColumns.Km && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("km_servicing")}
+                                >
+                                    {translate("KM")}
+                                </th>
+                            )}
+                             {selectedColumns.InvoiceNo && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("invoice_no_servicing")}
+                                >
+                                    {translate("Invoice No")}
+                                </th>
+                            )}
                             
                             {selectedColumns.Type && (
                                 <th
@@ -362,14 +384,7 @@ export function Servicing() {
                                     {translate("Service")}
                                 </th>
                             )}
-                             {selectedColumns.Km && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("km_servicing")}
-                                >
-                                    {translate("KM")}
-                                </th>
-                            )}
+                            
                             
                             {selectedColumns.Cost && (
                                 <th
@@ -424,9 +439,7 @@ export function Servicing() {
                                             {selectedColumns.ID && (
                                                 <td>{Servicing.id_servicing}</td>
                                             )}
-                                            {selectedColumns.InvoiceNo && (
-                                                <td>{Servicing.invoice_no_servicing}</td>
-                                            )}
+                                          
                                             {selectedColumns.Date && (
                                                 <td>{formatDateToTimestamp(Servicing.date_servicing)}</td>
 
@@ -434,14 +447,18 @@ export function Servicing() {
                                              {selectedColumns.Vehicle && (
                                                 <td>{Servicing.type_vehicule}</td>
                                             )}
+                                             {selectedColumns.Km && (
+                                                <td>{Servicing.km_servicing}</td>
+                                            )}
+                                              {selectedColumns.InvoiceNo && (
+                                                <td>{Servicing.invoice_no_servicing}</td>
+                                            )}
                                             {selectedColumns.Type && (
                                                 <td>
                                                     {serviceMapping[Servicing.type_servicing]}
                                                 </td>
                                             )}
-                                            {selectedColumns.Km && (
-                                                <td>{Servicing.km_servicing}</td>
-                                            )}
+                                           
                                             {selectedColumns.Cost && (
                                                 <td>{Servicing.cost_servicing}</td>
                                             )}
@@ -486,6 +503,20 @@ export function Servicing() {
                                             >
                                                 <i
                                                     className="fa fa-edit"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </Link>
+                                            <Link
+                                                to={``}
+                                                className="badge badge-warning mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Mettre à jour l'état"
+                                                onClick={() => handleShowConfirmModal(Servicing.id_servicing)}
+
+                                            >
+                                                <i
+                                                    className="fa fa-sync"
                                                     style={{ fontSize: "1.2em" }}
                                                 ></i>
                                             </Link>
@@ -534,6 +565,22 @@ export function Servicing() {
             </div>
             <ModalEditServicing show={showEditServicingModal} onHide={handleCloseEditServicingModal} id_servicing={selectedServicingId} onSuccess={refreshData} />
             <ModalShowServicing show={showShowServicingModal} onHide={handleCloseShowServicingModal} id_servicing={selectedServicingId} />
+            <Modal show={showConfirmModal} onHide={handleCloseConfirmModal} responsive>
+                <Modal.Header closeButton>
+                    <Modal.Title>{translate("Confirmation")}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {translate("Are you sure you want to close this interview?")}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseConfirmModal}>
+                        {translate("No")}
+                    </Button>
+                    <Button variant="primary" onClick={handleCloseConfirmModal}>
+                        {translate("Yes")}
+                    </Button>
+                    </Modal.Footer>
+                    </Modal>
 
         </>
     );

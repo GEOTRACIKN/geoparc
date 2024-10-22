@@ -568,7 +568,10 @@
 "Brake adjustment": "Réglage des freins",
 "Electric adjustment": "Réglage électrique",
 "Control": "Contrôle",
-"Others": "Autres"
-
+"Others": "Autres",
+"Confirmation": "Confirmation",
+"Are you sure you want to close this interview?" : "Êtes-vous sûr de vouloir clôturer cet entretien ?",
+"Yes": "Oui",
+"No": "Non"
 
 }

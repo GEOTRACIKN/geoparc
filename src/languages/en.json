@@ -560,7 +560,12 @@
 "Brake adjustment": "Brake adjustment",
 "Electric adjustment": "Electric adjustment",
 "Control": "Control",
-"Others": "Others"
+"Others": "Others",
+
+"Confirmation": "Confirmation",
+"Are you sure you want to close this interview?": "Are you sure you want to close this interview?",
+"Yes": "Yes",
+"No": "No"
 
 
 
