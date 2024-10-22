@@ -576,7 +576,12 @@
 "Brake adjustment": "ضبط الفرامل",
 "Electric adjustment": "ضبط كهربائي",
 "Control": "تحكم",
-"Others": "أخرى"
+"Others": "أخرى",
+
+"Confirmation": "تأكيد",
+"Are you sure you want to close this interview?": "هل أنت متأكد أنك تريد إنهاء هذه المقابلة؟",
+"Yes": "نعم",
+"No": "لا"
 
 
 
