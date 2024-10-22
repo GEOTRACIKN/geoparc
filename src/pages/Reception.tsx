@@ -103,7 +103,7 @@ export function Reception() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/gmao/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/intervention/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
 
@@ -122,7 +122,7 @@ export function Reception() {
     const getIntervention = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/gmao/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();

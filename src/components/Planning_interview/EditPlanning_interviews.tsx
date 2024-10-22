@@ -31,7 +31,7 @@ const ModalEditPlanninginterviews: React.FC<
     // Fetch data from API and set form data
     const fetchPlanninginterview = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/fetchplanninginterview/${id_planning}`;
+            const url = `${backendUrl}/api/geop/fetchplanninginterview/${id_planning}`;
             const response = await fetch(url);
 
             const data = await response.json();

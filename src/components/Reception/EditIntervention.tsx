@@ -46,7 +46,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/showintervention/${id_intervention}`;
+            const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,7 +90,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
     const handleUpdate = async () => {
         try {
-            const url = `${backendUrl}/api/geop/gmao/updateintervention/${id_intervention}`;
+            const url = `${backendUrl}/api/geop/updateintervention/${id_intervention}`;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {

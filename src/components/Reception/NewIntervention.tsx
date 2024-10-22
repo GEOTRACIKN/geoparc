@@ -72,7 +72,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         };
 
         try {
-            const response = await fetch(`${backendUrl}/api/geop/gmao/addnewintervention/${geopuserID}`, {
+            const response = await fetch(`${backendUrl}/api/geop/addnewintervention/${geopuserID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
