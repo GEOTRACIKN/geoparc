@@ -13,14 +13,14 @@ interface Servicing {
     id_servicing: number;
     invoice_no_servicing: number;
     type_servicing: number;
-    id_vehicule: string;
+    id_vehicule: number;
     type_vehicule: string;
     date_servicing: string;
     place_servicing: string;
     cost_servicing: number;
     depreciation_servicing: number;
     km_servicing: number;
-    next_oil_change_servicing: string;
+    next_oil_change_servicing: number;
     
 }
 
