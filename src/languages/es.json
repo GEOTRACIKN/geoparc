@@ -629,6 +629,35 @@
   "Type of interview" : "Tipo de entrevista",
   "Planned interviews" : "Entrevistas planificadas",
   "Planning date" : "Fecha de planificación",
-  "Reception" : "Recepción"
+  "Reception" : "Recepción",
+
+
+
+  
+"Depreciation servicing Period (days)" : "Período de servicio de depreciación (días) ",
+"Servicing" : "Servicio",
+"ID Servicing" : "ID Servicio",
+"Next oil change (days)" : "Próximo cambio de aceite (días)",
+"Invoice No" : "Número de factura",
+"InvoiceNo" : "Número de factura",
+"Place" : "Lugar",
+"Select Type of Service" : "Seleccione el tipo de servicio",
+
+
+"Action" : "Acción",
+"Washing": "Lavado",
+"Oil Change": "Cambio de aceite",
+"Change filters (oil/air)": "Cambiar filtros (aceite/aire)",
+"Drain + air filter": "Drain + air filter",
+"Oil change + oil filter": "Cambio de aceite + filtro de aceite",
+"Oil change + Filter change (oil/air)" : "Cambio de aceite + Cambio de filtro (aceite/aire)",
+"Wheel alignment": "Alineación de ruedas",
+"Tire rotation": "Rotación de neumáticos",
+"Engine tuning": "Puesta a punto del motor",
+"Brake adjustment": "Ajuste de los frenos",
+"Electric adjustment": "Ajuste eléctrico",
+"Control": "Controlar",
+"Others": "Otros"
+
 
 }

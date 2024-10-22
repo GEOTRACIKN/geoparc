@@ -533,7 +533,34 @@
 "Type of interview" : "Type of interview",
 "Planned interviews" : "Planned interviews",
 "Planning date" : "Planning date",
-"Reception" : "Reception"
+"Reception" : "Reception",
+
+
+"Depreciation servicing Period (days) " : "Depreciation servicing Period (days) ",
+"Servicing" : "Servicing",
+"ID Servicing" : "ID Servicing",
+"Depreciation servicing Period (days)" : "Depreciation servicing Period (days)",
+"Next oil change" : "Next oil change",
+"Invoice No" : "Invoice No",
+"InvoiceNo" : "InvoiceNo",
+"Place" : "Place",
+"Next oil change (days)" : "Next oil change (days)",
+"Select Type of Service" : "Select Type of Service",
+
+
+"Washing": "Washing",
+"Oil Change": "Oil Change",
+"Change filters (oil/air)": "Change filters (oil/air)",
+"Drain + air filter": "Drain + air filter",
+"Oil change + oil filter": "Oil change + oil filter",
+"Oil change + Filter change (oil/air)": "Oil change + Filter change (oil/air)",
+"Wheel alignment": "Wheel alignment",
+"Tire rotation": "Tire rotation",
+"Engine tuning": "Engine tuning",
+"Brake adjustment": "Brake adjustment",
+"Electric adjustment": "Electric adjustment",
+"Control": "Control",
+"Others": "Others"
 
 
 
