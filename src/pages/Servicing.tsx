@@ -3,7 +3,6 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewServicing from "../components/Servicing/NewServicing"
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
@@ -104,12 +103,10 @@ export function Servicing() {
     };
     
 
-    const [showNewServicingModal, setShowNewServicingModal] = useState(false);
     const [showEditServicingModal, setShowEditServicingModal] = useState(false);
     const [showShowServicingModal, setShowShowServicingModal] = useState(false);
 
-    const handleShowNewServicingModal = () => setShowNewServicingModal(true);
-    const handleCloseNewServicingModal = () => setShowNewServicingModal(false);
+
 
     const handleEditServicingModal = (id: number) => {
         setSelectedServicingId(id);
@@ -229,14 +226,7 @@ export function Servicing() {
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Servicing")} ({total})</h4>
                 </div>
-                {/* 
-<div className="col-md-6 col-sm-12 text-right">
-    <Button onClick={handleShowNewServicingModal} className="btn btn-primary mt-2 mr-1">
-        <i className="las la-plus mr-3"></i>
-        {translate("New Request")}
-    </Button>
-</div>
-*/}
+      
             </div>
             <div className="row">
                 <div
@@ -357,7 +347,7 @@ export function Servicing() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicle_servicing")}
+                                    onClick={() => handleSortingColumn("type_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
@@ -460,17 +450,7 @@ export function Servicing() {
                                           
                                             
                                            
-                                    {/* 
-                                        <td
-                                            style={{                
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}
-                                        >
-                                            <Icon />
-                                        </td>
-                                        */}
-
+                                    
 
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
@@ -551,7 +531,6 @@ export function Servicing() {
                 </div>
                 
             </div>
-            <ModalNewServicing show={showNewServicingModal} onHide={handleCloseNewServicingModal} onSuccess={refreshData} />
             <ModalEditServicing show={showEditServicingModal} onHide={handleCloseEditServicingModal} id_servicing={selectedServicingId} onSuccess={refreshData} />
             <ModalShowServicing show={showShowServicingModal} onHide={handleCloseShowServicingModal} id_servicing={selectedServicingId} />
 
