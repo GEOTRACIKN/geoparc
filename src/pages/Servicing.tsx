@@ -252,7 +252,8 @@ export function Servicing() {
                         </Dropdown>
                         <input
                             type="text"
-                            placeholder={` By ${typeSearch}`}
+                            //placeholder={` By ${typeSearch}`}
+                            placeholder={translate(typeSearch)} 
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />

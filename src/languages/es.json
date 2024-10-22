@@ -634,7 +634,7 @@
 
 
   
-"Depreciation servicing Period (days) " : "Período de servicio de depreciación (días) ",
+"Depreciation servicing Period (days)" : "Período de servicio de depreciación (días) ",
 "Servicing" : "Servicio",
 "ID Servicing" : "ID Servicio",
 "Next oil change (days)" : "Próximo cambio de aceite (días)",
@@ -644,7 +644,7 @@
 "Select Type of Service" : "Seleccione el tipo de servicio",
 
 
-
+"Action" : "Acción",
 "Washing": "Lavado",
 "Oil Change": "Cambio de aceite",
 "Change filters (oil/air)": "Cambiar filtros (aceite/aire)",

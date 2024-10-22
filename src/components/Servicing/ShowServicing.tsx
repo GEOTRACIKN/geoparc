@@ -118,7 +118,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
                       <Form.Group controlId="type_vehicule">
-                        <Form.Label>{translate("Vehicle Type")}</Form.Label>
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}
@@ -215,7 +215,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                   
 
                     <Form.Group controlId="next_oil_change_servicing">
-                        <Form.Label>{translate("Nex oil change")}</Form.Label>
+                        <Form.Label>{translate("Next oil change (days)")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}

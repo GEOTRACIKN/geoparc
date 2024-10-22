@@ -178,7 +178,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     
 
 <Form.Group controlId="type_vehicule">
-                        <Form.Label>{translate("Vehicle Type")}</Form.Label>
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}
