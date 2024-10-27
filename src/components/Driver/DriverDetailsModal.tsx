@@ -139,84 +139,85 @@ const DriverDetailsModal: React.FC<DriverDetailsModalProps> = ({
           <div className="row text-left">
           {/* Informations Générales */}
           <div className="col-12 row border-bottom pb-3">
-            <h5>Informations Générales :</h5>
+            <h5>{translate("General Information")} :</h5>
             <div className="col-6">
               <p>
                 <i className="fas fa-user" style={{ color: '#f7ac35' }}></i>
-                <strong> Nom :</strong> {driver.nom_conducteur ||  translate("None")}
+                <strong> {translate("First name")} :</strong> {driver.nom_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-user-circle" style={{ color: '#f7ac35' }}></i>
-                <strong> Prénom :</strong> {driver.prenom_conducteur ||  translate("None")}
+                <strong> {translate("Last name")} :</strong> {driver.prenom_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-id-badge" style={{ color: '#f7ac35' }}></i>
-                <strong> Code d'identification :</strong> {driver.code_conducteur ||  translate("None")}
+                <strong> {translate("Identification code")} :</strong> {driver.code_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-briefcase" style={{ color: '#f7ac35' }}></i>
-                <strong> Fonction :</strong> {driver.role_conducteur ||  translate("None")}
+                <strong> {translate("Function")} :</strong> {driver.role_conducteur || translate("None")}
               </p>
             </div>
             <div className="col-6">
               <p>
                 <i className="fas fa-map-marker-alt" style={{ color: '#f7ac35' }}></i>
-                <strong> Adresse :</strong> {driver.adresse_conducteur ||  translate("None")}
+                <strong> {translate("Address")} :</strong> {driver.adresse_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-phone" style={{ color: '#f7ac35' }}></i>
-                <strong> Téléphone :</strong> {driver.telephone_conducteur ||  translate("None")}
+                <strong> {translate("Phone")} :</strong> {driver.telephone_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-envelope" style={{ color: '#f7ac35' }}></i>
-                <strong> Email :</strong> {driver.email_conducteur ||  translate("None")}
+                <strong> {translate("Email")} :</strong> {driver.email_conducteur || translate("None")}
               </p>
             </div>
           </div>
           <div className="col-12 row p-3">
             {/* Pièce d'identité */}
             <div className="mb-3 col-6">
-              <h5>Pièce d'identité :</h5>
+              <h5>{translate("Identity Document")} :</h5>
               <p>
                 <i className="fas fa-id-card" style={{ color: '#f7ac35' }}></i>
-                <strong> Type de la pièce :</strong> {driver.piece_identite_conducteur ||  translate("None")}
+                <strong> {translate("Type of document")} :</strong> {driver.piece_identite_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-file-alt" style={{ color: '#f7ac35' }}></i>
-                <strong> Numéro de la pièce :</strong> {driver.numero_piece_identite_conducteur ||  translate("None")}
+                <strong> {translate("Document number")} :</strong> {driver.numero_piece_identite_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-calendar-alt" style={{ color: '#f7ac35' }}></i>
-                <strong> Date de délivrance :</strong> {driver.date_delivrance_pi_conducteur ||  translate("None")}
+                <strong> {translate("Date of issue")} :</strong> {driver.date_delivrance_pi_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-map-marker-alt" style={{ color: '#f7ac35' }}></i>
-                <strong> Lieu de délivrance :</strong> {driver.lieu_delivrance_pi_conducteur ||  translate("None")}
+                <strong> {translate("Place of issue")} :</strong> {driver.lieu_delivrance_pi_conducteur || translate("None")}
               </p>
             </div>
         
             {/* Permis de conduire */}
             <div className="mb-3 col-6">
-              <h5>Permis de conduire :</h5>
+              <h5>{translate("Driving License")} :</h5>
               <p>
                 <i className="fas fa-car" style={{ color: '#f7ac35' }}></i>
-                <strong> Type de permis :</strong> {driver.premis_conducteur ||  translate("None")}
+                <strong> {translate("Type of license")} :</strong> {driver.premis_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-id-card" style={{ color: '#f7ac35' }}></i>
-                <strong> Numéro de permis :</strong> {driver.numero_permis_conducteur ||  translate("None")}
+                <strong> {translate("License number")} :</strong> {driver.numero_permis_conducteur || translate("None")}
               </p>
               <p>
                 <i className="fas fa-calendar-alt" style={{ color: '#f7ac35' }}></i>
-                <strong> Date de délivrance :</strong> {driver.date_delivrance_permis_conducteur ? formatDateToTimestamp(driver.date_delivrance_permis_conducteur) :  translate("None")}
+                <strong> {translate("Date of issue")} :</strong> {driver.date_delivrance_permis_conducteur ? formatDateToTimestamp(driver.date_delivrance_permis_conducteur) : translate("None")}
               </p>
               <p>
                 <i className="fas fa-calendar-times" style={{ color: '#f7ac35' }}></i>
-                <strong> Date d'expiration :</strong> {driver.date_expir_permis_conducteur ? formatDateToTimestamp(driver.date_expir_permis_conducteur) :  translate("None")}
+                <strong> {translate("Expiration date")} :</strong> {driver.date_expir_permis_conducteur ? formatDateToTimestamp(driver.date_expir_permis_conducteur) : translate("None")}
               </p>
             </div>
           </div>
         </div>
+        
         
         ) : (
           <p>{translate("No driver details available.")}</p>

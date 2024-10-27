@@ -345,7 +345,6 @@
 "Start Time": "وقت البدء",
 "End Time": "وقت الانتهاء",
 "Duration": "المدة",
-"Status": "الحالة", 
 "Statistics for Day": "إحصائيات لليوم",
 "Total Distance": "إجمالي المسافة",
 "Total Duration": "إجمالي المدة",
@@ -356,15 +355,10 @@
 "KM": "كم",
 "Stopped with Engine Running": "توقف مع تشغيل المحرك",
 "Speed reports":"تقارير السرعة",
-
 "Statistics of the Day":"إحصاءات اليوم",
 "Global statistics":"الإحصاءات الكلية",
 "Fuel type":"نوع الوقود",
 "Tank capacity":"سعة الخزان",
-
-
-
-
 "Creation Date": "تاريخ الإنشاء",
 "Rapports": "تقارير",
 "New Report": "تقرير جديد",
@@ -518,7 +512,6 @@
 "Displaying": "إظهار",
 "Import": "تحميل",
 "Validate employees' salaries":"التحقق من رواتب الموظفين",  
-"on":"على",
 "Status":"الحالة",
 "Display columns":"أعمدة العرض",
 "Intervention Requests":"طلب التدخل",
@@ -545,10 +538,23 @@
 "Add Warning" : "إضافة تحذير",
 "Warnings" : "تحذيرات",
 "Type Warning" : "نوع التحذير",
- "Date Warning" : "تاريخ التحذير",
- "Interview date" : "تاريخ المقابلة",
- "Type of interview" : "نوع المقابلة",
- "Planned interviews" : "المقابلات المخطط لها",
- "Planning date" : "تاريخ التخطيط",
- "Reception" : "الاستقبال"
+"Date Warning" : "تاريخ التحذير",
+"Interview date" : "تاريخ المقابلة",
+"Type of interview" : "نوع المقابلة",
+"Planned interviews" : "المقابلات المخطط لها",
+"Planning date" : "تاريخ التخطيط",
+"Reception" : "الاستقبال",
+"General Information": "معلومات عامة",
+"Identification code": "رمز التعريف",
+"Function": "الوظيفة",
+"Identity Document": "وثيقة الهوية",
+"Type of document": "نوع الوثيقة",
+"Document number": "رقم الوثيقة",
+"Date of issue": "تاريخ الإصدار",
+"Place of issue": "مكان الإصدار",
+"Driving License": "رخصة القيادة",
+"Type of license": "نوع الرخصة",
+"License number": "رقم الرخصة",
+"Date of issue (for driving license)": "تاريخ الإصدار (لرخصة القيادة)",
+"Expiration date": "تاريخ انتهاء الصلاحية"
 }

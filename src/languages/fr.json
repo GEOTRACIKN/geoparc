@@ -508,8 +508,6 @@
 "Displaying": "Affichage" ,
 "Import": "Importer",
 "Validate employees' salaries":"Valider les salaires des employés",
-"on":"sur",
-"Status":"État",
 "Display columns":"Colonnes dʼaffichage",
 "Intervention Requests":"Demandes d'intervention",
 "Client":"Client",
@@ -540,5 +538,18 @@
 "Type of interview" : "Type d'entretien",
 "Planned interviews" : "Entretiens planifiés",
 "Planning date" : "Date de planification",
-"Reception" : "Réception"
+"Reception" : "Réception",
+"General Information": "Informations Générales",
+"Identification code": "Code d'identification",
+"Function": "Fonction",
+"Identity Document": "Pièce d'identité",
+"Type of document": "Type de la pièce",
+"Document number": "Numéro de la pièce",
+"Date of issue": "Date de délivrance",
+"Place of issue": "Lieu de délivrance",
+"Driving License": "Permis de conduire",
+"Type of license": "Type de permis",
+"License number": "Numéro de permis",
+"Date of issue (for driving license)": "Date de délivrance (pour le permis)",
+"Expiration date": "Date d'expiration"
 }
