@@ -1,13 +1,16 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from 'react-spinners';
-import DriverModal from "../components/Driver/DriverModal";
+import DriverModal from "../components/Driver/DriverDeleteModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import DriverDeleteModal from "../components/Driver/DriverDeleteModal";
+import DriverDetailsModal from "../components/Driver/DriverDetailsModal";
 
 interface Drivers {
   id_conducteur: number;
@@ -35,6 +38,10 @@ export function Drivers() {
   const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
+
+  const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
+  const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+
   const [modalConfirmStatus, setModalConfirmStatus] = useState<string | null>(null);
   const [titleConfirmStatus, setTitleConfirmStatus] = useState<string | null>(null);
   const [modalAssignmentStatus, setModalAssignmentStatus] = useState<string | null>(null);
@@ -253,7 +260,7 @@ export function Drivers() {
   };
 
 
-  const handledeleteDriver = async (id_conducteur: number) => {
+  const HandleDeleteDriver = async (id_conducteur: number) => {
     try {
       console.log(id_conducteur);
       setModalStatus('Do you want to delete this Driver');
@@ -269,6 +276,25 @@ export function Drivers() {
       console.error(error);
     }
   };
+
+
+  const HandleDetailDriver = async (id_conducteur: number) => {
+    try {
+      console.log(id_conducteur);
+      setModalStatusDetail('Do you want to Show this Driver');
+      setTitleStatusDetail('Driver Information :');
+      setIdUser(parseInt(id_user || '0', 0));
+      setIdDriver(id_conducteur);
+
+      // Perform deletion logic here...
+
+      // After successful deletion, update the vehicle list
+      //  await updateVehicleList();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
 
   const handleConfirmSalaryDriver = async () => {
@@ -311,6 +337,11 @@ export function Drivers() {
   const closeModal = () => {
     setModalStatus(null);
   };
+
+  const closeDetailModal = () => {
+    setModalStatusDetail(null);
+  };
+
 
 
   const closeConfirmModal = () => {
@@ -596,6 +627,12 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
+                          <a className="badge bg-primary mr-2" onClick={() => HandleDetailDriver(driver.id_conducteur)} title={translate("Delete")} >
+                            <i
+                              className="las la-eye"
+                              style={{ fontSize: "1.2em" }}
+                            ></i>
+                          </a>
                           <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
@@ -607,7 +644,7 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteDriver(driver.id_conducteur)} title={translate("Delete")} >
+                          <a className="badge bg-primary mr-2" onClick={() => HandleDeleteDriver(driver.id_conducteur)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -654,7 +691,7 @@ export function Drivers() {
             activeClassName={"active"}
           />
         </div>
-        <DriverModal
+        <DriverDeleteModal
           show={modalStatus !== null}
           onHide={closeModal}
           status={modalStatus}
@@ -663,6 +700,16 @@ export function Drivers() {
           IdDriver={IdDriver}
           updateDriverList={handleUpdateDriverList}
         />
+        
+        <DriverDetailsModal
+          show={modalStatusDetail !== null}
+          onHide={closeDetailModal}
+          status={modalStatusDetail}
+          title={titleStatusDetail}
+          IdUser={IdUser}
+          IdDriver={IdDriver}
+        />
+
         <ConfirmSalaryModal
           show={modalConfirmStatus !== null}
           onHide={closeConfirmModal}
@@ -692,8 +739,5 @@ export function Drivers() {
       </div>
     </>
   );
-}
-function convertValue(maintenance: any) {
-  throw new Error("Function not implemented.");
 }
 
