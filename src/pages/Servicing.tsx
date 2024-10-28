@@ -1,53 +1,83 @@
 import { useEffect, useState } from "react";
-import { Button, Dropdown, Modal, Table } from "react-bootstrap";
+import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
+import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
-import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";
-import { Bounce, toast } from "react-toastify";
+import ModalEditServicing from "../components/Servicing/EditServicing";
 
 
-interface Schedule {
-    id_planning: number;
-    date_planification: string;
-    vehicule: string;
-    km: number;
-    service: number;
-    type_entretien: string,
-    date_dentretien: string,
+interface Servicing {
+    id_servicing: number;
+    invoice_no_servicing: number;
+    type_servicing: number;
+    id_vehicule: number;
+    type_vehicule: string;
+    date_servicing: string;
+    place_servicing: string;
+    cost_servicing: number;
+    depreciation_servicing: number;
+    km_servicing: number;
+    next_oil_change_servicing: number;
+    
 }
 
 
-export function InterviewSchedule() {
+export function Servicing() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
-    const [list_Schedule, setSchedule] = useState<Schedule[]>([]);
+    const [list_servicing, setServicing] = useState<Servicing[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID Schedule");
+    const [typeSearch, setTypeSearch] = useState("ID Servicing");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_planning");
+    const [column, setSortColumn] = useState("id_servicing");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
+
+    
+    
+    const [selectedServicingId, setSelectedServicingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
-    const [selectedPlanninginterviewsId, setSelectedPlanninginterviewsId] = useState<number | null>(null);
-    const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
-    const [selectedInterviewId, setSelectedInterviewId] = useState<number | null>(null); // To keep track of the interview being closed
 
 
+
+   ///voir avec Hichem + syntaxe
     const initialColumns = {
-        IDPlanning: true,
-        Planningdate: true,
-        vehicle: true,
-        km: true,
-        TypeInterview: true,
-        Interviewdate: true
+        ID: true,
+        InvoiceNo: true,
+        Type: true,
+        Vehicle: true,
+        Date: true,
+        Place: true,
+        Cost: true,
+        //Depreciation: true,
+        KM: true,
+        //NextOilChange: true,
+    
+    };
+    
+    const serviceMapping: { [key: number]: string } = {
+        1: translate("Washing"),
+        2: translate("Oil Change"),
+        3: translate("Change filters (oil/air)"),
+        4: translate("Drain + air filter"),
+        5: translate("Oil change + oil filter"),
+        6: translate("Oil change + Filter change (oil/air)"),
+        7: translate("Wheel alignment"),
+        8: translate("Tire rotation"),
+        9: translate("Engine tuning"),
+        10: translate("Brake adjustment"),
+        11: translate("Electric adjustment"),
+        12: translate("Control"),
+        13: translate("Others"),
     };
 
     // Load selected columns from localStorage or use initial state
@@ -71,15 +101,43 @@ export function InterviewSchedule() {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getSchedule();
+        getServicing();
+    };
+    
+
+    const [showEditServicingModal, setShowEditServicingModal] = useState(false);
+    const [showShowServicingModal, setShowShowServicingModal] = useState(false);
+
+
+
+    const handleEditServicingModal = (id: number) => {
+        setSelectedServicingId(id);
+        setShowEditServicingModal(true);
+    };
+    const handleCloseEditServicingModal = () => setShowEditServicingModal(false);
+
+    const handleShowShowServicingModal = (id: number) => {
+        setSelectedServicingId(id);
+        setShowShowServicingModal(true);
+    };
+    const handleCloseShowServicingModal = () => setShowShowServicingModal(false);
+
+
+    const handleShowConfirmModal = (id: number) => {
+        setSelectedServicingId(id); // Set the selected interview ID
+        setShowConfirmModal(true); // Show the modal
+    };
+
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false); // Close the modal without action
     };
 
 
-    const getCountSchedule = async () => {
+    const getCountServicing = async () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/InterviewSchedule/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/servicing/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
 
@@ -88,23 +146,25 @@ export function InterviewSchedule() {
             setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
 
         } catch (error) {
-            console.error(error);
+            //console.error(error);
         } finally {
             setLoading(false);
         }
     };
 
 
-    const getSchedule = async () => {
+    const getServicing = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/InterviewSchedule/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/servicing/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
 
             const data = await response.json();
-            console.log('Intervention data:', data);
+            console.log("Fetched data:", data);
 
-            setSchedule(data);
+
+            setServicing(data);
+            console.log("Updated servicing list:", data);
         } catch (error) {
             console.error(error);
         }
@@ -113,36 +173,38 @@ export function InterviewSchedule() {
         }
     };
     useEffect(() => {
-        getCountSchedule();
-        getSchedule();
+        getCountServicing();
+        
+        getServicing();
     }, [currentPage, limit, search, type, column, sort]);
+   
+    
 
-
-    const [showEditPlanninginterviewsModal, setshowEditPlanninginterviewsModal] = useState(false);
-    const handleCloseEditPlanninginterviewsModal = () => setshowEditPlanninginterviewsModal(false);
-
-    const handleEditPlanninginterviewsModal = (id: number) => {
-        setSelectedPlanninginterviewsId(id);
-        setshowEditPlanninginterviewsModal(true);
-    };
 
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
 
         switch (selectedValue) {
-            case translate("ID Intervention"):
+            case translate("ID Servicing"):
                 setType(0);
                 break;
-            case translate("Vehicule"):
+            case translate("Date"):
                 setType(1);
                 break;
-            case translate("Km"):
+            case translate("Vehicle"):
                 setType(2);
                 break;
-            case translate("Type of interview"):
+            case translate("Place"):
                 setType(3);
                 break;
+            case translate("Cost"):
+                setType(4);
+                break;
+            case translate("Place"):
+                setType(5);
+                break;
+                       
             default:
                 console.log("Unknown selection");
                 break;
@@ -166,87 +228,8 @@ export function InterviewSchedule() {
     };
 
     const refreshData = () => {
-        getCountSchedule();
-        getSchedule();
-    };
-
-    // Modal for confirmation of closing the interview
-    const handleShowConfirmModal = (id: number) => {
-        setSelectedInterviewId(id); // Set the selected interview ID
-        setShowConfirmModal(true); // Show the modal
-    };
-
-    const handleCloseConfirmModal = () => {
-        setShowConfirmModal(false); // Close the modal without action
-    };
-
-
-    const handleUpdateState = async () => {
-        if (selectedInterviewId) {
-            try {
-                // Effectuer la mise à jour de l'état de l'entretien via l'API
-                const response = await fetch(`${backendUrl}/api/geop/InterviewSchedule/updatestate/${selectedInterviewId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        statut: "Cloturé", // Le statut que vous souhaitez mettre à jour
-                    }),
-                });
-
-                // Vérifier si la requête a réussi
-                if (response.ok) {
-                    // Afficher une notification de succès
-                    toast.success("Statut de l'entretien mis à jour avec succès!", {
-                        position: "bottom-right",
-                        autoClose: 3000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                        transition: Bounce,
-
-                    });
-
-                    refreshData(); // Rafraîchir les données après la mise à jour
-                } else {
-                    // Afficher une notification d'erreur si la requête a échoué
-                    toast.error("Erreur lors de la mise à jour du statut de l'entretien.", {
-                        position: "bottom-right",
-                        autoClose: 3000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                        transition: Bounce,
-
-                    });
-                }
-            } catch (error) {
-                console.error("Erreur lors de la clôture de l'entretien:", error);
-
-                // Afficher une notification d'erreur en cas d'exception
-                toast.error("Une erreur s'est produite. Veuillez réessayer.", {
-                    position: "bottom-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Bounce,
-
-                });
-            } finally {
-                setShowConfirmModal(false); // Fermer la modal après l'opération
-            }
-        }
+        getCountServicing();
+        getServicing();
     };
 
 
@@ -254,9 +237,9 @@ export function InterviewSchedule() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Planned interviews")} ({total})</h4>
+                    <h4>{translate("Servicing")} ({total})</h4>
                 </div>
-
+      
             </div>
             <div className="row">
                 <div
@@ -272,15 +255,18 @@ export function InterviewSchedule() {
                                 ></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
-                                <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Km")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type of interview")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("ID Servicing")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Place")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
+
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
                             type="text"
-                            placeholder={` By ${typeSearch}`}
+                            //placeholder={` By ${typeSearch}`}
+                            placeholder={translate(typeSearch)} 
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -347,57 +333,79 @@ export function InterviewSchedule() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.IDPlanning && (
+                         
+                            {selectedColumns.ID && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("IDPlanning")}
+                                    onClick={() => handleSortingColumn("id_servicing")}
                                 >
                                     {translate("ID")}
                                 </th>
                             )}
-
-                            {selectedColumns.Planningdate && (
+                           
+                            {selectedColumns.Date && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Planningdate")}
+                                    onClick={() => handleSortingColumn("date_servicing")}
                                 >
-                                    {translate("Planning date")}
+                                    {translate("Date")}
                                 </th>
                             )}
-
-                            {selectedColumns.vehicle && (
+                            {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicle")}
+                                    onClick={() => handleSortingColumn("type_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.km && (
+                             {selectedColumns.Km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("km")}
+                                    onClick={() => handleSortingColumn("km_servicing")}
                                 >
                                     {translate("KM")}
                                 </th>
                             )}
-                            {selectedColumns.Interviewdate && (
+                             {selectedColumns.InvoiceNo && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("InterviewDate")}
+                                    onClick={() => handleSortingColumn("invoice_no_servicing")}
                                 >
-                                    {translate("Interview date")}
+                                    {translate("Invoice No")}
                                 </th>
                             )}
-
-                            {selectedColumns.TypeInterview && (
+                            
+                            {selectedColumns.Type && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("TypeInterview")}
+                                    onClick={() => handleSortingColumn("type_servicing")}
                                 >
-                                    {translate("Type of interview")}
+                                    {translate("Service")}
                                 </th>
                             )}
+                            
+                            
+                            {selectedColumns.Cost && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("cost_servicing")}
+                                >
+                                    {translate("Cost")}
+                                </th>
+                            )}
+                            {selectedColumns.Place && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("place_servicing")}
+                                >
+                                    {translate("Place")}
+                                </th>
+                            )}
+                            
+                             
+                            
+                         
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -414,8 +422,8 @@ export function InterviewSchedule() {
                                     </p>
                                 </td>
                             </tr>
-                        ) : Array.isArray(list_Schedule) && list_Schedule.length !== 0 ? (
-                            list_Schedule.map((Schedule, index) => (
+                        ) : Array.isArray(list_servicing) && list_servicing.length !== 0 ? (
+                            list_servicing.map((Servicing, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -427,48 +435,60 @@ export function InterviewSchedule() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.IDPlanning && (
-                                        <td>
-                                            {Schedule.id_planning}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Planningdate && (
-                                        <td>
-                                            {formatDateToTimestamp(Schedule.date_planification)}
-                                        </td>
-                                    )}
-
-                                    {selectedColumns.vehicle && (
-                                        <td>
-                                            {Schedule.vehicule}
-                                        </td>
-                                    )}
-                                    {selectedColumns.km && (
-                                        <td>
-                                            {Schedule.km}
-                                        </td>
-                                    )}
-                                    {selectedColumns.Interviewdate && (
-                                        <td>
-                                            {Schedule.date_dentretien ? (
-                                                formatDateToTimestamp(Schedule.date_dentretien)
-                                            ) : (
-                                                <span style={{ color: "orange" }}>En attente</span>
+                                    
+                                            {selectedColumns.ID && (
+                                                <td>{Servicing.id_servicing}</td>
                                             )}
-                                        </td>
-                                    )}
+                                          
+                                            {selectedColumns.Date && (
+                                                <td>{formatDateToTimestamp(Servicing.date_servicing)}</td>
 
-                                    {selectedColumns.TypeInterview && (
-                                        <td>
-                                            {Schedule.type_entretien ? (
-                                                Schedule.type_entretien
-                                            ) : (
-                                                <span style={{ color: "orange" }}>En attente</span>
                                             )}
-                                        </td>
-                                    )}
+                                             {selectedColumns.Vehicle && (
+                                                <td>{Servicing.type_vehicule}</td>
+                                            )}
+                                             {selectedColumns.Km && (
+                                                <td>{Servicing.km_servicing}</td>
+                                            )}
+                                              {selectedColumns.InvoiceNo && (
+                                                <td>{Servicing.invoice_no_servicing}</td>
+                                            )}
+                                            {selectedColumns.Type && (
+                                                <td>
+                                                    {serviceMapping[Servicing.type_servicing]}
+                                                </td>
+                                            )}
+                                           
+                                            {selectedColumns.Cost && (
+                                                <td>{Servicing.cost_servicing}</td>
+                                            )}
+                                            {selectedColumns.Place && (
+                                                <td>{Servicing.place_servicing}</td>
+                                            )}
+                                          
+                                            
+                                           
+                                    
+
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
+                                            <Link
+                                                to={``}
+                                                className="badge badge-success mr-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title="Détail"
+                                                onClick={() =>
+                                                    handleShowShowServicingModal(
+                                                        Servicing.id_servicing
+                                                    )
+                                                }
+                                            >
+                                                <i
+                                                    className="fa fa-eye"
+                                                    style={{ fontSize: "1.2em" }}
+                                                ></i>
+                                            </Link>
                                             <Link
                                                 to={``}
                                                 className="badge badge-primary mr-2"
@@ -476,8 +496,8 @@ export function InterviewSchedule() {
                                                 data-placement="top"
                                                 title="Edit"
                                                 onClick={() =>
-                                                    handleEditPlanninginterviewsModal(
-                                                        Schedule.id_planning
+                                                    handleEditServicingModal(
+                                                        Servicing.id_servicing
                                                     )
                                                 }
                                             >
@@ -492,7 +512,7 @@ export function InterviewSchedule() {
                                                 data-toggle="tooltip"
                                                 data-placement="top"
                                                 title="Mettre à jour l'état"
-                                                onClick={() => handleShowConfirmModal(Schedule.id_planning)}
+                                                onClick={() => handleShowConfirmModal(Servicing.id_servicing)}
 
                                             >
                                                 <i
@@ -500,6 +520,7 @@ export function InterviewSchedule() {
                                                     style={{ fontSize: "1.2em" }}
                                                 ></i>
                                             </Link>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -521,8 +542,8 @@ export function InterviewSchedule() {
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
-                        previousLabel={"previous"}
-                        nextLabel={"next"}
+                        previousLabel={translate("previous")}
+                        nextLabel={translate("next")}
                         breakLabel={"..."}
                         pageCount={pageCount}
                         marginPagesDisplayed={2}
@@ -540,25 +561,28 @@ export function InterviewSchedule() {
                         activeClassName={"active"}
                     />
                 </div>
+                
             </div>
-            <ModalEditPlanninginterviews show={showEditPlanninginterviewsModal} onHide={handleCloseEditPlanninginterviewsModal} id_planning={selectedPlanninginterviewsId} onSuccess={refreshData} />
-            {/* Confirmation Modal */}
+            <ModalEditServicing show={showEditServicingModal} onHide={handleCloseEditServicingModal} id_servicing={selectedServicingId} onSuccess={refreshData} />
+            <ModalShowServicing show={showShowServicingModal} onHide={handleCloseShowServicingModal} id_servicing={selectedServicingId} />
             <Modal show={showConfirmModal} onHide={handleCloseConfirmModal} responsive>
                 <Modal.Header closeButton>
                     <Modal.Title>{translate("Confirmation")}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {translate("Êtes-vous sûr de vouloir clôturer cet entretien ?")}
+                    {translate("Are you sure you want to close this interview?")}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseConfirmModal}>
-                        {translate("Non")}
+                        {translate("No")}
                     </Button>
-                    <Button variant="primary" onClick={handleUpdateState}>
-                        {translate("Oui")}
+                    <Button variant="primary" onClick={handleCloseConfirmModal}>
+                        {translate("Yes")}
                     </Button>
-                </Modal.Footer>
-            </Modal>
+                    </Modal.Footer>
+                    </Modal>
+
         </>
     );
 }
+                  

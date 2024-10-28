@@ -30,6 +30,8 @@ import { Cash_management } from "./pages/Cash_management";
 import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
 import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
+import { Servicing } from "./pages/Servicing";
+
 import { InterviewSchedule } from "./pages/Planning_interviews";
 
 
@@ -135,9 +137,9 @@ function App() {
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
+          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
 
           
-     
         </Routes>
       </div>
       <ToastContainer

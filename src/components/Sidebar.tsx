@@ -513,13 +513,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/"
+                        to="/servicing"
                         className="svg-icon"
                         as={NavLink}
-                        style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
+                        //style={{ color: '#A9A9A9', pointerEvents: 'none', opacity: 0.6 }}
 
                       >
-
                         <span className={` ${activeMenuText}`}>
                           {translate("Entretiens")}
                         </span>
