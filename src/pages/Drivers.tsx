@@ -53,7 +53,7 @@ export function Drivers() {
 
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
-  let [total, settotal] = useState(0);
+  let [total, setTotal] = useState(0);
   const [colum, setSortColum] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
@@ -122,7 +122,7 @@ export function Drivers() {
 
       const totalPagesJson = await totalPagesResponse.json();
       const total = totalPagesJson[0]["count"];
-      settotal(total);
+      setTotal(total);
 
       // Retrieve driver data
       const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, {

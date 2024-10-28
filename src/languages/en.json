@@ -568,5 +568,11 @@
 "Confirmation": "Confirmation",
 "Are you sure you want to close this interview?": "Are you sure you want to close this interview?",
 "Yes": "Yes",
-"No": "No"
+"No": "No",
+"Closed": "Closed",
+"Urgent": "Urgent",
+"Normal":"Normal",
+"Request":"Request",
+"Garage":"Garage",
+"Object":"Object"
 }

@@ -575,5 +575,11 @@
 "Confirmation": "Confirmación",
 "Are you sure you want to close this interview?": "¿Está seguro de que desea cerrar esta entrevista?",
 "Yes": "Sí",
-"No": "No"
+"No": "No",
+"Closed": "Cerrado",
+"Urgent": "Urgente",
+"Normal": "Normal",
+"Request": "Solicitud",
+"Garage":"Garaje",
+"Object":"Objeto"
 }

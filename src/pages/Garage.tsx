@@ -1,136 +1,257 @@
-import { useState } from "react";
-import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import { useEffect, useState } from "react";
+import { Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
-import ModalNewIntervention from "../components/Reception/NewIntervention"
-
+import { PropagateLoader } from "react-spinners";
+import { formatDateToTimestamp } from "../utilities/functions";
 
 interface Intervention {
+    id_garage: number;
+    id_user: number;
     id_intervention: number;
     date_intervention: string;
-    client: string;
-    vehicule: string;
-    odometre: string;
-    Priority: string;
-    etat: string;
-    date_modifie: string;
-
-
+    date_update: string;
+    priority: string;
+    status: string;
+    immatriculation_vehicule: string;
+    odometer: string;
+    subject: string;
+    client_name: string;
+    client_phone_number: string;
+    receptionist_name: string;
+    service: string;
 }
+
 
 export function Garage() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
-    const [list_intervention, setintervention] = useState<Intervention[]>([]);
+    const [list_garage, setGarages] = useState<Intervention[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
-    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [page, setPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
     const [typeSearch, setTypeSearch] = useState("ID Intervention");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_intervention");
     const [sort, setSort] = useState("ASC");
     const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [Column, setSortColumn] = useState("id_garage");
+    const [pageCount, setPageCount] = useState(0);
 
 
 
+    const handlePageClick = async (data: any) => {
+        let page = data.selected + 1;
+        await getGarages(limit, page, search, type, Column, sort);
 
-    const initialColumns = {
-        id_intervention: true,
-        date_intervention: true,
-        client: true,
-        vehicule: true,
-        odometre: true,
-        Priority: true,
-        etat: true,
-        date_modifie: true,
+        window.scrollTo(0, 0);
     };
 
-    // Load selected columns from localStorage or use initial state
-    const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumns");
-        return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+
+
+    const handleSortingColumn = (currentColumnn: string) => {
+
+        setSortColumn(currentColumnn)
+        sort === "ASC" ? setSort("DESC") : setSort("ASC");
+        getGarages(limit, page, search, type, Column, sort);
     };
 
-    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
-
-    const handleColumnChange = (column: string) => {
-        const updatedColumns = {
-            ...selectedColumns,
-            [column]: !selectedColumns[column],
-        };
-        setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
-    };
-
-    const handleSortingColumn = (currentColumn: string) => {
-        const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
-        setSortColumn(currentColumn);
-        setSort(newSortOrder);
-        getIntervention();
-    };
+ 
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const searchColumn: { [key: string]: number } = {
+        id_garage: 0,
+        date_intervention: 1,
+        immatriculation_vehicule: 2,
+        subject: 3,
+        priority: 4,
+        service: 5,
+        date_update: 6,
+    };
 
-    const getIntervention = async () => {
+    useEffect(() => {
+        getGarages(limit, page, search, type, Column, sort);
+    }, []);
+
+    const getGarages = async (
+        limit: number,
+        page: number,
+        search: string,
+        type: number,
+        Column: string,
+        sort: string
+    ) => {
         try {
-            const response = await fetch(
-                `${backendUrl}/api/geop/intervention/${id_user}/${currentPage}/${limit}`
+            setLoading(true);
+
+            // Preparing the data to send
+            const bodyData = JSON.stringify({
+                limit,
+                page,
+                search,
+                type,
+                id_user,
+                Column: searchColumn[Column],
+                sort,
+            });
+
+            // Retrieve the total number of pages
+            const totalPagesResponse = await fetch(
+                `${backendUrl}/api/geop/garage/totalpage`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: bodyData,
+                    mode: "cors",
+                }
             );
-            const data = await response.json();
-            setintervention(data);
+
+            const totalPagesJson = await totalPagesResponse.json();
+            const total = totalPagesJson[0]["count"];
+            setTotal(total);
+
+            // Retrieve driver data
+            const DriversResponse = await fetch(
+                `${backendUrl}/api/geop/garage/search`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: bodyData,
+                    mode: "cors",
+                }
+            );
+
+            const data = await DriversResponse.json();
+            setPageCount(Math.ceil(total / limit));
+            setLimit(limit);
+            setGarages(data);
+            return data;
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleTypeSearch = (event: any) => {
-        const selectedValue = event.target.textContent;
+    const handleTypeSearch = (selectedValue: string) => {
+        
+
 
         switch (selectedValue) {
-            case translate("ID Violation"):
+            case 'ID '+translate("Garage"):
                 setType(0);
                 break;
-            case translate("Driver"):
+            case translate("Date of request"):
                 setType(1);
                 break;
-            case translate("Vehicule"):
+            case translate("Vehicle"):
                 setType(2);
                 break;
-            case translate("Type Violation"):
+            case translate("Object"):
                 setType(3);
                 break;
-            case translate("Description"):
+            case translate("Priority"):
                 setType(4);
                 break;
-            case translate("Date"):
+            case translate("Status"):
                 setType(5);
+                break;
+            case translate("Updated date"):
+                setType(6);
                 break;
             default:
                 console.log("Unknown selection");
                 break;
         }
         setTypeSearch(selectedValue);
-
-    }
+    };
 
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
-        setCurrentPage(1);
+        setPage(1);
     };
 
     const handleSelectChange = (event: any) => {
         const newValue = event.target.value;
         setLimit(parseInt(newValue));
-        setCurrentPage(1);
+        setPage(1);
     };
 
 
+    const menuItems = [
+        translate("ID"),
+        translate("Date of request"),
+        translate("Vehicle"),
+        translate("Object"),
+        translate("Priority"),
+        translate("State"),
+        translate("Updated date"),
+    ];
+
+
+    const handleResetSearch = async () => {
+        setSearch("")
+
+        await getGarages(limit, page, search, type, Column, sort)
+    };
+
+
+
+    const [selectedColumnns, setSelectedColumnns] = useState({
+        id_garage: true,
+        date_intervention: true,
+        immatriculation_vehicule: true,
+        subject: true,
+        priority: true,
+        status: true,
+        service: true,
+        date_update: true,
+    });
+
+
+    const ColumnnOptions = [
+        { key: "id_garage", label: 'ID '+translate("Garage") },
+        { key: "date_intervention", label: translate("Intervention Requests")  },
+        { key: "immatriculation_vehicule", label: translate("Matriculation")+' '+translate("Vehicle")  },
+        { key: "subject", label: translate("Subject")  },
+        { key: "priority", label: translate("Priority")  },
+        { key: "status", label: translate("Status")  },
+        { key: "service", label: translate("Service")  },
+        { key: "date_update", label: translate("Date update") }
+    ];
+
+
+    type SelectedColumnnsType = {
+        id_garage: boolean;
+        date_intervention: boolean;
+        immatriculation_vehicule: boolean;
+        subject: boolean;
+        priority: boolean;
+        status: boolean;
+        service: boolean;
+        date_update: boolean;
+    };
+
+
+
+    const handleColumnnChange = (Columnn: string) => {
+        setSelectedColumnns((prevState: any) => ({
+          ...prevState,
+          [Columnn]: !prevState[Columnn],
+        }));
+      };
+    
 
     return (
         <>
@@ -139,88 +260,101 @@ export function Garage() {
                     <h4>{translate("Garage")}</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <button onClick={handleShow} className="btn btn-outline-secondary  mt-2 mr-1">
+                    <button
+                        onClick={handleShow}
+                        className="btn btn-outline-secondary  mt-2 mr-1"
+                    >
                         <i className="las la-download mr-3"></i>
                         {translate("Export")}
                     </button>
                 </div>
             </div>
-                <div className="row">
-                    <div
-                        className="col-md-4"
-                        style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
-                    >
-                        <div className="input-group">
-                            <Dropdown>
-                                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                                    <i
-                                        className="fas fa-chevron-down"
-                                        style={{ fontSize: "20px" }}
-                                    ></i>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu onClick={handleTypeSearch}>
-                                    <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Client")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Priority")}</Dropdown.Item>
-                                    <Dropdown.Item>{translate("Status")}</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                            <input
-                                type="text"
-                                placeholder={` By ${typeSearch}`}
-                                onChange={handleAdvancedSearch}
-                                className="form-control"
-                            />
-                        </div>
-                    </div>
-                    <div className="col-md-8 d-flex justify-content-end align-items-center">
-                        <div className="dataTables_length">
-                            <label style={{ marginBottom: "0" }}>
-                                {translate("Show")}
-                                <select
-                                    className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                                    style={{ width: "66px" }}
-                                    onChange={handleSelectChange}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
-                                    <option value="500">500</option>
-                                </select>
-                            </label>
-                        </div>
+            <div className="row">
+                <div
+                    className="col-md-4"
+                    style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+                >
+                    <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle
-                                variant="link"
-                                id="dropdown-basic"
-                                title="Display Columns"
-                            >
-                                <i className="las la-eye"></i>
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" >
+                                <i
+                                    className="fas fa-chevron-down"
+                                    style={{ fontSize: "20" }}
+                                ></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                {Object.keys(initialColumns).map((col, idx) => (
+                                {menuItems.map((item, index) => (
                                     <Dropdown.Item
-                                        key={idx}
-                                        as="button"
-                                        style={{ display: "flex", alignItems: "center" }}
+                                        key={index}
+                                        onClick={() => handleTypeSearch(item)}
+                                        eventKey={item}
+                                        active={typeSearch === item}
+                                        className={typeSearch === item ? "select-active" : ""}
                                     >
-                                        <input
-                                            type="checkbox"
-                                            className="form-check-input"
-                                            checked={selectedColumns[col as keyof typeof initialColumns]}
-                                            onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
-                                        />
-                                        <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                                        {item}
                                     </Dropdown.Item>
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
+                        <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+                        <Button
+                            variant="secondary"
+                            onClick={handleResetSearch}
+                            className="btn-reset"
+                        >
+                            <i className="las la-times" style={{ color: "#fff" }}></i>
+                        </Button>
                     </div>
                 </div>
-        
+                <div className="col-md-8 d-flex justify-content-end align-items-center">
+                    <div className="dataTables_length">
+                        <label style={{ marginBottom: "0" }}>
+                            {translate("Show")}
+                            <select
+                                className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                                style={{ width: "66px" }}
+                                onChange={handleSelectChange}
+                            >
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                                <option value="500">500</option>
+                            </select>
+                        </label>
+                    </div>
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            variant=""
+                            id="dropdown-basic"
+                            title={translate("Display Columnns")}
+                        >
+                            <i className="las la-eye"></i>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {ColumnnOptions.map((Columnn) => (
+                                <Dropdown.Item
+                                    as="button"
+                                    style={{ display: "flex", alignItems: "center" }}
+                                    key={Columnn.key}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        checked={selectedColumnns[Columnn.key as keyof SelectedColumnnsType]}
+                                        onChange={() => handleColumnnChange(Columnn.key as keyof SelectedColumnnsType)}
+                                    />
+                                    <span style={{ marginLeft: "10px" }}>
+                                        {translate(Columnn.label)}
+                                    </span>
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+            </div>
+
             <div className="row m-1">
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
@@ -235,81 +369,75 @@ export function Garage() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.id_intervention && (
-                                <th
-                                    className="sorting"
-                                    onClick={() => handleSortingColumn("id_intervention")}
-                                >
-                                    {translate("ID")}
-                                </th>
-                            )}
-                            {selectedColumns.date_intervention && (
-                                <th
-                                    className="sorting"
-                                    onClick={() => handleSortingColumn("date_intervention")}
-                                >
-                                    {translate("Date Intervention")}
-                                </th>
-                            )}
-                            {selectedColumns.client && (
-                                <th className="sorting" onClick={() => handleSortingColumn("client")}>
-                                    {translate("Client")}
-                                </th>
-                            )}
-                            {selectedColumns.vehicule && (
-                                <th className="sorting" onClick={() => handleSortingColumn("vehicule")}>
-                                    {translate("Vehicle")}
-                                </th>
-                            )}
-                            {selectedColumns.odometre && (
-                                <th className="sorting" onClick={() => handleSortingColumn("odometre")}>
-                                    {translate("Odometer")}
-                                </th>
-                            )}
-                            {selectedColumns.Priority && (
-                                <th className="sorting" onClick={() => handleSortingColumn("Priority")}>
-                                    {translate("Priority")}
-                                </th>
-                            )}
-                            {selectedColumns.etat && (
-                                <th className="sorting" onClick={() => handleSortingColumn("etat")}>
-                                    {translate("Status")}
-                                </th>
-                            )}
-                            {selectedColumns.date_modifie && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_modifie")}>
-                                    {translate("Modified Date")}
-                                </th>
+                            {selectedColumnns.id_garage && (<th className="sorting" onClick={() => handleSortingColumn("id_garage")} >  {"Id "+translate("Garage")} </th>)}
+                            {selectedColumnns.immatriculation_vehicule && (<th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>    {translate("Vehicle")} </th>)}
+                            {selectedColumnns.subject && (<th className="sorting" onClick={() => handleSortingColumn("subject")}  > {translate("Object")} </th>)}
+                            {selectedColumnns.priority && (<th className="sorting" onClick={() => handleSortingColumn("Priority")}  > {translate("Priority")}  </th>)}
+                            {selectedColumnns.status && (<th className="sorting" onClick={() => handleSortingColumn("status")} >   {translate("Status")}  </th>)} 
+                            {selectedColumnns.date_intervention && (<th className="sorting" onClick={() => handleSortingColumn("date_intervention")} > {translate("Intervention Requests")}  </th>)}
+                            {selectedColumnns.date_update && (<th className="sorting" onClick={() => handleSortingColumn("date_update")} >  {translate("Date")+" "+translate("Update")} </th>
                             )}
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
-                    <tbody className="light-body">
-                        {list_intervention.map((Intervention, index) => (
+                    <tbody className="light-body"> {loading ? (
+                        <tr style={{ textAlign: "center" }}>
+                            <td className="text-center" colSpan={10}>
+                                <p>
+                                    <PropagateLoader
+                                        color={"#123abc"}
+                                        loading={loading}
+                                        size={20}
+                                    />
+                                </p>
+                            </td>
+                        </tr>
+                    ) : list_garage.length > 0 ? (
+                        list_garage.map((garage, index) => (
                             <tr key={index}>
                                 <td>
                                     <div className="form-check form-check-inline">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
-                                        // checked={selectedViolations.includes(
-                                        //     violation.id_violation
-                                        // )}
-                                        // onChange={() =>
-                                        //     handleSelectViolation(violation.id_violation)
-                                        // }
+                                        // Ajouter la logique pour sélectionner une violation
+                                        // checked={selectedViolations.includes(violation.id_violation)}
+                                        // onChange={() => handleSelectViolation(violation.id_violation)}
                                         />
                                     </div>
                                 </td>
-                                {selectedColumns.id_intervention && <td>{Intervention.id_intervention}</td>}
-                                {selectedColumns.date_intervention && <td>{Intervention.date_intervention}</td>}
-                                {selectedColumns.client && <td>{Intervention.client}</td>}
-                                {selectedColumns.vehicule && <td>{Intervention.vehicule}</td>}
-                                {selectedColumns.odometre && <td>{Intervention.odometre}</td>}
-                                {selectedColumns.Priority && <td>{Intervention.Priority}</td>}
-                                {selectedColumns.etat && <td>{Intervention.etat}</td>}
-                                {selectedColumns.date_modifie && <td>{Intervention.date_modifie}</td>}
+                                {selectedColumnns.id_garage && (<td>{garage.id_garage}</td>)}
+                                {selectedColumnns.immatriculation_vehicule && <td>{garage.immatriculation_vehicule}</td>}
+                                {selectedColumnns.subject && <td>{garage.subject}</td>}
+                                {selectedColumnns.priority && <td>
+                                    {garage.priority === "Urgent" ? (
+                                        <>
+                                          
+                                            {translate("Urgent")}
+                                        </>
+                                    ) : (
+                                        <>
+                                        
+                                            {translate("Normal")}
+                                        </>
+                                    )}
+                                </td>}
+                                {selectedColumnns.status && <td> 
 
+                                    {garage.status === "Closed" ? (
+                                        <>
+                                            <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i>
+                                            {translate("Closed")}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i>
+                                            {translate("Request")}
+                                        </>
+                                    )}
+                                </td>}
+                                {selectedColumnns.date_intervention && (<td>{formatDateToTimestamp(garage.date_intervention)}</td>)}
+                                {selectedColumnns.date_update && <td>{formatDateToTimestamp(garage.date_update)}</td>}
                                 <td>
                                     <div className="d-flex align-items-center list-action">
                                         <Link
@@ -317,45 +445,66 @@ export function Garage() {
                                             className="badge badge-success mr-2"
                                             data-toggle="tooltip"
                                             data-placement="top"
-                                            title="Détail"
+                                            title={translate("Status")+" "+translate("Update")}
                                         >
-                                            <i
-                                                className="fa fa-eye"
-                                                style={{ fontSize: "1.2em" }}
-                                            ></i>
+                                            <i className="las la-sync" style={{ fontSize: "1.2em" }}></i>
                                         </Link>
-                                        <a
+                                        <Link
+                                            to={``}
+                                            className="badge bg-primary mr-2"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title={translate("See request")}
+                                        >
+                                            <i className="fa fa fa-eye" style={{ fontSize: "1.2em" }}></i>
+                                        </Link>
+                                        <Link
+                                            to={``}
+                                            className="badge badge-success mr-2"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title={translate("Estimate")}
+                                        >
+                                            <i className="las la-chart-bar" style={{ fontSize: "1.2em" }}></i>
+                                        </Link>
+                                        <Link
+                                            to={``}
                                             className="badge bg-warning mr-2"
                                             data-toggle="tooltip"
                                             data-placement="top"
-                                            title="Delete"
+                                            title={translate("Request for parts")}
                                         >
-                                            <i
-                                                className="ri-delete-bin-line mr-0"
-                                                style={{ fontSize: "1.2em" }}
-                                            ></i>
-                                        </a>
+                                            <i className="ri-delete-bin-line mr-0" style={{ fontSize: "1.2em" }}></i>
+                                        </Link>
                                     </div>
                                 </td>
                             </tr>
-                        ))}
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={10} style={{ textAlign: "center" }}>Aucun conducteur disponible</td>
+                        </tr>
+                    )}
+
                     </tbody>
                 </Table>
             </div>
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>Affichage 1 à {limit} sur {total} </span>
+                    <span>
+                        {translate("Displaying")} {list_garage.length} {translate("on")} {total} {" "}
+                    </span>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 d-flex justify-content-end">
                     <ReactPaginate
-                        previousLabel={"previous"}
-                        nextLabel={"next"}
+                        previousLabel={translate("previous")}
+                        nextLabel={translate("next")}
                         breakLabel={"..."}
-                        pageCount={1}
+                        pageCount={pageCount}
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
-                        // onPageChange={}
-                        containerClassName={"pagination justify-content-end"}
+                        onPageChange={handlePageClick}
+                        containerClassName={"pagination justify-right"}
                         pageClassName={"page-item"}
                         pageLinkClassName={"page-link"}
                         previousClassName={"page-item"}
@@ -364,13 +513,10 @@ export function Garage() {
                         nextLinkClassName={"page-link"}
                         breakClassName={"page-item"}
                         breakLinkClassName={"page-link"}
-                         activeClassName={"active"}
+                        activeClassName={"active"}
                     />
                 </div>
             </div>
-          
-
-
         </>
     );
 }
