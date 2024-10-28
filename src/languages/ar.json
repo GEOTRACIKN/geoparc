@@ -581,5 +581,11 @@
 "Confirmation": "تأكيد",
 "Are you sure you want to close this interview?": "هل أنت متأكد أنك تريد إنهاء هذه المقابلة؟",
 "Yes": "نعم",
-"No": "لا"
+"No": "لا",
+"Closed": "مغلق",
+"Urgent": "عاجل",
+"Normal": "عادي",
+"Request": "طلب",
+"Garage":"مرآب",
+"Object":"الموضوع"
 }
