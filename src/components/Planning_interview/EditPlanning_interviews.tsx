@@ -110,7 +110,7 @@ const ModalEditPlanninginterviews: React.FC<
                 ...formData,
                 date_dentretien: formattedDate,
             };
-            const url = `${backendUrl}/api/geop/gmao/updateplanninginterview/${id_planning}`;
+            const url = `${backendUrl}/api/geop/updateplanninginterview/${id_planning}`;
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
