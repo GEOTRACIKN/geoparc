@@ -32,7 +32,14 @@ import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
 import { Servicing } from "./pages/Servicing";
 
+
 import { InterviewSchedule } from "./pages/Planning_interviews";
+
+
+import { MissionOrder } from "./pages/MissionOrder";
+import { MissionOrderManage } from "./pages/MissionOrderManage";
+
+import { MissionReport } from "./pages/MissionReport";
 
 
 import axios from "axios";
@@ -134,6 +141,13 @@ function App() {
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
+          <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
+          <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
+          <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
+          <Route path="/mission-order-manage/edit/:id_conducteur" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
+
+
+
 
           
      

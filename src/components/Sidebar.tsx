@@ -307,6 +307,67 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                   </ul>
                 </li>
+
+
+                <li>
+                  <Nav.Link
+                    to="/mission"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("Mission");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="las la-user-nurse"></i>
+                    <span className={`ml-2 ${activeMenuText}`}>
+                      {translate("Missions")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="vehicles"
+                    className={`iq-submenu ${openSubmenus.includes("Mission")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link to="/mission-order" className="svg-icon" as={NavLink}>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("Mission Order")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    <li>
+                      <Nav.Link to="/mission-report" className="svg-icon" as={NavLink}>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("Mission Report")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                    
+                  </ul>
+                </li>
+
+
+
                 {/* HSE section */}
                 <li>
                   <Nav.Link
@@ -520,7 +581,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
                       >
                         <span className={` ${activeMenuText}`}>
-                          {translate("Entretiens")}
+                          {translate("Servicing")}
                         </span>
                       </Nav.Link>
                     </li>
