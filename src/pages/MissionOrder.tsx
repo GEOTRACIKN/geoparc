@@ -4,7 +4,7 @@ import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from 'react-spinners';
-import DriverModal from "../components/Driver/DriverModal";
+//import DriverModal from "../components/Driver/DriverModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
@@ -19,6 +19,30 @@ interface Drivers {
   telephone_conducteur: string;
   id_parc: number;
   nom_parc: string;
+}
+interface MissionOrder {
+  id_mission: number;
+  object_mission: string;
+  fuel_loading_mission: number;
+  fuel_type_mission: number;
+  expenses_mission: number;
+  tank_mission: number;
+  trailer_mission: number;
+  driver_mission: number;
+  accomp_mission: number;
+  dep_loc_mission: string;
+  dep_date_mission: number;
+  dep_dest_mission: string;
+  return_date_mission: number;
+  itinerary_mission: string;
+  vehicle_km_mission: number;
+  new_km_mission: number;
+  fuel_cost_mission: number;
+  fuel_level_mission: number;
+  voucher_mission: number;
+  vehicle_mission: number;
+  id_user: string;
+
 }
 
 
@@ -54,6 +78,11 @@ export function MissionOrder() {
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
   const [showDownloadModal, setShowDownloadModal] = useState(false); 
 
+
+
+  const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
+
+
   const driverHeaders = [
     translate("ID"),
     translate("Code"),
@@ -73,6 +102,32 @@ export function MissionOrder() {
     driver.email_conducteur,
     driver.nom_parc,
   ]);
+
+  const missionOrderData = list_MissionOrder.map(missionOrder=> [
+            missionOrder.id_mission,
+            missionOrder.object_mission,
+            missionOrder.fuel_loading_mission,
+            missionOrder.fuel_type_mission,
+            missionOrder.expenses_mission,
+            missionOrder.tank_mission,
+            missionOrder.trailer_mission,
+            missionOrder.driver_mission,
+            missionOrder.accomp_mission,
+            missionOrder.dep_loc_mission,
+            missionOrder.dep_date_mission,
+            missionOrder.dep_dest_mission,
+            missionOrder.return_date_mission,
+            missionOrder.itinerary_mission,
+            missionOrder.vehicle_km_mission,
+            missionOrder.new_km_mission,
+            missionOrder.fuel_cost_mission,
+            missionOrder.fuel_level_mission,
+            missionOrder.voucher_mission,
+            missionOrder.vehicle_mission,
+
+   
+  ]);
+  
   
   const downloadVehicleExcel = () => {
     generateExcelFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
@@ -361,7 +416,7 @@ export function MissionOrder() {
 
           <NavLink to="/mission-order-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate("Add")} {translate("Driver")}
+            {translate("Add")} {translate("Mission Order")}
           </NavLink>
 
         
@@ -652,15 +707,18 @@ export function MissionOrder() {
             activeClassName={"active"}
           />
         </div>
-        <DriverModal
-          show={modalStatus !== null}
-          onHide={closeModal}
-          status={modalStatus}
-          title={titleStatus}
-          IdUser={IdUser}
-          IdDriver={IdDriver}
-          updateDriverList={handleUpdateDriverList}
-        />
+        {/*
+<DriverModal
+  show={modalStatus !== null}
+  onHide={closeModal}
+  status={modalStatus}
+  title={titleStatus}
+  IdUser={IdUser}
+  IdDriver={IdDriver}
+  updateDriverList={handleUpdateDriverList}
+/>
+*/}
+
         <ConfirmSalaryModal
           show={modalConfirmStatus !== null}
           onHide={closeConfirmModal}
