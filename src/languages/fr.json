@@ -507,8 +507,6 @@
 "Displaying": "Affichage" ,
 "Import": "Importer",
 "Validate employees' salaries":"Valider les salaires des employés",
-"on":"sur",
-"Status":"État",
 "Display columns":"Colonnes dʼaffichage",
 "Intervention Requests":"Demandes d'intervention",
 "Client":"Client",
@@ -540,12 +538,19 @@
 "Planned interviews" : "Entretiens planifiés",
 "Planning date" : "Date de planification",
 "Reception" : "Réception",
-
-
-
-
-
-
+"General Information": "Informations Générales",
+"Identification code": "Code d'identification",
+"Function": "Fonction",
+"Identity Document": "Pièce d'identité",
+"Type of document": "Type de la pièce",
+"Document number": "Numéro de la pièce",
+"Date of issue": "Date de délivrance",
+"Place of issue": "Lieu de délivrance",
+"Driving License": "Permis de conduire",
+"Type of license": "Type de permis",
+"License number": "Numéro de permis",
+"Date of issue (for driving license)": "Date de délivrance (pour le permis)",
+"Expiration date": "Date d'expiration",
 "Servicing" : "Entretiens",
 "Depreciation servicing Period (days)" : " Durée d'amortissement (jours) ",
 "Next oil change (days)" : "Prochain vidange (jours)",
@@ -553,8 +558,6 @@
 "InvoiceNo" : "N° Facture",
 "Place" : "Place",
 "Select Type of Service" : "Sélectionnez le type de service",
-
-
 "ID Servicing": "ID Entretiens",
 "Washing": "Lavage",
 "Oil Change": "Changement d'huile",
@@ -572,6 +575,12 @@
 "Confirmation": "Confirmation",
 "Are you sure you want to close this interview?" : "Êtes-vous sûr de vouloir clôturer cet entretien ?",
 "Yes": "Oui",
-"No": "Non"
-
+"No": "Non",
+"Closed": "Clôturé",
+"Urgent": "Urgent",
+"Normal": "Normale",
+"Request": "Demande",
+"Garage":"Garage",
+"Status": "État",
+"Object":"Objet"
 }

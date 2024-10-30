@@ -434,7 +434,6 @@
 "Create vehicle": "Create vehicle", 
 "Read": "Read",
 "Update": "Update",
-"Reset": "Reset",
 "Delete confirmation":"Delete confirmation",
 "Places of effect":"Places of effect",
 "Start of the day": "Start of the day",
@@ -465,7 +464,6 @@
 "Delete photo": "Delete photo",
 "Personal info": "Personal info",
 "When a user wants to change their Geopusername or email address, they must send a confirmation email to validate the change.": "When a user wants to change their Geopusername or email address, they must send a confirmation email to validate the change.",
-"Geopusername": "Geopusername",
 "Email address": "Email address",
 "Time Zone": "Time Zone",
 "Reset": "Reset",
@@ -483,7 +481,6 @@
 "Error deleting image": "Error deleting image",
 "User Deleted successfully !":"User Deleted successfully !",
 "Utilisateur ajouté avec succès": "User added successfull",
-"Utilisateur modifié avec succès":"User modified successfully",
 "User Restored successfully !":"User Restored successfully !",
 "Reports Deleted successfully !":"Reports Deleted successfully !",
 "Creation Date": "Creation Date",
@@ -501,8 +498,6 @@
 "Displaying": "Displaying",
 "Import": "Import",
 "Validate employees' salaries":"Validate employees' salaries",
-"on":"on",
-"Status":"Status",
 "Display columns":"Display columns",
 "Intervention Requests":"Intervention Requests",
 "Client":"Client",
@@ -534,8 +529,19 @@
 "Planned interviews" : "Planned interviews",
 "Planning date" : "Planning date",
 "Reception" : "Reception",
-
-
+"General Information": "General Information",
+"Identification code": "Identification code",
+"Function": "Function",
+"Identity Document": "Identity Document",
+"Type of document": "Type of document",
+"Document number": "Document number",
+"Date of issue": "Date of issue",
+"Place of issue": "Place of issue",
+"Driving License": "Driving License",
+"Type of license": "Type of license",
+"License number": "License number",
+"Date of issue (for driving license)": "Date of issue (for driving license)",
+"Expiration date": "Expiration date",
 "Depreciation servicing Period (days) " : "Depreciation servicing Period (days) ",
 "Servicing" : "Servicing",
 "ID Servicing" : "ID Servicing",
@@ -546,8 +552,6 @@
 "Place" : "Place",
 "Next oil change (days)" : "Next oil change (days)",
 "Select Type of Service" : "Select Type of Service",
-
-
 "Washing": "Washing",
 "Oil Change": "Oil Change",
 "Change filters (oil/air)": "Change filters (oil/air)",
@@ -561,12 +565,14 @@
 "Electric adjustment": "Electric adjustment",
 "Control": "Control",
 "Others": "Others",
-
 "Confirmation": "Confirmation",
 "Are you sure you want to close this interview?": "Are you sure you want to close this interview?",
 "Yes": "Yes",
-"No": "No"
-
-
-
+"No": "No",
+"Closed": "Closed",
+"Urgent": "Urgent",
+"Normal":"Normal",
+"Request":"Request",
+"Garage":"Garage",
+"Object":"Object"
 }

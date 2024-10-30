@@ -48,6 +48,9 @@ import { Extinguisher } from "./pages/Extinguisher";
 import { PharmacyBox } from "./pages/pharmacy_box";
 import DashboardKPI from "./pages/DashboardKPI";
 
+import LoginForm from "./pages/Login-geoparc";
+import LoginLayout from "./components/LoginLayout";
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
@@ -140,6 +143,7 @@ function App() {
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
+          <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
@@ -150,7 +154,6 @@ function App() {
 
 
           
-     
         </Routes>
       </div>
       <ToastContainer

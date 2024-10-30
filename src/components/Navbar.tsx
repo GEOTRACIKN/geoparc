@@ -263,7 +263,8 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarinNavbar, changNavbar })
                 <li className="nav-item nav-icon dropdown" style={{ margin: "0 5px" }}>
                   <Dropdown onToggle={handleToggleProfile} show={dropdownOpenProfile}>
                     <Dropdown.Toggle as="span" id="dropdownMenuButton4" className="search-toggle" href="#">
-                      <img src="asset/images/user/1.png" alt="user" style={{ width: "50px" }} className="img-fluid rounded" />
+                      {/* <img src="asset/images/user/1.png" alt="user" style={{ width: "50px" }} className="img-fluid rounded" /> */}
+                      <i className='las la-user' style={{ fontSize: "25px" }}></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu style={{ width: "auto", inset: "auto auto auto auto" }} className='dropdownProfile'>
                       <div className="card shadow-none border-0 m-0">
