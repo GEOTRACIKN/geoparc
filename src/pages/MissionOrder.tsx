@@ -181,6 +181,12 @@ export function MissionOrder() {
         body: bodyData,
         mode: 'cors',
       });
+      //setDrivers et data et dDreiversResponse
+      // DriversReesponse et serDrivers 
+
+
+      //partie mission
+      
 
       const data = await DriversResponse.json();
       setPageCount(Math.ceil(total / limitValue));
@@ -194,6 +200,67 @@ export function MissionOrder() {
       setLoading(false);
     }
   };
+
+  
+  const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
+    try {
+      setLoading(true);
+
+      // Preparing the data to send
+      const bodyData = JSON.stringify({
+        limitValue,
+        currentPage,
+        search,
+        type,
+        id_user,
+        colum: searchColum[colum],
+        sort
+      });
+
+      // Retrieve the total number of pages
+      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/totalpage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: bodyData,
+        mode: 'cors',
+      });
+
+      const totalPagesJson = await totalPagesResponse.json();
+      const total = totalPagesJson[0]["count"];
+      settotal(total);
+
+      // Retrieve driver data
+      const MissionOrderResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: bodyData,
+        mode: 'cors',
+      });
+      //setDrivers et data et dDreiversResponse
+      // DriversReesponse et serDrivers 
+
+
+      //partie mission
+      
+
+      const data = await MissionOrderResponse.json();
+      setPageCount(Math.ceil(total / limitValue));
+      setLimit(limitValue)
+      setMissionOrder(data);
+      return data;
+    } catch (error) {
+      console.error(error);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
 
 
@@ -634,6 +701,7 @@ export function MissionOrder() {
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
                       {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      
 
                       <td>
                         <div className="d-flex align-items-center list-action">
