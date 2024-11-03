@@ -103,30 +103,6 @@ export function MissionOrder() {
     driver.nom_parc,
   ]);
 
-  const missionOrderData = list_MissionOrder.map(missionOrder=> [
-            missionOrder.id_mission,
-            missionOrder.object_mission,
-            missionOrder.fuel_loading_mission,
-            missionOrder.fuel_type_mission,
-            missionOrder.expenses_mission,
-            missionOrder.tank_mission,
-            missionOrder.trailer_mission,
-            missionOrder.driver_mission,
-            missionOrder.accomp_mission,
-            missionOrder.dep_loc_mission,
-            missionOrder.dep_date_mission,
-            missionOrder.dep_dest_mission,
-            missionOrder.return_date_mission,
-            missionOrder.itinerary_mission,
-            missionOrder.vehicle_km_mission,
-            missionOrder.new_km_mission,
-            missionOrder.fuel_cost_mission,
-            missionOrder.fuel_level_mission,
-            missionOrder.voucher_mission,
-            missionOrder.vehicle_mission,
-
-   
-  ]);
   
   
   const downloadVehicleExcel = () => {
@@ -159,21 +135,9 @@ export function MissionOrder() {
       });
 
       // Retrieve the total number of pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/driver/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
-
+    
       // Retrieve driver data
-      const DriversResponse = await fetch(`${backendUrl}/api/geop/driver/search`, {
+      const DriversResponsssse = await fetch(`${backendUrl}/api/geop/driver/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,11 +152,10 @@ export function MissionOrder() {
       //partie mission
       
 
-      const data = await DriversResponse.json();
+      const datan = await DriversResponsssse.json();
       setPageCount(Math.ceil(total / limitValue));
       setLimit(limitValue)
-      setDrivers(data);
-      return data;
+      return datan;
     } catch (error) {
       console.error(error);
 
@@ -201,7 +164,7 @@ export function MissionOrder() {
     }
   };
 
-  
+  //
   const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
     try {
       setLoading(true);
@@ -267,36 +230,49 @@ export function MissionOrder() {
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    await getDrivers(limit, currentPage, search, type, colum, sort);
-    // setDrivers(commentsFormServer);
+    await getMissionOrder(limit, currentPage, search, type, colum, sort);
+    //setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
-
   useEffect(() => {
-    getDrivers(limit, currentPage, search, type, colum, sort);
+    getMissionOrder(limit, currentPage, search, type, colum, sort);
   }, []);
 
+ 
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
-    setDrivers(commentsFormServer);
+    const commentsFormServer = await getMissionOrder(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    setMissionOrder(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_conducteur: true,
-    code_conducteur: true,
-    nom_conducteur: true,
-    prenom_conducteur: true,
-    date_naissance_conducteur: true,
-    email_conducteur: true,
-    telephone_conducteur: true,
-    id_parc: true
+    id_mission: true,
+    object_mission: true,
+    fuel_loading_mission: true,
+    fuel_type_mission: true,
+    expenses_mission: true,
+    tank_mission: true,
+    trailer_mission: true,
+    driver_mission: true,
+    accomp_mission: true,
+    dep_loc_mission: true,
+    dep_date_mission: true,
+    dep_dest_mission: true,
+    return_date_mission: true,
+    itinerary_mission: true,
+    vehicle_km_mission: true,
+    new_km_mission: true,
+    fuel_cost_mission: true,
+    fuel_level_mission: true,
+    voucher_mission: true,
+    vehicle_mission: true,
   });
+  
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -363,7 +339,7 @@ export function MissionOrder() {
 
     const newValue = event.target.value;
     setSearch(newValue)
-    await getDrivers(limit, currentPage, newValue, type, colum, sort);
+    await getMissionOrder(limit, currentPage, newValue, type, colum, sort);
   };
 
 
@@ -371,7 +347,7 @@ export function MissionOrder() {
 
     setSortColum(curentColum)
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getDrivers(limit, currentPage, search, type, colum, sort);
+    getMissionOrder(limit, currentPage, search, type, colum, sort);
   };
 
 
@@ -570,8 +546,8 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_conducteur}
-                  onChange={() => handleColumnChange("id_conducteur")}
+                  checked={selectedColumns.id_mission}
+                  onChange={() => handleColumnChange("id_mission")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("ID")}
@@ -605,20 +581,7 @@ export function MissionOrder() {
                   {translate("Last and first name")}
                 </span>
               </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.date_naissance_conducteur}
-                  onChange={() => handleColumnChange("date_naissance_conducteur")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Date of birth")}
-                </span>
-              </Dropdown.Item>
+             
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -648,6 +611,20 @@ export function MissionOrder() {
                   {translate("Email")}
                 </span>
               </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.object_mission}
+                  onChange={() => handleColumnChange("object_mission")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Object")}
+                </span>
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -662,14 +639,12 @@ export function MissionOrder() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
+              {selectedColumns.id_mission && (<th className="sorting" onClick={() => handleSortingColum("id_mission")}>{translate("ID")}</th>)}
 
-              {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last and first name")}</th>)}
-              {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
-              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
+
+              
+              {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
+
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -686,27 +661,26 @@ export function MissionOrder() {
               </tr>
             ) :
               (
-                list_Drivers.length > 0 ? (
-                  list_Drivers.map((driver) => (
-                    <tr key={driver.id_conducteur}>
+                list_MissionOrder.length > 0 ? (
+                  list_MissionOrder.map((missionOrder) => (
+                    <tr key={missionOrder.id_mission}>
                       <td>
                         <div className="form-check form-check-inline">
                           <input type="checkbox" className="form-check-input" />
                         </div>
                       </td>
-                      {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
-                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
-                      {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
-                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
-                      {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
-                      {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                      {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumns.id_mission && (<td>{missionOrder.id_mission}</td>)}
+
+                   
+                      {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
+
+
                       
 
                       <td>
                         <div className="d-flex align-items-center list-action">
                           <Link
-                            to={`/mission-order-manage/edit/${driver.id_conducteur}`}
+                            to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
@@ -717,7 +691,7 @@ export function MissionOrder() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
+                          <a className="badge bg-warning mr-2"   onClick={() => {}}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -728,7 +702,7 @@ export function MissionOrder() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteDriver(driver.id_conducteur)} title={translate("Delete")} >
+                          <a className="badge bg-primary mr-2"   onClick={() => {}} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
