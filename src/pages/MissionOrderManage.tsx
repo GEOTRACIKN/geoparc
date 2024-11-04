@@ -455,7 +455,7 @@ const createMifgssion = async (mission: MissionOrderInterface) => {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {isEditing ? " Edit Mission Order" : " Add Mission Order"}
+            {isEditing ? " Edit Mission Order" : " New Mission Order"}
           </h4>
         </div>
 

@@ -9,6 +9,11 @@ import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
+import MissionOrderModal from "../components/MissionOrder/MissionOrderDeleteModal";
+import MissionOrderDeleteModal from "../components/MissionOrder/MissionOrderDeleteModal";
+
+
+
 interface Drivers {
   id_conducteur: number;
   code_conducteur: number;
@@ -79,6 +84,7 @@ export function MissionOrder() {
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
   const [showDownloadModal, setShowDownloadModal] = useState(false); 
 
+  const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
 
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
@@ -353,13 +359,13 @@ export function MissionOrder() {
   };
 
 
-  const handledeleteDriver = async (id_conducteur: number) => {
+  const handledeleteMissionOrder = async (id_mission: number) => {
     try {
-      console.log(id_conducteur);
-      setModalStatus('Do you want to delete this Driver');
-      setTitleStatus('Delete Driver');
+      console.log(id_mission);
+      setModalStatus('Do you want to delete this MissionOrder');
+      setTitleStatus('Delete MissionOrder');
       setIdUser(parseInt(id_user || '0', 0));
-      setIdDriver(id_conducteur);
+      setIdMissionOrder(id_mission);
 
       // Perform deletion logic here...
 
@@ -370,20 +376,12 @@ export function MissionOrder() {
     }
   };
 
-
-
-
-  const closeConfirmModal = () => {
-    setModalConfirmStatus(null);
+  const closeModal = () => {
+    setModalStatus(null);
   };
 
-  const closeAssignmentModal = () => {
-    setModalAssignmentStatus(null);
-    setTitleAssignmentStatus("");
-    setIdUser(0);
-    setIdDriver(0);
-    setIdPark(0);
-  };
+
+
 
   const handleUpdateDriverList = () => {
     getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
@@ -421,7 +419,7 @@ export function MissionOrder() {
 
           <NavLink to="/mission-order-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate("Add")} {translate("Mission Order")}
+            {translate("New")} {translate("Mission Order")}
           </NavLink>
 
         
@@ -665,18 +663,9 @@ export function MissionOrder() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                          <a className="badge bg-warning mr-2"   onClick={() => {}}
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title={translate("Update park")}
-                            data-original-title="Delete"
-                          >
-                            <i
-                              className="ri-share-forward-fill  mr-0"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </a>
-                          <a className="badge bg-primary mr-2"   onClick={() => {}} >
+                         
+                          
+                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionOrder(missionOrder.id_mission)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -735,24 +724,15 @@ export function MissionOrder() {
 />
 */}
 
-        <ConfirmSalaryModal
-          show={modalConfirmStatus !== null}
-          onHide={closeConfirmModal}
-          status={modalConfirmStatus}
-          title={titleConfirmStatus}
+      
+          <MissionOrderDeleteModal
+          show={modalStatus !== null}
+          onHide={closeModal}
+          status={modalStatus}
+          title={titleStatus}
           IdUser={IdUser}
-        // updateConfirmSalaryList={ }       
-        />
-
-        <DriverAssignmentModal
-          show={modalAssignmentStatus !== null}
-          onHide={closeAssignmentModal}
-          status={modalAssignmentStatus}
-          title={titleAssignmentStatus}
-          id_user={IdUser}
-          id_driver={IdDriver}
-          id_parc={IdPark}
-          updateDriverList={handleUpdateDriverList}
+          IdMissionOrder={IdMissionOrder}
+          //updateDriverList={handleUpdateDriverList}
         />
 
         <DownloadModal
