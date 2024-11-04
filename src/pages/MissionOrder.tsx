@@ -369,46 +369,6 @@ export function MissionOrder() {
   };
 
 
-  const handleConfirmSalaryDriver = async () => {
-    try {
-
-      setModalConfirmStatus('Are you sure you want to validate the salary?');
-      setTitleConfirmStatus('Confirm!');
-      setIdUser(parseInt(id_user || '0', 0));
-      // setIdDriver(id_conducteur);
-
-      // Perform deletion logic here...
-
-      // After successful deletion, update the vehicle list
-      //  await updateVehicleList();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-
-
-  const handleDriverAssignmentDriver = async (id_conducteur: number, id_parc: number, nom_parc: string, id_user: any) => {
-    try {
-
-      setModalAssignmentStatus('Are you sure you want to assignment this driver to this park?');
-      setTitleAssignmentStatus('Driver assignment');
-      setIdUser(parseInt(id_user || '0', 0));
-      setIdDriver(id_conducteur);
-      setIdPark(id_parc)
-      setNamePark(nom_parc)
-      // Perform deletion logic here...
-
-      // After successful deletion, update the vehicle list
-      //  await updateVehicleList();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const closeModal = () => {
-    setModalStatus(null);
-  };
 
 
   const closeConfirmModal = () => {
@@ -451,7 +411,7 @@ export function MissionOrder() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-user-nurse"></i>
-            {translate("Drivers")} <span>{total}</span>
+            {translate("Missions Order")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
@@ -539,7 +499,8 @@ export function MissionOrder() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item
+      
+            <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
               >
@@ -553,49 +514,6 @@ export function MissionOrder() {
                   {translate("ID")}
                 </span>
               </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.code_conducteur}
-                  onChange={() => handleColumnChange("code_conducteur")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Code")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.nom_conducteur}
-                  onChange={() => handleColumnChange("nom_conducteur")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Last and first name")}
-                </span>
-              </Dropdown.Item>
-             
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.telephone_conducteur}
-                  onChange={() => handleColumnChange("telephone_conducteur")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Phone")}
-                </span>
-              </Dropdown.Item>
 
               <Dropdown.Item
                 as="button"
@@ -604,13 +522,14 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.email_conducteur}
-                  onChange={() => handleColumnChange("email_conducteur")}
+                  checked={selectedColumns.voucher_mission}
+                  onChange={() => handleColumnChange("voucher_mission")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Email")}
+                  {translate("Voucher")}
                 </span>
               </Dropdown.Item>
+              
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -625,6 +544,58 @@ export function MissionOrder() {
                   {translate("Object")}
                 </span>
               </Dropdown.Item>
+
+
+
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.driver_mission}
+                  onChange={() => handleColumnChange("driver_mission")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Driver")}
+                </span>
+              </Dropdown.Item>
+
+
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.dep_date_mission}
+                  onChange={() => handleColumnChange("dep_date_mission")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Departure Date")}
+                </span>
+              </Dropdown.Item>
+
+
+
+             
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.vehicle_mission}
+                  onChange={() => handleColumnChange("vehicle_mission")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Vehicle")}
+                </span>
+              </Dropdown.Item>
+
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -640,10 +611,16 @@ export function MissionOrder() {
                 </div>
               </th>
               {selectedColumns.id_mission && (<th className="sorting" onClick={() => handleSortingColum("id_mission")}>{translate("ID")}</th>)}
+              {selectedColumns.voucher_mission && (<th className="sorting" onClick={() => handleSortingColum("voucher_mission")}>{translate("Voucher")}</th>)}
+
+              {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
+              {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
+              {selectedColumns.vehicle_mission && (<th className="sorting" onClick={() => handleSortingColum("vehicle_mission")}>{translate("Vehicle")}</th>)}
 
 
               
-              {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
+              {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
+
 
               {<th>{translate("Action")}</th>}
             </tr>
@@ -670,9 +647,13 @@ export function MissionOrder() {
                         </div>
                       </td>
                       {selectedColumns.id_mission && (<td>{missionOrder.id_mission}</td>)}
+                      {selectedColumns.voucher_mission && (<td>{missionOrder.voucher_mission}</td>)}
+                      {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
+                      {selectedColumns.dep_date_mission && (<td>{missionOrder.dep_date_mission}</td>)}
+                      {selectedColumns.vehicle_mission && (<td>{missionOrder.vehicle_mission}</td>)}
 
                    
-                      {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
+                      {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
 
                       
@@ -714,7 +695,7 @@ export function MissionOrder() {
                   ))) : (
 
                   <tr>
-                    <td colSpan={9}>No drivers available</td>
+                    <td colSpan={9}>No Mission Orders available</td>
                   </tr>
                 )
               )}
