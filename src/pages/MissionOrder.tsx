@@ -22,6 +22,7 @@ interface Drivers {
 }
 interface MissionOrder {
   id_mission: number;
+  ref_mission: number;
   object_mission: string;
   fuel_loading_mission: number;
   fuel_type_mission: number;
@@ -252,6 +253,7 @@ export function MissionOrder() {
 
   const [selectedColumns, setSelectedColumns] = useState({
     id_mission: true,
+    ref_mission: true,
     object_mission: true,
     fuel_loading_mission: true,
     fuel_type_mission: true,
@@ -302,7 +304,7 @@ export function MissionOrder() {
         console.log(0)
         setType(0);
         break;
-      case translate("Code"):
+      case translate("Object"):
         console.log(1)
         setType(1);
         break;
@@ -397,7 +399,7 @@ export function MissionOrder() {
 
   const menuItems = [
     translate("ID"),
-    translate("Code"),
+    translate("Object"),
     translate("Last and first name"),
     translate("Date of birth"),
     translate("Email"),
@@ -410,8 +412,8 @@ export function MissionOrder() {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-            <i className="las la-user-nurse"></i>
-            {translate("Missions Order")} <span>{total}</span>
+            <i className="las la-tasks"></i>
+            {translate(" Missions Order")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
@@ -522,11 +524,11 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.voucher_mission}
-                  onChange={() => handleColumnChange("voucher_mission")}
+                  checked={selectedColumns.ref_mission}
+                  onChange={() => handleColumnChange("ref_mission")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("Voucher")}
+                  {translate("Reference")}
                 </span>
               </Dropdown.Item>
               
@@ -577,9 +579,6 @@ export function MissionOrder() {
                   {translate("Departure Date")}
                 </span>
               </Dropdown.Item>
-
-
-
              
               <Dropdown.Item
                 as="button"
@@ -611,14 +610,10 @@ export function MissionOrder() {
                 </div>
               </th>
               {selectedColumns.id_mission && (<th className="sorting" onClick={() => handleSortingColum("id_mission")}>{translate("ID")}</th>)}
-              {selectedColumns.voucher_mission && (<th className="sorting" onClick={() => handleSortingColum("voucher_mission")}>{translate("Voucher")}</th>)}
-
+              {selectedColumns.ref_mission && (<th className="sorting" onClick={() => handleSortingColum("ref_mission")}>{translate("Reference")}</th>)}
               {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
               {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.vehicle_mission && (<th className="sorting" onClick={() => handleSortingColum("vehicle_mission")}>{translate("Vehicle")}</th>)}
-
-
-              
+              {selectedColumns.vehicle_mission && (<th className="sorting" onClick={() => handleSortingColum("vehicle_mission")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
 
 
@@ -647,12 +642,10 @@ export function MissionOrder() {
                         </div>
                       </td>
                       {selectedColumns.id_mission && (<td>{missionOrder.id_mission}</td>)}
-                      {selectedColumns.voucher_mission && (<td>{missionOrder.voucher_mission}</td>)}
+                      {selectedColumns.ref_mission && (<td>{missionOrder.ref_mission}</td>)}
                       {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
                       {selectedColumns.dep_date_mission && (<td>{missionOrder.dep_date_mission}</td>)}
                       {selectedColumns.vehicle_mission && (<td>{missionOrder.vehicle_mission}</td>)}
-
-                   
                       {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
 
@@ -665,7 +658,7 @@ export function MissionOrder() {
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title={translate("Edit") + " " + translate("Driver")}
+                            title={translate("Edit") + " " + translate("Mission Order")}
                           >
                             <i
                               className="las la-cog"

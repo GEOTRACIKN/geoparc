@@ -8,6 +8,7 @@ import { MissionOrder } from "./MissionOrder";
 
 interface MissionOrderInterface {
   id_mission?: number | null;
+  ref_mission: number | null;
   object_mission: string | null;
   fuel_loading_mission: number | null;
   fuel_type_mission: number | null;
@@ -41,6 +42,7 @@ export function MissionOrderManage() {
   const id_user = localStorage.getItem("GeopUserID");
   const [mission, setMission] = useState<MissionOrderInterface | null>({
     id_mission: isEditing && id_mission ? Number(id_mission) : null,
+    ref_mission: null,
     object_mission: null,
     fuel_loading_mission: null,
     fuel_type_mission: null,
@@ -78,7 +80,7 @@ export function MissionOrderManage() {
       try {
         // Récupération des informations du conducteur
         const res = await fetch(
-          `${backendUrl}/api/geop/mission/find/${id_mission}`,
+          `${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`,
           {
             mode: "cors",
           }
@@ -134,6 +136,8 @@ export function MissionOrderManage() {
         // Prepare the mission data by filtering out null values
         let missionOrderData = {
             id_mission: mission.id_mission,
+            ref_mission: mission.ref_mission,
+
             object_mission: mission.object_mission,
             fuel_loading_mission: mission.fuel_loading_mission,
             fuel_type_mission: mission.fuel_type_mission,
@@ -156,7 +160,7 @@ export function MissionOrderManage() {
         };
 
         // Update the mission
-        const res = await fetch(`${backendUrl}/api/geop/mission/update`, {
+        const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/update`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -220,6 +224,7 @@ const createMission = async (mission: MissionOrderInterface) => {
     );
 
     const dateFields = [
+      'ref_mission',
       'object_mission',
       'fuel_loading_mission',
       'fuel_type_mission',
@@ -290,7 +295,7 @@ const createMission = async (mission: MissionOrderInterface) => {
       return;
     }
 
-    toast.success("Driver created successfully", {
+    toast.success("Mission Order created successfully", {
       position: "bottom-right",
       autoClose: 2400,
       hideProgressBar: false,
@@ -305,7 +310,7 @@ const createMission = async (mission: MissionOrderInterface) => {
     setButtonClicked(false);
     navigate("/mission-order");
   } catch (error) {
-    console.error("Can't create driver", error);
+    console.error("Can't create Mission Order", error);
     toast.warn("Can't create driver", {
       position: "bottom-right",
       autoClose: 2400,
@@ -449,8 +454,8 @@ const createMifgssion = async (mission: MissionOrderInterface) => {
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
-            <i className="las la-user-nurse"></i>
-            {isEditing ? "Modifier un conducteur" : "Ajouter un conducteur"}
+            <i className="las la-tasks"></i>
+            {isEditing ? " Edit Mission Order" : " Add Mission Order"}
           </h4>
         </div>
 
@@ -463,6 +468,19 @@ const createMifgssion = async (mission: MissionOrderInterface) => {
             <div className="container mt-4">
           <div className="row">
             <div className="col-md-6">
+            <Form.Group className="form-group" controlId="formObject">
+              <Form.Label>
+                <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Reference (*)
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="ref_mission"
+                placeholder="Enter the mission reference"
+                value={mission?.ref_mission || ''}
+                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                required
+              />
+            </Form.Group>
             <Form.Group className="form-group" controlId="formObject">
               <Form.Label>
                 <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Mission Object (*)

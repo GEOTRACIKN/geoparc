@@ -148,7 +148,7 @@ function App() {
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
           <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
-          <Route path="/mission-order-manage/edit/:id_conducteur" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
+          <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
 
 
 

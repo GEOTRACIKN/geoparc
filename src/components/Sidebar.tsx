@@ -310,36 +310,37 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
 
                 <li>
-                  <Nav.Link
-                    to="/mission"
-                    className={activeCollapsed}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSubmenuClick("Mission");
-                    }}
-                    as={NavLink}
+                <Nav.Link
+                  to="/mission"
+                  className={activeCollapsed}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmenuClick("Mission");
+                  }}
+                  as={NavLink}
+                >
+                  <i className="las la-map-marked-alt"></i> {/* New Icon for Missions */}
+                  <span className={`ml-2 ${activeMenuText}`}>
+                    {translate("Missions")}
+                  </span>
+                  <svg
+                    style={{ minWidth: "fit-content" }}
+                    className="svg-icon iq-arrow-right arrow-active"
+                    width="20"
+                    height="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <i className="las la-user-nurse"></i>
-                    <span className={`ml-2 ${activeMenuText}`}>
-                      {translate("Missions")}
-                    </span>
-                    <svg
-                      style={{ minWidth: "fit-content" }}
-                      className="svg-icon iq-arrow-right arrow-active"
-                      width="20"
-                      height="20"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <polyline points="10 15 15 20 20 15"></polyline>
-                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
-                    </svg>
-                  </Nav.Link>
+                    <polyline points="10 15 15 20 20 15"></polyline>
+                    <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                  </svg>
+                </Nav.Link>
+
                   <ul
                     id="vehicles"
                     className={`iq-submenu ${openSubmenus.includes("Mission")
@@ -350,6 +351,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   >
                     <li>
                       <Nav.Link to="/mission-order" className="svg-icon" as={NavLink}>
+                        <i className="las la-tasks"></i> {/* Icon for Mission Order */}
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Mission Order")}
                         </span>
@@ -357,6 +359,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link to="/mission-report" className="svg-icon" as={NavLink}>
+                        <i className="las la-file-alt"></i> {/* Icon for Mission Report */}
                         <span className={`ml-2 ${activeMenuText}`}>
                           {translate("Mission Report")}
                         </span>
