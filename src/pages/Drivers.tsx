@@ -730,7 +730,8 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-warning mr-2" onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
+                          <a className="badge bg-warning mr-2" 
+                          onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
