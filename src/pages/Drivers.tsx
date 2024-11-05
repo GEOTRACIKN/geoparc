@@ -11,6 +11,7 @@ import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 import DriverDeleteModal from "../components/Driver/DriverDeleteModal";
 import DriverDetailsModal from "../components/Driver/DriverDetailsModal";
+import { toast } from "react-toastify";
 
 interface Drivers {
   id_conducteur: number;
@@ -61,6 +62,9 @@ export function Drivers() {
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
   const [showDownloadModal, setShowDownloadModal] = useState(false); 
 
+  const [selectedDrivers, setSelectedDrivers] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+
   const driverHeaders = [
     translate("ID"),
     translate("Code"),
@@ -71,28 +75,109 @@ export function Drivers() {
     translate("Park")
   ];
 
-  const driverData = list_Drivers.map(driver=> [
-    driver.id_conducteur,
+
+  
+  const downloadVehicleExcel = () => {
+
+    const selectedData = list_Drivers.filter((driver) =>
+      selectedDrivers.includes(driver.id_conducteur.toString())
+    ).map((driver) => [
+      driver.id_conducteur,
+      driver.code_conducteur,
+      driver.nom_conducteur+' '+ driver.prenom_conducteur,
+      toTimestamp(driver.date_naissance_conducteur),
+      driver.telephone_conducteur,
+      driver.email_conducteur,
+      driver.nom_parc,
+    ]);
+
+
+    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
+  };
+
+  const downloadVehiclePDF = () => {
+
+    const selectedData = list_Drivers.filter((driver) =>
+      selectedDrivers.includes(driver.id_conducteur.toString())
+    ).map((driver) => [
+      driver.id_conducteur,
     driver.code_conducteur,
     driver.nom_conducteur+' '+ driver.prenom_conducteur,
     toTimestamp(driver.date_naissance_conducteur),
     driver.telephone_conducteur,
     driver.email_conducteur,
     driver.nom_parc,
-  ]);
-  
-  const downloadVehicleExcel = () => {
-    generateExcelFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
+    ]);
+    generatePDFFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
   };
 
-  const downloadVehiclePDF = () => {
-    generatePDFFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
-  };
 
   const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    if (selectedDrivers.length > 0) {
+      handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    } else {
+      toast.warn("Please select at least one driver", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
   };
-  
+
+
+  const [isVehiclesSelected, setIsVehiclesSelected] = useState(false);
+
+
+  const handleDriversSelect = (DriverID: string) => {
+    let updatedsetSelectedDrivers: string[] = [];
+
+    // If "Select All Vehicles" is enabled, selects or deselects all vehicles
+    if (selectAll) {
+      updatedsetSelectedDrivers = selectedDrivers.includes(DriverID)
+        ? selectedDrivers.filter(id => id !== DriverID) //Deselect if already selected
+        : list_Drivers.map(driver => driver.id_conducteur.toString()); // Select all vehicles
+    } else {
+      //Managing selection/normal selection of an individual vehicle
+      if (selectedDrivers.includes(DriverID)) {
+        updatedsetSelectedDrivers = selectedDrivers.filter(id => id !== DriverID);
+      } else {
+        updatedsetSelectedDrivers = [...selectedDrivers, DriverID];
+      }
+    }
+
+    // Updates the list of selected vehicles
+    setSelectedDrivers(updatedsetSelectedDrivers);
+
+    // Updates the Vehicles Selected state (activate if at least one is selected)
+    setIsVehiclesSelected(updatedsetSelectedDrivers.length > 0);
+
+    console.log(updatedsetSelectedDrivers);
+  };
+
+
+
+  useEffect(() => {
+   // If the list of selected POIs is empty, disable general selection
+    if (setSelectedDrivers.length === 0 && selectAll) {
+      setSelectAll(false);
+    }
+  }, [setSelectedDrivers, selectAll]);
+
+
+  // In the handleSelectAllDrivers function
+  const handleSelectAllDrivers = (checked: boolean) => {
+    setSelectAll(checked);
+    console.log(checked)
+    if (checked) {
+      // Select all POIs
+      const allVehicleIDs = list_Drivers.map((driver) => driver.id_conducteur.toString()); // Convert to strings
+      setSelectedDrivers(allVehicleIDs);
+      setIsVehiclesSelected(true);// Mark as selected
+    } else {
+      // Select all POIs
+      setSelectedDrivers([]);
+      setIsVehiclesSelected(false); // Mark as unselected
+    }
+  };
 
 
   const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
@@ -569,8 +654,13 @@ export function Drivers() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
-                  <label className="form-check-label"></label>
+                <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={(e) => handleSelectAllDrivers(e.target.checked)}
+                      />
+                      <label className="form-check-label"></label>
                 </div>
               </th>
 
@@ -602,7 +692,14 @@ export function Drivers() {
                     <tr key={driver.id_conducteur}>
                       <td>
                         <div className="form-check form-check-inline">
-                          <input type="checkbox" className="form-check-input" />
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`checkbox-${driver.id_conducteur}`}
+                            checked={selectedDrivers.includes(driver.id_conducteur.toString())}
+                            onChange={() => handleDriversSelect(driver.id_conducteur.toString())}
+                          />
+                          <label htmlFor={`checkbox-${driver.id_conducteur}`} className="mb-0"></label>
                         </div>
                       </td>
                       {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
@@ -672,23 +769,24 @@ export function Drivers() {
         </div>
         <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
-            previousLabel={translate("previous")}
-            nextLabel={translate("next")}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination justify-right"}
-            pageClassName={"page-item"}
-            pageLinkClassName={"page-link"}
-            previousClassName={"page-item"}
-            previousLinkClassName={"page-link"}
-            nextClassName={"page-item"}
-            nextLinkClassName={"page-link"}
-            breakClassName={"page-item"}
-            breakLinkClassName={"page-link"}
-            activeClassName={"active"}
+           previousLabel={translate("previous")}
+           nextLabel={translate("next")}
+           breakLabel={"..."}
+           pageCount={pageCount}
+           marginPagesDisplayed={2}
+           pageRangeDisplayed={3}
+           onPageChange={handlePageClick}
+           containerClassName={"pagination justify-content-end"}
+           pageClassName={"page-item"}
+           pageLinkClassName={"page-link"}
+           previousClassName={"page-item"}
+           previousLinkClassName={"page-link"}
+           nextClassName={"page-item"}
+           nextLinkClassName={"page-link"}
+           breakClassName={"page-item"}
+           breakLinkClassName={"page-link"}
+           activeClassName={"active"}
+           forcePage={currentPage - 1}
           />
         </div>
         <DriverDeleteModal
