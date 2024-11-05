@@ -13,10 +13,10 @@ interface MissionOrderModalProps {
   title?: string | null; 
   IdUser: number; 
   IdMissionOrder: number; 
-  //updateMissionOrderList: () => void | Promise<void>;
+  updateMissionOrderList: () => void | Promise<void>;
 }
 
-const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, status, title,IdUser, IdMissionOrder  }) => {
+const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, status, title,IdUser, IdMissionOrder, updateMissionOrderList  }) => {
   
   const { translate } = useTranslate();
 
@@ -33,9 +33,9 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
       if (!res.ok) {
        
   
-        console.error("Error deleting driver");
+        console.error("Error deleting Mission Order");
         status=null;
-        toast.warn("Can't deleting driver", {
+        toast.warn("Can't delete Mission Order", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -53,7 +53,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
       if (res.ok) {
        
         console.error("driver deleted successfully");
-        //updateMissionOrderList();  
+        updateMissionOrderList();  
         toast.success("driver deleted successfully !", {
           position: "bottom-right",
           autoClose: 2500,
@@ -72,7 +72,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
 
     } catch (error) {
-      console.error("Error deleting driver", error);
+      console.error("Error deleting mission Order", error);
 
 
       toast.warn("Can't deleting driver", {

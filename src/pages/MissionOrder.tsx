@@ -383,8 +383,8 @@ export function MissionOrder() {
 
 
 
-  const handleUpdateDriverList = () => {
-    getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
+  const handleUpdateMissionOrderList = () => {
+    getMissionOrder(limit, currentPage, search, type, colum, sort).catch(error => {
       console.error('Failed to update driver list:', error);
     });
   };
@@ -732,7 +732,7 @@ export function MissionOrder() {
           title={titleStatus}
           IdUser={IdUser}
           IdMissionOrder={IdMissionOrder}
-          //updateDriverList={handleUpdateDriverList}
+          updateMissionOrderList={handleUpdateMissionOrderList}
         />
 
         <DownloadModal
