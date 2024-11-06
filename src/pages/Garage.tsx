@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import { formatDateToTimestamp } from "../utilities/functions";
+import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";
 
 interface Intervention {
     id_garage: number;
@@ -41,8 +42,10 @@ export function Garage() {
     const [loading, setLoading] = useState(true);
     const [Column, setSortColumn] = useState("id_garage");
     const [pageCount, setPageCount] = useState(0);
-
-
+    const [modalGarageStatus, setModalGarageStatus] = useState<string | null>(null);
+    const [titleGarageStatus, setTitleGarageStatus] = useState<string | null>(null);
+    const [IdGarage, setIdGarage] = useState<number>(0);
+    const [IdUser, setIdUser] = useState<number>(0);
 
     const handlePageClick = async (data: any) => {
         let page = data.selected + 1;
@@ -52,15 +55,14 @@ export function Garage() {
     };
 
 
+    const handleSortingColumn = (currentColumn: string) => {
 
-    const handleSortingColumn = (currentColumnn: string) => {
-
-        setSortColumn(currentColumnn)
+        setSortColumn(currentColumn)
         sort === "ASC" ? setSort("DESC") : setSort("ASC");
         getGarages(limit, page, search, type, Column, sort);
     };
 
- 
+
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -145,11 +147,11 @@ export function Garage() {
     };
 
     const handleTypeSearch = (selectedValue: string) => {
-        
+
 
 
         switch (selectedValue) {
-            case 'ID '+translate("Garage"):
+            case 'ID ' + translate("Garage"):
                 setType(0);
                 break;
             case translate("Date of request"):
@@ -208,7 +210,7 @@ export function Garage() {
 
 
 
-    const [selectedColumnns, setSelectedColumnns] = useState({
+    const [selectedColumns, setselectedColumns] = useState({
         id_garage: true,
         date_intervention: true,
         immatriculation_vehicule: true,
@@ -221,18 +223,18 @@ export function Garage() {
 
 
     const ColumnnOptions = [
-        { key: "id_garage", label: 'ID '+translate("Garage") },
-        { key: "date_intervention", label: translate("Intervention Requests")  },
-        { key: "immatriculation_vehicule", label: translate("Matriculation")+' '+translate("Vehicle")  },
-        { key: "subject", label: translate("Subject")  },
-        { key: "priority", label: translate("Priority")  },
-        { key: "status", label: translate("Status")  },
-        { key: "service", label: translate("Service")  },
+        { key: "id_garage", label: 'ID ' + translate("Garage") },
+        { key: "date_intervention", label: translate("Intervention Requests") },
+        { key: "immatriculation_vehicule", label: translate("Matriculation") + ' ' + translate("Vehicle") },
+        { key: "subject", label: translate("Subject") },
+        { key: "priority", label: translate("Priority") },
+        { key: "status", label: translate("Status") },
+        { key: "service", label: translate("Service") },
         { key: "date_update", label: translate("Date update") }
     ];
 
 
-    type SelectedColumnnsType = {
+    type selectedColumnsType = {
         id_garage: boolean;
         date_intervention: boolean;
         immatriculation_vehicule: boolean;
@@ -246,12 +248,38 @@ export function Garage() {
 
 
     const handleColumnnChange = (Columnn: string) => {
-        setSelectedColumnns((prevState: any) => ({
-          ...prevState,
-          [Columnn]: !prevState[Columnn],
+        setselectedColumns((prevState: any) => ({
+            ...prevState,
+            [Columnn]: !prevState[Columnn],
         }));
-      };
-    
+    };
+
+    const closeGarageModal = () => {
+        setModalGarageStatus(null);
+        setTitleGarageStatus("");
+        setIdUser(0);
+        setIdGarage(0);
+        setIdGarage(0);
+    };
+
+    const handleUpdateGarage = async (id_garage: number, id_user: any) => {
+        try {
+
+            setModalGarageStatus('Are you sure you want to update this vehicle to this garage?');
+            setTitleGarageStatus('Update status');
+            setIdUser(parseInt(id_user || '0', 0));
+            setIdGarage(id_garage);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleUpdateGarageList = () => {
+        getGarages(limit, page, search, type, Column, sort).catch(error => {
+            console.error('Failed to update driver list:', error);
+        });
+    };
 
     return (
         <>
@@ -328,7 +356,7 @@ export function Garage() {
                         <Dropdown.Toggle
                             variant=""
                             id="dropdown-basic"
-                            title={translate("Display Columnns")}
+                            title={translate("Display Columns")}
                         >
                             <i className="las la-eye"></i>
                         </Dropdown.Toggle>
@@ -342,8 +370,8 @@ export function Garage() {
                                     <input
                                         type="checkbox"
                                         className="form-check-input"
-                                        checked={selectedColumnns[Columnn.key as keyof SelectedColumnnsType]}
-                                        onChange={() => handleColumnnChange(Columnn.key as keyof SelectedColumnnsType)}
+                                        checked={selectedColumns[Columnn.key as keyof selectedColumnsType]}
+                                        onChange={() => handleColumnnChange(Columnn.key as keyof selectedColumnsType)}
                                     />
                                     <span style={{ marginLeft: "10px" }}>
                                         {translate(Columnn.label)}
@@ -369,13 +397,13 @@ export function Garage() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumnns.id_garage && (<th className="sorting" onClick={() => handleSortingColumn("id_garage")} >  {"Id "+translate("Garage")} </th>)}
-                            {selectedColumnns.immatriculation_vehicule && (<th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>    {translate("Vehicle")} </th>)}
-                            {selectedColumnns.subject && (<th className="sorting" onClick={() => handleSortingColumn("subject")}  > {translate("Object")} </th>)}
-                            {selectedColumnns.priority && (<th className="sorting" onClick={() => handleSortingColumn("Priority")}  > {translate("Priority")}  </th>)}
-                            {selectedColumnns.status && (<th className="sorting" onClick={() => handleSortingColumn("status")} >   {translate("Status")}  </th>)} 
-                            {selectedColumnns.date_intervention && (<th className="sorting" onClick={() => handleSortingColumn("date_intervention")} > {translate("Intervention Requests")}  </th>)}
-                            {selectedColumnns.date_update && (<th className="sorting" onClick={() => handleSortingColumn("date_update")} >  {translate("Date")+" "+translate("Update")} </th>
+                            {selectedColumns.id_garage && (<th className="sorting" onClick={() => handleSortingColumn("id_garage")} >  {"Id " + translate("Garage")} </th>)}
+                            {selectedColumns.immatriculation_vehicule && (<th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>    {translate("Vehicle")} </th>)}
+                            {selectedColumns.subject && (<th className="sorting" onClick={() => handleSortingColumn("subject")}  > {translate("Object")} </th>)}
+                            {selectedColumns.priority && (<th className="sorting" onClick={() => handleSortingColumn("Priority")}  > {translate("Priority")}  </th>)}
+                            {selectedColumns.status && (<th className="sorting" onClick={() => handleSortingColumn("status")} >   {translate("Status")}  </th>)}
+                            {selectedColumns.date_intervention && (<th className="sorting" onClick={() => handleSortingColumn("date_intervention")} > {translate("Intervention Requests")}  </th>)}
+                            {selectedColumns.date_update && (<th className="sorting" onClick={() => handleSortingColumn("date_update")} >  {translate("Date") + " " + translate("Update")} </th>
                             )}
                             <th>{translate("Action")}</th>
                         </tr>
@@ -406,46 +434,81 @@ export function Garage() {
                                         />
                                     </div>
                                 </td>
-                                {selectedColumnns.id_garage && (<td>{garage.id_garage}</td>)}
-                                {selectedColumnns.immatriculation_vehicule && <td>{garage.immatriculation_vehicule}</td>}
-                                {selectedColumnns.subject && <td>{garage.subject}</td>}
-                                {selectedColumnns.priority && <td>
+                                {selectedColumns.id_garage && (<td>{garage.id_garage}</td>)}
+                                {selectedColumns.immatriculation_vehicule && <td>{garage.immatriculation_vehicule}</td>}
+                                {selectedColumns.subject && <td>{garage.subject}</td>}
+                                {selectedColumns.priority && <td>
                                     {garage.priority === "Urgent" ? (
                                         <>
-                                          
+
                                             {translate("Urgent")}
                                         </>
                                     ) : (
                                         <>
-                                        
+
                                             {translate("Normal")}
                                         </>
                                     )}
                                 </td>}
-                                {selectedColumnns.status && <td> 
+                                {selectedColumns.status && <td>
+
 
                                     {garage.status === "Closed" ? (
                                         <>
                                             <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i>
                                             {translate("Closed")}
                                         </>
-                                    ) : (
+                                    ) : garage.status === "Under repair" ? ( 
                                         <>
-                                            <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i>
+                                            <i className="fas fa-tools" style={{ marginRight: "5px", color: "#007bff" }}></i>
+                                            {translate("Under repair")}
+                                        </>
+                                    ) : garage.status === "Under diagnosis" ? (
+                                        <>
+                                            <i className="fas fa-stethoscope" style={{ marginRight: "5px", color: "#ffc107" }}></i>
+                                            {translate("Under diagnosis")}
+                                        </>
+                                    ) : garage.status === "Request" ? (
+                                        <>
+                                            <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#17a2b8" }}></i>
                                             {translate("Request")}
                                         </>
+                                    ) : garage.status === "Pending OR" ? (
+                                        <>
+                                            <i className="fas fa-clock" style={{ marginRight: "5px", color: "#fd7e14" }}></i>
+                                            {translate("Pending OR")}
+                                        </>
+                                    ) : garage.status === "OR established" ? (
+                                        <>
+                                            <i className="fas fa-check-double" style={{ marginRight: "5px", color: "#6f42c1" }}></i>
+                                            {translate("OR established")}
+                                        </>
+                                    ) : garage.status === "Pending part" ? (
+                                        <>
+                                            <i className="fas fa-box-open" style={{ marginRight: "5px", color: "#dc3545" }}></i>
+                                            {translate("Pending part")}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-question-circle" style={{ marginRight: "5px", color: "#6c757d" }}></i>
+                                            {translate("Unknown")}
+                                        </>
                                     )}
-                                </td>}
-                                {selectedColumnns.date_intervention && (<td>{formatDateToTimestamp(garage.date_intervention)}</td>)}
-                                {selectedColumnns.date_update && <td>{formatDateToTimestamp(garage.date_update)}</td>}
+
+
+                                </td>
+                                }
+                                {selectedColumns.date_intervention && (<td>{formatDateToTimestamp(garage.date_intervention)}</td>)}
+                                {selectedColumns.date_update && <td>{formatDateToTimestamp(garage.date_update)}</td>}
                                 <td>
                                     <div className="d-flex align-items-center list-action">
                                         <Link
                                             to={``}
+                                            onClick={() => handleUpdateGarage(garage.id_garage, id_user)}
                                             className="badge badge-success mr-2"
                                             data-toggle="tooltip"
                                             data-placement="top"
-                                            title={translate("Status")+" "+translate("Update")}
+                                            title={translate("Status") + " " + translate("Update")}
                                         >
                                             <i className="las la-sync" style={{ fontSize: "1.2em" }}></i>
                                         </Link>
@@ -517,6 +580,16 @@ export function Garage() {
                     />
                 </div>
             </div>
+            <UpdateStatusGarageModal
+                show={modalGarageStatus !== null}
+                onHide={closeGarageModal}
+                status={modalGarageStatus}
+                title={titleGarageStatus}
+                id_user={IdUser}
+                id_garage={IdGarage}
+                updateGarageList={handleUpdateGarageList}
+            />
+
         </>
     );
 }
