@@ -14,17 +14,6 @@ import MissionOrderDeleteModal from "../components/MissionOrder/MissionOrderDele
 
 
 
-interface Drivers {
-  id_conducteur: number;
-  code_conducteur: number;
-  nom_conducteur: string;
-  prenom_conducteur: string;
-  date_naissance_conducteur: string;
-  email_conducteur: string;
-  telephone_conducteur: string;
-  id_parc: number;
-  nom_parc: string;
-}
 interface MissionOrder {
   id_mission: number;
   ref_mission: number;
@@ -46,7 +35,8 @@ interface MissionOrder {
   fuel_cost_mission: number;
   fuel_level_mission: number;
   voucher_mission: number;
-  vehicle_mission: number;
+  immatriculation_vehicule : string;
+  id_vehicule : number;
   id_user: string;
 
 }
@@ -58,21 +48,13 @@ export function MissionOrder() {
   const { translate } = useTranslate();
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
-  const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
-  const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
-  const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
+ 
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
-  const [modalConfirmStatus, setModalConfirmStatus] = useState<string | null>(null);
-  const [titleConfirmStatus, setTitleConfirmStatus] = useState<string | null>(null);
-  const [modalAssignmentStatus, setModalAssignmentStatus] = useState<string | null>(null);
-  const [titleAssignmentStatus, setTitleAssignmentStatus] = useState<string | null>(null);
-  const [IdDriver, setIdDriver] = useState<number>(0);
+
   const [IdUser, setIdUser] = useState<number>(0);
-  const [IdPark, setIdPark] = useState<number>(0);
-  const [NamePark, setNamePark] = useState<string>("");
+ 
 
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
@@ -82,7 +64,6 @@ export function MissionOrder() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
-  const [showDownloadModal, setShowDownloadModal] = useState(false); 
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
@@ -100,76 +81,7 @@ export function MissionOrder() {
     translate("Park")
   ];
 
-  const driverData = list_Drivers.map(driver=> [
-    driver.id_conducteur,
-    driver.code_conducteur,
-    driver.nom_conducteur+' '+ driver.prenom_conducteur,
-    toTimestamp(driver.date_naissance_conducteur),
-    driver.telephone_conducteur,
-    driver.email_conducteur,
-    driver.nom_parc,
-  ]);
-
   
-  
-  const downloadVehicleExcel = () => {
-    generateExcelFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
-  };
-
-  const downloadVehiclePDF = () => {
-    generatePDFFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
-  };
-
-  const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
-  };
-  
-
-
-  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
-    try {
-      setLoading(true);
-
-      // Preparing the data to send
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
-
-      // Retrieve the total number of pages
-    
-      // Retrieve driver data
-      const DriversResponsssse = await fetch(`${backendUrl}/api/geop/driver/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-      //setDrivers et data et dDreiversResponse
-      // DriversReesponse et serDrivers 
-
-
-      //partie mission
-      
-
-      const datan = await DriversResponsssse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-      return datan;
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
 
   //
   const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
@@ -278,7 +190,8 @@ export function MissionOrder() {
     fuel_cost_mission: true,
     fuel_level_mission: true,
     voucher_mission: true,
-    vehicle_mission: true,
+    immatriculation_vehicule : true,
+    id_vehicule: true,
   });
   
 
@@ -291,13 +204,12 @@ export function MissionOrder() {
 
 
   const searchColum: { [key: string]: number } = {
-    id_conducteur: 0,
-    code_conducteur: 1,
-    nom_conducteur: 2,
-    date_naissance_conducteur: 3,
-    email_conducteur: 4,
-    telephone_conducteur: 5,
-    id_sousParc: 6
+    id_mission: 0,
+    object_mission: 1,
+    ref_mission: 2,
+    dep_date_mission: 3,
+    vehicle_mission: 4,
+    driver_mission: 5
   };
 
 
@@ -314,25 +226,21 @@ export function MissionOrder() {
         console.log(1)
         setType(1);
         break;
-      case translate("Last and first name"):
+      case translate("Reference"):
         console.log(2)
         setType(2);
         break;
-      case translate("Date of birth"):
+      case translate("Departure Date"):
         console.log(3)
         setType(3);
         break;
-      case translate("Email"):
+      case translate("Vehicle"):
         console.log(4)
         setType(4);
         break;
-      case translate("Phone"):
+      case translate("Driver"):
         console.log(5)
         setType(5);
-        break;
-      case translate("Park"):
-        console.log(6)
-        setType(6);
         break;
       default:
         console.log('Unknown selection');
@@ -367,10 +275,7 @@ export function MissionOrder() {
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionOrder(id_mission);
 
-      // Perform deletion logic here...
-
-      // After successful deletion, update the vehicle list
-      //  await updateVehicleList();
+    
     } catch (error) {
       console.error(error);
     }
@@ -379,8 +284,6 @@ export function MissionOrder() {
   const closeModal = () => {
     setModalStatus(null);
   };
-
-
 
 
   const handleUpdateMissionOrderList = () => {
@@ -392,18 +295,17 @@ export function MissionOrder() {
   const handleResetSearch = async () => {
     setSearch("")
 
-    await getDrivers(limit, currentPage, search, type, colum, sort)
+    await getMissionOrder(limit, currentPage, search, type, colum, sort)
   };
 
   const menuItems = [
     translate("ID"),
     translate("Object"),
-    translate("Last and first name"),
-    translate("Date of birth"),
-    translate("Email"),
-    translate("Phone"),
-    translate("Park")
-  ];
+    translate("Reference"),
+    translate("Departure Date"),
+    translate("Vehicle"),
+    translate("Driver")
+   ];
 
   return (
     <>
@@ -426,7 +328,7 @@ export function MissionOrder() {
 
           <button
             className="btn btn-outline-secondary  mt-2 mr-1"
-            onClick={() => setShowDownloadModal(true)}
+            onClick={() => (true)}
           >
             <i className="las la-download"></i>
             {translate("Export")} {translate("Driver")}
@@ -545,8 +447,6 @@ export function MissionOrder() {
                 </span>
               </Dropdown.Item>
 
-
-
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -585,8 +485,8 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.vehicle_mission}
-                  onChange={() => handleColumnChange("vehicle_mission")}
+                  checked={selectedColumns.immatriculation_vehicule }
+                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -611,7 +511,7 @@ export function MissionOrder() {
               {selectedColumns.ref_mission && (<th className="sorting" onClick={() => handleSortingColum("ref_mission")}>{translate("Reference")}</th>)}
               {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
               {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.vehicle_mission && (<th className="sorting" onClick={() => handleSortingColum("vehicle_mission")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
 
 
@@ -643,7 +543,7 @@ export function MissionOrder() {
                       {selectedColumns.ref_mission && (<td>{missionOrder.ref_mission}</td>)}
                       {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
                       {selectedColumns.dep_date_mission && (<td>{missionOrder.dep_date_mission}</td>)}
-                      {selectedColumns.vehicle_mission && (<td>{missionOrder.vehicle_mission}</td>)}
+                      {selectedColumns.immatriculation_vehicule  && (<td>{missionOrder.immatriculation_vehicule }</td>)}
                       {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
 
@@ -687,7 +587,7 @@ export function MissionOrder() {
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            {translate("Displaying")} {list_Drivers.length} {translate("on")}{" "}
+            {translate("Displaying")} {list_MissionOrder.length} {translate("on")}{" "}
             {total}
           </span>
         </div>
@@ -712,18 +612,6 @@ export function MissionOrder() {
             activeClassName={"active"}
           />
         </div>
-        {/*
-<DriverModal
-  show={modalStatus !== null}
-  onHide={closeModal}
-  status={modalStatus}
-  title={titleStatus}
-  IdUser={IdUser}
-  IdDriver={IdDriver}
-  updateDriverList={handleUpdateDriverList}
-/>
-*/}
-
       
           <MissionOrderDeleteModal
           show={modalStatus !== null}
@@ -735,12 +623,7 @@ export function MissionOrder() {
           updateMissionOrderList={handleUpdateMissionOrderList}
         />
 
-        <DownloadModal
-          show={showDownloadModal}
-          onHide={() => setShowDownloadModal(false)}
-          onDownloadConfirm={onDownloadConfirm}
-        />
-
+      
       </div>
     </>
   );

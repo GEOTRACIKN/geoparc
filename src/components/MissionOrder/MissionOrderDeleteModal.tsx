@@ -1,4 +1,3 @@
-// DriverModal.tsx
 
 import React from "react";
 import Modal from "react-bootstrap/Modal";
@@ -52,9 +51,9 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
       if (res.ok) {
        
-        console.error("driver deleted successfully");
+        console.error("Mission Order deleted successfully");
         updateMissionOrderList();  
-        toast.success("driver deleted successfully !", {
+        toast.success("Mission Order deleted successfully !", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -75,7 +74,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
       console.error("Error deleting mission Order", error);
 
 
-      toast.warn("Can't deleting driver", {
+      toast.warn("Can't deleting Mission Order", {
         position: "bottom-right",
         autoClose: 2500, 
         hideProgressBar: false,

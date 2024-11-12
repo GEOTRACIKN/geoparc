@@ -27,7 +27,9 @@ interface MissionOrderInterface {
   fuel_cost_mission: number | null;
   fuel_level_mission: number | null;
   voucher_mission: number | null;
-  vehicle_mission: number | null;
+  immatriculation_vehicule : string | null;
+  id_vehicule : number | null;
+
   id_user: string | null;
 
 }
@@ -40,6 +42,7 @@ export function MissionOrderManage() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
   const id_user = localStorage.getItem("GeopUserID");
+  const [vehicles, setVehicles] = useState<string[]>([]);
   const [mission, setMission] = useState<MissionOrderInterface | null>({
     id_mission: isEditing && id_mission ? Number(id_mission) : null,
     ref_mission: null,
@@ -61,22 +64,22 @@ export function MissionOrderManage() {
     fuel_cost_mission: null,
     fuel_level_mission: null,
     voucher_mission: null,
-    vehicle_mission: null,
+    immatriculation_vehicule : null,
+    id_vehicule : null,
     id_user: isEditing ? null : id_user,
   });
 
   const [loading, setLoading] = useState<boolean | null>(true);
   const [error, setError] = useState<string | null>(null);
-  const [updatedCodeConducteur, setUpdatedCodeConducteur] = useState("");
   const [buttonClicked, setButtonClicked] = useState(false);
 
 
   const cancelClicked = () => {
     navigate("/mission-order");
   };
-
-  useEffect(() => {
-    const getMission = async () => {
+  
+   useEffect(() => {
+    const getMissionOrder = async () => {
       try {
         // Récupération des informations du conducteur
         const res = await fetch(
@@ -95,7 +98,6 @@ export function MissionOrderManage() {
         const data: MissionOrderInterface = await res.json();
         setMission(data);
 
-        //setUpdatedCodeConducteur(mission?.code_conducteur || "")
 
 
       } catch (error) {
@@ -105,29 +107,14 @@ export function MissionOrderManage() {
         setLoading(false);
       }
     };
-    if (isEditing) { getMission(); }
+    if (isEditing) { getMissionOrder(); }
     else { setLoading(false); }
 
 
 
   }, [id_mission]);
 
-  // Fonction de validation des emails
-  const validateEmail = (email: string): boolean => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  // Fonction de validation des numéros de téléphone
-  const validatePhone = (phone: string): boolean => {
-    const re = /^[0-9]{10}$/; // Exemple pour des numéros de téléphone à 10 chiffres
-    return re.test(phone);
-  };
-
-
-  const validateString = (str: string): boolean => {
-    return str.trim().length > 0; // Example: checks if the string is not empty
-  };
+  
 
 
 
@@ -137,7 +124,6 @@ export function MissionOrderManage() {
         let missionOrderData = {
             id_mission: mission.id_mission,
             ref_mission: mission.ref_mission,
-
             object_mission: mission.object_mission,
             fuel_loading_mission: mission.fuel_loading_mission,
             fuel_type_mission: mission.fuel_type_mission,
@@ -156,7 +142,7 @@ export function MissionOrderManage() {
             fuel_cost_mission: mission.fuel_cost_mission,
             fuel_level_mission: mission.fuel_level_mission,
             voucher_mission: mission.voucher_mission,
-            vehicle_mission: mission.vehicle_mission,
+            immatriculation_vehicule : mission.immatriculation_vehicule ,
         };
 
         // Update the mission
@@ -214,9 +200,6 @@ export function MissionOrderManage() {
 };
 
 
-
-
-
 const createMission = async (mission: MissionOrderInterface) => {
   try {
     let missionOrderData = Object.fromEntries(
@@ -243,7 +226,7 @@ const createMission = async (mission: MissionOrderInterface) => {
       'fuel_cost_mission',
       'fuel_level_mission',
       'voucher_mission',
-      'vehicle_mission'
+      'immatriculation_vehicule ',
     ];
 
     missionOrderData = Object.fromEntries(
@@ -266,6 +249,8 @@ const createMission = async (mission: MissionOrderInterface) => {
           return [key, value];
         })
     );
+
+    console.log("Formatted Mission Order Data:", missionOrderData);
 
     const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/create`, {
       method: "POST",
@@ -328,104 +313,27 @@ const createMission = async (mission: MissionOrderInterface) => {
 
 
 
-const createMifgssion = async (mission: MissionOrderInterface) => {
-  try {
-      // Prepare the mission data by filtering out null values
-      let missionOrderData = {
-          id_mission: mission.id_mission,
-          object_mission: mission.object_mission,
-          fuel_loading_mission: mission.fuel_loading_mission,
-          fuel_type_mission: mission.fuel_type_mission,
-          expenses_mission: mission.expenses_mission,
-          tank_mission: mission.tank_mission,
-          trailer_mission: mission.trailer_mission,
-          driver_mission: mission.driver_mission,
-          accomp_mission: mission.accomp_mission,
-          dep_loc_mission: mission.dep_loc_mission,
-          dep_date_mission: mission.dep_date_mission,
-          dep_dest_mission: mission.dep_dest_mission,
-          return_date_mission: mission.return_date_mission,
-          itinerary_mission: mission.itinerary_mission,
-          vehicle_km_mission: mission.vehicle_km_mission,
-          new_km_mission: mission.new_km_mission,
-          fuel_cost_mission: mission.fuel_cost_mission,
-          fuel_level_mission: mission.fuel_level_mission,
-          voucher_mission: mission.voucher_mission,
-          vehicle_mission: mission.vehicle_mission,
-      };
-
-      // Create the mission
-      const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/create`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          mode: "cors",
-          body: JSON.stringify(missionOrderData),
-      });
-
-      if (!res.ok) {
-          toast.warn("Can't create mission", {
-              position: "bottom-right",
-              autoClose: 2400,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-              transition: Bounce,
-          });
-          console.error("Error creating mission");
-          return;
-      }
-
-      toast.success("Mission created successfully", {
-          position: "bottom-right",
-          autoClose: 2400,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-      });
-
-      navigate("/mission-order");
-  } catch (error) {
-      toast.warn("Can't create mission", {
-          position: "bottom-right",
-          autoClose: 2400,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-      });
-  }
-};
 
 
   // Utilisez l'interface ChangeEvent pour le gestionnaire d'événements
-  const handleChange = (name: any, value: any) => {
+  const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    handleChange(name, value);  // Appel de la fonction de changement générique
+  };
+  
+  // Fonction générique de gestion des changements dans les formulaires
+  const handleChange = (name: string, value: string) => {
     console.log("name: " + name);
     console.log("value: " + value);
-
     if (mission) {
       setMission({
         ...mission,
         [name]: value,
       });
     }
-
-
-    console.log(mission)
-
+    console.log(mission);
   };
-
+  
 
 
   return (
@@ -751,21 +659,30 @@ const createMifgssion = async (mission: MissionOrderInterface) => {
                 required
               />
             </Form.Group>
+                      <Form.Group className="form-group" controlId="formVehicle">
+            <Form.Label>Vehicle (*)</Form.Label>
+            <Form.Control
+              as="select"
+              name="immatriculation_vehicule"
+              value={mission?.immatriculation_vehicule || ''}
+              onChange={(e) =>
+                handleChange(e.target.name, e.target.value) // Directement appelé dans l'élément select
+              }  // Utilisation de la fonction corrigée
+              required
+            >
+              <option value="">Select Vehicle</option>
+              {vehicles.length === 0 ? (
+                <option disabled>No vehicles available</option>
+              ) : (
+                vehicles.map((vehicle, index) => (
+                  <option key={index} value={vehicle}>
+                    {vehicle}
+                  </option>
+                ))
+              )}
+            </Form.Control>
+          </Form.Group>
 
-            <Form.Group className="form-group" controlId="formVehicle">
-              <Form.Label>
-                <i className="fas fa-car" style={{ color: 'orange' }}></i> Vehicle (*)
-              </Form.Label>
-              <Form.Control
-                type="text"
-                name="vehicle_mission"
-                
-                placeholder="Enter vehicle details"
-                value={mission?.vehicle_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
-              />
-            </Form.Group>
              
             </div>
           </div>
@@ -785,23 +702,24 @@ const createMifgssion = async (mission: MissionOrderInterface) => {
             {translate("Cancel")}
           </button>
           <Button
-            variant="primary"
-            type="submit"
+  variant="primary"
+  type="submit"
+  onClick={() => {
+    setButtonClicked(true);
+    console.log(mission);  // Log mission to check its current state
+    if (mission) {
+      isEditing
+        ? updateMission(mission)  // If editing, call updateMission
+        : createMission(mission);  // If creating, call createMission
+    }
+  }}
+  disabled={buttonClicked}
+>
+  {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
+  {isEditing ? "Modifier" : "Ajouter"}
+</Button>
 
-            onClick={() => {
- setButtonClicked(true);
-   mission &&
-   (isEditing
-     ? updateMission(mission)
-       : createMission(mission)
-    );
-}}
-            disabled={buttonClicked}
 
-          >
-            {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-            {isEditing ? "Modifier" : "Ajouter"}
-          </Button>
         </div>
       </div>
     </>
