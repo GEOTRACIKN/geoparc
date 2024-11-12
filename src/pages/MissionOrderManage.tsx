@@ -405,7 +405,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formFuelLoading">
               <Form.Label>
-                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> Fuel Loading (*)
+                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> Fuel Loading Type (*)
               </Form.Label>
               <Form.Control
                 type="number"
