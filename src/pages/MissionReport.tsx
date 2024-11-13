@@ -9,34 +9,34 @@ import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
-//import MissionReportDeleteModal from "../components/MissionReport/MissionReportDeleteModal";
+import MissionReportDeleteModal from "../components/MissionReport/MissionReportDeleteModal";
 
 
 
 interface MissionReport {
-  id_mission: number;
-  ref_mission: number;
-  object_mission: string;
-  fuel_loading_mission: number;
-  fuel_type_mission: number;
-  expenses_mission: number;
-  tank_mission: number;
-  trailer_mission: number;
-  driver_mission: number;
-  accomp_mission: number;
-  dep_loc_mission: string;
-  dep_date_mission: number;
-  dep_dest_mission: string;
-  return_date_mission: number;
-  itinerary_mission: string;
-  vehicle_km_mission: number;
-  new_km_mission: number;
-  fuel_cost_mission: number;
-  fuel_level_mission: number;
-  voucher_mission: number;
-  immatriculation_vehicule : string;
-  id_vehicule : number;
+  id_misrap: number;               // Primary key with AUTO_INCREMENT
+  ref_misrap: string;               // Reference, varchar(20)
+  objt_misrap: string;              // Object of the mission, varchar(20)
+  carb_misrap: string;              // Type of fuel, varchar(20)
+  frais_misrap: number;             // Expenses, int(11)
+  vehicule_misrap: string;         // Vehicle registration, varchar(20)
+  remorque_misrap: string;         // Trailer, varchar(20)
+  cond_misrap: string;             // Driver, varchar(20)
+  acc_misrap: string;              // Accomplice, varchar(20)
+  itnr_misrap: string;             // Itinerary, varchar(20)
+  amort_misrap: number;            // Amortization, int(11)
+  dep_misrap: string;              // Departure location, varchar(20)
+  date_dep_misrap: string;         // Departure date, varchar(20)
+  lieu_misrap: string;             // Place, varchar(20)
+  date_arr_misrap: string;         // Arrival date, varchar(20)
+  km_dep_misrap: number;           // Departure km, int(11)
+  nuit_misrap: number;             // Night, int(11)
+  immob_misrap: number;            // Immobilization, int(11)
+  durr_misrap: number;             // Duration, int(11)
+  km_ret_misrap: number;           // Return km, int(11)
+  dist_misrap: number;            // Distance, int(11)
   id_user: string;
+
 
 }
 
@@ -169,28 +169,29 @@ export function MissionReport() {
 
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_mission: true,
-    ref_mission: true,
-    object_mission: true,
-    fuel_loading_mission: true,
-    fuel_type_mission: true,
-    expenses_mission: true,
-    tank_mission: true,
-    trailer_mission: true,
-    driver_mission: true,
-    accomp_mission: true,
-    dep_loc_mission: true,
-    dep_date_mission: true,
-    dep_dest_mission: true,
-    return_date_mission: true,
-    itinerary_mission: true,
-    vehicle_km_mission: true,
-    new_km_mission: true,
-    fuel_cost_mission: true,
-    fuel_level_mission: true,
-    voucher_mission: true,
-    immatriculation_vehicule : true,
-    id_vehicule: true,
+    
+    id_misrap: true,
+    ref_misrap: true,
+    objt_misrap: true,
+    carb_misrap: true,
+    frais_misrap: true,
+    vehicule_misrap: true,
+    remorque_misrap: true,
+    cond_misrap: true,
+    acc_misrap: true,
+    itnr_misrap: true,
+    amort_misrap: true,
+    dep_misrap: true,
+    date_dep_misrap: true,
+    lieu_misrap: true,
+    date_arr_misrap: true,
+    km_dep_misrap: true,
+    nuit_misrap: true,
+    immob_misrap: true,
+    durr_misrap: true,
+    km_ret_misrap: true,
+    dist_misrap: true,
+    id_user: true, // Set id_user only if not editing
   });
   
 
@@ -203,12 +204,12 @@ export function MissionReport() {
 
 
   const searchColum: { [key: string]: number } = {
-    id_mission: 0,
-    object_mission: 1,
-    ref_mission: 2,
-    dep_date_mission: 3,
-    vehicle_mission: 4,
-    driver_mission: 5
+    id_misrap: 0,
+    objt_misrap: 1,
+    ref_misrap: 2,
+    date_dep_misrap: 3,
+    vehicule_misrap: 4,
+    cond_misrap: 5
   };
 
 
@@ -266,13 +267,13 @@ export function MissionReport() {
   };
 
 
-  const handledeleteMissionReport = async (id_mission: number) => {
+  const handledeleteMissionReport = async (id_misrap: number) => {
     try {
-      console.log(id_mission);
+      console.log(id_misrap);
       setModalStatus('Do you want to delete this MissionReport');
       setTitleStatus('Delete MissionReport');
       setIdUser(parseInt(id_user || '0', 0));
-      setIdMissionReport(id_mission);
+      setIdMissionReport(id_misrap);
 
     
     } catch (error) {
@@ -401,8 +402,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_mission}
-                  onChange={() => handleColumnChange("id_mission")}
+                  checked={selectedColumns.id_misrap}
+                  onChange={() => handleColumnChange("id_misrap")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("ID")}
@@ -416,8 +417,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.ref_mission}
-                  onChange={() => handleColumnChange("ref_mission")}
+                  checked={selectedColumns.ref_misrap}
+                  onChange={() => handleColumnChange("ref_misrap")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Reference")}
@@ -431,8 +432,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.object_mission}
-                  onChange={() => handleColumnChange("object_mission")}
+                  checked={selectedColumns.objt_misrap}
+                  onChange={() => handleColumnChange("objt_misrap")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Object")}
@@ -446,8 +447,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.driver_mission}
-                  onChange={() => handleColumnChange("driver_mission")}
+                  checked={selectedColumns.cond_misrap}
+                  onChange={() => handleColumnChange("cond_misrap")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Driver")}
@@ -462,8 +463,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.dep_date_mission}
-                  onChange={() => handleColumnChange("dep_date_mission")}
+                  checked={selectedColumns.date_dep_misrap}
+                  onChange={() => handleColumnChange("date_dep_misrap")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Departure Date")}
@@ -477,8 +478,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.immatriculation_vehicule }
-                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
+                  checked={selectedColumns.vehicule_misrap }
+                  onChange={() => handleColumnChange("vehicule_misrap ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -499,12 +500,12 @@ export function MissionReport() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_mission && (<th className="sorting" onClick={() => handleSortingColum("id_mission")}>{translate("ID")}</th>)}
-              {selectedColumns.ref_mission && (<th className="sorting" onClick={() => handleSortingColum("ref_mission")}>{translate("Reference")}</th>)}
-              {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
-              {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
-              {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
+              {selectedColumns.id_misrap && (<th className="sorting" onClick={() => handleSortingColum("id_misrap")}>{translate("ID")}</th>)}
+              {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrapon")}>{translate("Reference")}</th>)}
+              {selectedColumns.objt_misrap && (<th className="sorting" onClick={() => handleSortingColum("objt_misrap")}>{translate("Object")}</th>)}
+              {selectedColumns.date_dep_misrap && (<th className="sorting" onClick={() => handleSortingColum("date_dep_misrap")}>{translate("Departure Date")}</th>)}
+              {selectedColumns.vehicule_misrap  && (<th className="sorting" onClick={() => handleSortingColum("vehicule_misrap ")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.cond_misrap && (<th className="sorting" onClick={() => handleSortingColum("cond_misrap")}>{translate("Driver")}</th>)}
 
 
               {<th>{translate("Action")}</th>}
@@ -525,18 +526,18 @@ export function MissionReport() {
               (
                 list_MissionReport.length > 0 ? (
                   list_MissionReport.map((missionReport) => (
-                    <tr key={missionReport.id_mission}>
+                    <tr key={missionReport.id_misrap}>
                       <td>
                         <div className="form-check form-check-inline">
                           <input type="checkbox" className="form-check-input" />
                         </div>
                       </td>
-                      {selectedColumns.id_mission && (<td>{missionReport.id_mission}</td>)}
-                      {selectedColumns.ref_mission && (<td>{missionReport.ref_mission}</td>)}
-                      {selectedColumns.object_mission && (<td>{missionReport.object_mission}</td>)}
-                      {selectedColumns.dep_date_mission && (<td>{missionReport.dep_date_mission}</td>)}
-                      {selectedColumns.immatriculation_vehicule  && (<td>{missionReport.immatriculation_vehicule }</td>)}
-                      {selectedColumns.driver_mission && (<td>{missionReport.driver_mission}</td>)}
+                      {selectedColumns.id_misrap && (<td>{missionReport.id_misrap}</td>)}
+                      {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
+                      {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
+                      {selectedColumns.date_dep_misrap && (<td>{missionReport.date_dep_misrap}</td>)}
+                      {selectedColumns.vehicule_misrap  && (<td>{missionReport.vehicule_misrap }</td>)}
+                      {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
 
 
                       
@@ -544,7 +545,7 @@ export function MissionReport() {
                       <td>
                         <div className="d-flex align-items-center list-action">
                           <Link
-                            to={`/mission-report-manage/edit/${missionReport.id_mission}`}
+                            to={`/mission-report-manage/edit/${missionReport.id_misrap}`}
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
@@ -557,7 +558,7 @@ export function MissionReport() {
                           </Link>
                          
                           
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionReport(missionReport.id_mission)} title={translate("Delete")} >
+                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -604,11 +605,24 @@ export function MissionReport() {
             activeClassName={"active"}
           />
         </div>
+
+        <MissionReportDeleteModal
+          show={modalStatus !== null}
+          onHide={closeModal}
+          status={modalStatus}
+          title={titleStatus}
+          IdUser={IdUser}
+          IdMissionReport={IdMissionReport}
+          updateMissionReportList={handleUpdateMissionReportList}
+        />
+
+      
+      </div>
       
         
 
       
-      </div>
+      
     </>
   );
 }
