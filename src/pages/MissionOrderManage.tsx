@@ -42,7 +42,8 @@ export function MissionOrderManage() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
   const id_user = localStorage.getItem("GeopUserID");
-  const [vehicles, setVehicles] = useState<string[]>([]);
+  const [vehicles, setVehicles] = useState<{ immatriculation_vehicule: string }[]>([]);
+
   const [mission, setMission] = useState<MissionOrderInterface | null>({
     id_mission: isEditing && id_mission ? Number(id_mission) : null,
     ref_mission: null,
@@ -77,46 +78,53 @@ export function MissionOrderManage() {
   const cancelClicked = () => {
     navigate("/mission-order");
   };
-  
-   useEffect(() => {
+
+  useEffect(() => {
     const getMissionOrder = async () => {
       try {
-        // Récupération des informations du conducteur
-        const res = await fetch(
-          `${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`,
-          {
-            mode: "cors",
+        // Récupérer les informations de la mission (si on est en mode édition)
+        if (isEditing) {
+          const resMission = await fetch(
+            `${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`,
+            { mode: "cors" }
+          );
+  
+          if (!resMission.ok) {
+            console.error("Erreur lors de la récupération de la mission");
+            setError("Erreur lors de la récupération de la mission");
+            return;
           }
+  
+          const data: MissionOrderInterface = await resMission.json();
+          setMission(data); // Mettre à jour les informations de la mission
+        }
+        
+        // Récupérer les immatriculations des véhicules pour l'utilisateur (à chaque fois)
+        const resVehicles = await fetch(
+          `${backendUrl}/api/geop/vehicles/${id_user}`, // Utilise l'id_user de l'état ou de la mission
+          { mode: "cors" }
         );
-
-        if (!res.ok) {
-          console.error("Erreur lors de la récupération du conducteur");
-          setError("Erreur lors de la récupération du conducteur");
+  
+        if (!resVehicles.ok) {
+          console.error("Erreur lors de la récupération des véhicules");
+          setError("Erreur lors de la récupération des véhicules");
           return;
         }
-
-        const data: MissionOrderInterface = await res.json();
-        setMission(data);
-
-
-
+  
+        const vehiclesData = await resVehicles.json();
+        setVehicles(vehiclesData); // Mettre à jour la liste des véhicules
       } catch (error) {
-        console.error("Erreur lors de la récupération du conducteur", error);
-        setError("Erreur lors de la récupération du conducteur");
+        console.error("Erreur lors de la récupération des données", error);
+        setError("Erreur lors de la récupération des données");
       } finally {
         setLoading(false);
       }
     };
-    if (isEditing) { getMissionOrder(); }
-    else { setLoading(false); }
-
-
-
-  }, [id_mission]);
-
   
-
-
+    getMissionOrder(); // Toujours appeler pour récupérer les véhicules
+  
+  }, [id_mission, id_user, isEditing]); // Déclenche ce useEffect lorsque id_mission, id_user ou isEditing change
+  
 
   const updateMission = async (mission: MissionOrderInterface) => {
     try {
@@ -659,29 +667,32 @@ const createMission = async (mission: MissionOrderInterface) => {
                 required
               />
             </Form.Group>
-                      <Form.Group className="form-group" controlId="formVehicle">
-            <Form.Label>Vehicle (*)</Form.Label>
-            <Form.Control
-              as="select"
-              name="immatriculation_vehicule"
-              value={mission?.immatriculation_vehicule || ''}
-              onChange={(e) =>
-                handleChange(e.target.name, e.target.value) // Directement appelé dans l'élément select
-              }  // Utilisation de la fonction corrigée
-              required
-            >
-              <option value="">Select Vehicle</option>
-              {vehicles.length === 0 ? (
-                <option disabled>No vehicles available</option>
-              ) : (
-                vehicles.map((vehicle, index) => (
-                  <option key={index} value={vehicle}>
-                    {vehicle}
-                  </option>
-                ))
-              )}
-            </Form.Control>
-          </Form.Group>
+            <Form.Group className="form-group" controlId="formVehicle">
+              <Form.Label>Vehicle (*)</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="immatriculation_vehicule"
+                  value={mission?.immatriculation_vehicule || ''}
+                  onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  required
+                >
+                  <option value="">Select Vehicle</option>
+                  {vehicles.length === 0 ? (
+                    <option disabled>No vehicles available</option>
+                  ) : (
+                    vehicles.map((vehicle, index) => (
+                      <option key={index} value={vehicle.immatriculation_vehicule}>
+                        {vehicle.immatriculation_vehicule}
+                      </option>
+                    ))
+                  )}
+                </Form.Control>
+
+            </Form.Group>
+
+
+
+
 
              
             </div>
