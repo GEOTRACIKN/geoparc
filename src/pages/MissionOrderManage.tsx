@@ -29,7 +29,6 @@ interface MissionOrderInterface {
   voucher_mission: number | null;
   immatriculation_vehicule : string | null;
   id_vehicule : number | null;
-
   id_user: string | null;
 
 }
@@ -44,6 +43,8 @@ export function MissionOrderManage() {
   const id_user = localStorage.getItem("GeopUserID");
   const [vehicles, setVehicles] = useState<{ immatriculation_vehicule: string }[]>([]);
   const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
+  const [trailer, setTrailer] = useState<{ trailer_mission: string }[]>([]);
+
 
 
   const [mission, setMission] = useState<MissionOrderInterface | null>({
@@ -132,6 +133,20 @@ export function MissionOrderManage() {
         const driverData = await resDriver.json();
         setDriver(driverData); // Mettre à jour la liste des véhicules
 
+        //trailer
+         const resTrailer = await fetch(
+          `${backendUrl}/api/geop/trailer/${id_user}`, // Utilise l'id_user de l'état ou de la mission
+          { mode: "cors" }
+        );
+  
+        if (!resTrailer.ok) {
+          console.error("Erreur lors de la récupération des véhicules");
+          setError("Erreur lors de la récupération des véhicules");
+          return;
+        }
+  
+        const trailerData = await resTrailer.json();
+        setTrailer(trailerData); // Mettre à jour la liste des véhicules
 
 
 
@@ -141,7 +156,6 @@ export function MissionOrderManage() {
       } finally {
         setLoading(false);
       }
-
 
       
     };
@@ -497,16 +511,26 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Label>
                 <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
               </Form.Label>
+
               <Form.Control
-                type="number"
-                name="trailer_mission"
-                
-                
-                placeholder="Enter trailer"
-                value={mission?.trailer_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
-              />
+                  as="select"
+                  name="trailer_mission"
+                  value={mission?.trailer_mission || ''}
+                  onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  required
+                >
+                  <option value="">Select Vehicle</option>
+                  {trailer.length === 0 ? (
+                    <option disabled>No trailer available</option>
+                  ) : (
+                    trailer.map((trailers, index) => (
+                      <option key={index} value={trailers.trailer_mission}>
+                        {trailers.trailer_mission}
+                      </option>
+                    ))
+                  )}
+              </Form.Control>
+
             </Form.Group>
 
             <Form.Group className="form-group" controlId="formDriver">
