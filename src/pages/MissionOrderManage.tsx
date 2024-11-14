@@ -43,6 +43,8 @@ export function MissionOrderManage() {
   const { translate } = useTranslate();
   const id_user = localStorage.getItem("GeopUserID");
   const [vehicles, setVehicles] = useState<{ immatriculation_vehicule: string }[]>([]);
+  const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
+
 
   const [mission, setMission] = useState<MissionOrderInterface | null>({
     id_mission: isEditing && id_mission ? Number(id_mission) : null,
@@ -113,12 +115,35 @@ export function MissionOrderManage() {
   
         const vehiclesData = await resVehicles.json();
         setVehicles(vehiclesData); // Mettre à jour la liste des véhicules
+
+
+        //driver
+        const resDriver = await fetch(
+          `${backendUrl}/api/geop/driver/${id_user}`, // Utilise l'id_user de l'état ou de la mission
+          { mode: "cors" }
+        );
+  
+        if (!resDriver.ok) {
+          console.error("Erreur lors de la récupération des véhicules");
+          setError("Erreur lors de la récupération des véhicules");
+          return;
+        }
+  
+        const driverData = await resDriver.json();
+        setDriver(driverData); // Mettre à jour la liste des véhicules
+
+
+
+
       } catch (error) {
         console.error("Erreur lors de la récupération des données", error);
         setError("Erreur lors de la récupération des données");
       } finally {
         setLoading(false);
       }
+
+
+      
     };
   
     getMissionOrder(); // Toujours appeler pour récupérer les véhicules
@@ -488,15 +513,26 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Label>
                 <i className="fas fa-user" style={{ color: 'orange' }}></i> Driver (*)
               </Form.Label>
-              <Form.Control
-                type="text"
-                name="driver_mission"
-                
-                placeholder="Enter driver's name"
-                value={mission?.driver_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
-              />
+        
+
+                  <Form.Control
+                  as="select"
+                  name="driver_mission"
+                  value={mission?.driver_mission || ''}
+                  onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  required
+                >
+                  <option value="">Select Vehicle</option>
+                  {driver.length === 0 ? (
+                    <option disabled>No vehicles available</option>
+                  ) : (
+                    driver.map((drivers, index) => (
+                      <option key={index} value={drivers.driver_mission}>
+                        {drivers.driver_mission}
+                      </option>
+                    ))
+                  )}
+                </Form.Control>
             </Form.Group>
 
             <Form.Group className="form-group" controlId="formAccomp">

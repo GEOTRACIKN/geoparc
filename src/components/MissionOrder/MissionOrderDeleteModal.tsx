@@ -51,7 +51,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
       if (res.ok) {
        
-        console.error("Mission Order deleted successfully");
+        console.log("Mission Order deleted successfully");
         updateMissionOrderList();  
         toast.success("Mission Order deleted successfully !", {
           position: "bottom-right",
