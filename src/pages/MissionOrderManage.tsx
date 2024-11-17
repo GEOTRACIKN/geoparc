@@ -15,8 +15,8 @@ interface MissionOrderInterface {
   expenses_mission: number | null;
   tank_mission: number | null;
   trailer_mission: number | null;
-  driver_mission: number | null;
-  accomp_mission: number | null;
+  driver_mission: string | null;
+  accomp_mission: string | null;
   dep_loc_mission: string | null;
   dep_date_mission: number | null;
   dep_dest_mission: string | null;
@@ -253,46 +253,34 @@ const createMission = async (mission: MissionOrderInterface) => {
       Object.entries(mission).filter(([_, value]) => value !== null)
     );
 
-    const dateFields = [
-      'ref_mission',
-      'object_mission',
-      'fuel_loading_mission',
-      'fuel_type_mission',
-      'expenses_mission',
-      'tank_mission',
-      'trailer_mission',
-      'driver_mission',
-      'accomp_mission',
-      'dep_loc_mission',
-      'dep_date_mission',
-      'dep_dest_mission',
-      'return_date_mission',
-      'itinerary_mission',
-      'vehicle_km_mission',
-      'new_km_mission',
-      'fuel_cost_mission',
-      'fuel_level_mission',
-      'voucher_mission',
-      'immatriculation_vehicule ',
-    ];
+    
+    const dateFields = ['dep_date_mission', 'return_date_mission'];
 
     missionOrderData = Object.fromEntries(
-      Object.entries(mission)
-        .filter(([_, value]) => value !== null)
+      Object.entries(missionOrderData)
         .map(([key, value]) => {
+          // Only process date fields
           if (dateFields.includes(key)) {
             let date: Date;
+
+            // If the value is already a Date object, use it
             if (value instanceof Date) {
               date = value;
-            } else if (typeof value === 'string' && value.includes('T')) {
+            } 
+            // If the value is a string and contains 'T' (ISO format), parse it into a Date object
+            else if (typeof value === 'string' && value.includes('T')) {
               date = new Date(value);
-            } else {
-              return [key, value];
+            } 
+            else {
+              return [key, value]; // Return original if it’s not a valid date string
             }
 
+            // Format the date to 'YYYY-MM-DD HH:mm:ss'
             const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
             return [key, formattedDate];
           }
+
+          // If the field is not a date field, return the original value
           return [key, value];
         })
     );
@@ -300,6 +288,7 @@ const createMission = async (mission: MissionOrderInterface) => {
     console.log("Formatted Mission Order Data:", missionOrderData);
 
     const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/create`, {
+      
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -535,20 +524,19 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDriver">
               <Form.Label>
-                <i className="fas fa-user" style={{ color: 'orange' }}></i> Driver (*)
+                <i className="fas fa-driver" style={{ color: 'orange' }}></i> Driver (*)
               </Form.Label>
-        
 
-                  <Form.Control
+              <Form.Control
                   as="select"
                   name="driver_mission"
                   value={mission?.driver_mission || ''}
                   onChange={(e) => handleChange(e.target.name, e.target.value)}
                   required
                 >
-                  <option value="">Select Vehicle</option>
+                  <option value="">Select Driver</option>
                   {driver.length === 0 ? (
-                    <option disabled>No vehicles available</option>
+                    <option disabled>No driver available</option>
                   ) : (
                     driver.map((drivers, index) => (
                       <option key={index} value={drivers.driver_mission}>
@@ -556,7 +544,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                       </option>
                     ))
                   )}
-                </Form.Control>
+              </Form.Control>
+
             </Form.Group>
 
             <Form.Group className="form-group" controlId="formAccomp">

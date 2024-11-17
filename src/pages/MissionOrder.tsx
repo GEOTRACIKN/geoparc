@@ -4,13 +4,17 @@ import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from 'react-spinners';
+import { jsPDF } from 'jspdf';
+
+import 'jspdf-autotable';
 //import DriverModal from "../components/Driver/DriverModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
-import MissionOrderModal from "../components/MissionOrder/MissionOrderDeleteModal";
+import MissionOrderPreview from "../components/MissionOrder/MissionOrderPreview";
 import MissionOrderDeleteModal from "../components/MissionOrder/MissionOrderDeleteModal";
+
 
 
 
@@ -49,11 +53,15 @@ export function MissionOrder() {
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const id_user = localStorage.getItem("GeopUserID");
+  const [fileData, setFileData] = useState<Blob | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
  
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
 
   const [IdUser, setIdUser] = useState<number>(0);
+  const [previewVisible, setPreviewVisible] = useState(false); // Gestion de la visibilité du modal
  
 
   const [loading, setLoading] = useState(true); // Add loading state
@@ -307,6 +315,51 @@ export function MissionOrder() {
     translate("Driver")
    ];
 
+   
+   
+   const generatePDF = (missionOrder: MissionOrder) => {
+    const doc = new jsPDF();
+  
+    // Example: Add mission order details to the PDF
+    doc.text("Mission Order Details", 20, 10);
+    doc.text(`Mission Ref: ${missionOrder.ref_mission}`, 20, 20);
+    doc.text(`Mission Object: ${missionOrder.object_mission}`, 20, 30);
+    doc.text(`Fuel Type: ${missionOrder.fuel_type_mission}`, 20, 40);
+    doc.text(`Driver: ${missionOrder.driver_mission}`, 20, 50);
+    doc.text(`Departure Location: ${missionOrder.dep_loc_mission}`, 20, 60);
+    doc.text(`Departure Date: ${missionOrder.dep_date_mission}`, 20, 70);
+    doc.text(`Return Date: ${missionOrder.return_date_mission}`, 20, 80);
+    doc.text(`Vehicle Registration: ${missionOrder.immatriculation_vehicule}`, 20, 90);
+    // Add more details here as needed
+  
+    // Save the PDF
+    doc.save(`MissionOrder_${missionOrder.ref_mission}.pdf`);
+  };
+
+  
+  const fetchPdf = async () => {
+    try {
+      const response = await fetch('/path/to/your/pdf');
+      const blob = await response.blob();
+      setFileData(blob);
+      const fileUrl = URL.createObjectURL(blob);
+      setPdfUrl(fileUrl);
+    } catch (error) {
+      console.error("Error fetching PDF:", error);
+    }
+  };
+
+  const handleDownload = () => {
+    if (fileData) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(fileData);
+      link.download = "MissionOrder.pdf";
+      link.click();
+    }
+  };
+  
+
+
   return (
     <>
       <div className="row">
@@ -549,6 +602,7 @@ export function MissionOrder() {
 
                       
 
+                     
                       <td>
                         <div className="d-flex align-items-center list-action">
                           <Link
@@ -563,9 +617,31 @@ export function MissionOrder() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                         
-                          
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionOrder(missionOrder.id_mission)} title={translate("Delete")} >
+
+                          <a
+                            className="badge bg-primary mr-2"
+                            onClick={() => setPreviewVisible(true)} // Ouvrir le modal d'aperçu
+                            title={translate("Preview") + " " + translate("Mission Order")}
+                          >
+                            <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                          </a>
+
+                        {/* Modal d'aperçu */}
+                        {previewVisible && missionOrder && (
+                          <>
+                            {/* Affichage temporaire pour la vérification */}
+                            <div>Modal ouvert</div> {/* Seul affiché lorsque previewVisible est vrai */}
+                            
+                            <MissionOrderPreview
+                              show={previewVisible}
+                              onHide={() => setPreviewVisible(false)} // Fermer le modal
+                              missionOrder={missionOrder} // Passer les détails de la mission
+                            />
+                          </>
+                        )}
+
+
+                          <a className="badge bg-danger mr-2" onClick={() => handledeleteMissionOrder(missionOrder.id_mission)} title={translate("Delete")}>
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
