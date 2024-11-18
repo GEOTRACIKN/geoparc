@@ -266,7 +266,7 @@ export function Servicing() {
                         <input
                             type="text"
                             //placeholder={` By ${typeSearch}`}
-                            placeholder={translate(typeSearch)} 
+                            placeholder={`by ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
