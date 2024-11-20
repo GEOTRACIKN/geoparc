@@ -582,5 +582,26 @@
 "Request": "Demande",
 "Garage":"Garage",
 "Status": "État",
-"Object":"Objet"
+
+"Object":"Objet",
+"Depature Date": "Date de départ",
+"Reference": "Référence",
+"Mission Object": "Objet de la mission",
+"Fuel Loading Type": "Type de chargement du carburant",
+"Fuel Type": "Type de carburant",
+"Expenses": "Dépenses",
+"Tank": "Réservoir",
+"Accompaniment": "Accompagnants",
+"Departure Location": "Lieu de départ",
+"Departure Date": "Date de départ",
+"Destination": "Destination",
+"Return Date": "Date de retour",
+"Itinerary": "Itinéraire",
+"Vehicle KM": "Kilométrage du véhicule",
+"New KM": "Nouveau kilométrage",
+"Fuel Cost": "Coût du carburant",
+"Fuel Level": "Niveau de carburant",
+"Voucher": "Numéro de bon",
+"Missions Order": "Ordres de mission",
+"New Mission Order": "Nouvel ordre de mission"
 }

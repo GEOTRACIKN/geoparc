@@ -600,7 +600,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDepDest">
               <Form.Label>
-                <i className="fas fa-map" style={{ color: 'orange' }}></i>{translate(" Destination")} (*)
+                <i className="fas fa-map" style={{ color: 'orange' }}></i>{translate("Destination")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -780,7 +780,7 @@ const createMission = async (mission: MissionOrderInterface) => {
   disabled={buttonClicked}
 >
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-  {isEditing ? "Modifier" : "Ajouter"}
+  {isEditing ? "Edit" : "Add"}
 </Button>
 
 

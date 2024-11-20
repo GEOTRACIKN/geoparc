@@ -581,5 +581,26 @@
 "Normal": "Normal",
 "Request": "Solicitud",
 "Garage":"Garaje",
-"Object":"Objeto"
+"Object":"Objeto",
+
+"Depature Date": "Fecha de salida",
+  "Reference": "Referencia",
+  "Mission Object": "Objeto de la misión",
+  "Fuel Loading Type": "Tipo de carga de combustible",
+  "Fuel Type": "Tipo de combustible",
+  "Expenses": "Gastos",
+  "Tank": "Depósito",
+  "Accompaniment": "Acompañantes",
+  "Departure Location": "Lugar de salida",
+  "Departure Date": "Fecha de salida",
+  "Destination": "Destino",
+  "Return Date": "Fecha de regreso",
+  "Itinerary": "Itinerario",
+  "Vehicle KM": "Kilometraje del vehículo",
+  "New KM": "Nuevo kilometraje",
+  "Fuel Cost": "Costo del combustible",
+  "Fuel Level": "Nivel de combustible",
+  "Voucher": "Número del vale",
+  "Missions Order": "Órdenes de misión",
+  "New Mission Order": "Nueva orden de misión"
 }

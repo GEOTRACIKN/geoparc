@@ -587,5 +587,31 @@
 "Normal": "عادي",
 "Request": "طلب",
 "Garage":"مرآب",
+
+"Depature date":"تاريخ المغادرة",
+"Reference": "المرجع",
+"Mission Object": "موضوع المهمة",
+"Fuel Loading Type": "نوع تحميل الوقود",
+"Fuel Type": "نوع الوقود",
+"Expenses": "المصاريف",
+"Tank": "الخزان",
+
+"Accompaniment": "المرافقين",
+"Departure Location": "مكان الانطلاق",
+"Departure Date": "تاريخ الانطلاق",
+"Destination": "الوجهة",
+"Return Date": "تاريخ العودة",
+"Itinerary": "الخط سير",
+"Vehicle KM": "عدد كيلومترات المركبة",
+"New KM": "عدد الكيلومترات الجديدة",
+"Fuel Cost": "تكلفة الوقود",
+"Fuel Level": "مستوى الوقود",
+"Voucher": "رقم القسيمة",
+  "Missions Order": "أوامر المهمة",
+  "New Mission Order": "أمر مهمة جديد",
+
+
+
+
 "Object":"الموضوع"
 }

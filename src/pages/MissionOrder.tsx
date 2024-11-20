@@ -405,7 +405,7 @@ export function MissionOrder() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate(" Missions Order")} <span>{total}</span>
+            {translate("Missions Order")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
@@ -413,7 +413,7 @@ export function MissionOrder() {
 
           <NavLink to="/mission-order-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate("New")} {translate("Mission Order")}
+             {translate("Missions Order")}
           </NavLink>
 
         </div>
