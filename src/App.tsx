@@ -40,6 +40,8 @@ import { MissionOrder } from "./pages/MissionOrder";
 import { MissionOrderManage } from "./pages/MissionOrderManage";
 
 import { MissionReport } from "./pages/MissionReport";
+import { MissionReportManage } from "./pages/MissionReportManage";
+
 
 
 import axios from "axios";
@@ -145,11 +147,13 @@ function App() {
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
-          <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
+    
           <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
           <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
           <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
-
+          <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
+          <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+          <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
 
 
 

@@ -4,27 +4,20 @@ import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../components/LanguageProvider";
 import { PropagateLoader } from 'react-spinners';
+import { jsPDF } from 'jspdf';
+
+import 'jspdf-autotable';
 //import DriverModal from "../components/Driver/DriverModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
-import MissionOrderModal from "../components/MissionOrder/MissionOrderDeleteModal";
+import MissionOrderPreview from "../components/MissionOrder/MissionOrderPreview";
 import MissionOrderDeleteModal from "../components/MissionOrder/MissionOrderDeleteModal";
 
 
 
-interface Drivers {
-  id_conducteur: number;
-  code_conducteur: number;
-  nom_conducteur: string;
-  prenom_conducteur: string;
-  date_naissance_conducteur: string;
-  email_conducteur: string;
-  telephone_conducteur: string;
-  id_parc: number;
-  nom_parc: string;
-}
+
 interface MissionOrder {
   id_mission: number;
   ref_mission: number;
@@ -34,7 +27,7 @@ interface MissionOrder {
   expenses_mission: number;
   tank_mission: number;
   trailer_mission: number;
-  driver_mission: number;
+  driver_mission: string;
   accomp_mission: number;
   dep_loc_mission: string;
   dep_date_mission: number;
@@ -46,7 +39,8 @@ interface MissionOrder {
   fuel_cost_mission: number;
   fuel_level_mission: number;
   voucher_mission: number;
-  vehicle_mission: number;
+  immatriculation_vehicule : string;
+  id_vehicule : number;
   id_user: string;
 
 }
@@ -58,118 +52,37 @@ export function MissionOrder() {
   const { translate } = useTranslate();
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Drivers, setDrivers] = useState<Drivers[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
-  const [showCreateTicketModal, setShowCreateTicketModal] = useState(false);
-  const handleShowCreateTicketModal = () => setShowCreateTicketModal(true);
-  const handleCloseCreateTicketModal = () => setShowCreateTicketModal(false);
+  const [fileData, setFileData] = useState<Blob | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+ 
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
-  const [modalConfirmStatus, setModalConfirmStatus] = useState<string | null>(null);
-  const [titleConfirmStatus, setTitleConfirmStatus] = useState<string | null>(null);
-  const [modalAssignmentStatus, setModalAssignmentStatus] = useState<string | null>(null);
-  const [titleAssignmentStatus, setTitleAssignmentStatus] = useState<string | null>(null);
-  const [IdDriver, setIdDriver] = useState<number>(0);
+  const [selectedMissionOrder, setSelectedMissionOrder] = useState<any | null>(null);
+
   const [IdUser, setIdUser] = useState<number>(0);
-  const [IdPark, setIdPark] = useState<number>(0);
-  const [NamePark, setNamePark] = useState<string>("");
+  const [previewVisible, setPreviewVisible] = useState(false); // Gestion de la visibilité du modal
+
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Modal pour aperçu
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);   // Modal pour suppression
+
+  
 
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
   let [total, settotal] = useState(0);
-  const [colum, setSortColum] = useState("id_conducteur");
+  const [colum, setSortColum] = useState("id_mission");
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
-  const [type, setType] = useState(2);
-  const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
-  const [showDownloadModal, setShowDownloadModal] = useState(false); 
+  const [type, setType] = useState(0);
+  const [typeSearch, setTypeSearch] = useState(translate("ID"));
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
 
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
-
-  const driverHeaders = [
-    translate("ID"),
-    translate("Code"),
-    translate("Last and first name"),
-    translate("Date of birth"),
-    translate("Phone"),
-    translate("Email"),
-    translate("Park")
-  ];
-
-  const driverData = list_Drivers.map(driver=> [
-    driver.id_conducteur,
-    driver.code_conducteur,
-    driver.nom_conducteur+' '+ driver.prenom_conducteur,
-    toTimestamp(driver.date_naissance_conducteur),
-    driver.telephone_conducteur,
-    driver.email_conducteur,
-    driver.nom_parc,
-  ]);
-
-  
-  
-  const downloadVehicleExcel = () => {
-    generateExcelFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
-  };
-
-  const downloadVehiclePDF = () => {
-    generatePDFFile(translate("List")+' '+translate("Drivers"), driverHeaders, driverData);
-  };
-
-  const onDownloadConfirm = (format: string) => {
-    handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
-  };
-  
-
-
-  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
-    try {
-      setLoading(true);
-
-      // Preparing the data to send
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
-
-      // Retrieve the total number of pages
-    
-      // Retrieve driver data
-      const DriversResponsssse = await fetch(`${backendUrl}/api/geop/driver/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-      //setDrivers et data et dDreiversResponse
-      // DriversReesponse et serDrivers 
-
-
-      //partie mission
-      
-
-      const datan = await DriversResponsssse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-      return datan;
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
 
   //
   const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
@@ -233,7 +146,29 @@ export function MissionOrder() {
 
 
 
-
+  const missionOrders: MissionOrder[] = [
+    {
+      id_mission: 2, object_mission: 'Delivery', driver_mission: 'Jane Smith', immatriculation_vehicule: 'DEF456', dep_loc_mission: 'Oran', itinerary_mission: 'Route B',
+      ref_mission: 0,
+      fuel_loading_mission: 0,
+      fuel_type_mission: 0,
+      expenses_mission: 0,
+      tank_mission: 0,
+      trailer_mission: 0,
+      accomp_mission: 0,
+      dep_date_mission: 0,
+      dep_dest_mission: "",
+      return_date_mission: 0,
+      vehicle_km_mission: 0,
+      new_km_mission: 0,
+      fuel_cost_mission: 0,
+      fuel_level_mission: 0,
+      voucher_mission: 0,
+      id_vehicule: 0,
+      id_user: "1"
+    },
+    // Ajoute d'autres missions si nécessaire
+  ]
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -245,7 +180,19 @@ export function MissionOrder() {
     getMissionOrder(limit, currentPage, search, type, colum, sort);
   }, []);
 
- 
+  const handlePreviewClick = (missionOrder: any) => {
+    console.log("Selected Mission:", missionOrder); 
+    setSelectedMissionOrder(missionOrder); // Store the mission order data
+    setIsPreviewModalOpen(true); // Open the modal
+  };
+  
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false); // Close the modal
+  };
+
+
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -278,7 +225,8 @@ export function MissionOrder() {
     fuel_cost_mission: true,
     fuel_level_mission: true,
     voucher_mission: true,
-    vehicle_mission: true,
+    immatriculation_vehicule : true,
+    id_vehicule: true,
   });
   
 
@@ -291,13 +239,12 @@ export function MissionOrder() {
 
 
   const searchColum: { [key: string]: number } = {
-    id_conducteur: 0,
-    code_conducteur: 1,
-    nom_conducteur: 2,
-    date_naissance_conducteur: 3,
-    email_conducteur: 4,
-    telephone_conducteur: 5,
-    id_sousParc: 6
+    id_mission: 0,
+    object_mission: 1,
+    ref_mission: 2,
+    dep_date_mission: 3,
+    vehicle_mission: 4,
+    driver_mission: 5
   };
 
 
@@ -314,25 +261,21 @@ export function MissionOrder() {
         console.log(1)
         setType(1);
         break;
-      case translate("Last and first name"):
+      case translate("Reference"):
         console.log(2)
         setType(2);
         break;
-      case translate("Date of birth"):
+      case translate("Departure Date"):
         console.log(3)
         setType(3);
         break;
-      case translate("Email"):
+      case translate("Vehicle"):
         console.log(4)
         setType(4);
         break;
-      case translate("Phone"):
+      case translate("Driver"):
         console.log(5)
         setType(5);
-        break;
-      case translate("Park"):
-        console.log(6)
-        setType(6);
         break;
       default:
         console.log('Unknown selection');
@@ -367,10 +310,7 @@ export function MissionOrder() {
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionOrder(id_mission);
 
-      // Perform deletion logic here...
-
-      // After successful deletion, update the vehicle list
-      //  await updateVehicleList();
+    
     } catch (error) {
       console.error(error);
     }
@@ -379,8 +319,6 @@ export function MissionOrder() {
   const closeModal = () => {
     setModalStatus(null);
   };
-
-
 
 
   const handleUpdateMissionOrderList = () => {
@@ -392,18 +330,74 @@ export function MissionOrder() {
   const handleResetSearch = async () => {
     setSearch("")
 
-    await getDrivers(limit, currentPage, search, type, colum, sort)
+    await getMissionOrder(limit, currentPage, search, type, colum, sort)
   };
 
   const menuItems = [
     translate("ID"),
     translate("Object"),
-    translate("Last and first name"),
-    translate("Date of birth"),
-    translate("Email"),
-    translate("Phone"),
-    translate("Park")
-  ];
+    translate("Reference"),
+    translate("Departure Date"),
+    translate("Vehicle"),
+    translate("Driver")
+   ];
+
+   
+   const generatePDFPreview = (missionOrder: MissionOrder) => {
+    const doc = new jsPDF();
+  
+    // Exemple : Ajout des détails de la mission dans le PDF
+    doc.text("Mission Order Details", 20, 10);
+    doc.text(`Mission Ref: ${missionOrder.ref_mission}`, 20, 20);
+    doc.text(`Mission Object: ${missionOrder.object_mission}`, 20, 30);
+    doc.text(`Fuel Type: ${missionOrder.fuel_type_mission}`, 20, 40);
+    doc.text(`Driver: ${missionOrder.driver_mission}`, 20, 50);
+    doc.text(`Departure Location: ${missionOrder.dep_loc_mission}`, 20, 60);
+    doc.text(`Departure Date: ${missionOrder.dep_date_mission}`, 20, 70);
+    doc.text(`Return Date: ${missionOrder.return_date_mission}`, 20, 80);
+    doc.text(`Vehicle Registration: ${missionOrder.immatriculation_vehicule}`, 20, 90);
+  
+    // Génère le PDF comme un blob
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+    // Affiche l'aperçu
+    setPdfUrl(pdfUrl);
+    setPreviewVisible(true);
+  };
+  const handleDownloadPreview = () => {
+    const doc = new jsPDF();
+  
+    // Récupérer le contenu du modal
+    const content = `
+      Mission Ref: ${selectedMissionOrder?.ref_mission}
+      Object: ${selectedMissionOrder?.object_mission}
+      Driver: ${selectedMissionOrder?.driver_mission}
+      Vehicle: ${selectedMissionOrder?.immatriculation_vehicule}
+      Departure Location: ${selectedMissionOrder?.dep_loc_mission}
+      Itinerary: ${selectedMissionOrder?.itinerary_mission}
+    `;
+  
+    // Ajouter le contenu au PDF
+    doc.text(content, 10, 10);
+  
+    // Télécharger le PDF
+    doc.save("MissionOrder_Preview.pdf");
+  };
+  
+  const fetchPdf = async () => {
+    try {
+      const response = await fetch('/path/to/your/pdf');
+      const blob = await response.blob();
+      setFileData(blob);
+      const fileUrl = URL.createObjectURL(blob);
+      setPdfUrl(fileUrl);
+    } catch (error) {
+      console.error("Error fetching PDF:", error);
+    }
+  };
+  
+
 
   return (
     <>
@@ -422,15 +416,6 @@ export function MissionOrder() {
             {translate("New")} {translate("Mission Order")}
           </NavLink>
 
-        
-
-          <button
-            className="btn btn-outline-secondary  mt-2 mr-1"
-            onClick={() => setShowDownloadModal(true)}
-          >
-            <i className="las la-download"></i>
-            {translate("Export")} {translate("Driver")}
-          </button>
         </div>
       </div>
       <div className="row">
@@ -545,8 +530,6 @@ export function MissionOrder() {
                 </span>
               </Dropdown.Item>
 
-
-
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -585,8 +568,8 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.vehicle_mission}
-                  onChange={() => handleColumnChange("vehicle_mission")}
+                  checked={selectedColumns.immatriculation_vehicule }
+                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -611,7 +594,7 @@ export function MissionOrder() {
               {selectedColumns.ref_mission && (<th className="sorting" onClick={() => handleSortingColum("ref_mission")}>{translate("Reference")}</th>)}
               {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
               {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.vehicle_mission && (<th className="sorting" onClick={() => handleSortingColum("vehicle_mission")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
 
 
@@ -643,12 +626,10 @@ export function MissionOrder() {
                       {selectedColumns.ref_mission && (<td>{missionOrder.ref_mission}</td>)}
                       {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
                       {selectedColumns.dep_date_mission && (<td>{missionOrder.dep_date_mission}</td>)}
-                      {selectedColumns.vehicle_mission && (<td>{missionOrder.vehicle_mission}</td>)}
+                      {selectedColumns.immatriculation_vehicule  && (<td>{missionOrder.immatriculation_vehicule }</td>)}
                       {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
-
-                      
-
+                     
                       <td>
                         <div className="d-flex align-items-center list-action">
                           <Link
@@ -663,14 +644,32 @@ export function MissionOrder() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
-                         
-                          
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionOrder(missionOrder.id_mission)} title={translate("Delete")} >
-                            <i
-                              className="las la-trash"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </a>
+
+                          <a
+                          className="badge bg-primary mr-2"
+                          onClick={() => {
+                            console.log("Selected Mission:", missionOrder);
+                            setSelectedMissionOrder(missionOrder); // Set the mission
+                            setIsPreviewModalOpen(true); // Open the modal
+                          }}
+                          title={translate("Preview") + " " + translate("Mission Order")}
+                        >
+                          <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                        </a>
+
+                    <a
+                      className="badge bg-danger mr-2"
+                      onClick={() => handledeleteMissionOrder(missionOrder.id_mission)}
+                      title={translate("Delete")}
+                    >
+                      <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                    </a>
+
+
+                    
+
+
+                
                         </div>
                       </td>
                     </tr>
@@ -687,7 +686,7 @@ export function MissionOrder() {
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            {translate("Displaying")} {list_Drivers.length} {translate("on")}{" "}
+            {translate("Displaying")} {list_MissionOrder.length} {translate("on")}{" "}
             {total}
           </span>
         </div>
@@ -712,18 +711,6 @@ export function MissionOrder() {
             activeClassName={"active"}
           />
         </div>
-        {/*
-<DriverModal
-  show={modalStatus !== null}
-  onHide={closeModal}
-  status={modalStatus}
-  title={titleStatus}
-  IdUser={IdUser}
-  IdDriver={IdDriver}
-  updateDriverList={handleUpdateDriverList}
-/>
-*/}
-
       
           <MissionOrderDeleteModal
           show={modalStatus !== null}
@@ -734,13 +721,20 @@ export function MissionOrder() {
           IdMissionOrder={IdMissionOrder}
           updateMissionOrderList={handleUpdateMissionOrderList}
         />
+         <MissionOrderPreview
+            show={isPreviewModalOpen} // Contrôle si le modal est ouvert
+            onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
+            status={modalStatus} // Statut de la mission (peut être null)
+            title={titleStatus} // Titre du modal
+            IdUser={IdUser} // Id de l'utilisateur
+            IdMissionOrder={IdMissionOrder} // Id de la mission
+            selectedMissionOrder={selectedMissionOrder} // Mission sélectionnée
+            updateMissionOrderList={handleUpdateMissionOrderList} // Fonction pour mettre à jour la liste
+          />
 
-        <DownloadModal
-          show={showDownloadModal}
-          onHide={() => setShowDownloadModal(false)}
-          onDownloadConfirm={onDownloadConfirm}
-        />
 
+
+      
       </div>
     </>
   );

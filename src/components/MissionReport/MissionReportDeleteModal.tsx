@@ -5,26 +5,26 @@ import { useTranslate } from "../LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-interface MissionOrderModalProps {
+interface MissionReportModalProps {
   show: boolean;
   onHide: () => void;
   status: string | null; 
   title?: string | null; 
   IdUser: number; 
-  IdMissionOrder: number; 
-  updateMissionOrderList: () => void | Promise<void>;
+  IdMissionReport: number; 
+  updateMissionReportList: () => void | Promise<void>;
 }
 
-const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, status, title,IdUser, IdMissionOrder, updateMissionOrderList  }) => {
+const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, status, title,IdUser, IdMissionReport, updateMissionReportList  }) => {
   
   const { translate } = useTranslate();
 
 
-  const deletemissionOrder = async (id_mission: number, id_user: number) => {
+  const deletemissionReport = async (id_mission: number, id_user: number) => {
 
 
     try { 
-      const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/delete/${IdMissionOrder}/${id_user}`, {
+      const res = await fetch(`${backendUrl}/api/geop/missionReportManage/delete/${IdMissionReport}/${id_user}`, {
         method: "DELETE",
         mode: "cors",
       });
@@ -32,9 +32,9 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
       if (!res.ok) {
        
   
-        console.error("Error deleting Mission Order");
+        console.error("Error deleting Mission Report");
         status=null;
-        toast.warn("Can't delete Mission Order", {
+        toast.warn("Can't delete Mission Report", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -51,9 +51,9 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
       if (res.ok) {
        
-        console.log("Mission Order deleted successfully");
-        updateMissionOrderList();  
-        toast.success("Mission Order deleted successfully !", {
+        console.error("Mission Report deleted successfully");
+        updateMissionReportList();  
+        toast.success("Mission Report deleted successfully !", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -71,10 +71,10 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
 
     } catch (error) {
-      console.error("Error deleting mission Order", error);
+      console.error("Error deleting mission Report", error);
 
 
-      toast.warn("Can't deleting Mission Order", {
+      toast.warn("Can't deleting Mission Report", {
         position: "bottom-right",
         autoClose: 2500, 
         hideProgressBar: false,
@@ -103,7 +103,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
         <button  className="btn btn-outline-danger mt-2 mx-auto" onClick={onHide}> 
             {translate("Close")}
         </button>
-        <button   className="btn btn-outline-success mt-2 mx-auto" onClick={() =>deletemissionOrder(IdMissionOrder,IdUser)}> 
+        <button   className="btn btn-outline-success mt-2 mx-auto" onClick={() =>deletemissionReport(IdMissionReport,IdUser)}> 
           {translate("Delete")} 
         </button>
       </Modal.Footer>
@@ -117,4 +117,4 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({ show, onHide, sta
 
 
 
-export default MissionOrderModal;
+export default MissionReportModal;
