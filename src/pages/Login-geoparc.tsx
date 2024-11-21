@@ -10,7 +10,7 @@ import "../assets/vendor/remixicon/fonts/remixicon.css";
 import "../assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import "../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
 import { NavDropdown } from "react-bootstrap";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { Modal, Button, Form } from "react-bootstrap";
 

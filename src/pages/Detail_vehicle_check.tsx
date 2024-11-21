@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Nav, Tab, Col, Row, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from '../functions';
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import ExcelJS from 'exceljs';
 import { Bounce, toast } from "react-toastify";
 

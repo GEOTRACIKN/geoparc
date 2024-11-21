@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Cookies from 'universal-cookie';
 import axios from "axios";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { useNavigate , useLocation, redirect} from "react-router-dom";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 

@@ -11,13 +11,13 @@ import { Vehicles } from "./pages/Vehicles";
 import { VehiclesForms } from "./pages/Vehicles_forms";
 import { Vehicleschecks } from "./pages/Vehicles_checks";
 import { Vehiclecheck } from "./pages/Vehicle_check";
-import { LanguageProvider } from './components/LanguageProvider';
+import { LanguageProvider } from './hooks/LanguageProvider';
 import DashboardLayout from "./components/DashboardLayout";
 import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
 import {VehicleCost} from "./pages/Vehicle_cost"
 import {VehicleSinister} from "./pages/Vehicle_sinister"
-import { Role } from "./pages/Role";
+import  Role from "./pages/Role";
 import { Permission } from "./pages/Permission";
 import { Drivers } from "./pages/Drivers";
 import { Contrat } from "./pages/Contrat";
@@ -52,6 +52,8 @@ import DashboardKPI from "./pages/DashboardKPI";
 
 import LoginForm from "./pages/Login-geoparc";
 import LoginLayout from "./components/LoginLayout";
+import { Parks } from "./pages/parks";
+import Park from "./pages/park";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -115,7 +117,7 @@ function App() {
 
 
   return (
-    <LanguageProvider>
+    <LanguageProvider> 
       <div className="wrapper" style={{ transition: 'width 0.3s', backgroundColor: '#fff', height: '100vh', padding: '0px' }}>
         <Routes>
 
@@ -147,7 +149,10 @@ function App() {
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
-    
+          <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+          <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
+          <Route path="/park/edit/:id_poi" element={<DashboardLayout>{<Park/>}</DashboardLayout>} />
+          <Route path="/park/add" element={ <DashboardLayout>{< Park />}</DashboardLayout>} /> 
           <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
           <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
           <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />

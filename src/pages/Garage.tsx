@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import { formatDateToTimestamp } from "../utilities/functions";
 import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";

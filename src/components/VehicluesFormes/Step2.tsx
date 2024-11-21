@@ -20,7 +20,7 @@ import {
   VehicleValidateFormsStep2,
 } from "../../utilities/interfaces";
 
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 import { CategorieOption } from "../../utilities/selectOptions";
 import FurtherInformation from "./FurtherInformation";
 

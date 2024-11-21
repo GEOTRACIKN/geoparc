@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useTranslate } from './LanguageProvider';
+import { useTranslate } from '../hooks/LanguageProvider';
 import Cookies from 'universal-cookie';
 import Logout from './Logout';
 import NetworkStatusIcon from './NetworkStatusIcon';

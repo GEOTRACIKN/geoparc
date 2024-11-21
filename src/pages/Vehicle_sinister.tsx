@@ -1,7 +1,7 @@
 import { Dropdown, Table, Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect } from "react";
 import NewSinisterModal from "../components/NewSinisterModal";
 import EditSinisterModal from "../components/EditSinisterModal";

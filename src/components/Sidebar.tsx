@@ -3,7 +3,7 @@ import { Nav, Image } from "react-bootstrap";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import "./Sidebar.css";
-import { useTranslate } from "./LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import Cookies from "universal-cookie";
 import Logout from "./Logout";
 import axios from "axios";
@@ -307,6 +307,61 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                   </ul>
                 </li>
+
+
+
+
+                <li>
+                  <Nav.Link
+                    to="/drivers"
+                    className={activeCollapsed}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSubmenuClick("Parks");
+                    }}
+                    as={NavLink}
+                  >
+                    <i className="las la-parking"></i>
+                    <span className={`ml-2 ${activeMenuText}`}>
+                      {translate("Parks")}
+                    </span>
+                    <svg
+                      style={{ minWidth: "fit-content" }}
+                      className="svg-icon iq-arrow-right arrow-active"
+                      width="20"
+                      height="20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="10 15 15 20 20 15"></polyline>
+                      <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
+                    </svg>
+                  </Nav.Link>
+                  <ul
+                    id="vehicles"
+                    className={`iq-submenu ${openSubmenus.includes("Parks")
+                      ? "submenu-enter-active"
+                      : "submenu-enter"
+                      }`}
+                    data-parent="#iq-sidebar-toggle"
+                  >
+                    <li>
+                      <Nav.Link to="/parks" className="svg-icon" as={NavLink}>
+                        <i className="las la-list-alt"></i>
+                        <span className={`ml-2 ${activeMenuText}`}>
+                          {translate("List parks")}
+                        </span>
+                      </Nav.Link>
+                    </li>
+                  
+                  </ul>
+                </li>
+
 
 
                 <li>

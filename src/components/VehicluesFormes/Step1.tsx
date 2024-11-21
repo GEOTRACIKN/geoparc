@@ -42,7 +42,7 @@ import {
 } from "../../utilities/interfaces";
 
 import { Bounce, toast } from "react-toastify";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 
 const backendUrl = "http://localhost:5000/api/geop";
 
