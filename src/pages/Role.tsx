@@ -70,7 +70,7 @@ function Role() {
       setLoading(true);
 
 
-      const total_pages = await fetch(`${backendUrl}/api/role/totalpage`, {
+      const total_pages = await fetch(`${backendUrl}/api/geop/role/totalpage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +84,7 @@ function Role() {
       setTotal(totalPages[0]["count"]);
 
 
-      const rolesResponse = await fetch(`${backendUrl}/api/role/search`, {
+      const rolesResponse = await fetch(`${backendUrl}/api/geop/role/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

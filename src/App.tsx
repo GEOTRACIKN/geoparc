@@ -52,8 +52,8 @@ import DashboardKPI from "./pages/DashboardKPI";
 
 import LoginForm from "./pages/Login-geoparc";
 import LoginLayout from "./components/LoginLayout";
-import { Parks } from "./pages/parks";
-import Park from "./pages/park";
+import { Parks } from "./pages/Parks";
+import Park from "./pages/Park";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -150,6 +150,7 @@ function App() {
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+          <Route path="/role/permission/:id_user/:id_role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
           <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
           <Route path="/park/edit/:id_poi" element={<DashboardLayout>{<Park/>}</DashboardLayout>} />
           <Route path="/park/add" element={ <DashboardLayout>{< Park />}</DashboardLayout>} /> 
@@ -159,10 +160,6 @@ function App() {
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
-
-
-
-          
         </Routes>
       </div>
       <ToastContainer

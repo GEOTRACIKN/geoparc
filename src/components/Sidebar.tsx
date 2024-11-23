@@ -160,6 +160,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                   </Nav.Link>
                 </li>
 
+
+                <li>
+                  <Nav.Link to="/role" className="svg-icon" as={NavLink}>
+                  <i className="las la-check-circle"></i>
+                    <span className={`ml-2 ${activeMenuText}`}>
+                      {translate("Role")}
+                    </span>
+                  </Nav.Link>
+                </li>
+
                 <li>
                   <Nav.Link
                     to="/vehicles"
