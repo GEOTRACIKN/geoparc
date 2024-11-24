@@ -361,7 +361,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                       <Nav.Link to="/mission-report" className="svg-icon" as={NavLink}>
                         <i className="las la-file-alt"></i> {/* Icon for Mission Report */}
                         <span className={`ml-2 ${activeMenuText}`}>
-                          {translate("Mission Report")}
+                          {translate("Missions Report")}
                         </span>
                       </Nav.Link>
                     </li>

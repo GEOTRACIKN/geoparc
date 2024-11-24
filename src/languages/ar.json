@@ -607,11 +607,12 @@
 "Fuel Cost": "تكلفة الوقود",
 "Fuel Level": "مستوى الوقود",
 "Voucher": "رقم القسيمة",
-  "Missions Order": "أوامر المهمة",
-  "New Mission Order": "أمر مهمة جديد",
+"Missions Order": "أوامر المهمة",
+"New Mission Order": "أمر مهمة جديد",
 
+"Object":"الموضوع",
+"Missions Report": "تقرير المهام",
 
-
-
-"Object":"الموضوع"
+"Do you want to delete this": "هل تريد حذف هذا",
+"Mission Order": "أمر المهمة"
 }

@@ -146,29 +146,6 @@ export function MissionOrder() {
 
 
 
-  const missionOrders: MissionOrder[] = [
-    {
-      id_mission: 2, object_mission: 'Delivery', driver_mission: 'Jane Smith', immatriculation_vehicule: 'DEF456', dep_loc_mission: 'Oran', itinerary_mission: 'Route B',
-      ref_mission: 0,
-      fuel_loading_mission: 0,
-      fuel_type_mission: 0,
-      expenses_mission: 0,
-      tank_mission: 0,
-      trailer_mission: 0,
-      accomp_mission: 0,
-      dep_date_mission: 0,
-      dep_dest_mission: "",
-      return_date_mission: 0,
-      vehicle_km_mission: 0,
-      new_km_mission: 0,
-      fuel_cost_mission: 0,
-      fuel_level_mission: 0,
-      voucher_mission: 0,
-      id_vehicule: 0,
-      id_user: "1"
-    },
-    // Ajoute d'autres missions si nécessaire
-  ]
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -305,7 +282,7 @@ export function MissionOrder() {
   const handledeleteMissionOrder = async (id_mission: number) => {
     try {
       console.log(id_mission);
-      setModalStatus('Do you want to delete this MissionOrder');
+      setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Order')}?`);
       setTitleStatus('Delete MissionOrder');
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionOrder(id_mission);

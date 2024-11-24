@@ -76,15 +76,14 @@ doc.text("Mission Date:", 20, 70);
 doc.text("Vehicle  :", 20, 80); // Updated label for vehicle registration
 doc.text("Trailer :", 20, 90);
 doc.text("Driver :", 20, 100);
-doc.text("Function :", 20, 110);
-doc.text("Departure Location :", 20, 120);
-doc.text("Departure Date-Time :", 20, 130);
+doc.text("Departure Location :", 20, 110);
+doc.text("Departure Date-Time :", 20, 120);
 
 // Added missing fields here before setting font to bold
-doc.text("Expenses :", 20, 140); // Added label for expenses
-doc.text("Tank :", 20, 150); // Added label for tank
-doc.text("Accompaniment :", 20, 160); // Added label for accompaniment
-doc.text("Return Date :", 20, 170); // Added label for return date-time
+doc.text("Expenses :", 20, 130); // Added label for expenses
+doc.text("Tank :", 20, 140); // Added label for tank
+doc.text("Accompaniment :", 20, 150); // Added label for accompaniment
+doc.text("Return Date :", 20, 160); // Added label for return date-time
 
 // Set bold for values
 doc.setFont("helvetica", "bold"); // Set bold font for values

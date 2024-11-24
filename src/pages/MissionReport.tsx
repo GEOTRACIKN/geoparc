@@ -313,7 +313,7 @@ export function MissionReport() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate(" Missions Report")} <span>{total}</span>
+            {translate("Missions Report")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
@@ -321,7 +321,7 @@ export function MissionReport() {
 
           <NavLink to="/mission-report-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate("New")} {translate("Mission Report")}
+            {translate("New")} {translate("Missions Report")}
           </NavLink>
 
         
@@ -549,7 +549,7 @@ export function MissionReport() {
                             className="badge badge-success mr-2"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title={translate("Edit") + " " + translate("Mission Report")}
+                            title={translate("Edit") + " " + translate("Missions Report")}
                           >
                             <i
                               className="las la-cog"

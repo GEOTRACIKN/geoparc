@@ -14,7 +14,7 @@ interface MissionOrderInterface {
   fuel_type_mission: number | null;
   expenses_mission: number | null;
   tank_mission: number | null;
-  trailer_mission: number | null;
+  trailer_mission: string | null;
   driver_mission: string | null;
   accomp_mission: string | null;
   dep_loc_mission: string | null;
@@ -55,7 +55,7 @@ export function MissionOrderManage() {
     fuel_type_mission: null,
     expenses_mission: null,
     tank_mission: null,
-    trailer_mission: null,
+    trailer_mission: "0",
     driver_mission: null,
     accomp_mission: null,
     dep_loc_mission: null,

@@ -602,5 +602,11 @@
   "Fuel Level": "Nivel de combustible",
   "Voucher": "Número del vale",
   "Missions Order": "Órdenes de misión",
-  "New Mission Order": "Nueva orden de misión"
+  "New Mission Order": "Nueva orden de misión",
+  "Missions Report": "Informe de misiones",
+  "Do you want to delete this": "¿Quieres eliminar esto",
+  "Mission Order": "Orden de misión"
+
+
+
 }
