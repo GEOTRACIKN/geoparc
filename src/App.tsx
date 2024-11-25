@@ -47,7 +47,7 @@ import { MissionReportManage } from "./pages/MissionReportManage";
 import axios from "axios";
 import { Driver } from "./pages/Driver";
 import { Extinguisher } from "./pages/Extinguisher";
-import { PharmacyBox } from "./pages/pharmacy_box";
+import { Pharmacy } from "./pages/Pharmacy";
 import DashboardKPI from "./pages/DashboardKPI";
 
 import LoginForm from "./pages/Login-geoparc";
@@ -141,7 +141,6 @@ function App() {
           <Route path="/detail-vehicle-check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
           <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
           <Route path="/extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
-          <Route path="/pharmacy-box" element={<DashboardLayout>{<PharmacyBox />}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
@@ -154,6 +153,7 @@ function App() {
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+          <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
 
 
 

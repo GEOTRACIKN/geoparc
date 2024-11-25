@@ -487,7 +487,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/pharmacy-box"
+                        to="/pharmacy"
                         className="svg-icon"
                         as={NavLink}
                       >
