@@ -30,7 +30,7 @@ export function Parks() {
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_park, setPark] = useState<ParkInterface[]>([]);
-  const id_user = localStorage.getItem("userID");
+  const id_user = localStorage.getItem("GeopUserID");
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
   let [total, setTotal] = useState(0);

@@ -101,12 +101,15 @@ function addExtraCharactersToPassword(password:String) {
       localStorage.setItem("GeopUserID", response.data.id_user);
       localStorage.setItem("username", response.data.username);
       localStorage.setItem("api_key", response.data.api_key); 
-      localStorage.setItem("id_role", response.data.id_role); 
+      localStorage.setItem("id_role", response.data.id_role);
+      localStorage.setItem("theme_mode", response.data.profile_settings.theme_mode);
+      localStorage.setItem("language", response.data.profile_settings.language);
+      localStorage.setItem("timezone", response.data.profile_settings.timezone);
 
       
       // Fetch permissions for the user
       const permissionsResponse = await axios.get(
-        `${backendUrl}/api/permission/all/${response.data.id_role}`
+        `${backendUrl}/api/geop/permission/all/${response.data.id_role}`
       );
       localStorage.setItem(
         "userPermissions",

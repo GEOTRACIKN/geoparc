@@ -25,7 +25,7 @@ interface RoleProps {
 
 function Role() {
   const { translate } = useTranslate();
-  const id_user: string = localStorage.getItem("userID") ?? "";
+  const id_user: string = localStorage.getItem("GeopUserID") ?? "";
   const [roles, setRoles] = useState<RoleProps[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [colum, setSortColum] = useState("id_role");
@@ -423,7 +423,7 @@ function Role() {
                       {selectedColumns.date_creation_role && (<td>{toTimestamp(role.date_creation_role)}</td>)}
                       <td>
                         <Link
-                          to={`/role/permission/${id_user}/${role.id_role}`}
+                          to={`/role/permissions/${id_user}/${role.id_role}`}
                           className="badge bg-success mr-2"
                           data-toggle="tooltip"
                           data-placement="top"

@@ -68,7 +68,7 @@ const Park: React.FC = () => {
     const featureGroupRef = useRef<any>(null);
     const [step, setStep] = useState(1);
     const { translate } = useTranslate();
-    const id_user = localStorage.getItem("userID");
+    const id_user = localStorage.getItem("GeopUserID");
     const { id_poi } = useParams<{ id_poi?: string }>();
     let [POI, setPOI] = useState<POIInterface>({
         idgeof: parseInt(id_poi ?? "0", 10),
