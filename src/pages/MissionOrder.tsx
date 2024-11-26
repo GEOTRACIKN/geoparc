@@ -609,20 +609,7 @@ export function MissionOrder() {
                      
                       <td>
                         <div className="d-flex align-items-center list-action">
-                          <Link
-                            to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
-                            className="badge badge-success mr-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title={translate("Edit") + " " + translate("Mission Order")}
-                          >
-                            <i
-                              className="las la-cog"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </Link>
-
-                          <a
+                        <a
                           className="badge bg-primary mr-2"
                           onClick={() => {
                             console.log("Selected Mission:", missionOrder);
@@ -633,6 +620,20 @@ export function MissionOrder() {
                         >
                           <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                         </a>
+                          <Link
+                            to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
+                            className="badge badge-success mr-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title={translate("Edit") + " " + translate("Mission Order")}
+                          >
+                            <i
+                              className="las la-edit"
+                              style={{ fontSize: "1.2em" }}
+                            ></i>
+                          </Link>
+
+                        
 
                     <a
                       className="badge bg-danger mr-2"

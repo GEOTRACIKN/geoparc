@@ -552,7 +552,7 @@ export function MissionReport() {
                             title={translate("Edit") + " " + translate("Missions Report")}
                           >
                             <i
-                              className="las la-cog"
+                              className="las la-edit"
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>

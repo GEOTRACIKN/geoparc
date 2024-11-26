@@ -9,6 +9,8 @@ import ModalNewPharmacy from "../components/Pharmacy/NewPharmacy";
 import ModalShowPharmacy from "../components/Pharmacy/ShowPharmacy";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPharmacy from "../components/Pharmacy/EditPharmacy";
+import ModalDeletePharmacy from "../components/Pharmacy/DeletePharmacy";
+
 
 
 interface Pharmacy {
@@ -90,9 +92,21 @@ export function Pharmacy() {
     const [showNewPharmacyModal, setShowNewPharmacyModal] = useState(false);
     const [showEditPharmacyModal, setShowEditPharmacyModal] = useState(false);
     const [showShowPharmacyModal, setShowShowPharmacyModal] = useState(false);
+    const [showDeletePharmacyModal, setShowDeletePharmacyModal] = useState(false);
+
 
     const handleShowNewPharmacyModal = () => setShowNewPharmacyModal(true);
     const handleCloseNewPharmacyModal = () => setShowNewPharmacyModal(false);
+
+    
+    const handleDeletePharmacyModal = (id: number) => {
+        setSelectedPharmacyId(id);
+        setShowDeletePharmacyModal(true);
+    };
+    const handleCloseDeletePharmacyModal = () => setShowDeletePharmacyModal(false);
+
+
+    
 
     const handleEditPharmacyModal = (id: number) => {
         setSelectedPharmacyId(id);
@@ -440,48 +454,46 @@ export function Pharmacy() {
                                           
                                             
                                            
-                                    
+                                          <td className="text-center">
+                                            <div className="d-flex justify-content-center align-items-center list-action">
+                                                {/* View Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-primary mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Détail"
+                                                    onClick={() => handleShowShowPharmacyModal(Pharmacy.id_pharmacy)}
+                                                >
+                                                    <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
 
-                                    <td className="text-center">
-                                        <div className="d-flex justify-content-center align-items-center list-action">
-                                            <Link
-                                                to={``}
-                                                className="badge badge-success mr-2"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                title="Détail"
-                                                onClick={() =>
-                                                    handleShowShowPharmacyModal(
-                                                        Pharmacy.id_pharmacy
-                                                    )
-                                                }
-                                            >
-                                                <i
-                                                    className="fa fa-eye"
-                                                    style={{ fontSize: "1.2em" }}
-                                                ></i>
-                                            </Link>
-                                            <Link
-                                                to={``}
-                                                className="badge badge-primary mr-2"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                title="Edit"
-                                                onClick={() =>
-                                                    handleEditPharmacyModal(
-                                                        Pharmacy.id_pharmacy
-                                                    )
-                                                }
-                                            >
-                                                <i
-                                                    className="fa fa-edit"
-                                                    style={{ fontSize: "1.2em" }}
-                                                ></i>
-                                            </Link>
-                                          
+                                                {/* Edit Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge badge-success mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Edit"
+                                                    onClick={() => handleEditPharmacyModal(Pharmacy.id_pharmacy)}
+                                                >
+                                                    <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
 
-                                        </div>
-                                    </td>
+                                                {/* Delete Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-danger mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Delete"
+                                                    onClick={() => handleDeletePharmacyModal(Pharmacy.id_pharmacy)}
+                                                >
+                                                    <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+                                            </div>
+                                        </td>
+
                                 </tr>
                             ))
                         ) : (
@@ -524,6 +536,8 @@ export function Pharmacy() {
             </div>
             <ModalNewPharmacy show={showNewPharmacyModal} onHide={handleCloseNewPharmacyModal} onSuccess={refreshData} />
             <ModalEditPharmacy show={showEditPharmacyModal} onHide={handleCloseEditPharmacyModal} id_pharmacy={selectedPharmacyId} onSuccess={refreshData} />
+            <ModalDeletePharmacy show={showDeletePharmacyModal} onHide={handleCloseDeletePharmacyModal} id_pharmacy ={selectedPharmacyId} onSuccess={refreshData} />
+
             <ModalShowPharmacy show={showShowPharmacyModal} onHide={handleCloseShowPharmacyModal} id_pharmacy={selectedPharmacyId} />
 
            

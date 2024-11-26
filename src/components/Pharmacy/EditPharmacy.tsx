@@ -14,7 +14,13 @@ interface ModalEditInterventionProps {
 
 }
 
+interface Vehicle {
+    immatriculation_vehicule: string;
+}
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
+
 
 const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     show,
@@ -23,7 +29,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     onSuccess
 }) => {
     const [formData, setFormData] = useState({
-        id_pharmacy: "",
+    id_pharmacy: "",
     product_pharmacy: "",
     purch_date_pharmacy: "",
     exp_date_pharmacy: "",
@@ -32,6 +38,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     immatriculation_vehicule: "",
    
     });
+    const [vehicles, setVehicles] = useState<string[]>([]); // Store vehicle registrations as strings
 
     const { translate } = useTranslate();
 
@@ -64,13 +71,62 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
             console.error('Erreur lors de la récupération des données:', error);
         }
     };
-
     useEffect(() => {
-        if (show) {
-            fetchIntervention();
-        }
-    }, [show]);
-
+        const fetchData = async () => {
+            // Fetch intervention if `show` is true
+            if (show) {
+                try {
+                    await fetchIntervention(); // Assuming `fetchIntervention` is defined elsewhere
+                } catch (error) {
+                    console.error("Error fetching intervention:", error);
+                }
+            }
+    
+            // Fetch vehicles
+            try {
+                console.log("Fetching vehicles...");
+                const response = await fetch(
+                    `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                );
+                console.log(
+                    `Request sent to: ${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                );
+    
+                if (!response.ok) {
+                    console.error(`Response status: ${response.status}`);
+                    throw new Error("Failed to fetch vehicles");
+                }
+    
+                const data = await response.json();
+                console.log("Vehicles fetched successfully:", data);
+    
+                // Safely map the fetched data
+                if (data.vehicles && Array.isArray(data.vehicles)) {
+                    setVehicles(
+                        data.vehicles.map((vehicle: Vehicle) => vehicle.immatriculation_vehicule)
+                    );
+                } else {
+                    console.warn("Unexpected data format:", data);
+                }
+            } catch (error) {
+                console.error("Error fetching vehicles:", error);
+                toast.error("Error fetching vehicle registrations", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        };
+    
+        fetchData();
+    }, [show]); // Run when `show` state changes
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData(prevState => ({
@@ -201,14 +257,22 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
         {/* Champ pour immatriculation_vehicule */}
         <Form.Group controlId="immatriculation_vehicule">
-            <Form.Label>{translate("Vehicle Registration")}</Form.Label>
-            <Form.Control
-                type="text"
-                placeholder={translate("Enter vehicle registration")}
-                value={formData.immatriculation_vehicule}
-                onChange={handleChange}
-            />
-        </Form.Group>
+                        <Form.Label>{translate("Vehicle Registration")}</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={formData.immatriculation_vehicule}
+                            onChange={handleChange}
+                        >
+                            <option value="">{translate("Select Vehicle")}</option>
+                            {vehicles.map((vehicle, index) => (
+                                <option key={index} value={vehicle}>
+                                    {vehicle}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+
+            
 
                    
                 </Modal.Body>
