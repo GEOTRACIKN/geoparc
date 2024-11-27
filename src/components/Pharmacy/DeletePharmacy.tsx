@@ -19,25 +19,24 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
     id_pharmacy,
     onSuccess,
 }) => {
-
     const handleDelete = async () => {
-        if (!id_pharmacy) return;
-
+    
         try {
+            // Updated URL to include both id_pharmacy and id_user
             const response = await fetch(
-                `${backendUrl}/api/geop/deletepharmacy/${geopuserID}/${id_pharmacy}`,
+                `${backendUrl}/api/geop/deletepharmacy/${id_pharmacy}/${geopuserID}`,
                 {
                     method: "DELETE",
                 }
             );
-
+    
             if (!response.ok) {
                 throw new Error("Error deleting pharmacy.");
             }
-
+    
             const result = await response.json();
             console.log(result);
-
+    
             toast.success("Pharmacy deleted successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -48,11 +47,11 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
                 progress: undefined,
                 theme: "light",
             });
-
+    
             if (onSuccess) {
                 onSuccess();
             }
-
+    
             onHide();
         } catch (error) {
             console.error(error);
@@ -68,7 +67,7 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
             });
         }
     };
-
+    
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>

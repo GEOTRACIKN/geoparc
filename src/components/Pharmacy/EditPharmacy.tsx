@@ -6,7 +6,7 @@ import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 import { Pharmacy } from "../../pages/Pharmacy";
 
-interface ModalEditInterventionProps {
+interface ModalEditPharmacyProps {
     show: boolean;
     onHide: () => void;
     id_pharmacy: number | null;
@@ -22,7 +22,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
 
-const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
+const ModalEditPharmacy: React.FC<ModalEditPharmacyProps> = ({
     show,
     onHide,
     id_pharmacy,
@@ -44,7 +44,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
    
     // Fetch data from API and set form data
-    const fetchIntervention = async () => {
+    const fetchPharmacy = async () => {
         try {
             const url = `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`;
             const response = await fetch(url);
@@ -73,40 +73,28 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     };
     useEffect(() => {
         const fetchData = async () => {
-            // Fetch intervention if `show` is true
             if (show) {
                 try {
-                    await fetchIntervention(); // Assuming `fetchIntervention` is defined elsewhere
+                    // Fetch pharmacy details if `show` is true
+                    await fetchPharmacy();
                 } catch (error) {
-                    console.error("Error fetching intervention:", error);
+                    console.error("Error fetching pharmacy details:", error);
                 }
             }
     
-            // Fetch vehicles
+            // Fetch the list of vehicles
             try {
-                console.log("Fetching vehicles...");
                 const response = await fetch(
                     `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
                 );
-                console.log(
-                    `Request sent to: ${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
-                );
-    
-                if (!response.ok) {
-                    console.error(`Response status: ${response.status}`);
-                    throw new Error("Failed to fetch vehicles");
-                }
+                if (!response.ok) throw new Error("Failed to fetch vehicles");
     
                 const data = await response.json();
-                console.log("Vehicles fetched successfully:", data);
     
-                // Safely map the fetched data
                 if (data.vehicles && Array.isArray(data.vehicles)) {
                     setVehicles(
                         data.vehicles.map((vehicle: Vehicle) => vehicle.immatriculation_vehicule)
                     );
-                } else {
-                    console.warn("Unexpected data format:", data);
                 }
             } catch (error) {
                 console.error("Error fetching vehicles:", error);
@@ -125,7 +113,8 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
         };
     
         fetchData();
-    }, [show]); // Run when `show` state changes
+    }, [show, geopuserID]); // Run when `show` or `geopuserID` changes
+    
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -155,7 +144,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
             console.log('Update successful:', result);
     
             // Afficher une notification de succès
-            toast.success("Intervention updated successfully!", {
+            toast.success("Pharmacy updated successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -257,20 +246,20 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
 
         {/* Champ pour immatriculation_vehicule */}
         <Form.Group controlId="immatriculation_vehicule">
-                        <Form.Label>{translate("Vehicle Registration")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.immatriculation_vehicule}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle, index) => (
-                                <option key={index} value={vehicle}>
-                                    {vehicle}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+    <Form.Label>{translate("Vehicle Registration")}</Form.Label>
+    <Form.Control
+        as="select"
+        value={formData.immatriculation_vehicule || ""} // Ensure fallback to an empty value
+        onChange={handleChange}
+    >
+        <option value="">{translate("Select Vehicle")}</option>
+        {vehicles.map((vehicle, index) => (
+            <option key={index} value={vehicle}>
+                {vehicle}
+            </option>
+        ))}
+    </Form.Control>
+</Form.Group>
 
             
 
@@ -289,4 +278,4 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     );
 };
 
-export default ModalEditIntervention;
+export default ModalEditPharmacy;

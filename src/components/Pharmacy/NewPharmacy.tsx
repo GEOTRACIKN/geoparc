@@ -93,26 +93,49 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
         }));
     };
 
+    const validateForm = () => {
+        if (!formData.product_pharmacy || !formData.purch_date_pharmacy || !formData.exp_date_pharmacy || !formData.cost_pharmacy || !formData.type_pharmacy) {
+            toast.error("Please fill out all fields.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+        return true;
+    };
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+    
         const updatedFormData = { ...formData };
-
+    
         try {
-            const response = await fetch(`${backendUrl}/api/geop/addnewpharmacy/${geopuserID}`, {
+            const response = await fetch(`${backendUrl}/api/geop/addnewpharmacy`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(updatedFormData),
             });
-
+    
             if (!response.ok) {
                 throw new Error("Error adding pharmacy.");
             }
-
+    
             const result = await response.json();
             console.log(result);
-
+    
             toast.success("Pharmacy added successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -124,7 +147,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 theme: "light",
                 transition: Bounce,
             });
-
+    
             setFormData({
                 id_pharmacy: "",
                 product_pharmacy: "",
@@ -134,13 +157,13 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 type_pharmacy: "",
                 immatriculation_vehicule: "",
             });
-
+    
             if (onSuccess) {
                 onSuccess();
             }
-
+    
             onHide();
-
+    
         } catch (error) {
             console.error(error);
             toast.error("Error adding pharmacy. Please try again.", {
@@ -156,6 +179,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
             });
         }
     };
+    
 
     return (
         <Modal show={show} onHide={onHide} responsive>

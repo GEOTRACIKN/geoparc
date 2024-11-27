@@ -227,7 +227,7 @@ export function Pharmacy() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Pharmacy")} ({total})</h4>
+                    <h4>{translate("Emergency Box")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPharmacyModal} className="btn btn-primary mt-2 mr-1">
