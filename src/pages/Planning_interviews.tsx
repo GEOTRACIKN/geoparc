@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";

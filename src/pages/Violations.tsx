@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewVilation from "../components/Violation/NewViolation"
 import ModalEditVilation from "../components/Violation/EditViolations";

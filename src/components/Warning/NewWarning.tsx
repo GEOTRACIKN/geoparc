@@ -3,7 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Bounce, toast } from "react-toastify";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 
 
 interface ModalNewWArningProps {

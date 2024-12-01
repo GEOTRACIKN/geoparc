@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import { Card } from "react-bootstrap";
 import { formatDateToTimestamp } from "../../utilities/functions";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";

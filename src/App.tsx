@@ -11,14 +11,15 @@ import { Vehicles } from "./pages/Vehicles";
 import { VehiclesForms } from "./pages/Vehicles_forms";
 import { Vehicleschecks } from "./pages/Vehicles_checks";
 import { Vehiclecheck } from "./pages/Vehicle_check";
-import { LanguageProvider } from './components/LanguageProvider';
+import { LanguageProvider } from './hooks/LanguageProvider';
 import DashboardLayout from "./components/DashboardLayout";
 import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
 import {VehicleCost} from "./pages/Vehicle_cost"
 import {VehicleSinister} from "./pages/Vehicle_sinister"
-import { Role } from "./pages/Role";
+import  Role from "./pages/Role";
 import { Permission } from "./pages/Permission";
+import { Permissions } from "./pages/Permissions";
 import { Drivers } from "./pages/Drivers";
 import { Contrat } from "./pages/Contrat";
 import { Warnings } from "./pages/Warnings";
@@ -52,6 +53,10 @@ import DashboardKPI from "./pages/DashboardKPI";
 
 import LoginForm from "./pages/Login-geoparc";
 import LoginLayout from "./components/LoginLayout";
+import { Parks } from "./pages/Parks";
+import Park from "./pages/Park";
+import { ThemeProvider } from "./hooks/ThemeContext";
+import NotFound from "./pages/NotFound";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -86,11 +91,15 @@ function App() {
       localStorage.setItem("GeopUserID", response.data.id_user);
       localStorage.setItem("Geopusername", response.data.username);
       localStorage.setItem("api_key", response.data.api_key); 
+      localStorage.setItem("id_role", response.data.id_role); 
+      localStorage.setItem("theme_mode", response.data.profile_settings.theme_mode);
+      localStorage.setItem("language", response.data.profile_settings.language);
+      localStorage.setItem("timezone", response.data.profile_settings.timezone);
 
 
       // Fetch permissions for the user
       const permissionsResponse = await axios.get(
-        `${backendUrl}/api/permission/all/${response.data.id_user}`
+        `${backendUrl}/api/geop/permission/all/${response.data.id_role}`
       );
       localStorage.setItem(
         "userPermissions",
@@ -115,7 +124,8 @@ function App() {
 
 
   return (
-    <LanguageProvider>
+    <ThemeProvider>
+    <LanguageProvider> 
       <div className="wrapper" style={{ transition: 'width 0.3s', backgroundColor: '#fff', height: '100vh', padding: '0px' }}>
         <Routes>
 
@@ -147,17 +157,18 @@ function App() {
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
-    
+          <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+          <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
+          <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
+          <Route path="/park/edit/:id_poi" element={<DashboardLayout>{<Park/>}</DashboardLayout>} />
+          <Route path="/park/add" element={ <DashboardLayout>{< Park />}</DashboardLayout>} /> 
           <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
           <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
           <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
-
-
-
-          
+          <Route path="*" element={<NotFound />} />  
         </Routes>
       </div>
       <ToastContainer
@@ -173,6 +184,7 @@ function App() {
         theme="light"
       /> 
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
  

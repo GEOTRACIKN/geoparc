@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewWaring from "../components/Warning/NewWarning";
 import ModalEditWarning from "../components/Warning/EditWarning";

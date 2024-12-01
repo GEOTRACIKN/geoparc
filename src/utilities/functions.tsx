@@ -4,6 +4,10 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Button, Modal } from 'react-bootstrap';
 import { toast, Bounce } from 'react-toastify';
+import { polygon } from '@turf/helpers';
+import area from '@turf/area';
+import { lineString } from '@turf/helpers';
+import length from '@turf/length';
 
 export function formatDateToTimestamp(dateString: string): string {
     if (!dateString) {
@@ -26,6 +30,15 @@ export function formatDateToTimestamp(dateString: string): string {
     return formattedDate;
   }
  
+
+
+  export function formatToTimestamp(timestamp: string | number | Date) {
+    const date = new Date(timestamp);
+    const formattedDate = date.toLocaleString(); // ou utilisez des méthodes spécifiques pour obtenir le format souhaité
+    return formattedDate;
+  }
+  
+
   //Fonction sans heure juste la date
   export function toTimestamp(dateString: string): string {
     if (!dateString) {
@@ -286,4 +299,197 @@ export function formatDateForAlgeriaTimeZone(dateString: any) {
   // Return the formatted date
   return formattedDate;
 }
+
+
+
+export function extractObjectName(str: string) {
+  // Utilisation d'une expression régulière pour extraire le nom de l'objet
+  const match = str.match(/^([A-Z]+)\(.+\)$/);
+  console.log(match)
+  // Vérification si le nom de l'objet a été trouvé dans la chaîne
+  if (match && match[1]) {
+    // Retourne le nom de l'objet extrait
+    return match[1];
+  } else {
+    return null; // Retourne null si aucun correspondance n'a été trouvée
+  }
+}
+
+export interface Geofence {
+  id: number;
+  type?: "circle" | "polygon" | "polyline" | "marker" | "rectangle";
+  center?: [number, number];
+  radius?: number;
+  positions?: [number, number][];
+  position?: [number, number];
+}
+
+
+
+export function parseGeofenceAttributes(areageof: string, id: number): Geofence {
+  try {
+    let result: Geofence = { id };
+
+    if (areageof.startsWith("POLYGON")) {
+      result.type = "polygon";
+      const coordinatesString = areageof.slice(9, -2); // Remove "POLYGON((" at the start and "))" at the end
+      const coordinatesArray: [number, number][] = coordinatesString.split(",")
+        .map((coordinatePairString: string) => {
+          const [lat, lon] = coordinatePairString.trim().split(" ").map(parseFloat);
+          return [lat, lon];
+        });
+      result.positions = coordinatesArray;
+    } else if (areageof.startsWith("LINESTRING")) {
+      result.type = "polyline";
+      const coordinatesString = areageof.slice(11, -1); // Remove "LINESTRING(" at the start and ")" at the end
+      const coordinatesArray: [number, number][] = coordinatesString.split(",")
+        .map((coordinatePairString: string) => {
+          const [lat, lon] = coordinatePairString.trim().split(" ").map(parseFloat);
+          return [lat, lon];
+        });
+      result.positions = coordinatesArray;
+    } else if (areageof.startsWith("CIRCLE")) {
+      result.type = "circle";
+      const coords = areageof.slice(7, -1).split(",").map(parseFloat); // Remove "CIRCLE(" at the start and ")" at the end
+      result.center = [coords[0], coords[1]];
+      result.radius = coords[2];
+    } else {
+      console.error("Type de zone non pris en charge :", areageof);
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Erreur lors de l'analyse de la chaîne d'attributs geofence :", error);
+    return {
+      id: id,
+      type: undefined,
+    };
+  }
+}
+
+
+
+
+// Définir les types pour les géofences
+type CircleGeofence = {
+  type: 'CIRCLE';
+  radius: number; // en mètres
+};
+
+type RectangleGeofence = {
+  type: 'RECTANGLE';
+  width: number; // en mètres
+  height: number; // en mètres
+};
+
+type PolygonGeofence = {
+  type: 'POLYGON';
+  vertices: { x: number; y: number }[]; // Liste des sommets du polygone
+};
+
+type LineStringGeofence = {
+  type: 'LINESTRING';
+  points: { x: number; y: number }[]; // Liste des points de la ligne
+};
+
+// Type générique pour les géofences
+type Geofencing = CircleGeofence | PolygonGeofence | LineStringGeofence;
+
+// Fonction pour analyser la chaîne et retourner un objet Geofence
+export function parseGeofencing(input: string): Geofencing {
+  const match = input.match(/^(\w+)\(([^,]+),[^,]+,(\d+(\.\d+)?)\)$/);
+
+
+  if (match && match[1] === 'CIRCLE') {
+    return {
+      type: 'CIRCLE',
+      radius: parseFloat(match[3]),
+    };
+  }
+
+
+  // Expression régulière pour capturer le type POLYGON
+  const polygonMatch = input.match(/^POLYGON\(\(([^)]+)\)\)$/);
+  if (polygonMatch) {
+
+    // Capturer les coordonnées des sommets
+    const vertices = polygonMatch[1]
+      .split(',')
+      .map(coord => coord.trim().split(' ')
+        .map(Number))
+      .map(([x, y]) => ({ x, y })); // Convertir en objets { x, y }
+
+    return {
+      type: 'POLYGON',
+      vertices,
+    };
+  }
+
+  const lineStringMatch = input.match(/^LINESTRING\(([^)]+)\)$/);
+  if (lineStringMatch) {
+    const points = lineStringMatch[1].split(',').map(point => {
+      const [x, y] = point.split(' ').map(coord => parseFloat(coord));
+      return { x, y };
+    });
+    return {
+      type: 'LINESTRING',
+      points,
+    };
+  }
+
+  throw new Error('Type de géofence inconnu ou format invalide');
+};
+
+// Fonction pour calculer la surface ou la longueur
+export const calculateSurfaceOrLength = (geofence: Geofencing): number => {
+  switch (geofence.type) {
+    case 'CIRCLE':
+      // Surface d'un cercle: π * r^2
+      return Math.PI * Math.pow(geofence.radius, 2)/1000;
+
+    case 'POLYGON':
+      // Surface d'un polygone: algorithme de l'aire de Shoelace
+
+      console.log("geofence.vertices");
+
+      const vertices = geofence.vertices;
+      const coordinates = vertices.map(vertex => [vertex.x, vertex.y]);
+
+      // Ajouter le premier point à la fin pour fermer le polygone
+      coordinates.push(coordinates[0]);
+
+      // Créer le polygone avec Turf
+      const poly = polygon([coordinates]);
+
+      // Calculer l'aire en mètres carrés
+      const areaInSquareMeters = area(poly);
+
+
+      // Conversion en kilomètres carrés
+      const areaInSquareKilometers = areaInSquareMeters / 1000; 
+      console.log('Area in square:', areaInSquareKilometers);
+      return areaInSquareKilometers;
+
+    case 'LINESTRING':
+      // Longueur d'une ligne: somme des distances entre les points
+
+
+      const points = geofence.points.map(vertex => [vertex.x, vertex.y])
+
+      // Créer un LINESTRING avec Turf
+      const line = lineString(points);
+
+      // Calculer la distance du LINESTRING
+      const distance = length(line, { units: 'kilometers' });
+
+
+
+      return distance;
+
+    default:
+      throw new Error('Type de géofence inconnu');
+  }
+
+  
+};
 

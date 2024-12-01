@@ -2,7 +2,7 @@
 
 import React from "react";
 import Modal from "react-bootstrap/Modal";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 

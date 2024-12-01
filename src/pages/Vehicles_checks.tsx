@@ -1,7 +1,7 @@
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect } from "react";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";

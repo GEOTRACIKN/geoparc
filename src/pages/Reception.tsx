@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewIntervention from "../components/Reception/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowIntervention from "../components/Reception/ShowIntervention";

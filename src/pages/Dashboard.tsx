@@ -3,7 +3,7 @@ import FleetCounter from "../components/Dashboard/fleetCounter";
 import FleetSate from "../components/Dashboard/fleetSate";
 import StatsComponent from "../components/Dashboard/StatsComponent";
 
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 
 import { Table } from "react-bootstrap";
 import Highcharts from "highcharts";

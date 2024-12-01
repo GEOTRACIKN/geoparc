@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from 'react-spinners';
 import DriverModal from "../components/Driver/DriverDeleteModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
