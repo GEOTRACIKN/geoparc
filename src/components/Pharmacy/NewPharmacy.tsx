@@ -121,7 +121,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
         const updatedFormData = { ...formData };
     
         try {
-            const response = await fetch(`${backendUrl}/api/geop/addnewpharmacy`, {
+            const response = await fetch(`${backendUrl}/api/geop/addnewpharmacy/${geopuserID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
