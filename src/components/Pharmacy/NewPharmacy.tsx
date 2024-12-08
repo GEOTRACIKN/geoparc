@@ -4,15 +4,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 
-// Define the types for props
+// Définir les types pour les props
 interface ModalNewPharmacyProps {
     show: boolean;
     onHide: () => void;
     onSuccess?: () => void;
 }
 
-// Define the type for a vehicle
+// Définir le type pour un véhicule
 interface Vehicle {
+    id_vehicule: string;
     immatriculation_vehicule: string;
 }
 
@@ -31,70 +32,65 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
         exp_date_pharmacy: "",
         cost_pharmacy: "",
         type_pharmacy: "",
-        immatriculation_vehicule: "",
+        id_vehicule: "", // Store vehicle ID
     });
 
-    const [vehicles, setVehicles] = useState<string[]>([]); // Store vehicle registrations as strings
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
     const { translate } = useTranslate();
 
-    // Fetch vehicle registrations based on user ID
+    // Récupérer les véhicules selon l'ID utilisateur
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
-                console.log("Fetching vehicles...");
                 const response = await fetch(
                     `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
                 );
-                console.log(
-                    `Request sent to: ${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
-                );
-
+        
                 if (!response.ok) {
-                    console.error(`Response status: ${response.status}`);
                     throw new Error("Failed to fetch vehicles");
                 }
-
+        
                 const data = await response.json();
-                console.log("Vehicles fetched successfully:", data);
-
-                // Safely map the fetched data
-                if (data.vehicles && Array.isArray(data.vehicles)) {
-                    setVehicles(
-                        data.vehicles.map((vehicle: Vehicle) => vehicle.immatriculation_vehicule)
-                    );
-                } else {
-                    console.warn("Unexpected data format:", data);
-                }
+                console.log("Fetched vehicles:", data); // Ensure the correct structure
+                setVehicles(data.vehicles || []);
             } catch (error) {
                 console.error("Error fetching vehicles:", error);
-                toast.error("Error fetching vehicle registrations", {
+                toast.error("Error fetching vehicles.", {
                     position: "bottom-right",
                     autoClose: 2400,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    progress: undefined,
                     theme: "light",
                     transition: Bounce,
                 });
             }
         };
+        
 
-        fetchVehicles();
-    }, []); // Runs only once when the component mounts
-
+        if (geopuserID) {
+            fetchVehicles();
+        }
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
-        setFormData(prevState => ({
+        setFormData((prevState) => ({
             ...prevState,
             [id]: value,
         }));
     };
 
     const validateForm = () => {
-        if (!formData.product_pharmacy || !formData.purch_date_pharmacy || !formData.exp_date_pharmacy || !formData.cost_pharmacy || !formData.type_pharmacy) {
+        if (
+            !formData.product_pharmacy ||
+            !formData.purch_date_pharmacy ||
+            !formData.exp_date_pharmacy ||
+            !formData.cost_pharmacy ||
+            !formData.type_pharmacy ||
+            !formData.id_vehicule
+        ) {
             toast.error("Please fill out all fields.", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -102,40 +98,57 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
                 theme: "light",
                 transition: Bounce,
             });
             return false;
         }
+    
+        // Ensure formData.id_vehicule and vehicle.id_vehicule are the same type
+        const selectedVehicle = vehicles.find(
+            (vehicle) => String(vehicle.id_vehicule) === String(formData.id_vehicule)
+        );
+    
+        if (!selectedVehicle) {
+            toast.error("Please select a valid vehicle.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+    
         return true;
     };
     
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
-    
-        const updatedFormData = { ...formData };
-    
+
         try {
             const response = await fetch(`${backendUrl}/api/geop/addnewpharmacy/${geopuserID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(updatedFormData),
+                body: JSON.stringify(formData),
             });
-    
+
             if (!response.ok) {
                 throw new Error("Error adding pharmacy.");
             }
-    
+
             const result = await response.json();
-            console.log(result);
-    
+
             toast.success("Pharmacy added successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -143,11 +156,11 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
                 theme: "light",
                 transition: Bounce,
             });
-    
+
+            // Reset form data
             setFormData({
                 id_pharmacy: "",
                 product_pharmacy: "",
@@ -155,17 +168,16 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 exp_date_pharmacy: "",
                 cost_pharmacy: "",
                 type_pharmacy: "",
-                immatriculation_vehicule: "",
+                id_vehicule: "",
             });
-    
+
             if (onSuccess) {
                 onSuccess();
             }
-    
+
             onHide();
-    
         } catch (error) {
-            console.error(error);
+            console.error("Error adding pharmacy:", error);
             toast.error("Error adding pharmacy. Please try again.", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -173,25 +185,19 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
                 theme: "light",
                 transition: Bounce,
             });
         }
     };
-    
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
                 <Modal.Title>{translate("New Request")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
-                <Modal.Body
-                    style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
-                >
-                 
-
+                <Modal.Body>
                     {/* Product */}
                     <Form.Group controlId="product_pharmacy">
                         <Form.Label>{translate("Product")}</Form.Label>
@@ -242,20 +248,24 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                         />
                     </Form.Group>
 
-                    {/* Vehicle Registration */}
-                    <Form.Group controlId="immatriculation_vehicule">
-                        <Form.Label>{translate("Vehicle Registration")}</Form.Label>
+                    {/* Vehicle */}
+                    <Form.Group controlId="id_vehicule">
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             as="select"
-                            value={formData.immatriculation_vehicule}
+                            value={formData.id_vehicule}
                             onChange={handleChange}
                         >
                             <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle, index) => (
-                                <option key={index} value={vehicle}>
-                                    {vehicle}
-                                </option>
-                            ))}
+                            {vehicles.length === 0 ? (
+                                <option value="">{translate("No vehicles available")}</option>
+                            ) : (
+                                vehicles.map((vehicle) => (
+                                    <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
+                                        {vehicle.immatriculation_vehicule}
+                                    </option>
+                                ))
+                            )}
                         </Form.Control>
                     </Form.Group>
                 </Modal.Body>
