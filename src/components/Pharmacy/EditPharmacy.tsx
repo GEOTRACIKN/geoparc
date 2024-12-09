@@ -250,7 +250,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Pharmacy")}</Modal.Title>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
@@ -271,7 +271,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                         />
                     </Form.Group>
                     <Form.Group controlId="exp_date_pharmacy">
-                        <Form.Label>{translate("Expiry Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_pharmacy}

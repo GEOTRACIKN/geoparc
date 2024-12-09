@@ -35,7 +35,7 @@ export function Pharmacy() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID Pharmacy");
+    const [typeSearch, setTypeSearch] = useState("ID");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_pharmacy");
     const [sort, setSort] = useState("desc");
@@ -50,14 +50,13 @@ export function Pharmacy() {
 
 
 
-   ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
         Product: true,
         Type: true,
         Vehicle: true,
-        Date: true,
-        Expiration: true,
+       "Purchase Date": true, 
+       "Expiration Date": true,
         Cost: true,
     
     };
@@ -176,21 +175,20 @@ export function Pharmacy() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Date"):
+            case translate("Product"):
                 setType(1);
-                break;
+                    break;
+       
             case translate("Vehicle"):
                 setType(2);
                 break;
-            case translate("Expiration"):
+            case translate("Expiration Date"):
                 setType(3);
                 break;
             case translate("Cost"):
                 setType(4);
                 break;
-            case translate("Product"):
-                setType(5);
-                break;
+         
             case translate("Type"):
                 setType(6);
                 break;
@@ -251,11 +249,13 @@ export function Pharmacy() {
                                 ></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
-                                <Dropdown.Item>{translate("ID ")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Product")}</Dropdown.Item>
+
+                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Expriration Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Expiration Date")}</Dropdown.Item>
+
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                               
                             </Dropdown.Menu>
@@ -339,20 +339,20 @@ export function Pharmacy() {
                                 </th>
                             )}
                            
-                            {selectedColumns.Date && (
+                            {selectedColumns["Purchase Date"] && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("purch_date_pharmacy")}
                                 >
-                                    {translate("Date")}
+                                    {translate("Purchase Date")}
                                 </th>
                             )}
-                            {selectedColumns.Expiration && (
+                            {selectedColumns["Expiration Date"] && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("exp_date_pharmacy")}
                                 >
-                                    {translate("Expiration")}
+                                    {translate("Expiration Date")}
                                 </th>
                             )}
                             

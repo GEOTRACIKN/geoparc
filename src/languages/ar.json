@@ -614,5 +614,18 @@
 "Missions Report": "تقرير المهام",
 
 "Do you want to delete this": "هل تريد حذف هذا",
-"Mission Order": "أمر المهمة"
+"Mission Order": "أمر المهمة",
+
+
+"Edit Pharmacy": "تعديل الصيدلية",
+"Product": "المنتج",
+"Purchase Date": "تاريخ الشراء",
+"Select Vehicle": "اختر مركبة",
+"Expiration Date": "تاريخ الانتهاء",
+"No vehicles available": "لا توجد مركبات متوفرة",
+"Delete Pharmacy": "حذف الصيدلية",
+"Are you sure you want to delete this pharmacy?": "هل أنت متأكد أنك تريد حذف هذه الصيدلية؟",
+"Emergency Box": "صندوق الطوارئ",
+"New": "جديد",
+"Edit": "تعديل"
 }

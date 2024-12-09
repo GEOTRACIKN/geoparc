@@ -606,7 +606,18 @@
 "New Mission Order": "Nouvel ordre de mission",
 "Missions Report": "Rapport des missions",
 "Do you want to delete this": "Voulez-vous supprimer ce",
-"Mission Order": "Ordre de mission"
+"Mission Order": "Ordre de mission",
 
+"Edit Pharmacy": "Modifier la pharmacie",
+"Product": "Produit",
+"Purchase Date": "Date d'achat",
+"Select Vehicle": "Sélectionner le véhicule",
+"Expiration Date": "Date d'expiration",
+"No vehicles available": "Aucun véhicule disponible",
+"Delete Pharmacy": "Supprimer la pharmacie",
+"Are you sure you want to delete this pharmacy?": "Êtes-vous sûr de vouloir supprimer cette pharmacie ?",
+"Emergency Box": "Boîte d'urgence",
+"New": "Nouveau",
+"Edit": "Éditer"
 
 }

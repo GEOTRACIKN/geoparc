@@ -194,7 +194,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("New Request")}</Modal.Title>
+                <Modal.Title>{translate("New")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>

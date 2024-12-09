@@ -596,6 +596,18 @@
 "Voucher": "Voucher",
 "Missions Order": "Missions Order",
 "New Mission Order": "New Mission Order",
-"Mission Order": "Mission Order"
+"Mission Order": "Mission Order",
+
+"Edit Pharmacy": "Edit Pharmacy",
+"Product": "Product",
+"Purchase Date": "Purchase Date",
+"Select Vehicle": "Select Vehicle",
+"Expiration Date": "Expiration Date",
+"No vehicles available": "No vehicles available",
+"Delete Pharmacy": "Delete Pharmacy",
+"Are you sure you want to delete this pharmacy?": "Are you sure you want to delete this pharmacy?",
+"Emergency Box": "Emergency Box",
+  "New": "New",
+  "Edit": "Edit"
 
 }

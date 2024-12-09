@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useTranslate } from "../LanguageProvider";
 
 interface ModalDeletePharmacyProps {
     show: boolean;
@@ -19,25 +20,26 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
     id_pharmacy,
     onSuccess,
 }) => {
+    // Move the useTranslate hook inside the component
+    const { translate } = useTranslate();
+
     const handleDelete = async () => {
-    
         try {
-            // Updated URL to include both id_pharmacy and id_user
             const response = await fetch(
                 `${backendUrl}/api/geop/deletepharmacy/${id_pharmacy}/${geopuserID}`,
                 {
                     method: "DELETE",
                 }
             );
-    
+
             if (!response.ok) {
-                throw new Error("Error deleting pharmacy.");
+                throw new Error(translate("Error deleting pharmacy."));
             }
-    
+
             const result = await response.json();
             console.log(result);
-    
-            toast.success("Pharmacy deleted successfully!", {
+
+            toast.success(translate("Pharmacy deleted successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -47,15 +49,15 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
                 progress: undefined,
                 theme: "light",
             });
-    
+
             if (onSuccess) {
                 onSuccess();
             }
-    
+
             onHide();
         } catch (error) {
             console.error(error);
-            toast.error("Error deleting pharmacy. Please try again.", {
+            toast.error(translate("Error deleting pharmacy. Please try again."), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -67,21 +69,19 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
             });
         }
     };
-    
+
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
-                <Modal.Title>Delete Pharmacy</Modal.Title>
+                <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                Are you sure you want to delete this pharmacy?
-            </Modal.Body>
+            <Modal.Body>{translate("Are you sure you want to delete this pharmacy?")}</Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
-                    Close
+                    {translate("Close")}
                 </Button>
                 <Button variant="danger" onClick={handleDelete}>
-                    Delete
+                    {translate("Delete")}
                 </Button>
             </Modal.Footer>
         </Modal>

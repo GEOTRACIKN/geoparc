@@ -81,14 +81,14 @@ const ModalShowPharmacy: React.FC<ModalShowPharmacynProps> = ({
     return (
         <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Show Request")}</Modal.Title>
+                <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
             <Form>
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
                     <Form.Group controlId="product_pharmacy">
-                        <Form.Label>{translate("Pharmacy Product")}</Form.Label>
+                        <Form.Label>{translate("Product")}</Form.Label>
                         <Form.Control
                             value={formData.product_pharmacy}
                             readOnly
@@ -133,7 +133,7 @@ const ModalShowPharmacy: React.FC<ModalShowPharmacynProps> = ({
 
                     {/* Champ pour immatriculation_vehicule */}
                     <Form.Group controlId="immatriculation_vehicule">
-                        <Form.Label>{translate("Vehicle Registration")}</Form.Label>
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             value={formData.immatriculation_vehicule}
                             readOnly
