@@ -220,7 +220,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
                     {/* Expiry Date */}
                     <Form.Group controlId="exp_date_pharmacy">
-                        <Form.Label>{translate("Expiry Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_pharmacy}
