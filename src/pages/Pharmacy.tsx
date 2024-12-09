@@ -431,7 +431,7 @@ export function Pharmacy() {
                                             )}
                                           
                                             {selectedColumns.Date && (
-                                                <td>{formatDateToTimestamp(Pharmacy.purch_date_pharmacy)}</td>
+                                                <td>{(Pharmacy.purch_date_pharmacy)}</td>
 
                                             )}
                                              {selectedColumns.Expiration && (

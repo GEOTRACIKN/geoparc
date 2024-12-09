@@ -2,148 +2,220 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../LanguageProvider";
-import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
-import { Pharmacy } from "../../pages/Pharmacy";
 
-interface ModalEditPharmacyProps {
+interface EditPharmacyModalProps {
     show: boolean;
     onHide: () => void;
-    id_pharmacy: number | null;
+    id_pharmacy: number | null; // ID de la pharmacie à modifier
     onSuccess?: () => void;
-
 }
 
+// Définir le type pour un véhicule
 interface Vehicle {
+    id_vehicule: string;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
-
-const ModalEditPharmacy: React.FC<ModalEditPharmacyProps> = ({
+const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     show,
     onHide,
     id_pharmacy,
-    onSuccess
+    onSuccess,
 }) => {
     const [formData, setFormData] = useState({
-    id_pharmacy: "",
-    product_pharmacy: "",
-    purch_date_pharmacy: "",
-    exp_date_pharmacy: "",
-    cost_pharmacy: "",
-    type_pharmacy: "",
-    immatriculation_vehicule: "",
-   
+        id_pharmacy: "",
+        product_pharmacy: "",
+        purch_date_pharmacy: "",
+        exp_date_pharmacy: "",
+        cost_pharmacy: "",
+        type_pharmacy: "",
+        id_vehicule: "",
     });
-    const [vehicles, setVehicles] = useState<string[]>([]); // Store vehicle registrations as strings
 
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
 
-   
-    // Fetch data from API and set form data
-    const fetchPharmacy = async () => {
-        try {
-            const url = `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            if (data.length > 0) {
-                const pharmacy = data[0];
-                setFormData({
-                    id_pharmacy: pharmacy.id_pharmacy,
-                    immatriculation_vehicule: pharmacy.immatriculation_vehicule,
-                    product_pharmacy: pharmacy.product_pharmacy,
-                    purch_date_pharmacy: pharmacy.purch_date_pharmacy,
-                    exp_date_pharmacy: pharmacy.exp_date_pharmacy,
-                    cost_pharmacy: pharmacy.cost_pharmacy,
-                    type_pharmacy: pharmacy.type_pharmacy,
-                   
-                });
-            } else {
-                console.warn('No pharmacy data found for the provided ID.');
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération des données:', error);
-        }
-    };
+    // Charger les données de la pharmacie existante
     useEffect(() => {
-        const fetchData = async () => {
-            if (show) {
-                try {
-                    // Fetch pharmacy details if `show` is true
-                    await fetchPharmacy();
-                } catch (error) {
-                    console.error("Error fetching pharmacy details:", error);
-                }
-            }
-    
-            // Fetch the list of vehicles
+        const fetchPharmacy = async () => {
             try {
+                if (!id_pharmacy) {
+                    console.warn("No pharmacy ID provided");
+                    return;
+                }
+    
                 const response = await fetch(
-                    `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                    `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`
                 );
-                if (!response.ok) throw new Error("Failed to fetch vehicles");
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch pharmacy data. Status: ${response.status}`);
+                }
     
                 const data = await response.json();
+                console.log("API response for pharmacy:", data); // Log pour voir la réponse complète
     
-                if (data.vehicles && Array.isArray(data.vehicles)) {
-                    setVehicles(
-                        data.vehicles.map((vehicle: Vehicle) => vehicle.immatriculation_vehicule)
-                    );
+                // Vérifiez si `data` est un tableau
+                if (Array.isArray(data) && data.length > 0) {
+                    // Prenez le premier élément du tableau
+                    const pharmacyData = data[0];
+    
+                    // Mettez à jour les données du formulaire
+                    setFormData((prev) => ({
+                        ...prev,
+                        ...pharmacyData, // Fusionne les données de la pharmacie avec l'état actuel
+                    }));
+                } else {
+                    console.warn("No pharmacy data found in response.");
+                    toast.warn("No pharmacy data found.", {
+                        position: "bottom-right",
+                        autoClose: 2400,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "light",
+                        transition: Bounce,
+                    });
                 }
             } catch (error) {
-                console.error("Error fetching vehicles:", error);
-                toast.error("Error fetching vehicle registrations", {
+                console.error("Error fetching pharmacy:", error);
+                toast.error("Error fetching pharmacy data.", {
                     position: "bottom-right",
                     autoClose: 2400,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    progress: undefined,
                     theme: "light",
                     transition: Bounce,
                 });
             }
         };
     
-        fetchData();
-    }, [show, geopuserID]); // Run when `show` or `geopuserID` changes
+        fetchPharmacy();
+    }, [id_pharmacy, backendUrl]);
     
     
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            try {
+                if (!geopuserID) {
+                    console.warn("No user ID provided");
+                    return;
+                }
+    
+                const response = await fetch(
+                    `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                );
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch vehicles. Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+    
+                setVehicles(data.vehicles || []);
+            } catch (error) {
+                console.error("Error fetching vehicles:", error);
+                toast.error("Error fetching vehicles.", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        };
+    
+        fetchVehicles();
+    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
+    
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
-        setFormData(prevState => ({
+        setFormData((prevState) => ({
             ...prevState,
             [id]: value,
         }));
     };
 
-
-    const handleUpdate = async () => {
-        try {
-            const url = `${backendUrl}/api/geop/updatepharmacy/${id_pharmacy}`;
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+    const validateForm = () => {
+        if (
+            !formData.product_pharmacy ||
+            !formData.purch_date_pharmacy ||
+            !formData.exp_date_pharmacy ||
+            !formData.cost_pharmacy ||
+            !formData.type_pharmacy ||
+            !formData.id_vehicule
+        ) {
+            toast.error("Please fill out all fields.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
             });
-    
+            return false;
+        }
+
+        const selectedVehicle = vehicles.find(
+            (vehicle) => String(vehicle.id_vehicule) === String(formData.id_vehicule)
+        );
+
+        if (!selectedVehicle) {
+            toast.error("Please select a valid vehicle.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${backendUrl}/api/geop/updatepharmacy/${id_pharmacy}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error("Error updating pharmacy.");
             }
-    
+
             const result = await response.json();
-            console.log('Update successful:', result);
-    
-            // Afficher une notification de succès
+
             toast.success("Pharmacy updated successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -151,20 +223,17 @@ const ModalEditPharmacy: React.FC<ModalEditPharmacyProps> = ({
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
                 theme: "light",
                 transition: Bounce,
-
             });
-        // Rafraîchir les données
-        if (onSuccess) {
-            onSuccess(); // Appel du callback pour rafraîchir le tableau
-        }
-            onHide(); // Fermer la modal après une mise à jour réussie
+
+            if (onSuccess) {
+                onSuccess();
+            }
+
+            onHide();
         } catch (error) {
-            console.error('Erreur lors de la mise à jour des données:', error);
-    
-            // Afficher une notification d'erreur
+            console.error("Error updating pharmacy:", error);
             toast.error("Error updating pharmacy. Please try again.", {
                 position: "bottom-right",
                 autoClose: 2400,
@@ -172,104 +241,80 @@ const ModalEditPharmacy: React.FC<ModalEditPharmacyProps> = ({
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
                 theme: "light",
                 transition: Bounce,
-
             });
         }
     };
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Request")}</Modal.Title>
+                <Modal.Title>{translate("Edit Pharmacy")}</Modal.Title>
             </Modal.Header>
-            <Form>
-                <Modal.Body
-                    style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
-                >
-           
-
-        {/* Champ pour product_pharmacy */}
-        <Form.Group controlId="product_pharmacy">
-            <Form.Label>{translate("Pharmacy Product")}</Form.Label>
-            <Form.Control
-                type="text"
-                placeholder={translate("Enter product")}
-                value={formData.product_pharmacy}
-                onChange={handleChange}
-            />
-        </Form.Group>
-
-        {/* Champ pour purch_date_pharmacy */}
-        <Form.Group controlId="purch_date_pharmacy">
-            <Form.Label>{translate("Purchase Date")}</Form.Label>
-            <Form.Control
-                type="text"
-                value={formData.purch_date_pharmacy}
-                onChange={handleChange}
-            />
-        </Form.Group>
-
-        {/* Champ pour exp_date_pharmacy */}
-        <Form.Group controlId="exp_date_pharmacy">
-            <Form.Label>{translate("Expiration Date")}</Form.Label>
-            <Form.Control
-                type="text"
-                value={formData.exp_date_pharmacy}
-                onChange={handleChange}
-            />
-        </Form.Group>
-
-        {/* Champ pour cost_pharmacy */}
-        <Form.Group controlId="cost_pharmacy">
-            <Form.Label>{translate("Cost")}</Form.Label>
-            <Form.Control
-                type="number"
-                placeholder={translate("Enter cost")}
-                value={formData.cost_pharmacy}
-                onChange={handleChange}
-            />
-        </Form.Group>
-
-        {/* Champ pour type_pharmacy */}
-        <Form.Group controlId="type_pharmacy">
-            <Form.Label>{translate("Type")}</Form.Label>
-            <Form.Control
-                type="text"
-                placeholder={translate("Enter type")}
-                value={formData.type_pharmacy}
-                onChange={handleChange}
-            />
-        </Form.Group>
-
-        {/* Champ pour immatriculation_vehicule */}
-        <Form.Group controlId="immatriculation_vehicule">
-    <Form.Label>{translate("Vehicle Registration")}</Form.Label>
-    <Form.Control
-        as="select"
-        value={formData.immatriculation_vehicule || ""} // Ensure fallback to an empty value
-        onChange={handleChange}
-    >
-        <option value="">{translate("Select Vehicle")}</option>
-        {vehicles.map((vehicle, index) => (
-            <option key={index} value={vehicle}>
-                {vehicle}
-            </option>
-        ))}
-    </Form.Control>
-</Form.Group>
-
-            
-
-                   
+            <Form onSubmit={handleSubmit}>
+                <Modal.Body>
+                    <Form.Group controlId="product_pharmacy">
+                        <Form.Label>{translate("Product")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.product_pharmacy}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="purch_date_pharmacy">
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.purch_date_pharmacy}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="exp_date_pharmacy">
+                        <Form.Label>{translate("Expiry Date")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.exp_date_pharmacy}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="cost_pharmacy">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.cost_pharmacy}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="type_pharmacy">
+                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.type_pharmacy}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="id_vehicule">
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={formData.id_vehicule}
+                            onChange={handleChange}
+                        >
+                            <option value="">{translate("Select Vehicle")}</option>
+                            {vehicles.map((vehicle) => (
+                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
+                                    {vehicle.immatriculation_vehicule}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
-                    <Button variant="primary" onClick={handleUpdate}>
+                    <Button variant="primary" type="submit">
                         {translate("Update")}
                     </Button>
                 </Modal.Footer>
@@ -278,4 +323,4 @@ const ModalEditPharmacy: React.FC<ModalEditPharmacyProps> = ({
     );
 };
 
-export default ModalEditPharmacy;
+export default EditPharmacyModal;
