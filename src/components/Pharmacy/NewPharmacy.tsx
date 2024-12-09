@@ -43,7 +43,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
         const fetchVehicles = async () => {
             try {
                 const response = await fetch(
-                    `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
         
                 if (!response.ok) {

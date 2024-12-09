@@ -110,7 +110,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                 }
     
                 const response = await fetch(
-                    `${backendUrl}/api/geop/pharmacy/vehicule/${geopuserID}`
+                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
     
                 if (!response.ok) {
