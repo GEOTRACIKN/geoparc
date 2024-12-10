@@ -3,7 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../LanguageProvider";
 import { Bounce, toast } from "react-toastify";
-import axios from "axios";
+import axios, { AxiosError } from 'axios';
+import dayjs from "dayjs"; 
 
 interface EditPharmacyModalProps {
     show: boolean;
@@ -48,36 +49,70 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     };
 
     // Charger les données de la pharmacie existante
+
     useEffect(() => {
+        // Vérifie si l'id_pharmacy est valide avant de faire l'appel API
+        if (!id_pharmacy) {
+            console.error("id_pharmacy is invalid");
+            return;
+        }
+    
         const fetchPharmacy = async () => {
             try {
+                // Logge l'URL de l'API pour vérifier qu'elle est correcte
+                console.log("URL de l'API :", `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`);
+    
                 const response = await axios.get(`${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`);
                 const data = response.data;
-        
-                console.log("API response for pharmacy:", data);  // Ensure it's the right structure
-        
+    
+                // Logge les données reçues pour s'assurer que tout est bien là
+                console.log("Données reçues : ", JSON.stringify(data, null, 2));
+    
                 if (!data || !data.id_pharmacy) {
-                    console.warn("No pharmacy data found in response");
                     toast.error("Pharmacy data not found.");
                     return;
                 }
-        
-                // If valid data, update form data
+    
+                // Parse et formate les dates, en vérifiant leur validité
+                const parsedPurchDate = dayjs(data.purch_date_pharmacy, "DD/MM/YYYY");
+                const parsedExpDate = dayjs(data.exp_date_pharmacy, "DD/MM/YYYY");
+    
+                console.log("purch_date_pharmacy parsed:", parsedPurchDate.isValid(), parsedPurchDate);
+                console.log("exp_date_pharmacy parsed:", parsedExpDate.isValid(), parsedExpDate);
+    
+                const formattedData = {
+                    ...data,
+                    purch_date_pharmacy: parsedPurchDate.isValid()
+                        ? parsedPurchDate.format("YYYY-MM-DD")
+                        : "", // Si la date est invalide, on met une chaîne vide
+                    exp_date_pharmacy: parsedExpDate.isValid()
+                        ? parsedExpDate.format("YYYY-MM-DD")
+                        : "", // Idem pour la date d'expiration
+                };
+    
+                // Logge les données formatées pour vérifier
+                console.log("Données formatées :", formattedData);
+    
                 setFormData((prev) => ({
                     ...prev,
-                    product_pharmacy: data.product_pharmacy,
-                    purch_date_pharmacy: formatDate(data.purch_date_pharmacy),  // Format date before setting it
-                    exp_date_pharmacy: formatDate(data.exp_date_pharmacy),  // Format date before setting it
-                    cost_pharmacy: data.cost_pharmacy,
-                    type_pharmacy: data.type_pharmacy,
-                    id_vehicule: data.id_vehicule,
+                    ...formattedData,
                 }));
-        
-            } catch (error) {
-               
+            } catch (error: unknown) {  // Typage explicite de l'erreur ici
+                console.error("Error fetching pharmacy data:", error);
+    
+                // Vérifie et log l'erreur en cas de problème
+                if (error instanceof AxiosError) {
+                    console.error("Réponse du serveur:", error.response?.data);
+                    console.error("Statut:", error.response?.status);
+                } else if (error instanceof Error) {
+                    console.error("Erreur de requête:", error.message);
+                } else {
+                    console.error("Erreur inconnue:", error);
+                }
+    
+                toast.error("Error fetching pharmacy data.");
             }
         };
-        
     
         fetchPharmacy();
     }, [id_pharmacy, backendUrl]);
