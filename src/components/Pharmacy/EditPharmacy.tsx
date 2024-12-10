@@ -74,8 +74,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                 }));
         
             } catch (error) {
-                console.error("Error fetching pharmacy data:", error);
-                toast.error("Error fetching pharmacy data.");
+               
             }
         };
         
