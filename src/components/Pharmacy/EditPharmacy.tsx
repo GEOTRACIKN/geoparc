@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../LanguageProvider";
 import { Bounce, toast } from "react-toastify";
+import axios from "axios";
 
 interface EditPharmacyModalProps {
     show: boolean;
@@ -38,64 +39,46 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
+    const formatDate = (date: string) => {
+        const parsedDate = new Date(date);
+        const year = parsedDate.getFullYear();
+        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(parsedDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     // Charger les données de la pharmacie existante
     useEffect(() => {
         const fetchPharmacy = async () => {
             try {
-                if (!id_pharmacy) {
-                    console.warn("No pharmacy ID provided");
+                const response = await axios.get(`${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`);
+                const data = response.data;
+        
+                console.log("API response for pharmacy:", data);  // Ensure it's the right structure
+        
+                if (!data || !data.id_pharmacy) {
+                    console.warn("No pharmacy data found in response");
+                    toast.error("Pharmacy data not found.");
                     return;
                 }
-    
-                const response = await fetch(
-                    `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`
-                );
-    
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch pharmacy data. Status: ${response.status}`);
-                }
-    
-                const data = await response.json();
-                console.log("API response for pharmacy:", data); // Log pour voir la réponse complète
-    
-                // Vérifiez si `data` est un tableau
-                if (Array.isArray(data) && data.length > 0) {
-                    // Prenez le premier élément du tableau
-                    const pharmacyData = data[0];
-    
-                    // Mettez à jour les données du formulaire
-                    setFormData((prev) => ({
-                        ...prev,
-                        ...pharmacyData, // Fusionne les données de la pharmacie avec l'état actuel
-                    }));
-                } else {
-                    console.warn("No pharmacy data found in response.");
-                    toast.warn("No pharmacy data found.", {
-                        position: "bottom-right",
-                        autoClose: 2400,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        theme: "light",
-                        transition: Bounce,
-                    });
-                }
+        
+                // If valid data, update form data
+                setFormData((prev) => ({
+                    ...prev,
+                    product_pharmacy: data.product_pharmacy,
+                    purch_date_pharmacy: formatDate(data.purch_date_pharmacy),  // Format date before setting it
+                    exp_date_pharmacy: formatDate(data.exp_date_pharmacy),  // Format date before setting it
+                    cost_pharmacy: data.cost_pharmacy,
+                    type_pharmacy: data.type_pharmacy,
+                    id_vehicule: data.id_vehicule,
+                }));
+        
             } catch (error) {
-                console.error("Error fetching pharmacy:", error);
-                toast.error("Error fetching pharmacy data.", {
-                    position: "bottom-right",
-                    autoClose: 2400,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    theme: "light",
-                    transition: Bounce,
-                });
+                console.error("Error fetching pharmacy data:", error);
+                toast.error("Error fetching pharmacy data.");
             }
         };
+        
     
         fetchPharmacy();
     }, [id_pharmacy, backendUrl]);

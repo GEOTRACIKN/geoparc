@@ -430,11 +430,11 @@ export function Pharmacy() {
                                                 <td>{Pharmacy.id_pharmacy}</td>
                                             )}
                                           
-                                            {selectedColumns.Date && (
+                                            {selectedColumns["Purchase Date"] && (
                                                 <td>{(Pharmacy.purch_date_pharmacy)}</td>
 
                                             )}
-                                             {selectedColumns.Expiration && (
+                                             {selectedColumns["Expiration Date"] && (
                                                 <td>{Pharmacy.exp_date_pharmacy}</td>
                                             )}
                                             

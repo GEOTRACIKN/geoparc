@@ -493,7 +493,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                       >
                         <i className="las la-briefcase-medical"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
-                          {translate("Emergency box management")}
+                          {translate("Emergency Box")}
                         </span>
                       </Nav.Link>
                     </li>
