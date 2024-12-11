@@ -475,7 +475,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/extinguisher"
+                        to="/fire"
                         className="svg-icon"
                         as={NavLink}
                       >

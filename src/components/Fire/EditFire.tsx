@@ -1,0 +1,353 @@
+import React, { useState, useEffect } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useTranslate } from "../LanguageProvider";
+import { Bounce, toast } from "react-toastify";
+import axios, { AxiosError } from 'axios';
+import dayjs from "dayjs"; 
+
+interface EditPharmacyModalProps {
+    show: boolean;
+    onHide: () => void;
+    id_fire: number | null; // ID de la pharmacie à modifier
+    onSuccess?: () => void;
+}
+
+// Définir le type pour un véhicule
+interface Vehicle {
+    id_vehicule: string;
+    immatriculation_vehicule: string;
+}
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
+
+const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
+    show,
+    onHide,
+    id_fire,
+    onSuccess,
+}) => {
+    const [formData, setFormData] = useState({
+        id_fire: "",
+        volume_fire: "",
+        location_fire: "",
+        purch_date_fire: "",
+        exp_date_fire: "",
+        cost_fire: "",
+        type_fire: "",
+        id_vehicule: "",
+    });
+
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const { translate } = useTranslate();
+    const formatDate = (date: string) => {
+        const parsedDate = new Date(date);
+        const year = parsedDate.getFullYear();
+        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(parsedDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Charger les données de la pharmacie existante
+
+    useEffect(() => {
+        // Vérifie si l'id_fire est valide avant de faire l'appel API
+        if (!id_fire) {
+            console.error("id_fire is invalid");
+            return;
+        }
+    
+        const fetchPharmacy = async () => {
+            try {
+                // Logge l'URL de l'API pour vérifier qu'elle est correcte
+                console.log("URL de l'API :", `${backendUrl}/api/geop/showfire/${id_fire}`);
+    
+                const response = await axios.get(`${backendUrl}/api/geop/showfire/${id_fire}`);
+                const data = response.data;
+    
+                // Logge les données reçues pour s'assurer que tout est bien là
+                console.log("Données reçues : ", JSON.stringify(data, null, 2));
+    
+                if (!data || !data.id_fire) {
+                    toast.error("Pharmacy data not found.");
+                    return;
+                }
+    
+                // Parse et formate les dates, en vérifiant leur validité
+                const parsedPurchDate = dayjs(data.purch_date_fire, "DD/MM/YYYY");
+                const parsedExpDate = dayjs(data.exp_date_fire, "DD/MM/YYYY");
+    
+                console.log("purch_date_fire parsed:", parsedPurchDate.isValid(), parsedPurchDate);
+                console.log("exp_date_fire parsed:", parsedExpDate.isValid(), parsedExpDate);
+    
+                const formattedData = {
+                    ...data,
+                    purch_date_fire: parsedPurchDate.isValid()
+                        ? parsedPurchDate.format("YYYY-MM-DD")
+                        : "", // Si la date est invalide, on met une chaîne vide
+                    exp_date_fire: parsedExpDate.isValid()
+                        ? parsedExpDate.format("YYYY-MM-DD")
+                        : "", // Idem pour la date d'expiration
+                };
+    
+                // Logge les données formatées pour vérifier
+                console.log("Données formatées :", formattedData);
+    
+                setFormData((prev) => ({
+                    ...prev,
+                    ...formattedData,
+                }));
+            } catch (error: unknown) {  // Typage explicite de l'erreur ici
+                console.error("Error fetching fire data:", error);
+    
+                // Vérifie et log l'erreur en cas de problème
+                if (error instanceof AxiosError) {
+                    console.error("Réponse du serveur:", error.response?.data);
+                    console.error("Statut:", error.response?.status);
+                } else if (error instanceof Error) {
+                    console.error("Erreur de requête:", error.message);
+                } else {
+                    console.error("Erreur inconnue:", error);
+                }
+    
+                toast.error("Error fetching fire data.");
+            }
+        };
+    
+        fetchPharmacy();
+    }, [id_fire, backendUrl]);
+    
+    
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            try {
+                if (!geopuserID) {
+                    console.warn("No user ID provided");
+                    return;
+                }
+    
+                const response = await fetch(
+                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
+                );
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch vehicles. Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+    
+                setVehicles(data.vehicles || []);
+            } catch (error) {
+                console.error("Error fetching vehicles:", error);
+                toast.error("Error fetching vehicles.", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        };
+    
+        fetchVehicles();
+    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
+    
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    };
+
+    const validateForm = () => {
+        if (
+            !formData.volume_fire ||
+            !formData.location_fire ||
+            !formData.purch_date_fire ||
+            !formData.exp_date_fire ||
+            !formData.cost_fire ||
+            !formData.type_fire ||
+            !formData.id_vehicule
+        ) {
+            toast.error("Please fill out all fields.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+
+        const selectedVehicle = vehicles.find(
+            (vehicle) => String(vehicle.id_vehicule) === String(formData.id_vehicule)
+        );
+
+        if (!selectedVehicle) {
+            toast.error("Please select a valid vehicle.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${backendUrl}/api/geop/updatefire/${id_fire}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Error updating fire.");
+            }
+
+            const result = await response.json();
+
+            toast.success("Pharmacy updated successfully!", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+
+            if (onSuccess) {
+                onSuccess();
+            }
+
+            onHide();
+        } catch (error) {
+            console.error("Error updating fire:", error);
+            toast.error("Error updating fire. Please try again.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+        }
+    };
+
+    return (
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
+            </Modal.Header>
+            <Form onSubmit={handleSubmit}>
+                <Modal.Body>
+                    <Form.Group controlId="volume_fire">
+                        <Form.Label>{translate("Volume")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.volume_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="location_fire">
+                        <Form.Label>{translate("Location")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.location_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="purch_date_fire">
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.purch_date_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="exp_date_fire">
+                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.exp_date_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="cost_fire">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.cost_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="type_fire">
+                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.type_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="id_vehicule">
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={formData.id_vehicule}
+                            onChange={handleChange}
+                        >
+                            <option value="">{translate("Select Vehicle")}</option>
+                            {vehicles.map((vehicle) => (
+                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
+                                    {vehicle.immatriculation_vehicule}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={onHide}>
+                        {translate("Close")}
+                    </Button>
+                    <Button variant="primary" type="submit">
+                        {translate("Update")}
+                    </Button>
+                </Modal.Footer>
+            </Form>
+        </Modal>
+    );
+};
+
+export default EditPharmacyModal;

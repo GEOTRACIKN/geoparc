@@ -42,6 +42,8 @@ import { MissionOrderManage } from "./pages/MissionOrderManage";
 import { MissionReport } from "./pages/MissionReport";
 import { MissionReportManage } from "./pages/MissionReportManage";
 
+import { Fire } from "./pages/Fire";
+
 
 
 import axios from "axios";
@@ -154,6 +156,8 @@ function App() {
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
+          <Route path="/fire" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
+
 
 
 
