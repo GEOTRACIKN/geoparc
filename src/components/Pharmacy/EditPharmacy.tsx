@@ -74,22 +74,37 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                 }
     
                 // Parse et formate les dates, en vérifiant leur validité
-                const parsedPurchDate = dayjs(data.purch_date_pharmacy, "DD/MM/YYYY");
-                const parsedExpDate = dayjs(data.exp_date_pharmacy, "DD/MM/YYYY");
-    
-                console.log("purch_date_pharmacy parsed:", parsedPurchDate.isValid(), parsedPurchDate);
-                console.log("exp_date_pharmacy parsed:", parsedExpDate.isValid(), parsedExpDate);
-    
+                const toDateInputFormat = (date: string) => {
+                    const [day, month, year] = date.split('/');
+                    return `${year}-${month}-${day}`;
+                };
+                
+                const fromDateInputFormat = (date: string) => {
+                    const [year, month, day] = date.split('-');
+                    return `${day}/${month}/${year}`;
+                };
+                
+                // Lors de la récupération des données
                 const formattedData = {
                     ...data,
-                    purch_date_pharmacy: parsedPurchDate.isValid()
-                        ? parsedPurchDate.format("YYYY-MM-DD")
-                        : "", // Si la date est invalide, on met une chaîne vide
-                    exp_date_pharmacy: parsedExpDate.isValid()
-                        ? parsedExpDate.format("YYYY-MM-DD")
-                        : "", // Idem pour la date d'expiration
+                    purch_date_pharmacy: toDateInputFormat(data.purch_date_pharmacy),
+                    exp_date_pharmacy: toDateInputFormat(data.exp_date_pharmacy),
                 };
-    
+                
+                // Lors de l’envoi des données au backend
+                const payload = {
+                    ...formData,
+                    purch_date_pharmacy: fromDateInputFormat(formData.purch_date_pharmacy),
+                    exp_date_pharmacy: fromDateInputFormat(formData.exp_date_pharmacy),
+                };
+                
+                console.log("Données formatées :", formattedData);
+                
+                // Mettre à jour le state avec les dates formatées
+                setFormData((prev) => ({
+                    ...prev,
+                    ...formattedData,
+                }));
                 // Logge les données formatées pour vérifier
                 console.log("Données formatées :", formattedData);
     

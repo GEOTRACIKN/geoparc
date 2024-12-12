@@ -5,8 +5,9 @@ import { useTranslate } from "../LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
 import dayjs from "dayjs"; 
+import moment from "moment";
 
-interface EditPharmacyModalProps {
+interface EditFireModalProps {
     show: boolean;
     onHide: () => void;
     id_fire: number | null; // ID de la pharmacie à modifier
@@ -22,7 +23,7 @@ interface Vehicle {
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
-const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
+const EditFireModal: React.FC<EditFireModalProps> = ({
     show,
     onHide,
     id_fire,
@@ -41,13 +42,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
-    const formatDate = (date: string) => {
-        const parsedDate = new Date(date);
-        const year = parsedDate.getFullYear();
-        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(parsedDate.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+   
 
     // Charger les données de la pharmacie existante
 
@@ -58,7 +53,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
             return;
         }
     
-        const fetchPharmacy = async () => {
+        const fetchFire = async () => {
             try {
                 // Logge l'URL de l'API pour vérifier qu'elle est correcte
                 console.log("URL de l'API :", `${backendUrl}/api/geop/showfire/${id_fire}`);
@@ -70,34 +65,45 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                 console.log("Données reçues : ", JSON.stringify(data, null, 2));
     
                 if (!data || !data.id_fire) {
-                    toast.error("Pharmacy data not found.");
+                    toast.error("Fire data not found.");
                     return;
                 }
     
-                // Parse et formate les dates, en vérifiant leur validité
-                const parsedPurchDate = dayjs(data.purch_date_fire, "DD/MM/YYYY");
-                const parsedExpDate = dayjs(data.exp_date_fire, "DD/MM/YYYY");
-    
-                console.log("purch_date_fire parsed:", parsedPurchDate.isValid(), parsedPurchDate);
-                console.log("exp_date_fire parsed:", parsedExpDate.isValid(), parsedExpDate);
-    
+                const toDateInputFormat = (date: string) => {
+                    const [day, month, year] = date.split('/');
+                    return `${year}-${month}-${day}`;
+                };
+                
+                const fromDateInputFormat = (date: string) => {
+                    const [year, month, day] = date.split('-');
+                    return `${day}/${month}/${year}`;
+                };
+                
+                // Lors de la récupération des données
                 const formattedData = {
                     ...data,
-                    purch_date_fire: parsedPurchDate.isValid()
-                        ? parsedPurchDate.format("YYYY-MM-DD")
-                        : "", // Si la date est invalide, on met une chaîne vide
-                    exp_date_fire: parsedExpDate.isValid()
-                        ? parsedExpDate.format("YYYY-MM-DD")
-                        : "", // Idem pour la date d'expiration
+                    purch_date_fire: toDateInputFormat(data.purch_date_fire),
+                    exp_date_fire: toDateInputFormat(data.exp_date_fire),
                 };
-    
-                // Logge les données formatées pour vérifier
+                
+                // Lors de l’envoi des données au backend
+                const payload = {
+                    ...formData,
+                    purch_date_fire: fromDateInputFormat(formData.purch_date_fire),
+                    exp_date_fire: fromDateInputFormat(formData.exp_date_fire),
+                };
+                
                 console.log("Données formatées :", formattedData);
-    
+                
+                // Mettre à jour le state avec les dates formatées
                 setFormData((prev) => ({
                     ...prev,
                     ...formattedData,
                 }));
+                
+                
+                
+                
             } catch (error: unknown) {  // Typage explicite de l'erreur ici
                 console.error("Error fetching fire data:", error);
     
@@ -115,7 +121,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
             }
         };
     
-        fetchPharmacy();
+        fetchFire();
     }, [id_fire, backendUrl]);
     
     
@@ -235,7 +241,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Pharmacy updated successfully!", {
+            toast.success("Fire updated successfully!", {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -350,4 +356,4 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     );
 };
 
-export default EditPharmacyModal;
+export default EditFireModal;
