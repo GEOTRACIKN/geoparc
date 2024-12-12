@@ -605,9 +605,11 @@
 "Expiration Date": "Expiration Date",
 "No vehicles available": "No vehicles available",
 "Delete Pharmacy": "Delete Pharmacy",
-"Are you sure you want to delete this pharmacy?": "Are you sure you want to delete this pharmacy?",
+"Are you sure you want to delete?": "Are you sure you want to delete?",
 "Emergency Box": "Emergency Box",
-  "New": "New",
-  "Edit": "Edit"
+"New": "New",
+"Edit": "Edit",
+
+"Location": "Location"
 
 }

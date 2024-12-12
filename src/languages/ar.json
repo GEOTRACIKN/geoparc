@@ -624,8 +624,11 @@
 "Expiration Date": "تاريخ الانتهاء",
 "No vehicles available": "لا توجد مركبات متوفرة",
 "Delete Pharmacy": "حذف الصيدلية",
-"Are you sure you want to delete this pharmacy?": "هل أنت متأكد أنك تريد حذف هذه الصيدلية؟",
+"Are you sure you want to delete?": "هل أنت متأكد أنك تريد حذف؟",
 "Emergency Box": "صندوق الطوارئ",
 "New": "جديد",
-"Edit": "تعديل"
+"Edit": "تعديل",
+
+"Location": "الموقع",
+"Volume": "حجم"
 }

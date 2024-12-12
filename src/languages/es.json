@@ -614,10 +614,13 @@
   "Expiration Date": "Fecha de expiración",
   "No vehicles available": "No hay vehículos disponibles",
   "Delete Pharmacy": "Eliminar farmacia",
-  "Are you sure you want to delete this pharmacy?": "¿Está seguro de que desea eliminar esta farmacia?",
+  "Are you sure you want to delete?": "¿Está seguro de que desea eliminar?",
   "Emergency Box": "Caja de emergencia",
   "New": "Nuevo",
-  "Edit": "Editar"
+  "Edit": "Editar",
+
+  "Location": "ubicación",
+  "Volume": "Volumen"
 
 
 

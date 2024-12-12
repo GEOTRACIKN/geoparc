@@ -75,7 +75,7 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>{translate("Are you sure you want to delete this pharmacy?")}</Modal.Body>
+            <Modal.Body>{translate("Are you sure you want to delete?")}</Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
                     {translate("Close")}
