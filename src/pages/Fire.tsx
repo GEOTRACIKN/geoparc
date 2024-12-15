@@ -181,17 +181,17 @@ export function Fire() {
                 setType(1);
                     break;
             case translate("Location"):
-                setType(1);
+                setType(2);
                     break;
        
             case translate("Vehicle"):
-                setType(2);
-                break;
-            case translate("Expiration Date"):
                 setType(3);
                 break;
-            case translate("Cost"):
+            case translate("Expiration Date"):
                 setType(4);
+                break;
+            case translate("Cost"):
+                setType(5);
                 break;
          
             case translate("Type"):
