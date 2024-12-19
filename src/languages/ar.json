@@ -630,5 +630,8 @@
 "Edit": "تعديل",
 
 "Location": "الموقع",
-"Volume": "حجم"
+"Volume": "حجم",
+"Start Date": "تاريخ البدء",
+"End Date": "تاريخ الانتهاء",
+"Training": "التكوين"
 }

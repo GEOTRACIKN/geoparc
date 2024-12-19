@@ -620,7 +620,10 @@
   "Edit": "Editar",
 
   "Location": "ubicación",
-  "Volume": "Volumen"
+  "Volume": "Volumen",
+  "Start Date": "Fecha de inicio",
+  "End Date": "Fecha de fin",
+  "Training": "Formación"
 
 
 

@@ -47,7 +47,7 @@ export function Training() {
 
     const initialColumns = {
         ID: true,
-        Nom: true,
+        Name: true,
         Type: true,
        "Start Date": true, 
        "End Date": true,
@@ -169,7 +169,7 @@ export function Training() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Nom"):
+            case translate("Name"):
                 setType(1);
                     break;
             case translate("Start Date"):
@@ -242,7 +242,7 @@ export function Training() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Nom")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Name")}</Dropdown.Item>
 
 
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
@@ -333,12 +333,12 @@ export function Training() {
                            
                        
                             
-                             {selectedColumns.Nom && (
+                             {selectedColumns.Name && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("nom_training")}
                                 >
-                                    {translate("Nom")}
+                                    {translate("Name")}
                                 </th>
                             )}
                            
@@ -368,11 +368,7 @@ export function Training() {
                                 </th>
                             )}
                             
-                         
-                            
-                             
-                            
-                         
+                    
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -408,7 +404,7 @@ export function Training() {
                                           
                                            
                                             
-                                              {selectedColumns.Nom && (
+                                              {selectedColumns.Name && (
                                                 <td>{Training.nom_training}</td>
                                             )}
 

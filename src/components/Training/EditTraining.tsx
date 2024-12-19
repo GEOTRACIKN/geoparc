@@ -208,9 +208,9 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <Form.Group controlId="nom_training">
-                        <Form.Label>{translate("Nom")}</Form.Label>
+                        <Form.Label>{translate("Name")}</Form.Label>
                         <Form.Control
-                            type="number"
+                            type="text"
                             value={formData.nom_training}
                             onChange={handleChange}
                         />
