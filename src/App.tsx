@@ -21,6 +21,10 @@ import { Role } from "./pages/Role";
 import { Permission } from "./pages/Permission";
 import { Drivers } from "./pages/Drivers";
 import { Contrat } from "./pages/Contrat";
+import { Training } from "./pages/Training";
+
+
+
 import { Warnings } from "./pages/Warnings";
 import { Violations } from "./pages/Violations";
 import { Fuel_consumption } from "./pages/Fuel_consumption";
@@ -134,6 +138,9 @@ function App() {
           <Route path="/driver/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
+          <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
+
+
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violations" element={<DashboardLayout>{<Violations />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
