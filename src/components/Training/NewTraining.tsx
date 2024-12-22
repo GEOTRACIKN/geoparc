@@ -136,9 +136,9 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    {/* Nom */}
+                    {/* Name */}
                     <Form.Group controlId="nom_training">
-                        <Form.Label>{translate("Nom")}</Form.Label>
+                        <Form.Label>{translate("Name")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.nom_training}
@@ -149,7 +149,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
                   
                     {/* Purchase Date */}
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
@@ -159,7 +159,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
                     {/* Expiry Date */}
                     <Form.Group controlId="date_end_training">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("End Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_end_training}

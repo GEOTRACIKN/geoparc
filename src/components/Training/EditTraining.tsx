@@ -207,6 +207,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
+                    
                     <Form.Group controlId="nom_training">
                         <Form.Label>{translate("Name")}</Form.Label>
                         <Form.Control
@@ -216,16 +217,19 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                         />
                     </Form.Group>
                    
+
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
                             onChange={handleChange}
                         />
                     </Form.Group>
+
+
                     <Form.Group controlId="date_end_training">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("End Date")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_end_training}

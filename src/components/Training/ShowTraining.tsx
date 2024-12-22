@@ -94,7 +94,7 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
                     <Form.Group controlId="nom_training">
-                        <Form.Label>{translate("Nom")}</Form.Label>
+                        <Form.Label>{translate("Name")}</Form.Label>
                         <Form.Control
                             value={formData.nom_training}
                             readOnly

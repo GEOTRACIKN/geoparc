@@ -244,7 +244,6 @@ export function Training() {
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Name")}</Dropdown.Item>
 
-
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Start Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("End Date")}</Dropdown.Item>
