@@ -178,7 +178,7 @@ function App() {
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
-          <Route path="/fire" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
+          <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
 
 
 

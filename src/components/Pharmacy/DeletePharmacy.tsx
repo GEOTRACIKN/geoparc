@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 
 interface ModalDeletePharmacyProps {
     show: boolean;

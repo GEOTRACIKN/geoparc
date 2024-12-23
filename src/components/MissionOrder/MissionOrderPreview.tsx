@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
-import { useTranslate } from "../LanguageProvider";
+import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";

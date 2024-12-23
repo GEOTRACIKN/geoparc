@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewTraining from "../components/Training/NewTraining";
 
 import ModalShowTraining from "../components/Training/ShowTraining";

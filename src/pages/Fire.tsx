@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
-import { useTranslate } from "../components/LanguageProvider";
+import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewFire from "../components/Fire/NewFire";
 
 import ModalShowFire from "../components/Fire/ShowFire";
@@ -22,8 +22,7 @@ interface Fire {
     cost_fire: string;
     type_fire: string;
     immatriculation_vehicule: string;
-   
-    
+      
 }
 
 
