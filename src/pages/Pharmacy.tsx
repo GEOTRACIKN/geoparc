@@ -5,13 +5,10 @@ import { Link } from "react-router-dom";
 import { useTranslate } from "../components/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalNewPharmacy from "../components/Pharmacy/NewPharmacy";
-
 import ModalShowPharmacy from "../components/Pharmacy/ShowPharmacy";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPharmacy from "../components/Pharmacy/EditPharmacy";
 import ModalDeletePharmacy from "../components/Pharmacy/DeletePharmacy";
-
-
 
 interface Pharmacy {
     id_pharmacy: number;
@@ -20,15 +17,11 @@ interface Pharmacy {
     exp_date_pharmacy: string;
     cost_pharmacy: string;
     type_pharmacy: string;
-    immatriculation_vehicule: string;
-   
-    
+    immatriculation_vehicule: string;  
 }
-
 
 export function Pharmacy() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
     const { translate } = useTranslate();
     const [list_pharmacy, setPharmacy] = useState<Pharmacy[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
@@ -41,14 +34,9 @@ export function Pharmacy() {
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
-
-    
-    
     const [selectedPharmacyId, setSelectedPharmacyId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
-
-
 
     const initialColumns = {
         ID: true,
@@ -60,17 +48,12 @@ export function Pharmacy() {
         Cost: true,
     
     };
-    
-    
-
     // Load selected columns from localStorage or use initial state
     const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
     };
-
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
-
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
@@ -79,46 +62,33 @@ export function Pharmacy() {
         setSelectedColumns(updatedColumns);
         localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
     };
-
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
         getPharmacy();
     };
-    
-
     const [showNewPharmacyModal, setShowNewPharmacyModal] = useState(false);
     const [showEditPharmacyModal, setShowEditPharmacyModal] = useState(false);
     const [showShowPharmacyModal, setShowShowPharmacyModal] = useState(false);
     const [showDeletePharmacyModal, setShowDeletePharmacyModal] = useState(false);
-
-
     const handleShowNewPharmacyModal = () => setShowNewPharmacyModal(true);
     const handleCloseNewPharmacyModal = () => setShowNewPharmacyModal(false);
-
-    
     const handleDeletePharmacyModal = (id: number) => {
         setSelectedPharmacyId(id);
         setShowDeletePharmacyModal(true);
     };
     const handleCloseDeletePharmacyModal = () => setShowDeletePharmacyModal(false);
-
-
-    
-
     const handleEditPharmacyModal = (id: number) => {
         setSelectedPharmacyId(id);
         setShowEditPharmacyModal(true);
     };
     const handleCloseEditPharmacyModal = () => setShowEditPharmacyModal(false);
-
     const handleShowShowPharmacyModal = (id: number) => {
         setSelectedPharmacyId(id);
         setShowShowPharmacyModal(true);
     };
     const handleCloseShowPharmacyModal = () => setShowShowPharmacyModal(false);
-
     const getCountPharmacy = async () => {
         try {
             setLoading(true);
@@ -138,7 +108,6 @@ export function Pharmacy() {
         }
     };
 
-
     const getPharmacy = async () => {
         try {
             const response = await fetch(
@@ -147,8 +116,6 @@ export function Pharmacy() {
 
             const data = await response.json();
             console.log("Fetched data:", data);
-
-
             setPharmacy(data);
             console.log("Updated pharmacy list:", data);
         } catch (error) {
@@ -160,26 +127,19 @@ export function Pharmacy() {
     };
     useEffect(() => {
         getCountPharmacy();
-        
         getPharmacy();
     }, [currentPage, limit, search, type, column, sort]);
    
-    
-
-
-
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
-
         switch (selectedValue) {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Product"):
+            case translate("Name"):
                 setType(1);
                     break;
-       
-            case translate("Vehicle"):
+            case translate("Type"):
                 setType(2);
                 break;
             case translate("Expiration Date"):
@@ -188,11 +148,9 @@ export function Pharmacy() {
             case translate("Cost"):
                 setType(4);
                 break;
-         
             case translate("Type"):
                 setType(6);
-                break;
-                       
+                break;            
             default:
                 console.log("Unknown selection");
                 break;
@@ -205,7 +163,6 @@ export function Pharmacy() {
         setSearch(event.target.value);
         setCurrentPage(1);
     };
-
     const handleSelectChange = (event: any) => {
         const newValue = event.target.value;
         setLimit(parseInt(newValue));
@@ -214,12 +171,10 @@ export function Pharmacy() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-
     const refreshData = () => {
         getCountPharmacy();
         getPharmacy();
     };
-
 
     return (
         <>
@@ -251,13 +206,10 @@ export function Pharmacy() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Product")}</Dropdown.Item>
-
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Expiration Date")}</Dropdown.Item>
-
-                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
-                              
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -329,7 +281,6 @@ export function Pharmacy() {
                                     />
                                 </div>
                             </th>
-                         
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
@@ -354,7 +305,6 @@ export function Pharmacy() {
                                     {translate("Cost")}
                                 </th>
                             )}
-                            
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -363,7 +313,6 @@ export function Pharmacy() {
                                     {translate("Type")}
                                 </th>
                             )}
-                            
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
@@ -372,7 +321,6 @@ export function Pharmacy() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
-
                             {selectedColumns["Purchase Date"] && (
                                 <th
                                     className="sorting "
@@ -389,10 +337,6 @@ export function Pharmacy() {
                                     {translate("Expiration Date")}
                                 </th>
                             )}
-                            
-                             
-                            
-                         
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -417,7 +361,6 @@ export function Pharmacy() {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
-                                           
                                             />
                                         </div>
                                     </td>

@@ -36,27 +36,17 @@ export function Training() {
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
-
-    
-    
     const [selectedTrainingId, setSelectedTrainingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
-
-
-
     const initialColumns = {
         ID: true,
         Name: true,
         Type: true,
        "Start Date": true, 
        "End Date": true,
-       
-    
     };
     
-    
-
     // Load selected columns from localStorage or use initial state
     const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
@@ -64,7 +54,6 @@ export function Training() {
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
-
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
@@ -80,39 +69,27 @@ export function Training() {
         setSort(newSortOrder);
         getTraining();
     };
-    
-
     const [showNewTrainingModal, setShowNewTrainingModal] = useState(false);
     const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
     const [showShowTrainingModal, setShowShowTrainingModal] = useState(false);
     const [showDeleteTrainingModal, setShowDeleteTrainingModal] = useState(false);
-
-
     const handleShowNewTrainingModal = () => setShowNewTrainingModal(true);
     const handleCloseNewTrainingModal = () => setShowNewTrainingModal(false);
-
-    
     const handleDeleteTrainingModal = (id: number) => {
         setSelectedTrainingId(id);
         setShowDeleteTrainingModal(true);
     };
     const handleCloseDeleteTrainingModal = () => setShowDeleteTrainingModal(false);
-
-
-    
-
     const handleEditTrainingModal = (id: number) => {
         setSelectedTrainingId(id);
         setShowEditTrainingModal(true);
     };
     const handleCloseEditTrainingModal = () => setShowEditTrainingModal(false);
-
     const handleShowShowTrainingModal = (id: number) => {
         setSelectedTrainingId(id);
         setShowShowTrainingModal(true);
     };
     const handleCloseShowTrainingModal = () => setShowShowTrainingModal(false);
-
     const getCountTraining = async () => {
         try {
             setLoading(true);
@@ -120,7 +97,6 @@ export function Training() {
                 `${backendUrl}/api/geop/training/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-
             // Assurez-vous que result est bien un nombre
             setTotal(result); // Accède directement au nombre
             setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
@@ -132,7 +108,6 @@ export function Training() {
         }
     };
 
-
     const getTraining = async () => {
         try {
             const response = await fetch(
@@ -141,8 +116,6 @@ export function Training() {
 
             const data = await response.json();
             console.log("Fetched data:", data);
-
-
             setTraining(data);
             console.log("Updated training list:", data);
         } catch (error) {
@@ -154,14 +127,9 @@ export function Training() {
     };
     useEffect(() => {
         getCountTraining();
-        
         getTraining();
     }, [currentPage, limit, search, type, column, sort]);
    
-    
-
-
-
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
 
@@ -172,18 +140,15 @@ export function Training() {
             case translate("Name"):
                 setType(1);
                     break;
-            case translate("Start Date"):
+            case translate("Type"):
                 setType(2);
                     break;
-            case translate("Type"):
+            case translate("Start Date"):
                 setType(3);
                 break;
             case translate("End Date"):
                 setType(4);
                 break;
-         
-
-           
                        
             default:
                 console.log("Unknown selection");
