@@ -338,25 +338,7 @@ export function Pharmacy() {
                                     {translate("ID")}
                                 </th>
                             )}
-                           
-                            {selectedColumns["Purchase Date"] && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("purch_date_pharmacy")}
-                                >
-                                    {translate("Purchase Date")}
-                                </th>
-                            )}
-                            {selectedColumns["Expiration Date"] && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("exp_date_pharmacy")}
-                                >
-                                    {translate("Expiration Date")}
-                                </th>
-                            )}
-                            
-                             {selectedColumns.Product && (
+                            {selectedColumns.Product && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("product_pharmacy")}
@@ -382,15 +364,29 @@ export function Pharmacy() {
                                 </th>
                             )}
                             
-                            
-                           
-
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
+                                </th>
+                            )}
+
+                            {selectedColumns["Purchase Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("purch_date_pharmacy")}
+                                >
+                                    {translate("Purchase Date")}
+                                </th>
+                            )}
+                            {selectedColumns["Expiration Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("exp_date_pharmacy")}
+                                >
+                                    {translate("Expiration Date")}
                                 </th>
                             )}
                             
@@ -430,15 +426,7 @@ export function Pharmacy() {
                                                 <td>{Pharmacy.id_pharmacy}</td>
                                             )}
                                           
-                                            {selectedColumns["Purchase Date"] && (
-                                                <td>{(Pharmacy.purch_date_pharmacy)}</td>
-
-                                            )}
-                                             {selectedColumns["Expiration Date"] && (
-                                                <td>{Pharmacy.exp_date_pharmacy}</td>
-                                            )}
-                                            
-                                              {selectedColumns.Product && (
+                                            {selectedColumns.Product && (
                                                 <td>{Pharmacy.product_pharmacy}</td>
                                             )}
                                           
@@ -450,6 +438,13 @@ export function Pharmacy() {
                                             )}
                                                {selectedColumns.Vehicle && (
                                                 <td>{Pharmacy.immatriculation_vehicule}</td>
+                                            )}
+                                              {selectedColumns["Purchase Date"] && (
+                                                <td>{(Pharmacy.purch_date_pharmacy)}</td>
+
+                                            )}
+                                             {selectedColumns["Expiration Date"] && (
+                                                <td>{Pharmacy.exp_date_pharmacy}</td>
                                             )}
                                           
                                             

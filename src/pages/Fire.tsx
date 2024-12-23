@@ -262,14 +262,10 @@ export function Fire() {
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Volume")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Location")}</Dropdown.Item>
-
-
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Expiration Date")}</Dropdown.Item>
-
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
-                              
+                                <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Expiration Date")}</Dropdown.Item>  
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -350,23 +346,6 @@ export function Fire() {
                                     {translate("ID")}
                                 </th>
                             )}
-                           
-                            {selectedColumns["Purchase Date"] && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("purch_date_fire")}
-                                >
-                                    {translate("Purchase Date")}
-                                </th>
-                            )}
-                            {selectedColumns["Expiration Date"] && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("exp_date_fire")}
-                                >
-                                    {translate("Expiration Date")}
-                                </th>
-                            )}
                             
                              {selectedColumns.Volume && (
                                 <th
@@ -391,8 +370,7 @@ export function Fire() {
                                 >
                                     {translate("Cost")}
                                 </th>
-                            )}
-                            
+                            )} 
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -401,8 +379,6 @@ export function Fire() {
                                     {translate("Type")}
                                 </th>
                             )}
-                            
-                            
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
@@ -411,10 +387,23 @@ export function Fire() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
+                             {selectedColumns["Purchase Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("purch_date_fire")}
+                                >
+                                    {translate("Purchase Date")}
+                                </th>
+                            )}
+                            {selectedColumns["Expiration Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("exp_date_fire")}
+                                >
+                                    {translate("Expiration Date")}
+                                </th>
+                            )}
                             
-                             
-                            
-                         
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -447,15 +436,7 @@ export function Fire() {
                                             {selectedColumns.ID && (
                                                 <td>{Fire.id_fire}</td>
                                             )}
-                                          
-                                            {selectedColumns["Purchase Date"] && (
-                                                <td>{(Fire.purch_date_fire)}</td>
-
-                                            )}
-                                             {selectedColumns["Expiration Date"] && (
-                                                <td>{Fire.exp_date_fire}</td>
-                                            )}
-                                            
+                                         
                                               {selectedColumns.Volume && (
                                                 <td>{Fire.volume_fire}</td>
                                             )}
@@ -473,9 +454,16 @@ export function Fire() {
                                                {selectedColumns.Vehicle && (
                                                 <td>{Fire.immatriculation_vehicule}</td>
                                             )}
-                                          
+                                             
+                                             {selectedColumns["Purchase Date"] && (
+                                                <td>{(Fire.purch_date_fire)}</td>
+
+                                            )}
+                                             {selectedColumns["Expiration Date"] && (
+                                                <td>{Fire.exp_date_fire}</td>
+                                            )}
                                             
-                                           
+                                          
                                           <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">
                                                 {/* View Button */}
