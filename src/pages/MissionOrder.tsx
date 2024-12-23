@@ -27,7 +27,7 @@ interface MissionOrder {
   expenses_mission: number;
   tank_mission: number;
   trailer_mission: number;
-  driver_mission: number;
+  driver_mission: string;
   accomp_mission: number;
   dep_loc_mission: string;
   dep_date_mission: number;
@@ -59,37 +59,30 @@ export function MissionOrder() {
  
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
+  const [selectedMissionOrder, setSelectedMissionOrder] = useState<any | null>(null);
 
   const [IdUser, setIdUser] = useState<number>(0);
   const [previewVisible, setPreviewVisible] = useState(false); // Gestion de la visibilité du modal
- 
+
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Modal pour aperçu
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);   // Modal pour suppression
+
+  
 
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
   let [total, settotal] = useState(0);
-  const [colum, setSortColum] = useState("id_conducteur");
+  const [colum, setSortColum] = useState("id_mission");
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
-  const [type, setType] = useState(2);
-  const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
+  const [type, setType] = useState(0);
+  const [typeSearch, setTypeSearch] = useState(translate("ID"));
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
 
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
-
-  const driverHeaders = [
-    translate("ID"),
-    translate("Code"),
-    translate("Last and first name"),
-    translate("Date of birth"),
-    translate("Phone"),
-    translate("Email"),
-    translate("Park")
-  ];
-
-  
 
   //
   const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
@@ -154,7 +147,6 @@ export function MissionOrder() {
 
 
 
-
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getMissionOrder(limit, currentPage, search, type, colum, sort);
@@ -165,7 +157,19 @@ export function MissionOrder() {
     getMissionOrder(limit, currentPage, search, type, colum, sort);
   }, []);
 
- 
+  const handlePreviewClick = (missionOrder: any) => {
+    console.log("Selected Mission:", missionOrder); 
+    setSelectedMissionOrder(missionOrder); // Store the mission order data
+    setIsPreviewModalOpen(true); // Open the modal
+  };
+  
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false); // Close the modal
+  };
+
+
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -278,7 +282,7 @@ export function MissionOrder() {
   const handledeleteMissionOrder = async (id_mission: number) => {
     try {
       console.log(id_mission);
-      setModalStatus('Do you want to delete this MissionOrder');
+      setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Order')}?`);
       setTitleStatus('Delete MissionOrder');
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionOrder(id_mission);
@@ -316,11 +320,10 @@ export function MissionOrder() {
    ];
 
    
-   
-   const generatePDF = (missionOrder: MissionOrder) => {
+   const generatePDFPreview = (missionOrder: MissionOrder) => {
     const doc = new jsPDF();
   
-    // Example: Add mission order details to the PDF
+    // Exemple : Ajout des détails de la mission dans le PDF
     doc.text("Mission Order Details", 20, 10);
     doc.text(`Mission Ref: ${missionOrder.ref_mission}`, 20, 20);
     doc.text(`Mission Object: ${missionOrder.object_mission}`, 20, 30);
@@ -330,12 +333,34 @@ export function MissionOrder() {
     doc.text(`Departure Date: ${missionOrder.dep_date_mission}`, 20, 70);
     doc.text(`Return Date: ${missionOrder.return_date_mission}`, 20, 80);
     doc.text(`Vehicle Registration: ${missionOrder.immatriculation_vehicule}`, 20, 90);
-    // Add more details here as needed
   
-    // Save the PDF
-    doc.save(`MissionOrder_${missionOrder.ref_mission}.pdf`);
+    // Génère le PDF comme un blob
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+    // Affiche l'aperçu
+    setPdfUrl(pdfUrl);
+    setPreviewVisible(true);
   };
-
+  const handleDownloadPreview = () => {
+    const doc = new jsPDF();
+  
+    // Récupérer le contenu du modal
+    const content = `
+      Mission Ref: ${selectedMissionOrder?.ref_mission}
+      Object: ${selectedMissionOrder?.object_mission}
+      Driver: ${selectedMissionOrder?.driver_mission}
+      Vehicle: ${selectedMissionOrder?.immatriculation_vehicule}
+      Departure Location: ${selectedMissionOrder?.dep_loc_mission}
+      Itinerary: ${selectedMissionOrder?.itinerary_mission}
+    `;
+  
+    // Ajouter le contenu au PDF
+    doc.text(content, 10, 10);
+  
+    // Télécharger le PDF
+    doc.save("MissionOrder_Preview.pdf");
+  };
   
   const fetchPdf = async () => {
     try {
@@ -348,15 +373,6 @@ export function MissionOrder() {
       console.error("Error fetching PDF:", error);
     }
   };
-
-  const handleDownload = () => {
-    if (fileData) {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(fileData);
-      link.download = "MissionOrder.pdf";
-      link.click();
-    }
-  };
   
 
 
@@ -366,7 +382,7 @@ export function MissionOrder() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate(" Missions Order")} <span>{total}</span>
+            {translate("Missions Order")} <span>{total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
@@ -374,18 +390,9 @@ export function MissionOrder() {
 
           <NavLink to="/mission-order-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
-            {translate("New")} {translate("Mission Order")}
+             {translate("Missions Order")}
           </NavLink>
 
-        
-
-          <button
-            className="btn btn-outline-secondary  mt-2 mr-1"
-            onClick={() => (true)}
-          >
-            <i className="las la-download"></i>
-            {translate("Export")} {translate("Driver")}
-          </button>
         </div>
       </div>
       <div className="row">
@@ -599,12 +606,20 @@ export function MissionOrder() {
                       {selectedColumns.immatriculation_vehicule  && (<td>{missionOrder.immatriculation_vehicule }</td>)}
                       {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
-
-                      
-
                      
                       <td>
                         <div className="d-flex align-items-center list-action">
+                        <a
+                          className="badge bg-primary mr-2"
+                          onClick={() => {
+                            console.log("Selected Mission:", missionOrder);
+                            setSelectedMissionOrder(missionOrder); // Set the mission
+                            setIsPreviewModalOpen(true); // Open the modal
+                          }}
+                          title={translate("Preview") + " " + translate("Mission Order")}
+                        >
+                          <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                        </a>
                           <Link
                             to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
                             className="badge badge-success mr-2"
@@ -613,40 +628,26 @@ export function MissionOrder() {
                             title={translate("Edit") + " " + translate("Mission Order")}
                           >
                             <i
-                              className="las la-cog"
+                              className="las la-edit"
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </Link>
 
-                          <a
-                            className="badge bg-primary mr-2"
-                            onClick={() => setPreviewVisible(true)} // Ouvrir le modal d'aperçu
-                            title={translate("Preview") + " " + translate("Mission Order")}
-                          >
-                            <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
-                          </a>
+                        
 
-                        {/* Modal d'aperçu */}
-                        {previewVisible && missionOrder && (
-                          <>
-                            {/* Affichage temporaire pour la vérification */}
-                            <div>Modal ouvert</div> {/* Seul affiché lorsque previewVisible est vrai */}
-                            
-                            <MissionOrderPreview
-                              show={previewVisible}
-                              onHide={() => setPreviewVisible(false)} // Fermer le modal
-                              missionOrder={missionOrder} // Passer les détails de la mission
-                            />
-                          </>
-                        )}
+                    <a
+                      className="badge bg-danger mr-2"
+                      onClick={() => handledeleteMissionOrder(missionOrder.id_mission)}
+                      title={translate("Delete")}
+                    >
+                      <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                    </a>
 
 
-                          <a className="badge bg-danger mr-2" onClick={() => handledeleteMissionOrder(missionOrder.id_mission)} title={translate("Delete")}>
-                            <i
-                              className="las la-trash"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </a>
+                    
+
+
+                
                         </div>
                       </td>
                     </tr>
@@ -698,6 +699,18 @@ export function MissionOrder() {
           IdMissionOrder={IdMissionOrder}
           updateMissionOrderList={handleUpdateMissionOrderList}
         />
+         <MissionOrderPreview
+            show={isPreviewModalOpen} // Contrôle si le modal est ouvert
+            onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
+            status={modalStatus} // Statut de la mission (peut être null)
+            title={titleStatus} // Titre du modal
+            IdUser={IdUser} // Id de l'utilisateur
+            IdMissionOrder={IdMissionOrder} // Id de la mission
+            selectedMissionOrder={selectedMissionOrder} // Mission sélectionnée
+            updateMissionOrderList={handleUpdateMissionOrderList} // Fonction pour mettre à jour la liste
+          />
+
+
 
       
       </div>

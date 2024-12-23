@@ -14,7 +14,7 @@ interface MissionOrderInterface {
   fuel_type_mission: number | null;
   expenses_mission: number | null;
   tank_mission: number | null;
-  trailer_mission: number | null;
+  trailer_mission: string | null;
   driver_mission: string | null;
   accomp_mission: string | null;
   dep_loc_mission: string | null;
@@ -55,7 +55,7 @@ export function MissionOrderManage() {
     fuel_type_mission: null,
     expenses_mission: null,
     tank_mission: null,
-    trailer_mission: null,
+    trailer_mission: "0",
     driver_mission: null,
     accomp_mission: null,
     dep_loc_mission: null,
@@ -414,7 +414,7 @@ const createMission = async (mission: MissionOrderInterface) => {
             <div className="col-md-6">
             <Form.Group className="form-group" controlId="formObject">
               <Form.Label>
-                <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Reference (*)
+                <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> {translate("Reference")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -427,7 +427,7 @@ const createMission = async (mission: MissionOrderInterface) => {
             </Form.Group>
             <Form.Group className="form-group" controlId="formObject">
               <Form.Label>
-                <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Mission Object (*)
+                <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> {translate("Mission Object")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -441,7 +441,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formFuelLoading">
               <Form.Label>
-                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> Fuel Loading Type (*)
+                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> {translate("Fuel Loading Type")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -455,7 +455,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formFuelType">
               <Form.Label>
-                <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> Fuel Type (*)
+                <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> {translate("Fuel Type")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -469,7 +469,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formExpenses">
               <Form.Label>
-                <i className="fas fa-money-bill" style={{ color: 'orange' }}></i> Expenses (*)
+                <i className="fas fa-money-bill" style={{ color: 'orange' }}></i> {translate("Expenses")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -483,7 +483,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formTank">
               <Form.Label>
-                <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> Tank (*)
+                <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> {translate("Tank")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -498,7 +498,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formTrailer">
               <Form.Label>
-                <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
+                <i className="fas fa-trailer" style={{ color: 'orange' }}></i> {translate("Trailer")} (*)
               </Form.Label>
 
               <Form.Control
@@ -524,7 +524,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDriver">
               <Form.Label>
-                <i className="fas fa-driver" style={{ color: 'orange' }}></i> Driver (*)
+                <i className="fas fa-user" style={{ color: 'orange' }}></i> {translate("Driver")} (*)
               </Form.Label>
 
               <Form.Control
@@ -534,23 +534,24 @@ const createMission = async (mission: MissionOrderInterface) => {
                   onChange={(e) => handleChange(e.target.name, e.target.value)}
                   required
                 >
-                  <option value="">Select Driver</option>
-                  {driver.length === 0 ? (
-                    <option disabled>No driver available</option>
-                  ) : (
-                    driver.map((drivers, index) => (
-                      <option key={index} value={drivers.driver_mission}>
-                        {drivers.driver_mission}
-                      </option>
-                    ))
-                  )}
+                <option value="">Select Driver</option>
+                {driver.length === 0 ? (
+                  <option disabled>No driver available</option>
+                ) : (
+                  driver.map((drivers, index) => (
+                    <option key={index} value={drivers.driver_mission}>
+                      {drivers.driver_mission}
+                    </option>
+                  ))
+                )}
               </Form.Control>
 
             </Form.Group>
 
+
             <Form.Group className="form-group" controlId="formAccomp">
               <Form.Label>
-                <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> Accompaniment (*)
+                <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> {translate("Accompaniment")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -565,7 +566,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDepLoc">
               <Form.Label>
-                <i className="fas fa-map-marker-alt" style={{ color: 'orange' }}></i> Departure Location (*)
+                <i className="fas fa-map-marker-alt" style={{ color: 'orange' }}></i> {translate("Departure Location")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -584,7 +585,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDepDate">
               <Form.Label>
-                <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date (*)
+                <i className="fas fa-calendar" style={{ color: 'orange' }}></i> {translate("Departure Date")} (*)
               </Form.Label>
               <Form.Control
                 type="date"
@@ -599,7 +600,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formDepDest">
               <Form.Label>
-                <i className="fas fa-map" style={{ color: 'orange' }}></i> Departure Destination (*)
+                <i className="fas fa-map" style={{ color: 'orange' }}></i>{translate("Destination")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -614,7 +615,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formReturnDate">
               <Form.Label>
-                <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Return Date (*)
+                <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> {translate("Return Date")} (*)
               </Form.Label>
               <Form.Control
                 type="date"
@@ -629,7 +630,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formItinerary">
               <Form.Label>
-                <i className="fas fa-route" style={{ color: 'orange' }}></i> Itinerary (*)
+                <i className="fas fa-route" style={{ color: 'orange' }}></i> {translate("Itinerary")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -644,7 +645,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formVehicleKm">
               <Form.Label>
-                <i className="fas fa-car" style={{ color: 'orange' }}></i> Vehicle KM (*)
+                <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle KM")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -659,7 +660,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formNewKm">
               <Form.Label>
-                <i className="fas fa-car" style={{ color: 'orange' }}></i> New KM (*)
+                <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("New KM")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -674,7 +675,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formFuelCost">
               <Form.Label>
-                <i className="fas fa-dollar-sign" style={{ color: 'orange' }}></i> Fuel Cost (*)
+                <i className="fas fa-dollar-sign" style={{ color: 'orange' }}></i> {translate("Fuel Cost")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -689,7 +690,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formFuelLevel">
               <Form.Label>
-                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> Fuel Level (*)
+                <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> {translate("Fuel Level")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
@@ -704,7 +705,7 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             <Form.Group className="form-group" controlId="formVoucher">
               <Form.Label>
-                <i className="fas fa-receipt" style={{ color: 'orange' }}></i> Voucher (*)
+                <i className="fas fa-receipt" style={{ color: 'orange' }}></i> {translate("Voucher")} (*)
               </Form.Label>
               <Form.Control
                 type="text"
@@ -717,27 +718,30 @@ const createMission = async (mission: MissionOrderInterface) => {
               />
             </Form.Group>
             <Form.Group className="form-group" controlId="formVehicle">
-              <Form.Label>Vehicle (*)</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="immatriculation_vehicule"
-                  value={mission?.immatriculation_vehicule || ''}
-                  onChange={(e) => handleChange(e.target.name, e.target.value)}
-                  required
-                >
-                  <option value="">Select Vehicle</option>
-                  {vehicles.length === 0 ? (
-                    <option disabled>No vehicles available</option>
-                  ) : (
-                    vehicles.map((vehicle, index) => (
-                      <option key={index} value={vehicle.immatriculation_vehicule}>
-                        {vehicle.immatriculation_vehicule}
-                      </option>
-                    ))
-                  )}
-                </Form.Control>
-
+              <Form.Label>
+                <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle")} (*)
+              </Form.Label>
+              
+              <Form.Control
+                as="select"
+                name="immatriculation_vehicule"
+                value={mission?.immatriculation_vehicule || ''}
+                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                required
+              >
+                <option value="">Select Vehicle</option>
+                {vehicles.length === 0 ? (
+                  <option disabled>No vehicles available</option>
+                ) : (
+                  vehicles.map((vehicle, index) => (
+                    <option key={index} value={vehicle.immatriculation_vehicule}>
+                      {vehicle.immatriculation_vehicule}
+                    </option>
+                  ))
+                )}
+              </Form.Control>
             </Form.Group>
+
 
 
 
@@ -776,7 +780,7 @@ const createMission = async (mission: MissionOrderInterface) => {
   disabled={buttonClicked}
 >
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-  {isEditing ? "Modifier" : "Ajouter"}
+  {isEditing ? "Edit" : "Add"}
 </Button>
 
 
