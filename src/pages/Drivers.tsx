@@ -12,6 +12,8 @@ import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfir
 import DriverDeleteModal from "../components/Driver/DriverDeleteModal";
 import DriverDetailsModal from "../components/Driver/DriverDetailsModal";
 import { toast } from "react-toastify";
+import TrainingCalendar from "../components/Calendar/Events";
+
 
 interface Drivers {
   id_conducteur: number;
@@ -453,6 +455,45 @@ export function Drivers() {
     await getDrivers(limit, currentPage, search, type, colum, sort)
   };
 
+  interface TrainingEvent {
+    title: string;
+    start: Date;
+    end: Date;
+  }
+
+  const trainingData: TrainingEvent[] = [
+    {
+      title: "Formation React",
+      start: new Date('2024-12-23T10:00:00'),
+      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
+    },
+    {
+      title: "Formation TypeScript",
+      start: new Date('2024-12-23T10:00:00'),
+      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
+    }
+    ,
+    {
+      title: "Formation TypeScript",
+      start: new Date('2024-12-23T10:00:00'),
+      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
+    }
+    ,
+    {
+      title: "Formation TypeScript",
+      start: new Date('2024-12-23T10:00:00'),
+      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
+    }
+    ,
+    {
+      title: "Formation TypeScript",
+      start: new Date('2024-12-23T10:00:00'),
+      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
+    }
+    
+  ];
+  
+
   const menuItems = [
     translate("ID"),
     translate("Code"),
@@ -760,6 +801,7 @@ export function Drivers() {
               )}
           </tbody>
         </Table>
+        <TrainingCalendar eventsData={trainingData} />
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">

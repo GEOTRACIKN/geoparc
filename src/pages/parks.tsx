@@ -577,7 +577,7 @@ export function Parks() {
                   onChange={() => handleColumnChange("idgeof")}
                 />
                 <span style={{ marginLeft: "10px" }}>
-                  {translate("ID POI")}
+                  {translate("ID Park")}
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -691,7 +691,7 @@ export function Parks() {
                     className="sorting"
                     onClick={() => handleSortingColum("idgeof")}
                   >
-                    {translate("ID POI")}
+                    {translate("ID Park")}
                   </th>
                 )}
                 {selectedColumns.codegeof && (
