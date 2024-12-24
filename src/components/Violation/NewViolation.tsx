@@ -12,7 +12,7 @@ interface ModalNewViolationProps {
   onSuccess?: () => void;
 }
 type Driver = {
-  id_conducteur: number;
+  id_conducteur: string;
   nom_conducteur: string;
   prenom_conducteur: string;
 };
@@ -30,7 +30,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   onSuccess,
 }) => {
   const [formData, setFormData] = useState({
-    conducteur: 0,
+    id_conducteur: "",
     type: "",
     vehicule: "",
     date: "",
@@ -100,6 +100,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     const { name } = actionMeta;
     const value = selectedOption ? selectedOption.value : "";
     setFormData({ ...formData, [name]: value });
+    console.log(formData);  // Affiche les données dans la console
   };
 
   // Pour le champ de type de violation
@@ -124,7 +125,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
 
   const initialFormData = {
-    conducteur: 0,
+    id_conducteur: "",
     type: "",
     vehicule: "",
     date: "",
@@ -136,7 +137,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     e.preventDefault();
     const dateformat = formatDateToTimestamp(formData.date);
     const body = {
-      id_driver: formData.conducteur,
+      id_conducteur: formData.id_conducteur,
       type_violation: formData.type,
       vehicule: formData.vehicule,
       date_violation: dateformat,
@@ -211,6 +212,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, customType: e.target.value });
+    console.log(formData);  // Affiche les données dans la console
   };
 
   return (
@@ -251,9 +253,9 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             <Select
               options={conducteursOptions}
               onChange={handleSelectChange}
-              name="conducteur"
+              name="id_conducteur"
               value={conducteursOptions.find(
-                (option) => option.value === formData.conducteur
+                (option) => option.value === formData.id_conducteur
               )}
               isClearable
             />

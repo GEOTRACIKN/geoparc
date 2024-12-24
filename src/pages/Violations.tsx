@@ -10,7 +10,7 @@ import { DownloadModal, formatDateToTimestamp, generateExcelFile, generatePDFFil
 
 interface Violations {
   id_violation: number;
-  id_driver: number;
+  id_conducteur: number;
   id_user: number;
   type_violation: string;
   vehicule: string;

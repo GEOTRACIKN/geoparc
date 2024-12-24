@@ -36,6 +36,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.291.0",
     "mapbox-gl": "^2.15.0",
