@@ -12,13 +12,12 @@ interface ModalNewViolationProps {
   onSuccess?: () => void;
 }
 type Driver = {
-  id_conducteur: string;
+  id_conducteur: number;
   nom_conducteur: string;
   prenom_conducteur: string;
 };
 type Vehicle = {
   id_vehicule: number;
-  id_groupe: number;
   immatriculation_vehicule: string;
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -29,10 +28,14 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   handleClose,
   onSuccess,
 }) => {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+
+
   const [formData, setFormData] = useState({
     id_conducteur: "",
     type: "",
-    vehicule: "",
+    id_vehicule: "",
     date: "",
     cost: 0,
     description: "",
@@ -48,60 +51,74 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({ ...formData, [name]: value });
   };
 
-  const [drivers, setdrivers] = useState<Driver[]>([]);
-
+ 
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Drivers data:", data);
-          setdrivers(data);
-        })
-        .catch((error) => console.error("Error fetching Drivers:", error));
-
-      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Vehicles data:", data);
-          setVehicles(data);
-        })
-        .catch((error) => console.error("Error fetching vehicles:", error));
+      const fetchVehicles = async () => {
+        try {
+          const response = await fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`);
+  
+          if (!response.ok) {
+            throw new Error("Failed to fetch vehicles");
+          }
+  
+          const vehiclesData = await response.json();
+          console.log("Vehicles data received from API:", vehiclesData);
+  
+          setVehicles(vehiclesData.vehicles ? vehiclesData.vehicles : []); // Access "vehicles"
+        } catch (error) {
+          console.error("Error fetching vehicles:", error);
+          setVehicles([]); // Default to an empty array in case of an error
+        }
+      };
+  
+      fetchVehicles();
     }
-  }, [show]);
-
-  const handleSelectChange = (selectedOption: any, actionMeta: any) => {
-    const { name } = actionMeta;
-    const value = selectedOption ? Number(selectedOption.value) : 0;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const conducteursOptions = drivers.map((driver) => ({
-    value: driver.id_conducteur,
-    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
-  }));
-
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  }, [show, backendUrl, geopuserID]);
+  
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`)
-        .then((response) => response.json())
-        .then((data) => setVehicles(data))
-        .catch((error) => console.error("Error fetching vehicles:", error));
+      const fetchDrivers = async () => {
+        try {
+          const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+  
+          if (!response.ok) {
+            throw new Error("Failed to fetch drivers");
+          }
+  
+          const data = await response.json();
+          console.log("Drivers data received from API:", data);
+  
+          // Extract only drivers from the response
+          const drivers = data.vehicles.map((vehicle: any) => ({
+            id_conducteur: vehicle.id_conducteur,
+            nom_conducteur: vehicle.nom_conducteur,
+            prenom_conducteur: vehicle.prenom_conducteur
+          }));
+  
+          setDrivers(drivers); // Setting only the drivers data
+        } catch (error) {
+          console.error("Error fetching drivers:", error);
+          setDrivers([]); // Default to an empty array in case of an error
+        }
+      };
+  
+      fetchDrivers();
     }
-  }, [show]);
+  }, [show, backendUrl, geopuserID]);
+  
+  
 
-  const vehicleOptions = vehicles.map((vehicle) => ({
-    value: vehicle.immatriculation_vehicule,
-    label: vehicle.immatriculation_vehicule,
-  }));
 
-  const handleVehiculeSelectChange = (selectedOption: any, actionMeta: any) => {
-    const { name } = actionMeta;
-    const value = selectedOption ? selectedOption.value : "";
-    setFormData({ ...formData, [name]: value });
-    console.log(formData);  // Affiche les données dans la console
-  };
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    };
+
+ 
 
   // Pour le champ de type de violation
   const violationOptions = [
@@ -120,26 +137,29 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({
       ...formData,
       [name]: value,
-      customType: value === "other" ? formData.customType : "", // Réinitialiser customType si "autre" n'est pas sélectionné
+      customType: value === "other" ? formData.customType : "", 
     });
+    console.log(formData); 
+
   };
 
   const initialFormData = {
     id_conducteur: "",
     type: "",
-    vehicule: "",
+    id_vehicule: "",
     date: "",
     cost: 0,
     description: "",
     customType: "",
   };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const dateformat = formatDateToTimestamp(formData.date);
     const body = {
       id_conducteur: formData.id_conducteur,
       type_violation: formData.type,
-      vehicule: formData.vehicule,
+      id_vehicule: formData.id_vehicule,
       date_violation: dateformat,
       cost: formData.cost,
       description: formData.description,
@@ -209,7 +229,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       });
   };
 
-
   const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, customType: e.target.value });
     console.log(formData);  // Affiche les données dans la console
@@ -248,30 +267,47 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               />
             </Form.Group>
           )}
-          <Form.Group>
-            <Form.Label>{translate("Driver")}</Form.Label>
-            <Select
-              options={conducteursOptions}
-              onChange={handleSelectChange}
-              name="id_conducteur"
-              value={conducteursOptions.find(
-                (option) => option.value === formData.id_conducteur
-              )}
-              isClearable
-            />
-          </Form.Group>
-          <Form.Group controlId="vehicule">
-            <Form.Label>{translate("Vehicles")}</Form.Label>
-            <Select
-              options={vehicleOptions}
-              name="vehicule"
-              value={vehicleOptions.find(
-                (option) => option.value === formData.vehicule
-              )}
-              onChange={handleVehiculeSelectChange}
-              isClearable
-            />
-          </Form.Group>
+       
+       <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Control
+        as="select"
+        value={formData.id_conducteur}
+        onChange={handleChange}
+    >
+        <option value="">{translate("Select Driver")}</option>
+        {drivers.length === 0 ? (
+            <option value="">{translate("No drivers available")}</option>
+        ) : (
+            drivers.map((driver) => (
+                <option key={driver.id_conducteur} value={driver.id_conducteur}>
+                    {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
+                </option>
+            ))
+        )}
+    </Form.Control>
+</Form.Group>
+
+        <Form.Group controlId="id_vehicule">
+                               <Form.Label>{translate("Vehicle")}</Form.Label>
+                               <Form.Control
+                                   as="select"
+                                   value={formData.id_vehicule}
+                                   onChange={handleChange}
+                               >
+                                   <option value="">{translate("Select Vehicle")}</option>
+                                   {vehicles.length === 0 ? (
+                                       <option value="">{translate("No vehicles available")}</option>
+                                   ) : (
+                                       vehicles.map((vehicle) => (
+                                           <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
+                                               {vehicle.immatriculation_vehicule}
+                                           </option>
+                                       ))
+                                   )}
+                               </Form.Control>
+                           </Form.Group>
+
           <Form.Group controlId="date">
             <Form.Label>{translate("Date Violation")}</Form.Label>
             <Form.Control
