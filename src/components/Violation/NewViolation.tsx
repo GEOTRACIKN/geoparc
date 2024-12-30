@@ -51,7 +51,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({ ...formData, [name]: value });
   };
 
- 
   useEffect(() => {
     if (show) {
       const fetchVehicles = async () => {
@@ -65,10 +64,10 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           const vehiclesData = await response.json();
           console.log("Vehicles data received from API:", vehiclesData);
   
-          setVehicles(vehiclesData.vehicles ? vehiclesData.vehicles : []); // Access "vehicles"
+          setVehicles(Array.isArray(vehiclesData.vehicles) ? vehiclesData.vehicles : []);
         } catch (error) {
           console.error("Error fetching vehicles:", error);
-          setVehicles([]); // Default to an empty array in case of an error
+          setVehicles([]);
         }
       };
   
@@ -89,17 +88,24 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           const data = await response.json();
           console.log("Drivers data received from API:", data);
   
-          // Extract only drivers from the response
-          const drivers = data.vehicles.map((vehicle: any) => ({
-            id_conducteur: vehicle.id_conducteur,
-            nom_conducteur: vehicle.nom_conducteur,
-            prenom_conducteur: vehicle.prenom_conducteur
-          }));
+          const drivers = Array.isArray(data.vehicles)
+            ? data.vehicles
+                .filter(
+                  (driver: any) =>
+                    driver.nom_conducteur?.trim() !== "" &&
+                    driver.prenom_conducteur?.trim() !== ""
+                )
+                .map((driver: any) => ({
+                  id_conducteur: driver.id_conducteur,
+                  nom_conducteur: driver.nom_conducteur,
+                  prenom_conducteur: driver.prenom_conducteur,
+                }))
+            : [];
   
-          setDrivers(drivers); // Setting only the drivers data
+          setDrivers(drivers);
         } catch (error) {
           console.error("Error fetching drivers:", error);
-          setDrivers([]); // Default to an empty array in case of an error
+          setDrivers([]);
         }
       };
   
@@ -123,7 +129,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   // Pour le champ de type de violation
   const violationOptions = [
     { value: "speed", label: translate("Speed")}, 
-    { value: "overspeed", label: translate("Speed") },
+    { value: "overspeed", label: translate("Over Speed") },
     { value: "insufficient_break", label: translate("Insufficient Break") },
     { value: "night_driving", label: translate("Night Driving")},
     { value: "overtime_driving", label: translate("Overtime Driving") },
