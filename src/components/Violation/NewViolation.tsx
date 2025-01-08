@@ -8,7 +8,8 @@ import { Bounce, toast } from "react-toastify";
 
 interface ModalNewViolationProps {
   show: boolean;
-  handleClose: () => void;
+  onHide: () => void;
+
   onSuccess?: () => void;
 }
 type Driver = {
@@ -25,7 +26,7 @@ const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
-  handleClose,
+  onHide,
   onSuccess,
 }) => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -39,7 +40,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     date: "",
     cost: 0,
     description: "",
-    customType: "", // Champ pour gérer le type personnalisé
+    customType: "",
   });
 
   const { translate } = useTranslate();
@@ -73,6 +74,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   
       fetchVehicles();
     }
+
   }, [show, backendUrl, geopuserID]);
   
   useEffect(() => {
@@ -113,9 +115,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     }
   }, [show, backendUrl, geopuserID]);
   
-  
-
-
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prevState) => ({
@@ -123,8 +122,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             [id]: value,
         }));
     };
-
- 
 
   // Pour le champ de type de violation
   const violationOptions = [
@@ -203,7 +200,8 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           if (onSuccess) {
             onSuccess(); // Appel du callback pour rafraîchir le tableau
           }
-          handleClose();
+          onHide();
+
         } else {
           // Si la réponse ne contient pas le message de succès attendu
           toast.error("Failed to add violation. Please try again.", {
@@ -241,7 +239,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={handleClose} responsive>
+    <Modal show={show} onHide={onHide} responsive>
       <Modal.Header closeButton>
         <Modal.Title>{translate("Add Violation")}</Modal.Title>
       </Modal.Header>
@@ -348,7 +346,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={onHide}>
             {translate("Close")}
           </Button>
           <Button variant="primary" type="submit">
