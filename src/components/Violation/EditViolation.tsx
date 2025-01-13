@@ -9,9 +9,9 @@ import { formatDateToTimestamp } from "../../utilities/functions";
 
 interface ModalEditViolationProps {
   show: boolean;
-  handleClose: () => void;
+  onHide: () => void;
   onSuccess?: () => void; // Optional prop
-  violationId: number | null; //violation id 
+  id_violation: number | null; //violation id 
 
 }
 type Driver = {
@@ -28,9 +28,9 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   show,
-  handleClose,
+  onHide,
   onSuccess,
-  violationId,
+  id_violation,
 }) => {
   const [formData, setFormData] = useState({
     conducteur: 0,
@@ -52,14 +52,14 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
 
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/Conducteur_contrat/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+      fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
         .then((response) => response.json())
         .then((data) => {
           setdrivers(data);
         })
         .catch((error) => console.error("Error fetching Drivers:", error));
-      if (violationId) {
-        fetch(`${backendUrl}/api/geop/violation_form/${violationId}`)
+      if (id_violation) {
+        fetch(`${backendUrl}/api/geop/violation_form/${id_violation}`)
           .then((response) => response.json())
           .then((data) => {
             setFormData({
@@ -76,7 +76,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
       }
     }
 
-  }, [show, violationId]);
+  }, [show, id_violation]);
 
   const handleSelectChange = (selectedOption: any, actionMeta: any) => {
     const { name } = actionMeta;
@@ -92,7 +92,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
 
   useEffect(() => {
     if (show) {
-      fetch(`${backendUrl}/api/geop/vehicles_sinister/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
+      fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
         .then((response) => response.json())
         .then((data) => {
           setVehicles(data);
@@ -112,7 +112,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    fetch(`${backendUrl}/api/geop/update_violation/${violationId}`, {
+    fetch(`${backendUrl}/api/geop/update_violation/${id_violation}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -151,7 +151,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
         if (onSuccess) {
           onSuccess(); // Appel du callback pour rafraîchir le tableau
         }
-        handleClose();
+        onHide();
       })
       .catch((error) => {
         // Afficher une notification d'erreur en cas de problème
@@ -190,7 +190,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
 
 
   return (
-    <Modal show={show} onHide={handleClose} responsive>
+    <Modal show={show} onHide={onHide} responsive>
       <Modal.Header closeButton>
         <Modal.Title>{translate("Edit Violation")}</Modal.Title>
       </Modal.Header>
@@ -264,7 +264,7 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={onHide}>
             {translate("Close")}
           </Button>
           <Button variant="primary" type="submit" onClick={handleSubmit}>

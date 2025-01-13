@@ -15,6 +15,7 @@ interface Violation {
 
     id_violation: number;
     id_conducteur: number;
+    id_vehicule: number;
     type_violation: string;
     immatriculation_vehicule: string;
     cost: string;
@@ -50,7 +51,7 @@ export function Violation() {
         Type: true,
         Vehicle: true,
         Date: true, 
-       Description: true,
+        Description: true,
         Cost: true,
     
     };
@@ -152,7 +153,6 @@ export function Violation() {
     
     
     useEffect(() => {
-        getCountViolation();
         getViolation();
     }, [currentPage, limit, search, type, column, sort]);
    
@@ -182,7 +182,6 @@ export function Violation() {
                 break;
         }
         setTypeSearch(selectedValue);
-
     }
 
     const handleAdvancedSearch = (event: any) => {
@@ -198,7 +197,6 @@ export function Violation() {
         setCurrentPage(data.selected + 1);
     };
     const refreshData = () => {
-        getCountViolation();
         getViolation();
     };
 
@@ -500,6 +498,8 @@ export function Violation() {
             </div>
             <ModalNewViolation show={showNewViolationModal} onHide={handleCloseNewViolationModal} onSuccess={refreshData} />
             <ModalDeleteViolation show={showDeleteViolationModal} onHide={handleCloseDeleteViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
+            <ModalEditViolation show={showEditViolationModal} onHide={handleCloseEditViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
+
 
 
            
