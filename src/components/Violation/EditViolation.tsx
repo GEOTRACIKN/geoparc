@@ -1,201 +1,342 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import Select from "react-select";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../../hooks/LanguageProvider";
+import { Bounce, toast } from "react-toastify";
+import axios, { AxiosError } from 'axios';
+import Select from "react-select";
+
+import dayjs from "dayjs"; 
 import { formatDateToTimestamp } from "../../utilities/functions";
 
-
-interface ModalEditViolationProps {
-  show: boolean;
-  onHide: () => void;
-  onSuccess?: () => void; // Optional prop
-  id_violation: number | null; //violation id 
-
+interface EditViolationModalProps {
+    show: boolean;
+    onHide: () => void;
+    id_violation: number | null; // ID de la pharmacie à modifier
+    onSuccess?: () => void;
 }
 type Driver = {
   id_conducteur: number;
   nom_conducteur: string;
   prenom_conducteur: string;
 };
-type Vehicle = {
-  id_vehicule: number;
-  id_groupe: number;
-  immatriculation_vehicule: string;
-};
+// Définir le type pour un véhicule
+interface Vehicle {
+    id_vehicule: string;
+    immatriculation_vehicule: string;
+}
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
-const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
-  show,
-  onHide,
-  onSuccess,
-  id_violation,
+
+const EditViolationModal: React.FC<EditViolationModalProps> = ({
+    show,
+    onHide,
+    id_violation,
+    onSuccess,
 }) => {
-  const [formData, setFormData] = useState({
-    conducteur: 0,
-    type: "",
-    vehicule: "",
-    date: "",
-    cost: 0,
-    description: "",
-  });
+    const [formData, setFormData] = useState({
+        id_violation: "",
+        id_conducteur: "",
+        type_violation: "",
+        id_vehicule: "",
+        date_violation: "",
+        cost: 0,
+        description: "",
+        customType: "",
+    });
+    const dateformat = formatDateToTimestamp(formData.date_violation);
 
-  const { translate } = useTranslate();
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+      const [drivers, setDrivers] = useState<Driver[]>([]);
+    
+    const { translate } = useTranslate();
 
-  const [drivers, setdrivers] = useState<Driver[]>([]); // Préciser le type ici
-
-  useEffect(() => {
-    if (show) {
-      fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
-        .then((response) => response.json())
-        .then((data) => {
-          setdrivers(data);
-        })
-        .catch((error) => console.error("Error fetching Drivers:", error));
-      if (id_violation) {
-        fetch(`${backendUrl}/api/geop/violation_form/${id_violation}`)
-          .then((response) => response.json())
-          .then((data) => {
-            setFormData({
-              conducteur: data.id_driver,
-              type: data.type_violation,
-              date: formatDateToTimestamp(data.date_violation),
-              vehicule: data.vehicule,
-              cost: data.cost,
-              description: data.description,
-
-            });
-          })
-          .catch((error) => console.error("Error fetching violation:", error));
-      }
-    }
-
-  }, [show, id_violation]);
-
-  const handleSelectChange = (selectedOption: any, actionMeta: any) => {
-    const { name } = actionMeta;
-    const value = selectedOption ? Number(selectedOption.value) : 0; // Convertir en nombre
-    setFormData({ ...formData, [name]: value });
-  };
-  const conducteursOptions = drivers.map((driver) => ({
-    value: driver.id_conducteur,
-    label: driver.nom_conducteur + " " + driver.prenom_conducteur,
-  }));
-
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Préciser le type ici
-
-  useEffect(() => {
-    if (show) {
-      fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`) // Remplacez '1' par l'ID de l'utilisateur
-        .then((response) => response.json())
-        .then((data) => {
-          setVehicles(data);
-        })
-        .catch((error) => console.error("Error fetching vehicles:", error));
-    }
-  }, [show]);
-  const vehicleOptions = vehicles.map((vehicle) => ({
-    value: vehicle.immatriculation_vehicule,
-    label: vehicle.immatriculation_vehicule,
-  }));
-  const handleVehiculeSelectChange = (selectedOption: any, actionMeta: any) => {
-    const { name } = actionMeta;
-    const value = selectedOption ? selectedOption.value : "";
-    setFormData({ ...formData, [name]: value });
-  };
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    fetch(`${backendUrl}/api/geop/update_violation/${id_violation}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id_driver: formData.conducteur,
-        type_violation: formData.type,
-        vehicule: formData.vehicule,
-        date_violation: formData.date,
-        cost: formData.cost,
-        description: formData.description,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          // Si la réponse n'est pas OK, cela signifie qu'il y a eu une erreur
-          throw new Error("Erreur lors de la mise à jour de la violation.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Afficher une notification de succès si la mise à jour a réussi
-        toast.success("Violation mise à jour avec succès.", {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-
-        // Rafraîchir les données
-        if (onSuccess) {
-          onSuccess(); // Appel du callback pour rafraîchir le tableau
-        }
-        onHide();
-      })
-      .catch((error) => {
-        // Afficher une notification d'erreur en cas de problème
-        toast.error(
-          `Erreur lors de la mise à jour de la violation: ${error instanceof Error ? error.message : "Erreur inattendue"
-          }`,
-          {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          }
-        );
-        console.error("Error updating violation:", error);
+    const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
+      const { name } = actionMeta;
+      const value = selectedOption ? selectedOption.value : "";
+  
+      setFormData({
+        ...formData,
+        [name]: value,
+        customType: value === "other" ? formData.customType : "", 
       });
+      console.log(formData); 
+  
+    };
+    useEffect(() => {
+        // Vérifie si l'id_violation est valide avant de faire l'appel API
+        if (!id_violation) {
+            console.error("id_violation is invalid");
+            return;
+        }
+    
+        const fetchViolation = async () => {
+            try {
+                // Logge l'URL de l'API pour vérifier qu'elle est correcte
+                console.log("URL de l'API :", `${backendUrl}/api/geop/showviolation/${id_violation}`);
+    
+                const response = await axios.get(`${backendUrl}/api/geop/showviolation/${id_violation}`);
+                const data = response.data;
+    
+                // Logge les données reçues pour s'assurer que tout est bien là
+                console.log("Données reçues : ", JSON.stringify(data, null, 2));
+    
+                if (!data || !data.id_violation) {
+                    toast.error("Violation data not found.");
+                    return;
+                }
+    
+                // Lors de la récupération des données
+                const formattedData = {
+                    ...data,
+                 
+                };
+                
+                // Lors de l’envoi des données au backend
+                const payload = {
+                    ...formData,
+               
+                };
+                
+                console.log("Données formatées :", formattedData);
+                
+                // Mettre à jour le state avec les dates formatées
+                setFormData((prev) => ({
+                    ...prev,
+                    ...formattedData,
+                }));
+                // Logge les données formatées pour vérifier
+                console.log("Données formatées :", formattedData);
+    
+                setFormData((prev) => ({
+                    ...prev,
+                    ...formattedData,
+                }));
+            } catch (error: unknown) {  // Typage explicite de l'erreur ici
+                console.error("Error fetching violation data:", error);
+    
+                // Vérifie et log l'erreur en cas de problème
+                if (error instanceof AxiosError) {
+                    console.error("Réponse du serveur:", error.response?.data);
+                    console.error("Statut:", error.response?.status);
+                } else if (error instanceof Error) {
+                    console.error("Erreur de requête:", error.message);
+                } else {
+                    console.error("Erreur inconnue:", error);
+                }
+    
+                toast.error("Error fetching violation data.");
+            }
+        };
+    
+        fetchViolation();
+    }, [id_violation, backendUrl]);
+    
+    
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            try {
+                if (!geopuserID) {
+                    console.warn("No user ID provided");
+                    return;
+                }
+    
+                const response = await fetch(
+                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
+                );
+    
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch vehicles. Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+    
+                setVehicles(data.vehicles || []);
+            } catch (error) {
+                console.error("Error fetching vehicles:", error);
+                toast.error("Error fetching vehicles.", {
+                    position: "bottom-right",
+                    autoClose: 2400,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            }
+        };
+    
+        fetchVehicles();
+    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
+
+
+
+     useEffect(() => {
+        if (show) {
+          const fetchDrivers = async () => {
+            try {
+              const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+      
+              if (!response.ok) {
+                throw new Error("Failed to fetch drivers");
+              }
+      
+              const data = await response.json();
+              console.log("Drivers data received from API:", data);
+      
+              const drivers = Array.isArray(data.vehicles)
+                ? data.vehicles
+                    .filter(
+                      (driver: any) =>
+                        driver.nom_conducteur?.trim() !== "" &&
+                        driver.prenom_conducteur?.trim() !== ""
+                    )
+                    .map((driver: any) => ({
+                      id_conducteur: driver.id_conducteur,
+                      nom_conducteur: driver.nom_conducteur,
+                      prenom_conducteur: driver.prenom_conducteur,
+                    }))
+                : [];
+      
+              setDrivers(drivers);
+            } catch (error) {
+              console.error("Error fetching drivers:", error);
+              setDrivers([]);
+            }
+          };
+      
+          fetchDrivers();
+        }
+      }, [show, backendUrl, geopuserID]);
+    
+     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+            const { id, value } = e.target;
+            setFormData((prevState) => ({
+                ...prevState,
+                [id]: value,
+            }));
+        };
+    
+      // Pour le champ de type de violation
+      const violationOptions = [
+        { value: "speed", label: translate("Speed")}, 
+        { value: "overspeed", label: translate("Over Speed") },
+        { value: "insufficient_break", label: translate("Insufficient Break") },
+        { value: "night_driving", label: translate("Night Driving")},
+        { value: "overtime_driving", label: translate("Overtime Driving") },
+        { value: "other", label: translate("Other")},
+      ];
+      const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, customType: e.target.value });
+        console.log(formData);  // Affiche les données dans la console
+      };
+    
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    };
+
+    const validateForm = () => {
+      console.log("Validation du formulaire...");
+      console.log("ID Conducteur :", formData.id_conducteur);
+      console.log("Type Violation :", formData.type_violation);
+      console.log("ID Véhicule :", formData.id_vehicule);
+      console.log("Date Violation :", formData.date_violation);
+      console.log("Timestamp :", formatDateToTimestamp(formData.date_violation));
+      console.log("Cost :", formData.cost);
+      console.log("Description :", formData.description);
+  
+      if (
+          !formData.id_conducteur ||
+          !formData.type_violation ||
+          !formData.id_vehicule ||
+          !formData.date_violation || // Vérifie si la date est vide
+          !formatDateToTimestamp(formData.date_violation) || // Vérifie si le timestamp est valide
+          !formData.cost ||
+          !formData.description
+      ) {
+          console.log("Formulaire invalide !");
+          return false;
+      }
+  
+      console.log("Formulaire valide !");
+      return true;
   };
+  
 
-  // Options pour le champ de type de violation
-  const violationOptions = [
-    { value: "speed", label: "speed" },
-    { value: "overspeed", label: "overspeed" },
-    { value: "insufficient_break", label: "Insufficient Break" },
-    { value: "night_driving", label: "Night Driving" },
-    { value: "overtime_driving", label: "Overtime Driving" },
-    { value: "other", label: "Other" },
-  ];
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  const handleViolationTypeChange = (selectedOption: any) => {
-    setFormData({ ...formData, type: selectedOption ? selectedOption.value : "" });
-  };
+        if (!validateForm()) {
+            return;
+        }
 
+        try {
+            const response = await fetch(
+                `${backendUrl}/api/geop/updateviolation/${id_violation}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
 
-  return (
-    <Modal show={show} onHide={onHide} responsive>
-      <Modal.Header closeButton>
-        <Modal.Title>{translate("Edit Violation")}</Modal.Title>
-      </Modal.Header>
-      <Form>
-        <Modal.Body style={{ maxHeight: 'calc(80vh - 200px)', overflowY: 'auto' }}>
+            if (!response.ok) {
+                throw new Error("Error updating violation.");
+            }
+
+            const result = await response.json();
+
+            toast.success("Violation updated successfully!", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+
+            if (onSuccess) {
+                onSuccess();
+            }
+
+            onHide();
+        } catch (error) {
+            console.error("Error updating violation:", error);
+            toast.error("Error updating violation. Please try again.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+        }
+    };
+
+    return (
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
+            </Modal.Header>
+            <Form onSubmit={handleSubmit}>
+            <Modal.Body
+          style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
+        >
           <Form.Group controlId="type">
             <Form.Label>{translate("Violation type")}</Form.Label>
             <Select
@@ -203,44 +344,75 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
               onChange={handleViolationTypeChange}
               name="type"
               value={violationOptions.find(
-                (option) => option.value === formData.type
+                (option) => option.value === formData.type_violation
               )}
               isClearable
             />
           </Form.Group>
-          <Form.Group>
-            <Form.Label>{translate("Driver")}</Form.Label>
-            <Select
-              options={conducteursOptions}
-              onChange={handleSelectChange}
-              name="conducteur"
-              value={conducteursOptions.find(
-                (option) => option.value === formData.conducteur
-              )}
-              isClearable
-            />
-          </Form.Group>
-          <Form.Group controlId="vehicule">
-            <Form.Label>{translate("Vehicule")}</Form.Label>
-            <Select
-              options={vehicleOptions}
-              name="vehicule"
-              value={vehicleOptions.find(
-                (option) => option.value === formData.vehicule
-              )}
-              onChange={handleVehiculeSelectChange}
-            />
-          </Form.Group>
-          <Form.Group controlId="date">
+          {formData.type_violation === "other" && (
+            <Form.Group controlId="customType">
+              <Form.Label>{translate("Custom Violation Type")}</Form.Label>
+              <Form.Control
+                type="text"
+                name="customType"
+                value={formData.customType}
+                onChange={handleCustomTypeChange}
+                placeholder="Enter custom violation type"
+              />
+            </Form.Group>
+          )}
+       
+       <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Control
+        as="select"
+        value={formData.id_conducteur}
+        onChange={handleChange}
+    >
+        <option value="">{translate("Select Driver")}</option>
+        {drivers.length === 0 ? (
+            <option value="">{translate("No drivers available")}</option>
+        ) : (
+            drivers.map((driver) => (
+                <option key={driver.id_conducteur} value={driver.id_conducteur}>
+                    {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
+                </option>
+            ))
+        )}
+    </Form.Control>
+</Form.Group>
+
+        <Form.Group controlId="id_vehicule">
+                               <Form.Label>{translate("Vehicle")}</Form.Label>
+                               <Form.Control
+                                   as="select"
+                                   value={formData.id_vehicule}
+                                   onChange={handleChange}
+                               >
+                                   <option value="">{translate("Select Vehicle")}</option>
+                                   {vehicles.length === 0 ? (
+                                       <option value="">{translate("No vehicles available")}</option>
+                                   ) : (
+                                       vehicles.map((vehicle) => (
+                                           <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
+                                               {vehicle.immatriculation_vehicule}
+                                           </option>
+                                       ))
+                                   )}
+                               </Form.Control>
+                           </Form.Group>
+
+          <Form.Group controlId="date_violation">
             <Form.Label>{translate("Date Violation")}</Form.Label>
             <Form.Control
               type="datetime-local"
-              name="date"
-              value={formData.date}
+              name="date_violation"
+              value={formData.date_violation}
               onChange={handleInputChange}
               placeholder="Enter Date and Time here"
             />
           </Form.Group>
+
           <Form.Group controlId="cost">
             <Form.Label>{translate("Cost")}</Form.Label>
             <Form.Control
@@ -256,23 +428,24 @@ const ModalEditVilation: React.FC<ModalEditViolationProps> = ({
             <Form.Control
               as="textarea"
               name="description"
-              rows={4} // Set the number of rows for the textarea
+              rows={4}
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Enter description here"
             />
           </Form.Group>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            {translate("Close")}
-          </Button>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
-            {translate("Update")}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
-  );
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={onHide}>
+                        {translate("Close")}
+                    </Button>
+                    <Button variant="primary" type="submit">
+                        {translate("Update")}
+                    </Button>
+                </Modal.Footer>
+            </Form>
+        </Modal>
+    );
 };
-export default ModalEditVilation;
+
+export default EditViolationModal;
