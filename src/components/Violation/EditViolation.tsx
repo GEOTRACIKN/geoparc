@@ -1,15 +1,16 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import axios, { AxiosError } from 'axios';
+import Select from "react-select";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
-import axios, { AxiosError } from 'axios';
-import Select from "react-select";
 
 import dayjs from "dayjs"; 
 import { formatDateToTimestamp } from "../../utilities/functions";
 
-interface EditViolationModalProps {
+interface ModalEditViolationProps {
     show: boolean;
     onHide: () => void;
     id_violation: number | null; // ID de la pharmacie à modifier
@@ -29,7 +30,7 @@ interface Vehicle {
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
 
-const EditViolationModal: React.FC<EditViolationModalProps> = ({
+const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     show,
     onHide,
     id_violation,
@@ -53,18 +54,6 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
     
     const { translate } = useTranslate();
 
-    const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
-      const { name } = actionMeta;
-      const value = selectedOption ? selectedOption.value : "";
-  
-      setFormData({
-        ...formData,
-        [name]: value,
-        customType: value === "other" ? formData.customType : "", 
-      });
-      console.log(formData); 
-  
-    };
     useEffect(() => {
         // Vérifie si l'id_violation est valide avant de faire l'appel API
         if (!id_violation) {
@@ -230,6 +219,19 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
         { value: "overtime_driving", label: translate("Overtime Driving") },
         { value: "other", label: translate("Other")},
       ];
+      const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+          customType: value === "other" ? formData.customType : "", 
+        });
+        console.log(formData); 
+    
+      };
+    
       const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, customType: e.target.value });
         console.log(formData);  // Affiche les données dans la console
@@ -245,31 +247,49 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
     };
 
     const validateForm = () => {
-      console.log("Validation du formulaire...");
-      console.log("ID Conducteur :", formData.id_conducteur);
-      console.log("Type Violation :", formData.type_violation);
-      console.log("ID Véhicule :", formData.id_vehicule);
-      console.log("Date Violation :", formData.date_violation);
-      console.log("Timestamp :", formatDateToTimestamp(formData.date_violation));
-      console.log("Cost :", formData.cost);
-      console.log("Description :", formData.description);
-  
-      if (
-          !formData.id_conducteur ||
-          !formData.type_violation ||
-          !formData.id_vehicule ||
-          !formData.date_violation || // Vérifie si la date est vide
-          !formatDateToTimestamp(formData.date_violation) || // Vérifie si le timestamp est valide
-          !formData.cost ||
-          !formData.description
-      ) {
-          console.log("Formulaire invalide !");
-          return false;
-      }
-  
-      console.log("Formulaire valide !");
-      return true;
-  };
+        console.log("Validation du formulaire...");
+        console.log("ID Conducteur :", formData.id_conducteur);
+        console.log("Type Violation :", formData.type_violation);
+        console.log("ID Véhicule :", formData.id_vehicule);
+        console.log("Date Violation :", formData.date_violation);
+        console.log("Coût :", formData.cost);
+        console.log("Description :", formData.description);
+    
+        let isValid = true;
+    
+        if (!formData.id_conducteur) {
+            toast.error("L'ID Conducteur est requis !");
+            isValid = false;
+        }
+    
+        if (!formData.type_violation) {
+            toast.error("Le type de violation est requis !");
+            isValid = false;
+        }
+    
+        if (!formData.id_vehicule) {
+            toast.error("L'ID Véhicule est requis !");
+            isValid = false;
+        }
+    
+        if (!formData.date_violation || !dayjs(formData.date_violation, "YYYY-MM-DDTHH:mm", true).isValid()) {
+            toast.error("La date de violation est invalide !");
+            isValid = false;
+        }
+    
+        if (Number(formData.cost) < 0 || isNaN(Number(formData.cost))) {
+            toast.error("Le coût doit être un nombre positif !");
+            isValid = false;
+        }
+    
+        if (!formData.description) {
+            toast.error("La description est requise !");
+            isValid = false;
+        }
+    
+        return isValid;
+    };
+    
   
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -337,12 +357,12 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
             <Modal.Body
           style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
         >
-          <Form.Group controlId="type">
+           <Form.Group controlId="type_violation">
             <Form.Label>{translate("Violation type")}</Form.Label>
             <Select
               options={violationOptions}
               onChange={handleViolationTypeChange}
-              name="type"
+              name="type_violation"
               value={violationOptions.find(
                 (option) => option.value === formData.type_violation
               )}
@@ -361,7 +381,6 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
               />
             </Form.Group>
           )}
-       
        <Form.Group controlId="id_conducteur">
     <Form.Label>{translate("Driver")}</Form.Label>
     <Form.Control
@@ -448,4 +467,4 @@ const EditViolationModal: React.FC<EditViolationModalProps> = ({
     );
 };
 
-export default EditViolationModal;
+export default ModalEditViolation;
