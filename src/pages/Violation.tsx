@@ -15,7 +15,6 @@ interface Violation {
 
     id_violation: number;
     id_conducteur: number;
-    id_vehicule: number;
     type_violation: string;
     immatriculation_vehicule: string;
     cost: string;
@@ -176,7 +175,8 @@ export function Violation() {
                 break;
             case translate("Type"):
                 setType(6);
-                break;            
+                break;     
+                    
             default:
                 console.log("Unknown selection");
                 break;
