@@ -125,12 +125,12 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
   // Pour le champ de type de violation
   const violationOptions = [
-    { value: "speed", label: translate("Speed")}, 
-    { value: "overspeed", label: translate("Over Speed") },
-    { value: "insufficient_break", label: translate("Insufficient Break") },
-    { value: "night_driving", label: translate("Night Driving")},
-    { value: "overtime_driving", label: translate("Overtime Driving") },
-    { value: "other", label: translate("Other")},
+    { value: "Speed", label: translate("Speed")}, 
+    { value: "Over Speed", label: translate("Over Speed") },
+    { value: "Insufficient Break", label: translate("Insufficient Break") },
+    { value: "Night Driving", label: translate("Night Driving")},
+    { value: "Overtime Driving", label: translate("Overtime Driving") },
+    { value: "Other", label: translate("Other")},
   ];
 
   const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
@@ -140,7 +140,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({
       ...formData,
       [name]: value,
-      customType: value === "other" ? formData.customType : "", 
+      customType: value === "Other" ? formData.customType : "", 
     });
     console.log(formData); 
 
@@ -259,7 +259,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               isClearable
             />
           </Form.Group>
-          {formData.type === "other" && (
+          {formData.type === "Other" && (
             <Form.Group controlId="customType">
               <Form.Label>{translate("Custom Violation Type")}</Form.Label>
               <Form.Control

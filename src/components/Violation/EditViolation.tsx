@@ -212,12 +212,12 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     
       // Pour le champ de type de violation
       const violationOptions = [
-        { value: "speed", label: translate("Speed")}, 
-        { value: "overspeed", label: translate("Over Speed") },
-        { value: "insufficient_break", label: translate("Insufficient Break") },
-        { value: "night_driving", label: translate("Night Driving")},
-        { value: "overtime_driving", label: translate("Overtime Driving") },
-        { value: "other", label: translate("Other")},
+        { value: "Speed", label: translate("Speed")}, 
+        { value: "Over Speed", label: translate("Over Speed") },
+        { value: "Insufficient Break", label: translate("Insufficient Break") },
+        { value: "Night Driving", label: translate("Night Driving")},
+        { value: "Overtime Driving", label: translate("Overtime Driving") },
+        { value: "Other", label: translate("Other")},
       ];
       const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
         const { name } = actionMeta;

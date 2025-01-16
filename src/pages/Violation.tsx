@@ -28,6 +28,8 @@ export function Violation() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const { translate } = useTranslate();
     const [list_violation, setViolation] = useState<Violation[]>([]);
+    const [count, setCount] = useState<number>();
+
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
@@ -99,29 +101,23 @@ export function Violation() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/pharmacy/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/violation/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
             const result = await response.json();
-            setTotal(result);
-            setPageCount(Math.ceil(result / limit));
+    
+            // Make sure to extract the count if the API returns an object
+            const count = result.count || 0; // Default to 0 if count is undefined
+            setTotal(count); // Pass the count value directly
+            setPageCount(Math.ceil(count / limit)); // Calculate the number of pages
     
         } catch (error) {
-            if (error instanceof Error) {
-                console.error("Error in getCountViolation:", error.message);
-                setError(error.message || "Failed to fetch count violations");
-            } else {
-                console.error("Unknown error in getCountViolation:", error);
-                setError("An unexpected error occurred while fetching count violations");
-            }
+            console.error("Error fetching violation count:", error);
         } finally {
             setLoading(false);
         }
     };
+    
+
     
     const getViolation = async () => {
         try {
@@ -153,6 +149,8 @@ export function Violation() {
     
     useEffect(() => {
         getViolation();
+        getCountViolation();
+        
     }, [currentPage, limit, search, type, column, sort]);
    
     const handleTypeSearch = (event: any) => {
@@ -197,6 +195,7 @@ export function Violation() {
         setCurrentPage(data.selected + 1);
     };
     const refreshData = () => {
+        getCountViolation();
         getViolation();
     };
 
@@ -393,10 +392,10 @@ export function Violation() {
                                                 <td>{Violation.id_violation}</td>
                                             )}
                                           
-                                            {selectedColumns.Driver && (
-                                                <td>{Violation.conducteur_nom}</td>
+                                          {selectedColumns.Driver && (
+                                         <td>{Violation.conducteur_prenom} {Violation.conducteur_nom}</td>
+      
                                             )}
-                                          
                                             {selectedColumns.Cost && (
                                                 <td>{Violation.cost}</td>
                                             )}
