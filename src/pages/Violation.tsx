@@ -320,22 +320,7 @@ export function Violation() {
                                     {translate("Driver")}
                                 </th>
                             )}
-                             {selectedColumns.Cost && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("cost_violation")}
-                                >
-                                    {translate("Cost")}
-                                </th>
-                            )}
-                            {selectedColumns.Type && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("type_violation")}
-                                >
-                                    {translate("Type")}
-                                </th>
-                            )}
+                           
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
@@ -352,6 +337,23 @@ export function Violation() {
                                     {translate("Date")}
                                 </th>
                             )}
+                             {selectedColumns.Type && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("type_violation")}
+                                >
+                                    {translate("Type")}
+                                </th>
+                            )}
+                              {selectedColumns.Cost && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("cost_violation")}
+                                >
+                                    {translate("Cost")}
+                                </th>
+                            )}
+                           
                             {selectedColumns.Description && (
                                 <th
                                     className="sorting "
@@ -396,18 +398,20 @@ export function Violation() {
                                          <td>{Violation.conducteur_prenom} {Violation.conducteur_nom}</td>
       
                                             )}
-                                            {selectedColumns.Cost && (
-                                                <td>{Violation.cost}</td>
-                                            )}
-                                            {selectedColumns.Type && (
-                                                <td>{Violation.type_violation}</td>
-                                            )}
+                                            
                                                {selectedColumns.Vehicle && (
                                                 <td>{Violation.immatriculation_vehicule}</td>
                                             )}
                                               {selectedColumns.Date && (
                                                 <td>{(Violation.date_violation)}</td>
 
+                                            )}
+                                           
+                                            {selectedColumns.Type && (
+                                                <td>{Violation.type_violation}</td>
+                                            )}
+                                             {selectedColumns.Cost && (
+                                                <td>{Violation.cost}</td>
                                             )}
                                              {selectedColumns.Description && (
                                                 <td>{Violation.description}</td>
