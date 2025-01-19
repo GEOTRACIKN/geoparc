@@ -27,7 +27,7 @@ import { Training } from "./pages/Training";
 
 
 import { Warnings } from "./pages/Warnings";
-import { Violations } from "./pages/Violations";
+import { Violation} from "./pages/Violation";
 import { Fuel_consumption } from "./pages/Fuel_consumption";
 import { Card_management } from "./pages/Card_management";
 import { Tank_management } from "./pages/Tank_management";
@@ -152,7 +152,7 @@ function App() {
 
 
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
-          <Route path="/violations" element={<DashboardLayout>{<Violations />}</DashboardLayout>} />
+          <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
           <Route path="/card-management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
           <Route path="/tank-management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />

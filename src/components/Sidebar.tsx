@@ -239,9 +239,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 20,
-          label: "Violations",
+          label: "Violation",
           icon: "las la-ban",
-          to: "/violations",
+          to: "/violation",
           permissionId: 40,
         },
         {
@@ -683,13 +683,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                     </li>
                     <li>
                       <Nav.Link
-                        to="/violations"
+                        to="/violation"
                         className="svg-icon"
                         as={NavLink}
                       >
                         <i className="las la-ban"></i>
                         <span className={`ml-2 ${activeMenuText}`}>
-                          {translate("Violations")}
+                          {translate("Violation")}
                         </span>
                       </Nav.Link>
                     </li>
