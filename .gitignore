@@ -50,3 +50,4 @@ package-lock.json
 
 
 /src/assets
+*.json
