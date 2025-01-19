@@ -47,7 +47,7 @@ interface Permission {
 
 const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar }) => {
 
-  const userName = localStorage.getItem("username");
+  const userName = localStorage.getItem("Geopusername");
   const [isOpen, setIsOpen] = useState("");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [activeLogo, setActiveLogo] = useState("header-logo-show");

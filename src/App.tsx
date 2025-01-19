@@ -90,7 +90,7 @@ function App() {
       const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {
 
       });
-
+      console.log(response)
       localStorage.setItem("authToken", response.data.token);
       const GeoploginTime = new Date().getTime(); // Store current time
       localStorage.setItem("GeoploginTime", GeoploginTime.toString());
