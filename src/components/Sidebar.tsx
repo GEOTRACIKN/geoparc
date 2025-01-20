@@ -109,11 +109,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       permissionId: 36, // ID de permission à ajuster
     },
     {
-      id: 49,
+      id: 38,
       label: "Role",
       icon: "las la-check-circle",
       to: "/role",
-      permissionId: 49, // ID de permission à ajuster
+      permissionId: 38, // ID de permission à ajuster
     },
     {
       id: 37,
