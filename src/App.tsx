@@ -86,7 +86,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-
+      
       const response = await axios.get(`${backendUrl}/api/logingeop?apiKey=${apiKey}`, {
 
       });
@@ -121,7 +121,7 @@ function App() {
     }
   };
 
-   handleLogin()   
+  // handleLogin()   
 
   useEffect(() => {
     console.log()
