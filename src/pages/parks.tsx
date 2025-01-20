@@ -791,11 +791,11 @@ export function Parks() {
                     <td>
                       <div className="d-flex align-items-center list-action">
                         <Link
-                          to={`/poi/edit/${poi.idgeof}`}
+                          to={`/park/edit/${poi.idgeof}`}
                           className="badge badge-success mr-2"
                           data-toggle="tooltip"
                           data-placement="top"
-                          title="Editer POI"
+                          title="Edit park"
                         >
                           <i
                             className="las la-cog"
