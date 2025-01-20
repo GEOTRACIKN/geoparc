@@ -46,7 +46,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
         description: "",
         customType: "",
     });
-    const dateformat = formatDateToTimestamp(formData.date_violation);
 
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -63,13 +62,13 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     
         const fetchViolation = async () => {
             try {
-                // Logge l'URL de l'API pour vérifier qu'elle est correcte
+                // Log de l'URL de l'API
                 console.log("URL de l'API :", `${backendUrl}/api/geop/showviolation/${id_violation}`);
     
                 const response = await axios.get(`${backendUrl}/api/geop/showviolation/${id_violation}`);
                 const data = response.data;
     
-                // Logge les données reçues pour s'assurer que tout est bien là
+                // Log des données reçues
                 console.log("Données reçues : ", JSON.stringify(data, null, 2));
     
                 if (!data || !data.id_violation) {
@@ -77,37 +76,31 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
                     return;
                 }
     
-                // Lors de la récupération des données
+                // Fonction pour convertir une date au format 'YYYY-MM-DDTHH:mm' attendu par le champ datetime-local
+                const toDatetimeLocalFormat = (date: string) => {
+                    const [day, month, year, time] = date.split(/[/ ]/); // Sépare par "/" et espace
+                    return `${year}-${month}-${day}T${time}`;
+                };
+    
+                // Formater la date pour le champ input
                 const formattedData = {
                     ...data,
-                 
+                    date_violation: toDatetimeLocalFormat(data.date_violation), // Conversion au format 'YYYY-MM-DDTHH:mm'
                 };
-                
-                // Lors de l’envoi des données au backend
-                const payload = {
-                    ...formData,
-               
-                };
-                
-                console.log("Données formatées :", formattedData);
-                
-                // Mettre à jour le state avec les dates formatées
-                setFormData((prev) => ({
-                    ...prev,
-                    ...formattedData,
-                }));
-                // Logge les données formatées pour vérifier
+    
+                // Log des données formatées
                 console.log("Données formatées :", formattedData);
     
+                // Mise à jour du state avec les données formatées
                 setFormData((prev) => ({
                     ...prev,
                     ...formattedData,
                 }));
-            } catch (error: unknown) {  // Typage explicite de l'erreur ici
+            } catch (error: unknown) {
                 console.error("Error fetching violation data:", error);
     
-                // Vérifie et log l'erreur en cas de problème
-                if (error instanceof AxiosError) {
+                // Gestion explicite des erreurs
+                if (axios.isAxiosError(error)) {
                     console.error("Réponse du serveur:", error.response?.data);
                     console.error("Statut:", error.response?.status);
                 } else if (error instanceof Error) {
@@ -122,6 +115,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     
         fetchViolation();
     }, [id_violation, backendUrl]);
+    
     
     
     useEffect(() => {
@@ -421,11 +415,11 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
                                </Form.Control>
                            </Form.Group>
 
-          <Form.Group controlId="date_violation">
+          <Form.Group controlId="date">
             <Form.Label>{translate("Date Violation")}</Form.Label>
             <Form.Control
               type="datetime-local"
-              name="date_violation"
+              name="date"
               value={formData.date_violation}
               onChange={handleInputChange}
               placeholder="Enter Date and Time here"
