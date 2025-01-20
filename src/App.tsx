@@ -87,7 +87,7 @@ function App() {
   const handleLogin = async () => {
     try {
 
-      const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {
+      const response = await axios.get(`${backendUrl}/api/logingeop?apiKey=${apiKey}`, {
 
       });
       console.log(response)
