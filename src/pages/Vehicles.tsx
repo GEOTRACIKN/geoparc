@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-const backendUrl = 'http://localhost:5000/api/geop';
+const backendUrl = process.env.REACT_APP_BACKEND_URL+'/api/geop';
 const options = [10, 20, 40, 60, 80, 100, 200, 500]; 
 interface VehiculeListInterface {
   id_vehicule: number,
@@ -167,6 +167,7 @@ const clearSearchTerm = () => {
           <th>{translate("Actions")}</th>
         </tr>
       </thead>
+      
     );
   };
 
