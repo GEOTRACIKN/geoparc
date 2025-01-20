@@ -812,7 +812,7 @@
 /*# sourceMappingURL=bootstrap-steps.min.css.map */
 
 .nav-tabs {
-  display: none !important;
+ /* display: none !important;*/
 }
 
 /*.date-control{width: 100%!important;} */
