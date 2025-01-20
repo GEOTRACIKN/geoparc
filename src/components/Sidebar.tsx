@@ -23,10 +23,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
 
   const [isOpen, setIsOpen] = useState("");
-  const [activeLogo, setActiveLogo] = useState("header-logo-show");
-  const [activeMenuText, setActiveMenuText] = useState("");
-  const [menuButtonSidebar, setMenuButtonSidebar] = useState("iq-menu-bt-sidebar-show");
-  const [sidebar, setSidebar] = useState("sidebar-open");
+  const [activeLogo, setActiveLogo] = useState("header-logo-hide");
+  const [activeMenuText, setActiveMenuText] = useState("iq-menu-span-hide");
+  const [menuButtonSidebar, setMenuButtonSidebar] = useState("iq-menu-bt-sidebar-hide");
+  const [sidebar, setSidebar] = useState("sidebar-close");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
 
