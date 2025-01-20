@@ -7,32 +7,40 @@ import moment from 'moment';  // Importation de moment.js
 interface ModalShowViolationnProps {
     show: boolean;
     onHide: () => void;
-    id_pharmacy: number | null;
+    id_violation: number | null;
 }
+
+interface Vehicle {
+    id_vehicule: string;
+    immatriculation_vehicule: string;
+}
+
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
     show,
     onHide,
-    id_pharmacy,
+    id_violation,
 }) => {
     const [formData, setFormData] = useState({
-        id_pharmacy: "",
-        product_pharmacy: "",
-        purch_date_pharmacy: "",
-        exp_date_pharmacy: "",
-        cost_pharmacy: "",
-        type_pharmacy: "",
+        
+        id_conducteur: "",
+        type_violation: "",
+        date_violation: "",
+        cost: 0,
+        description: "",
         immatriculation_vehicule: "",
     });
+        const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    
 
     const { translate } = useTranslate();
 
     // Fetch data from API and set form data
     const fetchViolation = async () => {
         try {
-            const url = `${backendUrl}/api/geop/showpharmacy/${id_pharmacy}`;
+            const url = `${backendUrl}/api/geop/showviolation/${id_violation}`;
             console.log('Request URL:', url);
         
             const response = await fetch(url);
@@ -43,28 +51,28 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
         
             const data = await response.json();
         
-            console.log('API response for pharmacy:', data);
+            console.log('API response for violation:', data);
         
             // Vérifie si les données sont présentes
-            if (data && data.id_pharmacy) {
+            if (data && data.id_violation) {
                 // Vérifie si les dates sont valides avant de les formater
-                const purchDate = moment(data.purch_date_pharmacy, 'DD/MM/YYYY');
-                const expDate = moment(data.exp_date_pharmacy, 'DD/MM/YYYY');
+                const date_violation = moment(data.date_violation, 'DD/MM/YYYY');
                 
                 setFormData({
-                    id_pharmacy: data.id_pharmacy,
-                    product_pharmacy: data.product_pharmacy,
-                    purch_date_pharmacy: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
-                    exp_date_pharmacy: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
-                    cost_pharmacy: data.cost_pharmacy,
-                    type_pharmacy: data.type_pharmacy,
-                    immatriculation_vehicule: data.immatriculation_vehicule
+                    id_conducteur: data.id_conducteur,
+
+                    date_violation: date_violation.isValid() ? date_violation.format('DD/MM/YYYY') : 'Invalid Date',
+                    type_violation: data.type_violation,
+                    immatriculation_vehicule: data.immatriculation_vehicule,
+                    cost: data.cost,
+                    description: data.description,
+
                 });
             } else {
-                console.warn('No pharmacy data found for the provided ID.');
+                console.warn('No violation data found for the provided ID.');
             }
         } catch (error) {
-            console.error('Error fetching pharmacy data:', error);
+            console.error('Error fetching violation data:', error);
         }
     };
     
@@ -94,52 +102,52 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
-                    <Form.Group controlId="product_pharmacy">
+                    <Form.Group controlId="type_violation">
                         <Form.Label>{translate("Product")}</Form.Label>
                         <Form.Control
-                            value={formData.product_pharmacy}
+                            value={formData.type_violation}
                             readOnly
                         />
                     </Form.Group>
 
-                    {/* Champ pour purch_date_pharmacy */}
-                    <Form.Group controlId="purch_date_pharmacy">
+                    {/* Champ pour purch_date_violation */}
+                    <Form.Group controlId="description">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control
-                            value={formData.purch_date_pharmacy}
+                            value={formData.description}
                             readOnly
                         />
                     </Form.Group>
 
-                    {/* Champ pour exp_date_pharmacy */}
-                    <Form.Group controlId="exp_date_pharmacy">
+                    {/* Champ pour exp_date_violation */}
+                    <Form.Group controlId="date_violation">
                         <Form.Label>{translate("Expiration Date")}</Form.Label>
                         <Form.Control
-                            value={formData.exp_date_pharmacy}
+                            value={formData.date_violation}
                             readOnly
                         />
                     </Form.Group>
 
-                    {/* Champ pour cost_pharmacy */}
-                    <Form.Group controlId="cost_pharmacy">
+                    {/* Champ pour cost_violation */}
+                    <Form.Group controlId="costt">
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
-                            value={formData.cost_pharmacy}
+                            value={formData.cost}
                             readOnly
                         />
                     </Form.Group>
 
-                    {/* Champ pour type_pharmacy */}
-                    <Form.Group controlId="type_pharmacy">
+                    {/* Champ pour type_violation */}
+                    <Form.Group controlId="type_violation">
                         <Form.Label>{translate("Type")}</Form.Label>
                         <Form.Control
-                            value={formData.type_pharmacy}
+                            value={formData.type_violation}
                             readOnly
                         />
                     </Form.Group>
 
                     {/* Champ pour immatriculation_vehicule */}
-                    <Form.Group controlId="immatriculation_vehicule">
+                    <Form.Group controlId="a">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             value={formData.immatriculation_vehicule}

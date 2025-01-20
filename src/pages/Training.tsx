@@ -39,6 +39,8 @@ export function Training() {
     const [selectedTrainingId, setSelectedTrainingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const [isGridView, setIsGridView] = useState(true);
+
     const initialColumns = {
         ID: true,
         Name: true,
@@ -189,6 +191,22 @@ export function Training() {
                         <i className="las la-plus mr-3"></i>
                         {translate("New Request")}
                     </Button>
+
+        <Button  onClick={() => setIsGridView(!isGridView)}  style={{background: "no-repeat", color: "#000", border: "1px solid #ddd"}}   className={` ${isGridView ? 'active' : ''}`} >
+          {isGridView ? (
+            <>
+              <i className="las la-icons" style={{fontSize: "21px"}} ></i>
+              <span>{translate("Grid View")}</span>
+            </>
+          ) : ( 
+            <>
+              <i className="las la-list" style={{fontSize: "21px"}} ></i>
+              <span> {translate("List view")}</span> 
+            </>
+          )}
+        </Button>
+
+        
                 </div>
       
             </div>
@@ -227,6 +245,8 @@ export function Training() {
                 </div>
                 <div className="col-md-8 d-flex justify-content-end align-items-center">
                     <div className="dataTables_length">
+
+                        
                         <label style={{ marginBottom: "0" }}>
                             {translate("Show")}
                             <select

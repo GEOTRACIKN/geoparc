@@ -159,19 +159,24 @@ export function Violation() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Name"):
+            case translate("Vehicle"):
                 setType(1);
                     break;
-            case translate("Type"):
+            case translate("Driver"):
                 setType(2);
                 break;
-            case translate("Date"):
+
+            case translate("Type"):
                 setType(3);
                 break;
-            case translate("Cost"):
+            case translate("Description"):
                 setType(4);
                 break;
-            case translate("Type"):
+            case translate("Date"):
+                setType(5);
+                break;
+          
+            case translate("Cost"):
                 setType(6);
                 break;     
                     
@@ -229,10 +234,12 @@ export function Violation() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Description")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
+
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -502,6 +509,8 @@ export function Violation() {
             <ModalNewViolation show={showNewViolationModal} onHide={handleCloseNewViolationModal} onSuccess={refreshData} />
             <ModalDeleteViolation show={showDeleteViolationModal} onHide={handleCloseDeleteViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
             <ModalEditViolation show={showEditViolationModal} onHide={handleCloseEditViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
+            <ModalShowViolation show={showShowViolationModal} onHide={handleCloseShowViolationModal} id_violation ={selectedViolationId}  />
+
 
 
 

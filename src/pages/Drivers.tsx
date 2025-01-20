@@ -801,7 +801,11 @@ export function Drivers() {
               )}
           </tbody>
         </Table>
-        <TrainingCalendar eventsData={trainingData} />
+{/* <TrainingCalendar eventsData={trainingData} /> */}
+
+
+
+
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
