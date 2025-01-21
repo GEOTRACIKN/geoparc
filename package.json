@@ -77,10 +77,10 @@
   },
   "scripts": {
     "start": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts start",
-    "build": "set \"REACT_APP_BACKEND_URL=https://geotrackin.com\" && react-scripts build",
-    "copy-build": "xcopy /E /I /Y \"build\" \"..\\..\\geoparc.geotrackin.com\"",
+    "build": "set \"REACT_APP_BACKEND_URL=https//geotrackon.com\" && react-scripts build",
+    "copy-build": "cp -r build/* /opt/lampp/htdocs/geoparc.geotrackin.com",
     "build-and-copy": "npm run build && npm run copy-build",
-    "test": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts test",
+    "test": "jest",
     "eject": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts eject"
   },
   "eslintConfig": {

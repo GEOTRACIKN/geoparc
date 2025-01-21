@@ -47,7 +47,7 @@ interface Permission {
 
 const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar }) => {
 
-  const userName = localStorage.getItem("username");
+  const userName = localStorage.getItem("Geopusername");
   const [isOpen, setIsOpen] = useState("");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [activeLogo, setActiveLogo] = useState("header-logo-show");
@@ -59,7 +59,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const navigate = useNavigate();
   const { translate } = useTranslate();
   const handleLanguageChange = (newLang: any) => { setLang(newLang); };
-  const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
   const strLang = {
@@ -414,7 +414,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                
               { checkPermission(27) && ( <li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
                   {userID === "1" && (
-                    <a href={`https://geoparc.geotrackin.com?APIkey=${APIkey}`} className="gp">
+                    <a href={`https://geoparc.geotrackin.com?apikey=${APIkey}`} className="gp">
                       <i className="las la-sign-in-alt" style={{ fontSize: "29px" }}></i>
                       <span style={{ fontSize: "16px" }}> GEOPARC</span>
                     </a>

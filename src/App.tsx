@@ -86,11 +86,11 @@ function App() {
 
   const handleLogin = async () => {
     try {
-
-      const response = await axios.get(`${backendUrl}/api/logingeop?api_Key=${apiKey}`, {
+      
+      const response = await axios.get(`https://geotrackin.com/api/logingeop?apiKey=${apiKey}`, {
 
       });
-
+      console.log(response)
       localStorage.setItem("authToken", response.data.token);
       const GeoploginTime = new Date().getTime(); // Store current time
       localStorage.setItem("GeoploginTime", GeoploginTime.toString());
@@ -121,20 +121,18 @@ function App() {
     }
   };
 
-   handleLogin()   
+  // handleLogin()   
 
   useEffect(() => {
     console.log()
     handleLogin()   
   }, []);
 
-
   return (
     <ThemeProvider>
     <LanguageProvider> 
       <div className="wrapper" style={{ transition: 'width 0.3s', backgroundColor: '#fff', height: '100vh', padding: '0px' }}>
         <Routes>
-
           <Route path="/" element={<DashboardLayout>{<Dashboard />}</DashboardLayout>} />
           <Route path="/vehicles" element={<DashboardLayout>{<Vehicles />}</DashboardLayout>} />
           <Route path="/vehicles-forms" element={<DashboardLayout>{<VehiclesForms />}</DashboardLayout>} />
@@ -149,8 +147,6 @@ function App() {
           <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
-
-
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
@@ -178,12 +174,7 @@ function App() {
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
-          <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
-
-
-
-
-          
+          <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />  
         </Routes>
       </div>
       <ToastContainer
