@@ -91,7 +91,7 @@ export function Vehicle() {
 interface Field {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email';
+  type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email' |'file';
   placeholder?: string;
   options?: string[];
   icon: string;
@@ -102,7 +102,7 @@ interface Field {
 
 
 
-const fieldsTab1: Field[] = [
+const fieldsTab: Field[] = [
     { id: 'nom_conducteur', label: "Nom du conducteur", type: 'text', placeholder: "Entrez le nom du conducteur", icon: "fas fa-user", required: true },
     { id: 'prenom_conducteur', label: "Prénom du conducteur", type: 'text', placeholder: "Entrez le prénom du conducteur", icon: "fas fa-user", required: true },
     { id: 'code_conducteur', label: "Code d'identification", type: 'number', placeholder: "Entrez le code d'identification", icon: "fas fa-id-card", required: true },
@@ -114,6 +114,114 @@ const fieldsTab1: Field[] = [
     { id: 'email_conducteur', label: "Email du conducteur", type: 'email', placeholder: "Entrez l'email", icon: "fas fa-envelope", required: false },
     { id: 'nationalite_conducteur', label: "Nationalité", type: 'text', placeholder: "Entrez la nationalité", icon: "fas fa-globe", required: false }
   ];
+
+
+
+  const fieldsTab1: Field[] = [
+    { id: "immatriculation", label: "Immatriculation", type: "text", placeholder: "Immatriculation", icon: "fas fa-car", required: true },
+    {
+      id: "categorie",
+      label: "Catégorie",
+      type: "select",
+      options: ["Catégorie", "Véhicule Automobile", "Véhicule Tractés", "Autre"],
+      icon: "fas fa-list",
+      required: true,
+    },
+    {
+      id: "type",
+      label: "Type",
+      type: "select",
+      options: [
+        "Type",
+        "Touristique",
+        "Utilitaire",
+        "Transport commun",
+        "Camionette",
+        "Camion",
+        "Camion (semi-remorque)",
+        "Engins",
+        "Spécifique",
+        "Remorque usage classique",
+        "Semi Remorque",
+        "Autre",
+      ],
+      icon: "fas fa-list",
+      required: true,
+    },
+    {
+      id: "marque",
+      label: "Marque",
+      type: "select",
+      options: ["Marque", "Renault", "Fiat", "Mercedes", "Hyundai", "Audi", "BMW"],
+      icon: "fas fa-tag",
+      required: true,
+    },
+    { id: "modele", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
+    { id: "moteur", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false },
+    { id: "codification", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true },
+    { id: "couleur", label: "Durée d'amortissement (jours)", type: "text", placeholder: "Durée d'amortissement", icon: "fas fa-calendar", required: true },
+    {
+      id: "acqui",
+      label: "Acquisition",
+      type: "select",
+      options: ["Acquisition", "Achat", "Leasing", "Location"],
+      icon: "fas fa-shopping-cart",
+      required: true,
+    },
+    {
+      id: "etat",
+      label: "État",
+      type: "select",
+      options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"],
+      icon: "fas fa-info-circle",
+      required: true,
+    },
+    {
+      id: "typeCarb",
+      label: "Type carburant",
+      type: "select",
+      options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"],
+      icon: "fas fa-gas-pump",
+      required: true,
+    },
+    {
+      id: "nameParc",
+      label: "Nom du parc automobile",
+      type: "select",
+      options: ["Nom du Parc", "Metalsteeltest"],
+      icon: "fas fa-warehouse",
+      required: false,
+    },
+    {
+      id: "conducteur",
+      label: "Nom du conducteur",
+      type: "select",
+      options: [
+        "Conducteur",
+        "Merzem Abdelatif",
+        "Touil Mohamed",
+        "HAMAL AMAR 16",
+        "Lebgaa Rabah",
+        "Messai Djemai",
+        "MEZIANI DJAMEL",
+      ],
+      icon: "fas fa-user",
+      required: false,
+    },
+    {
+      id: "service",
+      label: "Service",
+      type: "select",
+      options: ["Service"],
+      icon: "fas fa-tools",
+      required: false,
+    },
+    { id: "capacite_res", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false },
+    { id: "consom_moy", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false },
+    { id: "kilom", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-odometer", required: false },
+    { id: "fileToUpload", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false },
+  ];
+  
   
   const fieldsTab2: Field[] = [
     { id: 'piece_identite_conducteur', label: "Type de la pièce", type: 'select', options: ["Biométrie", "Normal"], icon: "fas fa-id-card", required: false },
