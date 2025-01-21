@@ -226,12 +226,9 @@ export function Training() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Name")}</Dropdown.Item>
-
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Start Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("End Date")}</Dropdown.Item>
-
-                              
+                                <Dropdown.Item>{translate("End Date")}</Dropdown.Item>       
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -292,6 +289,10 @@ export function Training() {
                 </div>
             </div>
 
+            {isGridView ? (
+                 <p>{translate("No content available in Grid View.")}</p>
+            ) : (
+
             <div className="row m-1">
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
@@ -314,9 +315,7 @@ export function Training() {
                                     {translate("ID")}
                                 </th>
                             )}
-                           
-                       
-                            
+
                              {selectedColumns.Name && (
                                 <th
                                     className="sorting "
@@ -325,8 +324,6 @@ export function Training() {
                                     {translate("Name")}
                                 </th>
                             )}
-                           
-                            
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -457,6 +454,7 @@ export function Training() {
                     </tbody>
                 </Table>
             </div>
+             )}
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">

@@ -71,15 +71,7 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
         if (show) {
             fetchViolation();
         }
-    }, [show]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [id]: value,
-        }));
-    };
+    }, [show, fetchViolation]);
 
     return (
         <Modal show={show} onHide={onHide} responsive>

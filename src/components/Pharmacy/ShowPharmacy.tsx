@@ -69,21 +69,13 @@ const ModalShowPharmacy: React.FC<ModalShowPharmacynProps> = ({
     };
     
     
-    
-
     useEffect(() => {
         if (show) {
             fetchPharmacy();
         }
     }, [show]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [id]: value,
-        }));
-    };
+    
 
     return (
         <Modal show={show} onHide={onHide} responsive>
