@@ -63,6 +63,7 @@ import { ThemeProvider } from "./hooks/ThemeContext";
 import NotFound from "./pages/NotFound";
 import { Parks } from "./pages/parks";
 import Park from "./pages/park";
+import { Vehicle } from "./pages/Vehicle";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -175,6 +176,9 @@ function App() {
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
           <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />  
+          <Route path="/vehicle" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+          <Route path="/vehicle/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+          <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
         </Routes>
       </div>
       <ToastContainer
