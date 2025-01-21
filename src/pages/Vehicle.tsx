@@ -4,7 +4,7 @@ import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
-import  FieldInput  from "../components/Vehicle/FieldInput";
+import FieldInput from "../components/Vehicle/FieldInput";
 
 interface VehicleInterface {
   id_conducteur?: number | null;
@@ -87,35 +87,26 @@ export function Vehicle() {
   const [buttonClicked, setButtonClicked] = useState(false);
 
 
-// Définition des types pour chaque champ
-interface Field {
-  id: string;
-  label: string;
-  type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email' |'file';
-  placeholder?: string;
-  options?: string[];
-  icon: string;
-  required?: boolean;
-}
+  // Définition des types pour chaque champ
+  interface Field {
+    id: string;
+    label: string;
+    type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email' | 'file';
+    placeholder?: string;
+    options?: string[];
+    icon: string;
+    required?: boolean;
+    tooltip?: string;
+  }
 
 
 
 
-
-const fieldsTab: Field[] = [
-    { id: 'nom_conducteur', label: "Nom du conducteur", type: 'text', placeholder: "Entrez le nom du conducteur", icon: "fas fa-user", required: true },
-    { id: 'prenom_conducteur', label: "Prénom du conducteur", type: 'text', placeholder: "Entrez le prénom du conducteur", icon: "fas fa-user", required: true },
-    { id: 'code_conducteur', label: "Code d'identification", type: 'number', placeholder: "Entrez le code d'identification", icon: "fas fa-id-card", required: true },
-    { id: 'role_conducteur', label: "Fonction du conducteur", type: 'text', placeholder: "Entrez la fonction du conducteur", icon: "fas fa-briefcase", required: false },
-    { id: 'date_naissance_conducteur', label: "Date de naissance", type: 'date', placeholder: "Sélectionnez la date de naissance", icon: "fas fa-calendar-day", required: false },
-    { id: 'adresse_conducteur', label: "Adresse du conducteur", type: 'text', placeholder: "Entrez l'adresse du conducteur", icon: "fas fa-home", required: false },
-    { id: 'ville_conducteur', label: "Ville du conducteur", type: 'text', placeholder: "Entrez la ville", icon: "fas fa-city", required: false },
-    { id: 'telephone_conducteur', label: "Téléphone du conducteur", type: 'tel', placeholder: "Entrez le téléphone", icon: "fas fa-phone", required: false },
-    { id: 'email_conducteur', label: "Email du conducteur", type: 'email', placeholder: "Entrez l'email", icon: "fas fa-envelope", required: false },
-    { id: 'nationalite_conducteur', label: "Nationalité", type: 'text', placeholder: "Entrez la nationalité", icon: "fas fa-globe", required: false }
-  ];
-
-
+  const tabTitles: { [key: string]: string } = {
+    tab_1: "Informations générales",
+    tab_2: "Caractéristiques techniques",
+    tab_3: "Autres informations",
+  };
 
   const fieldsTab1: Field[] = [
     { id: "immatriculation", label: "Immatriculation", type: "text", placeholder: "Immatriculation", icon: "fas fa-car", required: true },
@@ -221,15 +212,25 @@ const fieldsTab: Field[] = [
     { id: "kilom", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-odometer", required: false },
     { id: "fileToUpload", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false },
   ];
-  
-  
+
+
+
   const fieldsTab2: Field[] = [
-    { id: 'piece_identite_conducteur', label: "Type de la pièce", type: 'select', options: ["Biométrie", "Normal"], icon: "fas fa-id-card", required: false },
-    { id: 'numero_piece_identite_conducteur', label: "Numéro de la pièce", type: 'number', placeholder: "Entrez le numéro de la pièce", icon: "fas fa-id-card", required: false },
-    { id: 'date_delivrance_pi_conducteur', label: "Date de délivrance", type: 'date', placeholder: "Sélectionnez la date de délivrance", icon: "fas fa-calendar-day", required: false },
-    { id: 'lieu_delivrance_pi_conducteur', label: "Lieu de délivrance", type: 'text', placeholder: "Entrez le lieu de délivrance", icon: "fas fa-map-marker-alt", required: false }
+    { id: "psn", label: "PSN", type: "text", placeholder: "PSN", icon: "fas fa-barcode", tooltip: "N° série gps", required: false },
+    { id: "anne", label: "Année", type: "text", placeholder: "Année", icon: "fas fa-calendar", tooltip: "Année", required: false },
+    { id: "dateCirculation", label: "Date de circulation", type: "date", placeholder: "", icon: "fas fa-calendar-day", tooltip: "Date circulation", required: false },
+    { id: "numChassis", label: "N° Châssis", type: "text", placeholder: "N° Châssis", icon: "fas fa-car", tooltip: "N° Châssis du véhicule", required: false },
+    { id: "nbrePorte", label: "Nombre de Portes", type: "text", placeholder: "Nombre de Portes", icon: "fas fa-door-open", tooltip: "Nombre de portes", required: false },
+    { id: "nbrePlace", label: "Nombre de Places", type: "text", placeholder: "Nombre de Places", icon: "fas fa-chair", tooltip: "Nombre de places", required: false },
+    { id: "puissance", label: "Puissance", type: "text", placeholder: "Puissance", icon: "fas fa-bolt", tooltip: "Puissance", required: false },
+    { id: "ptac", label: "PTAC", type: "text", placeholder: "Poids total autorisé en charge", icon: "fas fa-weight-hanging", tooltip: "Poids total autorisé en charge", required: false },
+    { id: "longueur", label: "Longueur (m)", type: "text", placeholder: "Longueur (m)", icon: "fas fa-ruler-horizontal", tooltip: "Longueur en mètres", required: false },
+    { id: "largeur", label: "Largeur (m)", type: "text", placeholder: "Largeur (m)", icon: "fas fa-ruler-combined", tooltip: "Largeur en mètres", required: false },
+    { id: "hauteur", label: "Hauteur (m)", type: "text", placeholder: "Hauteur (m)", icon: "fas fa-ruler-vertical", tooltip: "Hauteur en mètres", required: false },
+    { id: "poids", label: "Poids (Kg)", type: "text", placeholder: "Poids (Kg)", icon: "fas fa-dumbbell", tooltip: "Poids du véhicule en kg", required: false },
+    { id: "co2", label: "Émission de CO2", type: "text", placeholder: "Émission de CO2", icon: "fas fa-cloud", tooltip: "Émission de CO2", required: false },
   ];
-  
+
   const fieldsTab3: Field[] = [
     { id: 'premis_conducteur', label: "Type de permis", type: 'select', options: ["A1", "A", "B", "B(E)", "C1", "C1(E)", "C", "C(E)", "D", "D(E)", "F"], icon: "fas fa-id-card", required: false },
     { id: 'numero_permis_conducteur', label: "Numéro de permis", type: 'text', placeholder: "Entrez le numéro de permis", icon: "fas fa-barcode", required: false },
@@ -243,7 +244,7 @@ const fieldsTab: Field[] = [
     tab_2: fieldsTab2,
     tab_3: fieldsTab3,
   };
-  
+
 
   const cancelClicked = () => {
     navigate("/Vehicles");
@@ -775,7 +776,7 @@ const fieldsTab: Field[] = [
           ) : (
             <Tabs defaultActiveKey="tab_1" id="vehicle-tabs" className="mb-3">
               {Object.entries(fieldsConfig).map(([tabKey, fields]) => (
-                <Tab eventKey={tabKey} title={`Onglet ${tabKey.split('_')[1]}`} key={tabKey}>
+              <Tab eventKey={tabKey} title={tabTitles[tabKey]} key={tabKey}>
                   <div className="row">
                     {fields.map((field) => (
                       <div className="col-md-6" key={field.id}>
