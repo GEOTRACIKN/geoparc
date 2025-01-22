@@ -6,38 +6,80 @@ import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import FieldInput from "../components/Vehicle/FieldInput";
 
-interface VehicleInterface {
-  id_conducteur?: number | null;
-  nom_conducteur: string | null;
-  prenom_conducteur: string | null;
-  date_naissance_conducteur: string | null; // Utilisez `string` pour la date, ou `Date` si vous convertissez en objet Date
-  premis_conducteur: string | null;
-  nationalite_conducteur: string | null;
-  adresse_conducteur: string | null;
-  email_conducteur: string | null;
-  telephone_conducteur: string | null;
-  piece_identite_conducteur: string | null;
-  numero_piece_identite_conducteur: string | null;
-  date_delivrance_pi_conducteur: string | null; // Utilisez `string` pour la date/heure
-  lieu_delivrance_pi_conducteur: string | null;
-  numero_permis_conducteur: string | null;
-  date_delivrance_permis_conducteur: string | null; // Utilisez `string` pour la date/heure
-  lieu_delivrance_permis_conducteur: string | null;
-  id_sousParc: number | null;
-  situation_conducteur: string | null;
-  prenom_pere_conducteur: string | null;
-  nom_mere_conducteur: string | null;
-  prenom_mere_conducteur: string | null;
-  role_conducteur: string | null;
-  service_conducteur: string | null;
-  sexe_conducteur: string | null;
-  date_expir_permis_conducteur: string | null; // Utilisez `string` pour la date/heure
-  total_salaire_conducteur: string | null;
-  code_conducteur: string | null;
-  id_user: string | null;
-  service: number | null;
-  type_permis: string | null;
-  groupe_sanguin: string | null;
+export interface VehicleInterface {
+  id_vehicule: number;
+  id_user?: number | null;
+  vehicule_type?: string | null;
+  category_vehicule?: string | null;
+  propriete_vehicule?: string | null;
+  id_marque?: number | null;
+  modele_vehicule?: string | null;
+  date_aquisition_vehicule?: Date | null;
+  type_carburant_vehicule?: string | null;
+  immatriculation_vehicule?: string | null;
+  annee_vehicule?: string | null;
+  couleur_vehicule?: string;
+  date_circulation_vehicule?: Date | null;
+  num_chassis_vehicule?: string | null;
+  nbre_place_vehicule?: number | null;
+  puissance_vehicule?: string | null;
+  etat_vehicule?: string | null;
+  kilometrage_vehicule?: string | null;
+  commentaire_vehicule?: string | null;
+  companie_assurance_vehicule?: string | null;
+  type_assurance_vehicule?: string | null;
+  date_debut_assurance_vehicule?: string | null;
+  date_expir_assurance_vehicule?: string | null;
+  cout_assurance_vehicule?: string | null;
+  delai_assurance_vehicule?: string | null;
+  reference_assurance_vehicule?: string | null;
+  note_assurance_vehicule?: string | null;
+  etat_ctr_tech_vehicule?: string | null;
+  date_debut_ctr_tech_vehicule?: string | null;
+  date_fin_ctr_tech_vehicule?: string | null;
+  station_ctr_vehicule?: string | null;
+  cout_ctr_tech_vehicule?: string | null;
+  note_ctr_tech_vehicule?: string | null;
+  date_vignette_vehicule?: string | null;
+  cout_vignette_vehicule?: string | null;
+  id_gps?: number | null;
+  id_conducteur_vehicule?: number | null;
+  longueur_vehicule?: string | null;
+  largeur_vehicule?: string | null;
+  hauteur_vehicule?: string | null;
+  poid_vehicule?: string | null;
+  nbre_porte_vehicule?: number | null;
+  icon_vehicule?: string | null;
+  detail_vehicule?: string | null;
+  num_porte_vehicule?: string | null;
+  ptac_vehicule?: string | null;
+  kilometrage_reel_vehicule?: string | null;
+  image_vehicule?: string | null;
+  consomatio_gasoil_reel_vehicule?: string | null;
+  latitude_vehicule?: string | null;
+  longitude_vehicule?: string | null;
+  date_heure_position_vehicule?: string | null;
+  id_sousParc_vehicule?: number | null;
+  num_vignette_vehicule?: string | null;
+  famille_vehicule?: string | null;
+  gamme_vehicule?: string | null;
+  id_groupe?: number;
+  fuel_level_vehicule?: string | null;
+  co2_vehicule?: string | null;
+  capacite_res_vehicule?: string | null;
+  prochain_vidange_vehicule?: string | null;
+  info_vehicule?: number | null;
+  draft?: number;
+  inService_vehicule?: string | null;
+  date_creation_vehicule?: string | null;
+  date_modification_vehicule?: string | null;
+  date_suppression_vehicule?: string | null;
+  PSN?: string | null;
+  LAST_IB_CODE?: string | null;
+  fuel_type?: string | null;
+  maximum_allowed_total?: string | null;
+  consommation_moyenne_vehicule?: string | null;
+  id_parc?: number | null;
 }
 
 export function Vehicle() {
@@ -47,38 +89,80 @@ export function Vehicle() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
   const id_user = localStorage.getItem("GeopUserID");
-  const [Vehicle, setVehicle] = useState<VehicleInterface | null>({
-    id_conducteur: isEditing && id_conducteur ? Number(id_conducteur) : null,
-    nom_conducteur: null,
-    prenom_conducteur: null,
-    date_naissance_conducteur: null,
-    premis_conducteur: null,
-    nationalite_conducteur: null,
-    adresse_conducteur: null,
-    email_conducteur: null,
-    telephone_conducteur: null,
-    piece_identite_conducteur: null,
-    numero_piece_identite_conducteur: null,
-    date_delivrance_pi_conducteur: null,
-    lieu_delivrance_pi_conducteur: null,
-    numero_permis_conducteur: null,
-    date_delivrance_permis_conducteur: null,
-    lieu_delivrance_permis_conducteur: null,
-    id_sousParc: null,
-    situation_conducteur: null,
-    prenom_pere_conducteur: null,
-    nom_mere_conducteur: null,
-    prenom_mere_conducteur: null,
-    role_conducteur: null,
-    service_conducteur: null,
-    sexe_conducteur: null,
-    date_expir_permis_conducteur: null,
-    total_salaire_conducteur: null,
-    code_conducteur: null,
-    id_user: isEditing ? null : id_user,
-    service: null,
-    groupe_sanguin: null,
-    type_permis: null,
+  const [vehicle, setVehicle] = useState<VehicleInterface | null>({
+    id_vehicule: 0,
+    id_user: null,
+    vehicule_type: null,
+    category_vehicule: null,
+    propriete_vehicule: null,
+    id_marque: null,
+    modele_vehicule: null,
+    date_aquisition_vehicule: null,
+    type_carburant_vehicule: null,
+    immatriculation_vehicule: null,
+    annee_vehicule: null,
+    couleur_vehicule: "#F70000",
+    date_circulation_vehicule: null,
+    num_chassis_vehicule: null,
+    nbre_place_vehicule: null,
+    puissance_vehicule: null,
+    etat_vehicule: null,
+    kilometrage_vehicule: null,
+    commentaire_vehicule: null,
+    companie_assurance_vehicule: null,
+    type_assurance_vehicule: null,
+    date_debut_assurance_vehicule: null,
+    date_expir_assurance_vehicule: null,
+    cout_assurance_vehicule: null,
+    delai_assurance_vehicule: null,
+    reference_assurance_vehicule: null,
+    note_assurance_vehicule: null,
+    etat_ctr_tech_vehicule: null,
+    date_debut_ctr_tech_vehicule: null,
+    date_fin_ctr_tech_vehicule: null,
+    station_ctr_vehicule: null,
+    cout_ctr_tech_vehicule: null,
+    note_ctr_tech_vehicule: null,
+    date_vignette_vehicule: null,
+    cout_vignette_vehicule: null,
+    id_gps: null,
+    id_conducteur_vehicule: null,
+    longueur_vehicule: null,
+    largeur_vehicule: null,
+    hauteur_vehicule: null,
+    poid_vehicule: null,
+    nbre_porte_vehicule: null,
+    icon_vehicule: null,
+    detail_vehicule: null,
+    num_porte_vehicule: null,
+    ptac_vehicule: null,
+    kilometrage_reel_vehicule: null,
+    image_vehicule: null,
+    consomatio_gasoil_reel_vehicule: null,
+    latitude_vehicule: null,
+    longitude_vehicule: null,
+    date_heure_position_vehicule: null,
+    id_sousParc_vehicule: null,
+    num_vignette_vehicule: null,
+    famille_vehicule: null,
+    gamme_vehicule: null,
+    id_groupe: 0,
+    fuel_level_vehicule: null,
+    co2_vehicule: null,
+    capacite_res_vehicule: null,
+    prochain_vidange_vehicule: null,
+    info_vehicule: null,
+    draft: 0,
+    inService_vehicule: null,
+    date_creation_vehicule: null,
+    date_modification_vehicule: null,
+    date_suppression_vehicule: null,
+    PSN: null,
+    LAST_IB_CODE: null,
+    fuel_type: null,
+    maximum_allowed_total: null,
+    consommation_moyenne_vehicule: null,
+    id_parc: null,
   });
 
   const [loading, setLoading] = useState<boolean | null>(true);
@@ -105,7 +189,9 @@ export function Vehicle() {
   const tabTitles: { [key: string]: string } = {
     tab_1: "Informations générales",
     tab_2: "Caractéristiques techniques",
-    tab_3: "Autres informations",
+    tab_3: "Assurance",
+    tab_4:"Contrôle technique",
+    tab_5: "Vignette"
   };
 
   const fieldsTab1: Field[] = [
@@ -217,32 +303,109 @@ export function Vehicle() {
 
   const fieldsTab2: Field[] = [
     { id: "psn", label: "PSN", type: "text", placeholder: "PSN", icon: "fas fa-barcode", tooltip: "N° série gps", required: false },
-    { id: "anne", label: "Année", type: "text", placeholder: "Année", icon: "fas fa-calendar", tooltip: "Année", required: false },
     { id: "dateCirculation", label: "Date de circulation", type: "date", placeholder: "", icon: "fas fa-calendar-day", tooltip: "Date circulation", required: false },
-    { id: "numChassis", label: "N° Châssis", type: "text", placeholder: "N° Châssis", icon: "fas fa-car", tooltip: "N° Châssis du véhicule", required: false },
-    { id: "nbrePorte", label: "Nombre de Portes", type: "text", placeholder: "Nombre de Portes", icon: "fas fa-door-open", tooltip: "Nombre de portes", required: false },
+
+    { id: "anne", label: "Année", type: "text", placeholder: "Année", icon: "fas fa-calendar", tooltip: "Année", required: false },
+     { id: "numChassis", label: "N° Châssis", type: "text", placeholder: "N° Châssis", icon: "fas fa-car", tooltip: "N° Châssis du véhicule", required: false },
+   // { id: "nbrePorte", label: "Nombre de Portes", type: "text", placeholder: "Nombre de Portes", icon: "fas fa-door-open", tooltip: "Nombre de portes", required: false },
     { id: "nbrePlace", label: "Nombre de Places", type: "text", placeholder: "Nombre de Places", icon: "fas fa-chair", tooltip: "Nombre de places", required: false },
     { id: "puissance", label: "Puissance", type: "text", placeholder: "Puissance", icon: "fas fa-bolt", tooltip: "Puissance", required: false },
     { id: "ptac", label: "PTAC", type: "text", placeholder: "Poids total autorisé en charge", icon: "fas fa-weight-hanging", tooltip: "Poids total autorisé en charge", required: false },
-    { id: "longueur", label: "Longueur (m)", type: "text", placeholder: "Longueur (m)", icon: "fas fa-ruler-horizontal", tooltip: "Longueur en mètres", required: false },
+   // { id: "longueur", label: "Longueur (m)", type: "text", placeholder: "Longueur (m)", icon: "fas fa-ruler-horizontal", tooltip: "Longueur en mètres", required: false },
     { id: "largeur", label: "Largeur (m)", type: "text", placeholder: "Largeur (m)", icon: "fas fa-ruler-combined", tooltip: "Largeur en mètres", required: false },
     { id: "hauteur", label: "Hauteur (m)", type: "text", placeholder: "Hauteur (m)", icon: "fas fa-ruler-vertical", tooltip: "Hauteur en mètres", required: false },
     { id: "poids", label: "Poids (Kg)", type: "text", placeholder: "Poids (Kg)", icon: "fas fa-dumbbell", tooltip: "Poids du véhicule en kg", required: false },
     { id: "co2", label: "Émission de CO2", type: "text", placeholder: "Émission de CO2", icon: "fas fa-cloud", tooltip: "Émission de CO2", required: false },
   ];
-
   const fieldsTab3: Field[] = [
-    { id: 'premis_conducteur', label: "Type de permis", type: 'select', options: ["A1", "A", "B", "B(E)", "C1", "C1(E)", "C", "C(E)", "D", "D(E)", "F"], icon: "fas fa-id-card", required: false },
-    { id: 'numero_permis_conducteur', label: "Numéro de permis", type: 'text', placeholder: "Entrez le numéro de permis", icon: "fas fa-barcode", required: false },
-    { id: 'lieu_delivrance_permis_conducteur', label: "Lieu de délivrance", type: 'text', placeholder: "Entrez le lieu de délivrance", icon: "fas fa-map-marker-alt", required: false },
-    { id: 'date_delivrance_permis_conducteur', label: "Date de délivrance", type: 'date', placeholder: "Sélectionnez la date de délivrance", icon: "fas fa-calendar-day", required: false },
-    { id: 'date_expir_permis_conducteur', label: "Date d'expiration", type: 'date', placeholder: "Sélectionnez la date d'expiration", icon: "fas fa-calendar-day", required: false }
+    // Première colonne
+    { id: "agenceAssurance", label: "Agence assurance", type: "text", placeholder: "Agence assurance", icon: "fas fa-building", tooltip: "Agence assurance", required: false },
+    { id: "typeAssurance", label: "Type assurance", type: "text", placeholder: "Type assurance", icon: "fas fa-shield-alt", tooltip: "Type assurance", required: false },
+    { id: "dateDebutAssurance", label: "Date début", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "dateExpAssurance", label: "Date expiration", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    // Deuxième colonne
+    { id: "coutAss", label: "Coût", type: "text", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
+    { id: "delai", label: "Délai (Mois)", type: "text", placeholder: "Délai (Mois)", icon: "fas fa-clock", tooltip: "Délai (Mois)", required: false },
+    { id: "referenceAssurance", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
   ];
+
+  const fieldsTab4: Field[] = [
+    // Première colonne
+    { id: "etabControle", label: "Etablissement de contrôle", type: "text", placeholder: "Etablissement de contrôle", icon: "fas fa-building", tooltip: "Etablissement de contrôle", required: false },
+    { id: "referenceControle", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
+    { id: "dateControle", label: "Date du contrôle", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "dateFinControle", label: "Date fin", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+  
+    // Deuxième colonne
+    { id: "coutControle", label: "Coût", type: "text", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
+  ];
+  
+  
+
+
+  const fieldsTab5: Field[] = [
+    { id: "numVignette", label: "N° Vignette", type: "text", placeholder: "N° Vignette", tooltip: "N° Vignette", icon: "fas fa-barcode", required: false },
+    { id: "dateVignette", label: "Date vignette", type: "date", placeholder: "", tooltip: "Date vignette", icon: "fas fa-calendar", required: false },
+    { id: "coutVignette", label: "Coût", type: "text", placeholder: "Coût", tooltip: "Coût", icon: "fas fa-money-bill", required: false },
+  ];
+  
+
+  const tab1Fields: Field[] = [
+    { id: "fournisseur", label: "Fournisseur", type: "text", placeholder: "Fournisseur", tooltip: "Nom du fournisseur", icon: "fas fa-building", required: false },
+    { id: "numContrat", label: "N° du contrat", type: "text", placeholder: "N° du contrat", tooltip: "Numéro du contrat", icon: "fas fa-file-contract", required: false },
+    {
+      id: "duree",
+      label: "Durée",
+      type: "select",
+      options: [
+        "Durée" ,
+         "6" ,
+         "12" ,
+         "36" ,
+         "48" ,
+         "60" ,
+      ],
+      tooltip: "Durée",
+      icon: "fas fa-clock",
+      required: false,
+    },
+    { id: "apport", label: "Apport", type: "number", placeholder: "Apport", tooltip: "Apport", icon: "fas fa-wallet", required: false },
+    { id: "datePremiereEcheance", label: "Date 1ère échéance", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "echeance", label: "Échéance", type: "number", placeholder: "Échéance", tooltip: "Échéance", icon: "fas fa-calendar-check", required: false },
+    { id: "echeanceRestante", label: "Échéance restante", type: "number", placeholder: "Échéance restantes (Mois)", tooltip: "Échéance restantes", icon: "fas fa-calendar-minus", required: false },
+    { id: "payeAcejour", label: "Payé à ce jour", type: "text", placeholder: "Payé à ce jour", tooltip: "Payé à ce jour", icon: "fas fa-money-check", required: false },
+    { id: "dernierPaiment", label: "Dernier paiement", type: "text", placeholder: "Dernier paiement", tooltip: "Dernier paiement", icon: "fas fa-money-bill", required: false },
+    { id: "prochaineEcheance", label: "Prochaine échéance", type: "text", placeholder: "Prochaine échéance", tooltip: "Prochaine échéance", icon: "fas fa-calendar-plus", required: false },
+    { id: "totalLeasing", label: "Total leasing H.T", type: "number", placeholder: "Total leasing H.T", tooltip: "Total leasing H.T", icon: "fas fa-calculator", required: false },
+  ];
+  
+  const tab2Fields: Field[] = [
+    { id: "numContratL", label: "N° Contrat (location)", type: "text", placeholder: "N° Contrat (location)", tooltip: "Numéro du contrat de location", icon: "fas fa-file-contract", required: false },
+    { id: "fournisseurL", label: "Fournisseur location", type: "text", placeholder: "Fournisseur location", tooltip: "Fournisseur location", icon: "fas fa-building", required: false },
+    { id: "coutLocation", label: "Coût location - mensuel", type: "text", placeholder: "Coût location - mensuel", tooltip: "Coût location", icon: "fas fa-euro-sign", required: false },
+    { id: "dateDebutLocation", label: "Date début location", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "nbreMoisLocation", label: "Nombre de mois", type: "number", placeholder: "Nombre de mois", tooltip: "Nombre de mois", icon: "fas fa-calendar-alt", required: false },
+    { id: "totalLocation", label: "Total location", type: "number", placeholder: "Total location", tooltip: "Total location", icon: "fas fa-calculator", required: false },
+    { id: "dernierVersement", label: "Dernier versement", type: "date", placeholder: "", icon: "fas fa-money-check", required: false },
+  ];
+  
+  const tab3Fields: Field[] = [
+    { id: "dateAcquis", label: "Date acquisition", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "taxe", label: "Taxe véhicule neuf", type: "text", placeholder: "Taxe véhicule neuf", tooltip: "Taxe véhicule neuf", icon: "fas fa-file-invoice-dollar", required: false },
+    { id: "totalAchat", label: "Total achat", type: "text", placeholder: "Total achat", tooltip: "Total achat", icon: "fas fa-calculator", required: false },
+  ];
+  
+  
+
 
   const fieldsConfig: { [tabName: string]: Field[] } = {
     tab_1: fieldsTab1,
     tab_2: fieldsTab2,
     tab_3: fieldsTab3,
+    tab_4: fieldsTab4,
+    tab_5: fieldsTab5,
+    tab_6: fieldsTab5,
+  //  tab_6: navTabsCustom
   };
 
 
@@ -270,7 +433,7 @@ export function Vehicle() {
         const data: VehicleInterface = await res.json();
         setVehicle(data);
 
-        setUpdatedCodeConducteur(Vehicle?.code_conducteur || "")
+      //  setUpdatedCodeConducteur(Vehicle?.immatriculation_vehicule || "")
 
 
       } catch (error) {
@@ -308,19 +471,19 @@ export function Vehicle() {
 
   const updateVehicle = async (Vehicle: VehicleInterface) => {
 
-    const isEmailValid = validateEmail(Vehicle.email_conducteur ?? "");
-    const isPhoneValid = validatePhone(Vehicle.telephone_conducteur ?? "");
-    const isNomConducteurValid = validateString(Vehicle.nom_conducteur ?? "");
-    const isPreNomConducteurValid = validateString(Vehicle.prenom_conducteur ?? "");
-    const isCodeConducteurValid = validateString(Vehicle.code_conducteur ?? "");
+    const isimmatriculationVehiculeValid = validateEmail(Vehicle.immatriculation_vehicule ?? "");
+    const isPhoneValid = validatePhone(Vehicle.category_vehicule ?? "");
+    const isNomConducteurValid = validateString(Vehicle.vehicule_type ?? "");
+    const isPreNomConducteurValid = validateString(Vehicle.modele_vehicule ?? "");
+    const PSN = validateString(Vehicle.PSN ?? "");
 
     // Validation échouée
-    if (!isEmailValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid || !isCodeConducteurValid) {
+    if (!isimmatriculationVehiculeValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid) {
       const emailElement = document.getElementById(
         "email_conducteur"
       ) as HTMLInputElement;
       if (emailElement) {
-        emailElement.style.borderColor = isEmailValid ? "#ced4da" : "red";
+        emailElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
       const phoneElement = document.getElementById(
@@ -340,11 +503,7 @@ export function Vehicle() {
         prenomElement.style.borderColor = isPreNomConducteurValid ? "#ced4da" : "red";
       }
 
-      const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
-      if (codeElement) {
-        codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
-      }
-
+ 
       toast.warn("Please fill in all required fields", {
         position: "bottom-right",
         autoClose: 2400,
@@ -370,9 +529,9 @@ export function Vehicle() {
         },
         mode: "cors",
         body: JSON.stringify({
-          code_conducteur: Vehicle.code_conducteur,
+          /*code_conducteur: Vehicle.code_conducteur,
           updated_code_conducteur: Vehicle.code_conducteur,
-          updated: Vehicle.code_conducteur === updatedCodeConducteur ? 0 : 1,
+          updated: Vehicle.code_conducteur === updatedCodeConducteur ? 0 : 1,*/
         }),
       });
 
@@ -509,23 +668,22 @@ export function Vehicle() {
   };
 
   const createVehicle = async (Vehicle: VehicleInterface) => {
-    const isEmailValid = validateEmail(Vehicle.email_conducteur ?? "");
-    const isPhoneValid = validatePhone(Vehicle.telephone_conducteur ?? "");
-    const isNomConducteurValid = validateString(Vehicle.nom_conducteur ?? "");
-    const isPreNomConducteurValid = validateString(Vehicle.prenom_conducteur ?? "");
-    const isCodeConducteurValid = validateString(Vehicle.code_conducteur ?? "");
-
+    const isimmatriculationVehiculeValid = validateEmail(Vehicle.immatriculation_vehicule ?? "");
+    const isPhoneValid = validatePhone(Vehicle.category_vehicule ?? "");
+    const isNomConducteurValid = validateString(Vehicle.vehicule_type ?? "");
+    const isPreNomConducteurValid = validateString(Vehicle.modele_vehicule ?? "");
+    const PSN = validateString(Vehicle.PSN ?? "");
 
 
 
 
     // Validation échouée
-    if (!isEmailValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid || !isCodeConducteurValid) {
+    if (!isimmatriculationVehiculeValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid ) {
       const emailElement = document.getElementById(
         "email_conducteur"
       ) as HTMLInputElement;
       if (emailElement) {
-        emailElement.style.borderColor = isEmailValid ? "#ced4da" : "red";
+        emailElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
       const phoneElement = document.getElementById(
@@ -547,7 +705,7 @@ export function Vehicle() {
 
       const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
       if (codeElement) {
-        codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
+        codeElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
       toast.warn("Please fill in all required fields", {
@@ -575,9 +733,9 @@ export function Vehicle() {
           },
           mode: "cors",
           body: JSON.stringify({
-            code_conducteur: Vehicle.code_conducteur,
+           /* code_conducteur: Vehicle.code_conducteur,
             updated_code_conducteur: Vehicle.code_conducteur,
-            update: 0, // For create operation
+            update: 0, // For create operation*/
           }),
         });
 
@@ -725,9 +883,9 @@ export function Vehicle() {
     console.log("name: " + name);
     console.log("value: " + value);
 
-    if (Vehicle) {
+    if (vehicle) {
       setVehicle({
-        ...Vehicle,
+        ...vehicle,
         [name]: value,
       });
     }
@@ -782,7 +940,7 @@ export function Vehicle() {
                       <div className="col-md-6" key={field.id}>
                         <FieldInput
                           field={field}
-                          value={Vehicle ? Vehicle[field.id as keyof VehicleInterface] : ""}
+                          value={vehicle ? vehicle[field.id as keyof VehicleInterface] : ""}
                           onChange={handleChange}
                         />
                       </div>
@@ -811,10 +969,10 @@ export function Vehicle() {
 
             onClick={() => {
               setButtonClicked(true);
-              Vehicle &&
+              vehicle &&
                 (isEditing
-                  ? updateVehicle(Vehicle)
-                  : createVehicle(Vehicle))
+                  ? updateVehicle(vehicle)
+                  : createVehicle(vehicle))
             }}
 
             disabled={buttonClicked}
