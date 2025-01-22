@@ -9,21 +9,21 @@ import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
 import ModalDeleteTraining from "../components/Training/DeleteTraining";
-
-
+import TrainingCalendar from "../components/Calendar/Events";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
 
 interface Training {
     id_training: number;
-    nom_training: number;
+    conducteur_prenom: string;
+    conducteur_nom: string;
     date_start_training: string;
     date_end_training: string;
     type_training: string;
 }
 
-
 export function Training() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
     const { translate } = useTranslate();
     const [list_training, setTraining] = useState<Training[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
@@ -40,15 +40,17 @@ export function Training() {
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
     const [isGridView, setIsGridView] = useState(true);
+    const localizer = momentLocalizer(moment);
 
+    // Define the calendar events (empty for now)
+    const events: any[] | undefined = [];
     const initialColumns = {
         ID: true,
         Name: true,
         Type: true,
        "Start Date": true, 
        "End Date": true,
-    };
-    
+    };    
     // Load selected columns from localStorage or use initial state
     const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
@@ -109,13 +111,11 @@ export function Training() {
             setLoading(false);
         }
     };
-
     const getTraining = async () => {
         try {
             const response = await fetch(
                 `${backendUrl}/api/geop/training/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
-
             const data = await response.json();
             console.log("Fetched data:", data);
             setTraining(data);
@@ -157,7 +157,6 @@ export function Training() {
                 break;
         }
         setTypeSearch(selectedValue);
-
     }
 
     const handleAdvancedSearch = (event: any) => {
@@ -178,7 +177,6 @@ export function Training() {
         getCountTraining();
         getTraining();
     };
-
 
     return (
         <>
@@ -290,7 +288,22 @@ export function Training() {
             </div>
 
             {isGridView ? (
-                 <p>{translate("No content available in Grid View.")}</p>
+                  <Calendar
+                  localizer={localizer}
+                  events={events}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: "100%" }}
+                  defaultView="month"
+                  messages={{
+                    month: "Month",
+                    week: "Week",
+                    day: "Day",
+                    today: "Today",
+                    previous: "<",
+                    next: ">",
+                  }}
+                />
             ) : (
 
             <div className="row m-1">
@@ -386,7 +399,7 @@ export function Training() {
                                            
                                             
                                               {selectedColumns.Name && (
-                                                <td>{Training.nom_training}</td>
+                                                <td>{Training.conducteur_nom} {Training.conducteur_prenom}</td>
                                             )}
 
                                           
