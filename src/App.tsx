@@ -176,9 +176,8 @@ function App() {
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
           <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />  
-          <Route path="/vehicle" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
-          <Route path="/vehicle/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
-          <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+          <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+          <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
         </Routes>
       </div>
       <ToastContainer

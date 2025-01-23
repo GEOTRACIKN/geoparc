@@ -5,7 +5,7 @@ import {Form } from "react-bootstrap";
 interface Field {
     id: string;
     label: string;
-    type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email'| 'file';
+    type: 'text' | 'number' | 'date' | 'select' | 'tel' | 'email'| 'file' | 'SelectGroup';
     placeholder?: string;
     options?: string[];
     icon: string;

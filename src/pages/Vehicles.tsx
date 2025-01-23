@@ -3,7 +3,7 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import {  Table,  Modal,   Form,  Col,  Row,  Dropdown,} from "react-bootstrap";
 import {  FaPlus,  FaRedo,  FaCar,  FaShieldAlt,  FaStickyNote,  FaTachometerAlt,  FaWrench,} from "react-icons/fa";
 import ReactPaginate from "react-paginate";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 import { ButtonCustomHover } from "../components/ButtonHover";
 import { useNavigate } from 'react-router-dom';
@@ -398,23 +398,10 @@ const handleClick = () => {
                   {visibleColumns.actions && (
                     <td>
                       <div className="d-flex align-items-center list-action">
-                        <a
-                          className="badge badge-info mr-2 nav-link"
-                          data-toggle="tooltip"
-                          title="Duplicate"
-                        >
-                          <i
-                            className="las la-copy"
-                            style={{ height: "12px", width: "12px" }}
-                          ></i>
-                        </a>
-                        <a
-                          className="badge badge-success mr-2 nav-link"
-                          data-toggle="tooltip"
-                          title="Update"
-                        >
-                          <i className="ri-pencil-line mr-0"></i>
-                        </a>
+                        
+                        <NavLink to={`/vehicle/edit/${item.id_vehicule}`} className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title={translate("Edit")}>
+                            <i className="ri-pencil-line mr-0"></i>
+                          </NavLink>
                         <a
                           className="badge bg-warning mr-2 nav-link"
                           data-toggle="tooltip"

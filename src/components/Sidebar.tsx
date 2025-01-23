@@ -130,6 +130,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 5,
+          label: "Add Vehicle",
+          icon: "las la-check-double",
+          to: "/vehicle",
+          permissionId: 37,
+        },
+        {
+          id: 5,
           label: "Vehicle checks",
           icon: "las la-check-double",
           to: "/vehicles-checks",
