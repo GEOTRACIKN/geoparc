@@ -19,10 +19,12 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_training: "",
-        nom_training: "",
-
+        id_conducteur: "",
         date_start_training: "",
         date_end_training: "",
+        prenom_conducteur: "",
+        nom_conducteur:"",
+
     
         type_training: "",
     
@@ -54,10 +56,11 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
                 
                 setFormData({
                     id_training: data.id_training,
-                    nom_training: data.nom_training,
+                    id_conducteur: data.id_conducteur,
                     date_start_training: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
                     date_end_training: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
-                   
+                    prenom_conducteur: data.prenom_conducteur,
+                    nom_conducteur: data.nom_conducteur,
                     type_training: data.type_training               });
             } else {
                 console.warn('No training data found for the provided ID.');
@@ -93,13 +96,14 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
-                    <Form.Group controlId="nom_training">
-                        <Form.Label>{translate("Name")}</Form.Label>
-                        <Form.Control
-                            value={formData.nom_training}
-                            readOnly
-                        />
-                    </Form.Group>
+                    
+                                          <Form.Group controlId="driver">
+                                            <Form.Label>{translate("Driver")}</Form.Label>
+                                            <Form.Control
+                                                value={`${formData.prenom_conducteur} ${formData.nom_conducteur}`}
+                                                readOnly
+                                            />
+                                        </Form.Group>
 
 
                     
