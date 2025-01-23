@@ -27,7 +27,6 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
     onSuccess,
 }) => {
     const [formData, setFormData] = useState({
-        id_training: "",
         id_conducteur: "",
         date_start_training: "",
         date_end_training: "",
@@ -146,7 +145,6 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
             // Reset form data
             setFormData({
-                id_training: "",
                 id_conducteur: "",
                 date_start_training: "",
                 date_end_training: "",
