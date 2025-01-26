@@ -137,7 +137,7 @@ export function Training() {
       useEffect(() => {
         const fetchTrainings = async () => {
           try {
-            const response = await fetch(`${backendUrl}/api/geop/alltrainings/calendar/${id_user}}`); // Appel à l'API du backend
+            const response = await fetch(`${backendUrl}/api/geop/alltrainings/calendar/${id_user}`);
             const data = await response.json();
     
             // Passer les événements à FullCalendar
@@ -182,6 +182,7 @@ export function Training() {
         setTypeSearch(selectedValue);
     }
 
+
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
         setCurrentPage(1);
@@ -195,6 +196,10 @@ export function Training() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
+    const handleEventClick = (info: any) => {
+        const { id_training } = info.event.extendedProps; // Récupère l'ID de l'entraînement
+        handleShowShowTrainingModal(id_training); // Ouvre le modal avec l'ID sélectionné
+      };
 
     const refreshData = () => {
         getCountTraining();
@@ -313,176 +318,178 @@ export function Training() {
 
             {isGridView ? (
 
-<div className="row m-1">
-<Table className="dataTable" responsive>
-    <thead className="bg-white text-uppercase">
-        <tr className="ligth ligth-data">
-            <th className="text-center">
-                <div className="form-check form-check-inline">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                  
-                    />
-                </div>
-            </th>
-         
-            {selectedColumns.ID && (
-                <th
-                    className="sorting "
-                    onClick={() => handleSortingColumn("id_training")}
-                >
-                    {translate("ID")}
-                </th>
-            )}
-
-             {selectedColumns.Name && (
-                <th
-                    className="sorting "
-                    onClick={() => handleSortingColumn("nom_training")}
-                >
-                    {translate("Name")}
-                </th>
-            )}
-            {selectedColumns.Type && (
-                <th
-                    className="sorting "
-                    onClick={() => handleSortingColumn("type_training")}
-                >
-                    {translate("Type")}
-                </th>
-            )}
-                 {selectedColumns["Start Date"] && (
-                <th
-                    className="sorting "
-                    onClick={() => handleSortingColumn("date_start_training")}
-                >
-                    {translate("Start Date")}
-                </th>
-            )}
-            {selectedColumns["End Date"] && (
-                <th
-                    className="sorting "
-                    onClick={() => handleSortingColumn("date_end_training")}
-                >
-                    {translate("End Date")}
-                </th>
-            )}
-            
-    
-            <th>{translate("Action")}</th>
-        </tr>
-    </thead>
-    <tbody className="light-body">
-        {loading ? (
-            <tr style={{ textAlign: "center" }}>
-                <td className="text-center" colSpan={10}>
-                    <p>
-                        <PropagateLoader
-                            color={"#123abc"}
-                            loading={loading}
-                            size={20}
-                        />
-                    </p>
-                </td>
-            </tr>
-        ) : Array.isArray(list_training) && list_training.length !== 0 ? (
-            list_training.map((Training, index) => (
-                <tr key={index}>
-                    <td className="text-center">
-                        <div className="form-check form-check-inline">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                           
-                            />
-                        </div>
-                    </td>
-                    
+                <div className="row m-1">
+                <Table className="dataTable" responsive>
+                    <thead className="bg-white text-uppercase">
+                        <tr className="ligth ligth-data">
+                            <th className="text-center">
+                                <div className="form-check form-check-inline">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                
+                                    />
+                                </div>
+                            </th>
+                        
                             {selectedColumns.ID && (
-                                <td>{Training.id_training}</td>
-                            )}
-                                              
-                              {selectedColumns.Name && (
-                                <td>{Training.conducteur_nom} {Training.conducteur_prenom}</td>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("id_training")}
+                                >
+                                    {translate("ID")}
+                                </th>
                             )}
 
-                          
+                            {selectedColumns.Name && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("nom_training")}
+                                >
+                                    {translate("Name")}
+                                </th>
+                            )}
                             {selectedColumns.Type && (
-                                <td>{Training.type_training}</td>
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("type_training")}
+                                >
+                                    {translate("Type")}
+                                </th>
                             )}
-                              {selectedColumns["Start Date"] && (
-                                <td>{(Training.date_start_training)}</td>
-
+                                {selectedColumns["Start Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("date_start_training")}
+                                >
+                                    {translate("Start Date")}
+                                </th>
                             )}
-                             {selectedColumns["End Date"] && (
-                                <td>{Training.date_end_training}</td>
+                            {selectedColumns["End Date"] && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("date_end_training")}
+                                >
+                                    {translate("End Date")}
+                                </th>
                             )}
                             
-                           
-                          <td className="text-center">
-                            <div className="d-flex justify-content-center align-items-center list-action">
-                                {/* View Button */}
-                                <Link
-                                    to={``}
-                                    className="badge bg-primary mr-2"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Détail"
-                                    onClick={() => handleShowShowTrainingModal(Training.id_training)}
-                                >
-                                    <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
-                                </Link>
+                    
+                            <th>{translate("Action")}</th>
+                        </tr>
+                    </thead>
+                    <tbody className="light-body">
+                        {loading ? (
+                            <tr style={{ textAlign: "center" }}>
+                                <td className="text-center" colSpan={10}>
+                                    <p>
+                                        <PropagateLoader
+                                            color={"#123abc"}
+                                            loading={loading}
+                                            size={20}
+                                        />
+                                    </p>
+                                </td>
+                            </tr>
+                        ) : Array.isArray(list_training) && list_training.length !== 0 ? (
+                            list_training.map((Training, index) => (
+                                <tr key={index}>
+                                    <td className="text-center">
+                                        <div className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                        
+                                            />
+                                        </div>
+                                    </td>
+                                    
+                                            {selectedColumns.ID && (
+                                                <td>{Training.id_training}</td>
+                                            )}
+                                                            
+                                            {selectedColumns.Name && (
+                                                <td>{Training.conducteur_nom} {Training.conducteur_prenom}</td>
+                                            )}
 
-                                {/* Edit Button */}
-                                <Link
-                                    to={``}
-                                    className="badge badge-success mr-2"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Edit"
-                                    onClick={() => handleEditTrainingModal(Training.id_training)}
-                                >
-                                    <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
-                                </Link>
+                                        
+                                            {selectedColumns.Type && (
+                                                <td>{Training.type_training}</td>
+                                            )}
+                                            {selectedColumns["Start Date"] && (
+                                                <td>{(Training.date_start_training)}</td>
 
-                                {/* Delete Button */}
-                                <Link
-                                    to={``}
-                                    className="badge bg-danger mr-2"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="Delete"
-                                    onClick={() => handleDeleteTrainingModal(Training.id_training)}
-                                >
-                                    <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
-                                </Link>
-                            </div>
-                        </td>
+                                            )}
+                                            {selectedColumns["End Date"] && (
+                                                <td>{Training.date_end_training}</td>
+                                            )}
+                                                                                    
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center align-items-center list-action">
+                                                {/* View Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-primary mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Détail"
+                                                    onClick={() => handleShowShowTrainingModal(Training.id_training)}
+                                                >
+                                                    <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
 
-                </tr>
-            ))
-        ) : (
-            <tr style={{ textAlign: "center" }}>
-                <td colSpan={selectedColumns.length || 10}>
-                    No data available
-                </td>
-            </tr>
-        )}
-    </tbody>
-</Table>
-</div>
+                                                {/* Edit Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge badge-success mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Edit"
+                                                    onClick={() => handleEditTrainingModal(Training.id_training)}
+                                                >
+                                                    <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+
+                                                {/* Delete Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-danger mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Delete"
+                                                    onClick={() => handleDeleteTrainingModal(Training.id_training)}
+                                                >
+                                                    <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+                                            </div>
+                                        </td>
+
+                                </tr>
+                            ))
+                        ) : (
+                            <tr style={{ textAlign: "center" }}>
+                                <td colSpan={selectedColumns.length || 10}>
+                                    No data available
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+               
+                </div>
                 
             ) : (
 
                 <div>
-      <h2>Calendrier des entraînements</h2>
-      <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
-        events={events} // Passer les événements récupérés au calendrier
-      />
-    </div>
+                <h2>Calendrier des entraînements</h2>
+                <FullCalendar
+                  plugins={[dayGridPlugin]}
+                  initialView="dayGridMonth"
+                  events={events} // Données des événements
+                  eventClick={handleEventClick} // Gérer le clic sur un événement
+                />
+              
+              </div>
          
              )}
 
