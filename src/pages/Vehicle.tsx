@@ -81,6 +81,17 @@ export interface VehicleInterface {
   maximum_allowed_total?: string | null;
   consommation_moyenne_vehicule?: string | null;
   id_parc?: number | null;
+  nom_user?: string | null;
+  prenom_user?: string | null;
+  nom_conducteur?: string | null;
+  prenom_conducteur?: string | null;
+  nom_parc?: string | null;
+}
+
+interface UserInterface {
+  id_user: number;
+  nom_user: string;
+  prenom_user: string;
 }
 
 export function Vehicle() {
@@ -91,6 +102,10 @@ export function Vehicle() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
   const id_user = localStorage.getItem("GeopUserID");
+  const [Users, setUsers] = useState<UserInterface[]>([]);
+  const [usersOptions, setUsersOptions] = useState<any[]>([{ value: "Aucun", label: "Aucun" },]);
+  const [drivesrOptions, setDriverOptions] = useState<{ value: string; label: string }[]>([]);
+  const [parksOptions, setParkOptions] = useState<{ value: string; label: string }[]>([]);
   const [vehicleItem, setVehicle] = useState<VehicleInterface | null>({
     id_vehicule: 0,
     id_user: null,
@@ -166,6 +181,21 @@ export function Vehicle() {
     consommation_moyenne_vehicule: null,
     id_parc: null,
   });
+
+  
+interface Driver {
+  nom_conducteur: string,
+  prenom_conducteur: string,
+  id_conducteur: string,
+}
+
+
+interface Parc {
+  nom_parc: string,
+  id_parc: string,
+}
+
+
   const [updateMatriculation, setUpdateMatriculation] = useState("");
   const [loading, setLoading] = useState<boolean | null>(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,8 +216,63 @@ export function Vehicle() {
     onChange?: (value: any) => void;
   }
 
+  const getDrivers = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/options-drivers/${id_user}`);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setParkOptions(data.map((parc: Parc) => ({
+          label: `${parc.nom_parc}`,
+          value: parc.id_parc,
+        })));
+
+      }
+    } catch (error) {
+      console.error("Error retrieving most recent assignment ID selector options", error);
+    }
+  };
 
 
+  const getParks = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/geop/park/options/${id_user}`);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setDriverOptions(data.map((driver: Driver) => ({
+          label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+          value: driver.id_conducteur,
+        })));
+
+      }
+    } catch (error) {
+      console.error("Error retrieving most recent assignment ID selector options", error);
+    }
+  };
+
+  const getUser = async (userId: any) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/users/find/${userId}`, {
+        mode: "cors",
+      });
+
+      if (!res.ok) {
+        console.error("Erreur lors de la récupération des utilisateurs");
+        return;
+      }
+
+      const usersData = await res.json();
+      setUsers(usersData);
+
+      const usersOptionsData = usersData.map((user: any) => ({
+        value: user.id_user,
+        label: `${user.nom_user} ${user.prenom_user || ""}`,
+      }));
+
+      setUsersOptions(usersOptionsData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des utilisateurs", error);
+    }
+  };
 
   const handleCategoryChange = async (selectedOption: any) => {
 
@@ -227,6 +312,45 @@ export function Vehicle() {
     }));
   };
 
+  
+  const handleBrandChange = async (selectedOption: any) => {
+    setVehicle((prevData) => ({
+      ...prevData!,
+      id_marque: selectedOption.value,
+    }));
+  };
+
+
+
+  const handleUserChange = (selectedOption: any) => {
+    setVehicle((prevData) => {
+      const newData: VehicleInterface = { ...prevData! };
+      newData.id_user = selectedOption.value;
+  //    getGroup(selectedOption.value);
+      return newData;
+    });
+  };
+
+
+  const handleDriverChange = (selectedOption: any) => {
+    setVehicle((prevData) => {
+      const newData: VehicleInterface = { ...prevData! };
+      newData.id_conducteur_vehicule = selectedOption.value;
+  //    getGroup(selectedOption.value);
+      return newData;
+    });
+  };
+
+
+  const handleParkChange = (selectedOption: any) => {
+    setVehicle((prevData) => {
+      const newData: VehicleInterface = { ...prevData! };
+      newData.id_parc = selectedOption.value;
+  //    getGroup(selectedOption.value);
+      return newData;
+    });
+  };
+
 
   const categoryOptions = [
     { value: "Aucun", label: "Aucun" },
@@ -237,6 +361,247 @@ export function Vehicle() {
     { value: "Utilitaires", label: "Utilitaires" },
     { value: "Autre", label: "Autre" },
   ];
+
+
+
+  const brandOptions = [
+      { value: "Marque", label: "Marque" },
+      { value: "Abarth", label: "Abarth" },
+      { value: "AC", label: "AC" },
+      { value: "Acrea", label: "Acrea" },
+      { value: "Acura", label: "Acura" },
+      { value: "Aixam", label: "Aixam" },
+      { value: "Aleko", label: "Aleko" },
+      { value: "Alfa Romeo", label: "Alfa Romeo" },
+      { value: "Allard", label: "Allard" },
+      { value: "Alpina", label: "Alpina" },
+      { value: "Alpine", label: "Alpine" },
+      { value: "Alta", label: "Alta" },
+      { value: "Alvis", label: "Alvis" },
+      { value: "Amilcar", label: "Amilcar" },
+      { value: "Arista", label: "Arista" },
+      { value: "Arnolt", label: "Arnolt" },
+      { value: "Aro", label: "Aro" },
+      { value: "Asa", label: "Asa" },
+      { value: "Aston Martin", label: "Aston Martin" },
+      { value: "Ats", label: "Ats" },
+      { value: "Auburn", label: "Auburn" },
+      { value: "Audi", label: "Audi" },
+      { value: "Austin", label: "Austin" },
+      { value: "Austin Healey", label: "Austin Healey" },
+      { value: "Auto Union", label: "Auto Union" },
+      { value: "Autobianchi", label: "Autobianchi" },
+      { value: "Auverland", label: "Auverland" },
+      { value: "Bajaj", label: "Bajaj" },
+      { value: "Bedford", label: "Bedford" },
+      { value: "Bellier", label: "Bellier" },
+      { value: "Bentley", label: "Bentley" },
+      { value: "Benz", label: "Benz" },
+      { value: "Bertone", label: "Bertone" },
+      { value: "Bizzarrini", label: "Bizzarrini" },
+      { value: "BMW", label: "BMW" },
+      { value: "Brabham", label: "Brabham" },
+      { value: "Brabus", label: "Brabus" },
+      { value: "Brasier", label: "Brasier" },
+      { value: "Bristol", label: "Bristol" },
+      { value: "Bugatti", label: "Bugatti" },
+      { value: "Buick", label: "Buick" },
+      { value: "Cadillac", label: "Cadillac" },
+      { value: "Carbodies", label: "Carbodies" },
+      { value: "Carlsson", label: "Carlsson" },
+      { value: "Caterham", label: "Caterham" },
+      { value: "Caterpillar", label: "Caterpillar" },
+      { value: "Chatenet", label: "Chatenet" },
+      { value: "Chevrolet US", label: "Chevrolet US" },
+      { value: "Chrysler", label: "Chrysler" },
+      { value: "Cisitalia", label: "Cisitalia" },
+      { value: "Citroen", label: "Citroen" },
+      { value: "Cobra", label: "Cobra" },
+      { value: "Comet", label: "Comet" },
+      { value: "Connaught", label: "Connaught" },
+      { value: "Cooper", label: "Cooper" },
+      { value: "Corvette", label: "Corvette" },
+      { value: "Dacia", label: "Dacia" },
+      { value: "Daewoo", label: "Daewoo" },
+      { value: "Daf", label: "Daf" },
+      { value: "Daihatsu", label: "Daihatsu" },
+      { value: "Daimler", label: "Daimler" },
+      { value: "Datsun", label: "Datsun" },
+      { value: "De Tomaso", label: "De Tomaso" },
+      { value: "Delage", label: "Delage" },
+      { value: "Delahaye", label: "Delahaye" },
+      { value: "Deutz Fahr", label: "Deutz Fahr" },
+      { value: "Dodge", label: "Dodge" },
+      { value: "Donkervoort", label: "Donkervoort" },
+      { value: "Doosan", label: "Doosan" },
+      { value: "Duesenberg", label: "Duesenberg" },
+      { value: "Edsel", label: "Edsel" },
+      { value: "Facel Vega", label: "Facel Vega" },
+      { value: "Ferrari", label: "Ferrari" },
+      { value: "Fiat", label: "Fiat" },
+      { value: "Fisker", label: "Fisker" },
+      { value: "Ford US", label: "Ford US" },
+      { value: "Four Stroke", label: "Four Stroke" },
+      { value: "Fournier-Marcadier", label: "Fournier-Marcadier" },
+      { value: "Frazer Nash", label: "Frazer Nash" },
+      { value: "Fso-Polski", label: "Fso-Polski" },
+      { value: "General Motors", label: "General Motors" },
+      { value: "Ghia", label: "Ghia" },
+      { value: "Ginetta", label: "Ginetta" },
+      { value: "GMC", label: "GMC" },
+      { value: "Gme", label: "Gme" },
+      { value: "Gordini", label: "Gordini" },
+      { value: "Grandin", label: "Grandin" },
+      { value: "Grecav", label: "Grecav" },
+      { value: "Gregoire", label: "Gregoire" },
+      { value: "Hinowa", label: "Hinowa" },
+      { value: "Hispano Suiza", label: "Hispano Suiza" },
+      { value: "Hommell", label: "Hommell" },
+      { value: "Honda", label: "Honda" },
+      { value: "Horch", label: "Horch" },
+      { value: "Howmet", label: "Howmet" },
+      { value: "Hummer", label: "Hummer" },
+      { value: "Hyundai", label: "Hyundai" },
+      { value: "Imperial", label: "Imperial" },
+      { value: "Infiniti", label: "Infiniti" },
+      { value: "Innocenti", label: "Innocenti" },
+      { value: "Invicta", label: "Invicta" },
+      { value: "Isuzu", label: "Isuzu" },
+      { value: "Ital Design", label: "Ital Design" },
+      { value: "Iveco", label: "Iveco" },
+      { value: "Jaguar", label: "Jaguar" },
+      { value: "Jcb", label: "Jcb" },
+      { value: "Jdm", label: "Jdm" },
+      { value: "Jeep", label: "Jeep" },
+      { value: "Jensen", label: "Jensen" },
+      { value: "Jmc", label: "Jmc" },
+      { value: "Kaiser", label: "Kaiser" },
+      { value: "Kenworth", label: "Kenworth" },
+      { value: "Kia", label: "Kia" },
+      { value: "Koenigsegg", label: "Koenigsegg" },
+      { value: "Ktm", label: "Ktm" },
+      { value: "Kurtis", label: "Kurtis" },
+      { value: "Lada", label: "Lada" },
+      { value: "Lagonda", label: "Lagonda" },
+      { value: "Lamborghini", label: "Lamborghini" },
+      { value: "Lancia", label: "Lancia" },
+      { value: "Land Rover", label: "Land Rover" },
+      { value: "Laraki", label: "Laraki" },
+      { value: "Lea-Francis", label: "Lea-Francis" },
+      { value: "Leopard", label: "Leopard" },
+      { value: "Lexus", label: "Lexus" },
+      { value: "Liebherr", label: "Liebherr" },
+      { value: "Ligier", label: "Ligier" },
+      { value: "Lincoln", label: "Lincoln" },
+      { value: "Lister", label: "Lister" },
+      { value: "Lola", label: "Lola" },
+      { value: "Lotus", label: "Lotus" },
+      { value: "Mahindra", label: "Mahindra" },
+      { value: "Man", label: "Man" },
+      { value: "Mansory", label: "Mansory" },
+      { value: "Marcos", label: "Marcos" },
+      { value: "Marmon", label: "Marmon" },
+      { value: "Maruti", label: "Maruti" },
+      { value: "Maserati", label: "Maserati" },
+      { value: "Matra", label: "Matra" },
+      { value: "Maybach", label: "Maybach" },
+      { value: "Maz", label: "Maz" },
+      { value: "Mazda", label: "Mazda" },
+      { value: "McLaren", label: "McLaren" },
+      { value: "Mega", label: "Mega" },
+      { value: "Mercedes-Benz", label: "Mercedes-Benz" },
+      { value: "Mercury", label: "Mercury" },
+      { value: "Mg", label: "Mg" },
+      { value: "Microcar", label: "Microcar" },
+      { value: "Mini", label: "Mini" },
+      { value: "Mitsubishi", label: "Mitsubishi" },
+      { value: "Monica", label: "Monica" },
+      { value: "Monteverdi", label: "Monteverdi" },
+      { value: "Morgan", label: "Morgan" },
+      { value: "Morris", label: "Morris" },
+      { value: "Moskvitch", label: "Moskvitch" },
+      { value: "Nash", label: "Nash" },
+      { value: "Nissan", label: "Nissan" },
+      { value: "Novitec Rosso", label: "Novitec Rosso" },
+      { value: "Oldsmobile", label: "Oldsmobile" },
+      { value: "Opel", label: "Opel" },
+      { value: "Osca", label: "Osca" },
+      { value: "Packard", label: "Packard" },
+      { value: "Pagani", label: "Pagani" },
+      { value: "Panhard", label: "Panhard" },
+      { value: "Peerless", label: "Peerless" },
+      { value: "Pegaso", label: "Pegaso" },
+      { value: "Peugeot", label: "Peugeot" },
+      { value: "Pgo", label: "Pgo" },
+      { value: "Pininfarina", label: "Pininfarina" },
+      { value: "Plymouth", label: "Plymouth" },
+      { value: "Pontiac", label: "Pontiac" },
+      { value: "Porsche", label: "Porsche" },
+      { value: "Proton", label: "Proton" },
+      { value: "Renault", label: "Renault" },
+      { value: "Riley", label: "Riley" },
+      { value: "Rinspeed", label: "Rinspeed" },
+      { value: "Rolland Pilain", label: "Rolland Pilain" },
+      { value: "Rolls Royce", label: "Rolls Royce" },
+      { value: "Rondeau Jean", label: "Rondeau Jean" },
+      { value: "Rover", label: "Rover" },
+      { value: "Saab", label: "Saab" },
+      { value: "Sarl Toufik", label: "Sarl Toufik" },
+      { value: "Saturn", label: "Saturn" },
+      { value: "Sbarro", label: "Sbarro" },
+      { value: "Scania", label: "Scania" },
+      { value: "Schwing_Stetter", label: "Schwing_Stetter" },
+      { value: "Seat", label: "Seat" },
+      { value: "Secma", label: "Secma" },
+      { value: "Shacman", label: "Shacman" },
+      { value: "Shelby", label: "Shelby" },
+      { value: "Siata", label: "Siata" },
+      { value: "Simatra", label: "Simatra" },
+      { value: "Simca", label: "Simca" },
+      { value: "Skoda", label: "Skoda" },
+      { value: "Smart", label: "Smart" },
+      { value: "Snvi", label: "Snvi" },
+      { value: "Socope", label: "Socope" },
+      { value: "Spyker", label: "Spyker" },
+      { value: "SsangYong", label: "SsangYong" },
+      { value: "Stanguellini", label: "Stanguellini" },
+      { value: "Stoewer", label: "Stoewer" },
+      { value: "Studbaker", label: "Studbaker" },
+      { value: "Subaru", label: "Subaru" },
+      { value: "Sunbeam", label: "Sunbeam" },
+      { value: "Suzuki", label: "Suzuki" },
+      { value: "Talbot", label: "Talbot" },
+      { value: "Tata", label: "Tata" },
+      { value: "Tatra", label: "Tatra" },
+      { value: "Tchaika", label: "Tchaika" },
+      { value: "Techart", label: "Techart" },
+      { value: "Tesla", label: "Tesla" },
+      { value: "Tirsam", label: "Tirsam" },
+      { value: "Tojeiro", label: "Tojeiro" },
+      { value: "Toyota", label: "Toyota" },
+      { value: "Tramontana", label: "Tramontana" },
+      { value: "Trident", label: "Trident" },
+      { value: "Triumph", label: "Triumph" },
+      { value: "Tunicom", label: "Tunicom" },
+      { value: "TVR", label: "TVR" },
+      { value: "Umm", label: "Umm" },
+      { value: "Vanwall", label: "Vanwall" },
+      { value: "Venturi", label: "Venturi" },
+      { value: "Veritas", label: "Veritas" },
+      { value: "Voisin", label: "Voisin" },
+      { value: "Volkswagen", label: "Volkswagen" },
+      { value: "Volvo", label: "Volvo" },
+      { value: "Westfield", label: "Westfield" },
+      { value: "Wiesmann", label: "Wiesmann" },
+      { value: "Willys Overland", label: "Willys Overland" },
+      { value: "Yamaha", label: "Yamaha" },
+      { value: "Zagato", label: "Zagato" },
+      { value: "Zastava", label: "Zastava" },
+      { value: "Zaz", label: "Zaz" },
+      { value: "Zest", label: "Zest" },
+
+    ];
+  
 
   const [typesOptions, setTypesOptions] = useState<any[]>([{ value: "Aucun", label: "Aucun" }]);
 
@@ -250,24 +615,32 @@ export function Vehicle() {
 
   const fieldsTab1: Field[] = [
     { id: "immatriculation_vehicule", label: "Immatriculation", type: "text", placeholder: "Immatriculation", icon: "fas fa-car", required: true },
-     { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
-     { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
-     { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
-    { id: "id_marque", label: "Marque", type: "select", options: ["Marque", "Abarth", "AC", "Acrea", "Acura", "Aixam", "Aleko", "Alfa Romeo", "Allard", "Alpina", "Alpine", "Alta", "Alvis", "Amilcar", "Arista", "Arnolt", "Aro", "Asa", "Aston Martin", "Ats", "Auburn", "Audi", "Austin", "Austin Healey", "Auto Union", "Autobianchi", "Auverland", "Bajaj", "Bedford", "Bellier", "Bentley", "Benz", "Bertone", "Bizzarrini", "BMW", "Brabham", "Brabus", "Brasier", "Bristol", "Bugatti", "Buick", "Cadillac", "Carbodies", "Carlsson", "Caterham", "Caterpillar", "Chatenet", "Chevrolet US", "Chrysler", "Cisitalia", "Citroen", "Cobra", "Comet", "Connaught", "Cooper", "Corvette", "Dacia", "Daewoo", "Daf", "Daihatsu", "Daimler", "Datsun", "De Tomaso", "Delage", "Delahaye", "Deutz Fahr", "Dodge", "Donkervoort", "Doosan", "Duesenberg", "Edsel", "Facel Vega", "Ferrari", "Fiat", "Fisker", "Ford US", "Four Stroke", "Fournier-Marcadier", "Frazer Nash", "Fso-Polski", "General Motors", "Ghia", "Ginetta", "GMC", "Gme", "Gordini", "Grandin", "Grecav", "Gregoire", "Hinowa", "Hispano Suiza", "Hommell", "Honda", "Horch", "Howmet", "Hummer", "Hyundai", "Imperial", "Infiniti", "Innocenti", "Invicta", "Isuzu", "Ital Design", "Iveco", "Jaguar", "Jcb", "Jdm", "Jeep", "Jensen", "Jmc", "Kaiser", "Kenworth", "Kia", "Koenigsegg", "Ktm", "Kurtis", "Lada", "Lagonda", "Lamborghini", "Lancia", "Land Rover", "Laraki", "Lea-Francis", "Leopard", "Lexus", "Liebherr", "Ligier", "Lincoln", "Lister", "Lola", "Lotus", "Mahindra", "Man", "Mansory", "Marcos", "Marmon", "Maruti", "Maserati", "Matra", "Maybach", "Maz", "Mazda", "McLaren", "Mega", "Mercedes-Benz", "Mercury", "Mg", "Microcar", "Mini", "Mitsubishi", "Monica", "Monteverdi", "Morgan", "Morris", "Moskvitch", "Nash", "Nissan", "Novitec Rosso", "Oldsmobile", "Opel", "Osca", "Packard", "Pagani", "Panhard", "Peerless", "Pegaso", "Peugeot", "Pgo", "Pininfarina", "Plymouth", "Pontiac", "Porsche", "Proton", "Renault", "Riley", "Rinspeed", "Rolland Pilain", "Rolls Royce", "Rondeau Jean", "Rover", "Saab", "Sarl Toufik", "Saturn", "Sbarro", "Scania", "Schwing_Stetter", "Seat", "Secma", "Shacman", "Shelby", "Siata", "Simatra", "Simca", "Skoda", "Smart", "Snvi", "Socope", "Spyker", "SsangYong", "Stanguellini", "Stoewer", "Studbaker", "Subaru", "Sunbeam", "Suzuki", "Talbot", "Tata", "Tatra", "Tchaika", "Techart", "Tesla", "Tirsam", "Tojeiro", "Toyota", "Tramontana", "Trident", "Triumph", "Tunicom", "TVR", "Umm", "Vanwall", "Venturi", "Veritas", "Voisin", "Volkswagen", "Volvo", "Westfield", "Wiesmann", "Willys Overland", "Yamaha", "Zagato", "Zastava", "Zaz", "Zest"], icon: "fas fa-tag", required: true, },
-     { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false },
-   { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true },
-    { id: "couleur_vehicule", label: "Durée d'amortissement (jours)", type: "text", placeholder: "Durée d'amortissement", icon: "fas fa-calendar", required: true },
-    { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: true, },
+    { id: "id_user", label: "User", type: "SelectGroup", placeholder: "User", options: usersOptions,  onChange:handleUserChange, icon: "fas fa-user", required: false },
+    { id: "id_parc", label: "Parc", type: "SelectGroup", options:parksOptions,onChange: handleParkChange, icon: "fas fa-warehouse", required: false, },
+    { id: "id_conducteur_vehicule", label: "Conducteur", type: "SelectGroup", options: drivesrOptions,onChange: handleDriverChange, icon: "fas fa-user", required: false, },
+    { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
+    { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
+    { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
+    { id: "id_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange , icon: "fas fa-tag", required: true, },
+    { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false },
     { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], icon: "fas fa-info-circle", required: true, },
-    { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
-    { id: "id_parc", label: "Nom du parc automobile", type: "select", options: ["Nom du Parc", "Metalsteeltest"], icon: "fas fa-warehouse", required: false, },
-    { id: "id_conducteur_vehicule", label: "Nom du conducteur", type: "select", options: ["Conducteur", "Merzem Abdelatif", "Touil Mohamed", "HAMAL AMAR 16", "Lebgaa Rabah", "Messai Djemai", "MEZIANI DJAMEL",], icon: "fas fa-user", required: false, },
-    { id: "inService_vehicule", label: "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, },
-    { id: "capacite_res_vehicule", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false },
-    { id: "consommation_moyenne_vehicule", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false },
-    { id: "kilometrage_vehicule", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-odometer", required: false },
-    { id: "image_vehicule", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false },
+    //{ id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
+    // { id: "inService_vehicule", label:  "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, },
+    // { id: "capacite_res_vehicule", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false },
+    // { id: "consommation_moyenne_vehicule", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false },
+    // { id: "kilometrage_vehicule", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-odometer", required: false },
+    // { id: "image_vehicule", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false },
+    // { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: true, },
+    // { id: "couleur_vehicule", label: "Durée d'amortissement (jours)", type: "text", placeholder: "Durée d'amortissement", icon: "fas fa-calendar", required: true },
+    //{ id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true },
+   
+   
   ];
+
+
+
+
+
 
 
   const fieldsTab2: Field[] = [
@@ -380,11 +753,13 @@ export function Vehicle() {
   };
 
   useEffect(() => {
-
+    getUser(id_user);
+    getDrivers();
+    getParks()
     const getVehicle = async () => {
 
       try {
-        const res = await fetch(`${backendUrl}/api/vehicle/find/${id_vehicule}`, {
+        const res = await fetch(`${backendUrl}/api/geop/vehicle/find/${id_vehicule}`, {
           mode: "cors",
         });
 
