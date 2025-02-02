@@ -209,28 +209,33 @@ export function Training() {
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Training")} ({total})</h4>
                 </div>
-                <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewTrainingModal} className="btn btn-primary mt-2 mr-1">
-                        <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
-                    </Button>
+                <div className="col-md-6 col-sm-12 text-right d-flex justify-content-end">
+    <Button 
+        onClick={handleShowNewTrainingModal} 
+        className="btn btn-primary mt-2 mr-1"
+    >
+        <i className="las la-plus mr-3"></i>
+        {translate("New Request")}
+    </Button>
 
-        <Button  onClick={() => setIsGridView(!isGridView)}  style={{background: "no-repeat", color: "#000", border: "1px solid #ddd"}}   className={` ${isGridView ? 'active' : ''}`} >
-          {isGridView ? (
+    <Button 
+        onClick={() => setIsGridView(!isGridView)}  
+        style={{background: "no-repeat", color: "#000", border: "1px solid #ddd"}}   
+        className={`mt-2 ${isGridView ? 'active' : ''}`}
+    >
+        {isGridView ? (
             <>
-              <i className="las la-icons" style={{fontSize: "21px"}} ></i>
-              <span>{translate("Grid View")}</span>
+                <i className="las la-icons"></i>
+                <span>{translate("Calendar View")}</span>
             </>
-          ) : ( 
+        ) : ( 
             <>
-              <i className="las la-list" style={{fontSize: "21px"}} ></i>
-              <span> {translate("List view")}</span> 
+                <i className="las la-list"></i>
+                <span>{translate("List view")}</span> 
             </>
-          )}
-        </Button>
-
-        
-                </div>
+        )}
+    </Button>
+</div>
       
             </div>
             <div className="row">
@@ -519,12 +524,7 @@ export function Training() {
                 
             </div>
             <ModalNewTraining
-  show={showNewTrainingModal}
-  onHide={() => {
-    handleCloseNewTrainingModal();
-    refreshData(); // Ensure the calendar updates when the modal closes
-  }}
-  onSuccess={refreshData} // Refresh when a new training is successfully added
+  show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} // Refresh when a new training is successfully added
 />
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
