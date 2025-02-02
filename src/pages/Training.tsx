@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
@@ -77,6 +77,7 @@ export function Training() {
         setSort(newSortOrder);
         getTraining();
     };
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewTrainingModal, setShowNewTrainingModal] = useState(false);
     const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
     const [showShowTrainingModal, setShowShowTrainingModal] = useState(false);
@@ -93,11 +94,14 @@ export function Training() {
         setShowEditTrainingModal(true);
     };
     const handleCloseEditTrainingModal = () => setShowEditTrainingModal(false);
+    const [trainingDetails, setTrainingDetails] = useState(null); // For storing the selected training data
+
     const handleShowShowTrainingModal = (id: number) => {
         setSelectedTrainingId(id);
         setShowShowTrainingModal(true);
     };
     const handleCloseShowTrainingModal = () => setShowShowTrainingModal(false);
+    
     const getCountTraining = async () => {
         try {
             setLoading(true);
@@ -131,13 +135,11 @@ export function Training() {
             setLoading(false);
         }
     };
-
     
-
-      useEffect(() => {
+    useEffect(() => {
         const fetchTrainings = async () => {
           try {
-            const response = await fetch(`${backendUrl}/api/geop/alltrainings/calendar/${id_user}`);
+            const response = await fetch(`${backendUrl}/api/geop/calendar/${id_user}`);
             const data = await response.json();
     
             // Passer les événements à FullCalendar
@@ -196,10 +198,13 @@ export function Training() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-    const handleEventClick = (info: any) => {
-        const { id_training } = info.event.extendedProps; // Récupère l'ID de l'entraînement
-        handleShowShowTrainingModal(id_training); // Ouvre le modal avec l'ID sélectionné
-      };
+    
+
+    const handleEventClick = (event: any) => {
+        handleShowShowTrainingModal(event.id);
+    };
+    
+      
 
     const refreshData = () => {
         getCountTraining();
@@ -483,14 +488,12 @@ export function Training() {
                 <div>
                 <h2>Calendrier des entraînements</h2>
                 <FullCalendar
-                  plugins={[dayGridPlugin]}
-                  initialView="dayGridMonth"
-                  events={events} // Données des événements
-                  eventClick={handleEventClick} // Gérer le clic sur un événement
-                />
-              
-              </div>
-         
+  plugins={[dayGridPlugin]}
+  initialView="dayGridMonth"
+  events={events} // Données des événements
+  eventClick={(info: { event: { id: number; }; }) => handleShowShowTrainingModal(info.event.id)}             
+/>         
+              </div>        
              )}
 
             <div className="row">
