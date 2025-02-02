@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
@@ -9,7 +9,6 @@ import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
 import ModalDeleteTraining from "../components/Training/DeleteTraining";
-import TrainingCalendar from "../components/Calendar/Events";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -127,6 +126,7 @@ export function Training() {
             const data = await response.json();
             console.log("Fetched data:", data);
             setTraining(data);
+            
             console.log("Updated training list:", data);
         } catch (error) {
             console.error(error);
@@ -136,25 +136,23 @@ export function Training() {
         }
     };
     
-    useEffect(() => {
-        const fetchTrainings = async () => {
-          try {
+    const getCalendarTrainings = async () => {
+        try {
             const response = await fetch(`${backendUrl}/api/geop/calendar/${id_user}`);
             const data = await response.json();
-    
-            // Passer les événements à FullCalendar
             setEvents(data);
-          } catch (error) {
+        } catch (error) {
             console.error("Erreur lors de la récupération des trainings :", error);
-          }
-        };
+        }
+    };
+
     
-        fetchTrainings();
-      }, []);
+  
 
     useEffect(() => {
         getCountTraining();
         getTraining();
+        getCalendarTrainings();
     }, [currentPage, limit, search, type, column, sort]);
    
     const handleTypeSearch = (event: any) => {
@@ -184,7 +182,6 @@ export function Training() {
         setTypeSearch(selectedValue);
     }
 
-
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
         setCurrentPage(1);
@@ -199,16 +196,11 @@ export function Training() {
         setCurrentPage(data.selected + 1);
     };
     
-
-    const handleEventClick = (event: any) => {
-        handleShowShowTrainingModal(event.id);
-    };
-    
-      
-
     const refreshData = () => {
         getCountTraining();
         getTraining();
+        getCalendarTrainings();
+
     };
 
     return (
@@ -483,16 +475,19 @@ export function Training() {
                
                 </div>
                 
-            ) : (
+            ) : ( 
 
                 <div>
                 <h2>Calendrier des entraînements</h2>
                 <FullCalendar
+  key={events.length} // Forces re-render when events change
   plugins={[dayGridPlugin]}
   initialView="dayGridMonth"
-  events={events} // Données des événements
-  eventClick={(info: { event: { id: number; }; }) => handleShowShowTrainingModal(info.event.id)}             
-/>         
+  events={events}
+  eventClick={(info: { event: { id: number; }; }) => handleShowShowTrainingModal(info.event.id)}
+/>
+
+
               </div>        
              )}
 
@@ -523,7 +518,14 @@ export function Training() {
                 </div>
                 
             </div>
-            <ModalNewTraining show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} />
+            <ModalNewTraining
+  show={showNewTrainingModal}
+  onHide={() => {
+    handleCloseNewTrainingModal();
+    refreshData(); // Ensure the calendar updates when the modal closes
+  }}
+  onSuccess={refreshData} // Refresh when a new training is successfully added
+/>
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
 

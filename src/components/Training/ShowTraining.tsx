@@ -100,13 +100,10 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
                                           <Form.Group controlId="driver">
                                             <Form.Label>{translate("Driver")}</Form.Label>
                                             <Form.Control
-                                                value={`${formData.prenom_conducteur} ${formData.nom_conducteur}`}
+                                                value={`${formData.nom_conducteur} ${formData.prenom_conducteur} `}
                                                 readOnly
-                                            />
-                                        </Form.Group>
-
-
-                    
+                    />
+                    </Form.Group>
 
                     {/* Champ pour date_start_training */}
                     <Form.Group controlId="date_start_training">

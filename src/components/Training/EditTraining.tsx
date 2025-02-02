@@ -190,13 +190,6 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
         }
       }, [show, backendUrl, geopuserID]);
 
-
-
-
-    
-    
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prevState) => ({
@@ -224,10 +217,6 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             });
             return false;
         }
-
-       
-
-       
 
         return true;
     };
@@ -309,7 +298,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                          ) : (
                              drivers.map((driver) => (
                                  <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                     {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
+                                     {`${driver.nom_conducteur} ${driver.prenom_conducteur} `}
                                  </option>
                              ))
                          )}
