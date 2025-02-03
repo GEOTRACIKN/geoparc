@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewTraining from "../components/Training/NewTraining";
-
 import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
@@ -12,8 +11,9 @@ import ModalDeleteTraining from "../components/Training/DeleteTraining";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction'; // Pour interagir avec le calendrier
 import moment from "moment";
+import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
+import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
 
 
 interface Training {
@@ -44,8 +44,24 @@ export function Training() {
     const [pageCount, setPageCount] = useState(0);
     const [isGridView, setIsGridView] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
+    const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
     const localizer = momentLocalizer(moment);
-
+    const calendarRef = useRef<FullCalendar | null>(null);
+    // Fonction pour changer la vue
+    const changeView = (view: string) => {
+        if (calendarRef.current) {
+          const calendarApi = calendarRef.current.getApi();
+          calendarApi.changeView(view);
+          setCurrentView(view); // Met à jour le texte du Dropdown
+        }
+      };
+      const viewTranslations: Record<string, string> = {
+        timeGridDay: "day",
+        timeGridWeek: "week",
+        dayGridMonth: "month",
+        listYear: "year",
+      };
+      
     // Define the calendar events (empty for now)
     const initialColumns = {
         ID: true,
@@ -76,6 +92,7 @@ export function Training() {
         setSort(newSortOrder);
         getTraining();
     };
+
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewTrainingModal, setShowNewTrainingModal] = useState(false);
     const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
@@ -145,9 +162,6 @@ export function Training() {
             console.error("Erreur lors de la récupération des trainings :", error);
         }
     };
-
-    
-  
 
     useEffect(() => {
         getCountTraining();
@@ -483,14 +497,35 @@ export function Training() {
             ) : ( 
 
                 <div>
-                <h2>Calendrier des entraînements</h2>
-                <FullCalendar
-  key={events.length} // Forces re-render when events change
-  plugins={[dayGridPlugin]}
-  initialView="dayGridMonth"
-  events={events}
-  eventClick={(info: { event: { id: number; }; }) => handleShowShowTrainingModal(info.event.id)}
-/>
+                <div style={{ marginBottom: "10px" }}>
+                <Dropdown>
+                <Dropdown.Toggle variant="primary" id="dropdown-view">
+  {translate(viewTranslations[currentView] || currentView)}
+</Dropdown.Toggle>
+  <Dropdown.Menu>
+    <Dropdown.Item onClick={() => changeView("timeGridDay")}>
+      {translate("day")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("timeGridWeek")}>
+      {translate("week")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("dayGridMonth")}>
+      {translate("month")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("listYear")}>
+      {translate("year")}
+    </Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
+      </div>
+      <FullCalendar
+        ref={calendarRef}
+        key={events.length} // Force le re-render quand les événements changent
+        plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} // Ajoutez les plugins nécessaires
+        initialView="dayGridMonth" // Vue par défaut
+        events={events}
+        eventClick={(info: { event: { id: number; }; }) => handleEditTrainingModal(info.event.id)}
+      />
 
 
               </div>        
