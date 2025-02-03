@@ -195,6 +195,11 @@ export function Vehicle() {
     id_parc: string,
   }
 
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+
+  const toggleMode = () => {
+    setIsAdvancedMode(!isAdvancedMode);
+  };
 
   const [updateMatriculation, setUpdateMatriculation] = useState("");
   const [loading, setLoading] = useState<boolean | null>(true);
@@ -214,6 +219,7 @@ export function Vehicle() {
     required?: boolean;
     tooltip?: string;
     onChange?: (value: any) => void;
+    mode?: boolean;
   }
 
   const getDrivers = async () => {
@@ -238,7 +244,7 @@ export function Vehicle() {
       const response = await fetch(`${backendUrl}/api/geop/park/options/${id_user}`);
       const data = await response.json();
       if (Array.isArray(data)) {
-         setParkOptions(data.map((parc: Parc) => ({
+        setParkOptions(data.map((parc: Parc) => ({
           label: `${parc.nom_parc}`,
           value: parc.id_parc,
         })));
@@ -618,38 +624,32 @@ export function Vehicle() {
   const tabTitles: { [key: string]: string } = {
     tab_1: translate("General information"),
     tab_2: translate("Technical characteristics"),
-    tab_3: translate("Assurance"),
+    tab_3: translate("Insurance"),
     tab_4: translate("Technical control"),
-    tab_5: translate("V")
+    tab_5: translate("Vehicle sticker")
   };
- 
+
   const fieldsTab1: Field[] = [
-    { id: "immatriculation_vehicule", label: translate("Immatriculation"), type: "text", placeholder: "Immatriculation", icon: "fas fa-car", required: true },
-    { id: "id_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false },
-    { id: "id_parc", label: "Parc", type: "SelectGroup",options: parksOptions, onChange: handleParkChange, icon: "fas fa-warehouse", required: false, },
-    { id: "id_conducteur_vehicule", label: "Conducteur",placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
+    { id: "immatriculation_vehicule", label: translate("Immatriculation")+" *", type: "text", placeholder: "Immatriculation", icon: "fas fa-barcode", required: true },
+    //   { id: "id_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false },
+    { id: "id_parc", label: "Parc", type: "SelectGroup", options: parksOptions, onChange: handleParkChange, icon: "fas fa-warehouse", required: false, mode: true },
+    { id: "id_conducteur_vehicule", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
     { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
     { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
     { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
     { id: "id_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
     { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], onChange: handleStateVehiculeChange, icon: "fas fa-info-circle", required: true, },
     { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
-    // { id: "inService_vehicule", label:  "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, },
-    // { id: "capacite_res_vehicule", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false },
-    // { id: "consommation_moyenne_vehicule", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false },
-    // { id: "kilometrage_vehicule", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-odometer", required: false },
-    // { id: "image_vehicule", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false },
-    // { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: true, },
-    // { id: "couleur_vehicule", label: "Durée d'amortissement (jours)", type: "text", placeholder: "Durée d'amortissement", icon: "fas fa-calendar", required: true },
-    //{ id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true },
-    //{ id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false },
+    { id: "inService_vehicule", label: "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, mode: true },
+    { id: "capacite_res_vehicule", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false, mode: true  },
+    { id: "consommation_moyenne_vehicule", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false , mode: true  },
+    { id: "kilometrage_vehicule", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-road", required: false },
+    { id: "image_vehicule", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false, mode: true  },
+    { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: true, mode: true  },
+    { id: "couleur_vehicule", label: "Durée d'amortissement (jours)", type: "text", placeholder: "Durée d'amortissement", icon: "fas fa-calendar", required: true , mode: true },
+    { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true , mode: true },
+    { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false , mode: true  },
   ];
-
-
-
-
-
-
 
   const fieldsTab2: Field[] = [
     { id: "psn", label: "PSN", type: "text", placeholder: "PSN", icon: "fas fa-barcode", tooltip: "N° série gps", required: false },
@@ -683,9 +683,6 @@ export function Vehicle() {
     { id: "dateFinControle", label: "Date fin", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
     { id: "coutControle", label: "Coût", type: "text", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
   ];
-
-
-
 
   const fieldsTab5: Field[] = [
     { id: "numVignette", label: "N° Vignette", type: "text", placeholder: "N° Vignette", tooltip: "N° Vignette", icon: "fas fa-barcode", required: false },
@@ -730,10 +727,10 @@ export function Vehicle() {
   const fieldsConfig: { [tabName: string]: Field[] } = {
     tab_1: fieldsTab1,
     tab_2: fieldsTab2,
-     tab_3: fieldsTab3,
-     tab_4: fieldsTab4,
-     tab_5: fieldsTab5,
-     tab_6: fieldsTab5,
+    tab_3: fieldsTab3,
+    tab_4: fieldsTab4,
+    tab_5: fieldsTab5,
+    tab_6: fieldsTab5,
     //  tab_6: navTabsCustom
   };
 
@@ -1014,17 +1011,12 @@ export function Vehicle() {
   };
 
   const createVehicle = async (Vehicle: VehicleInterface) => {
-    const isimmatriculationVehiculeValid = validateEmail(Vehicle.immatriculation_vehicule ?? "");
-    const isPhoneValid = validatePhone(Vehicle.category_vehicule ?? "");
-    const isNomConducteurValid = validateString(Vehicle.vehicule_type ?? "");
-    const isPreNomConducteurValid = validateString(Vehicle.modele_vehicule ?? "");
-    const PSN = validateString(Vehicle.PSN ?? "");
-
+    const isimmatriculationVehiculeValid = validateString(Vehicle.immatriculation_vehicule ?? "");
 
 
 
     // Validation échouée
-    if (!isimmatriculationVehiculeValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid) {
+    if (!isimmatriculationVehiculeValid) {
       const emailElement = document.getElementById(
         "email_conducteur"
       ) as HTMLInputElement;
@@ -1032,27 +1024,11 @@ export function Vehicle() {
         emailElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
-      const phoneElement = document.getElementById(
-        "telephone_conducteur"
-      ) as HTMLInputElement;
-      if (phoneElement) {
-        phoneElement.style.borderColor = isPhoneValid ? "#ced4da" : "red";
-      }
 
-      const nomElement = document.getElementById("nom_conducteur") as HTMLInputElement;
-      if (nomElement) {
-        nomElement.style.borderColor = isNomConducteurValid ? "#ced4da" : "red";
-      }
 
-      const prenomElement = document.getElementById("prenom_conducteur") as HTMLInputElement;
-      if (prenomElement) {
-        prenomElement.style.borderColor = isPreNomConducteurValid ? "#ced4da" : "red";
-      }
 
-      const codeElement = document.getElementById("code_conducteur") as HTMLInputElement;
-      if (codeElement) {
-        codeElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
-      }
+
+
 
       toast.warn("Please fill in all required fields", {
         position: "bottom-right",
@@ -1271,6 +1247,24 @@ export function Vehicle() {
             {isEditing ? "Edit vehicle" : "Add vehicle"}
           </h4>
         </div>
+        <div className="col-md-6 col-sm-12 text-right">
+
+          <Button
+            variant="outline-secondary"
+            className="btn mt-2 mr-1"
+            onClick={toggleMode}
+          >
+            <i className={`las ${isAdvancedMode ? 'la-cogs' : 'la-cubes'} mr-3`}></i>
+            {isAdvancedMode ? translate('Advanced Mode') : translate(' Simple Mode')}
+          </Button>
+          <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+          //     onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            {translate("Export")} {translate("Vehicle")}
+          </button>
+        </div>
 
         <div className="col-md-12">
           {loading ? (
@@ -1282,34 +1276,38 @@ export function Vehicle() {
               {Object.entries(fieldsConfig).map(([tabKey, fields]) => (
                 <Tab eventKey={tabKey} title={tabTitles[tabKey]} key={tabKey}>
                   <div className="row">
-                    {fields.map((field) => (
-                      <div className="col-md-6" key={field.id}>
-                        {field.type === "SelectGroup" ? (
-                          <SelectGroup
-                            controlId={field.id}
-                            name={field.id}
-                            label={field.label}
-                            icon={field.icon || "search"}
-                            options={field.options || []}
-                            valueType={{
-                              value: vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : translate("none"),
-                              label: vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : "",
-                            }}
-                            onChange={field.onChange}
-                          />
-                        ) : (
-                          <FieldInput
-                            field={field}
-                            value={vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : ""}
-                            onChange={handleChange}
-                          />
-                        )}
-                      </div>
-                    ))}
+                    {fields
+                      .filter((field) => isAdvancedMode || field.mode !== true) // Afficher uniquement si mode avancé ou toujours visible
+                      .map((field) => (
+                        <div className="col-md-6" key={field.id}>
+                          {field.type === "SelectGroup" ? (
+                            <SelectGroup
+                              controlId={field.id}
+                              name={field.id}
+                              label={field.label}
+                              icon={field.icon || "search"}
+                              options={field.options || []}
+                              valueType={{
+                                value: vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : translate("none"),
+                                label: vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : "",
+                              }}
+                              onChange={field.onChange}
+                            />
+                          ) : (
+                            <FieldInput
+                              field={field}
+                              value={vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : ""}
+                              onChange={handleChange}
+                            />
+                          )}
+                        </div>
+                      ))}
+
                   </div>
                 </Tab>
               ))}
             </Tabs>
+
 
           )}
         </div>

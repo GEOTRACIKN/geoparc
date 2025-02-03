@@ -304,7 +304,7 @@ export function Vehicles() {
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
-              <ButtonCustomHover text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success' onClick={() => handleClickLink('/vehicles-forms')} />
+              <ButtonCustomHover text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success' onClick={() => handleClickLink('/vehicle/add')} />
 
               <ButtonCustomHover text={translate("Initialisation des Affectations")} icon={<FaRedo />} />
               <ButtonCustomHover text={translate("Affectations Vehicule")} icon={<FaCar />} />
