@@ -207,29 +207,53 @@ export function Training() {
       };
     
       const adjustedEvents = adjustEndDate(events);
-      const countEventsPerDay = (events: { start: string }[]) => {
+
+      // Count events per day (UTC)
+      const countEventsPerDay = (events: { start: string; end: string }[]) => {
         const eventsPerDay: Record<string, number> = {};
+      
         events.forEach(event => {
-          const date = event.start.split('T')[0]; // Extract the date part from the ISO string
-          eventsPerDay[date] = (eventsPerDay[date] || 0) + 1;
+          let currentDate = new Date(event.start);
+          const endDate = new Date(event.end);
+      
+          while (currentDate <= endDate) {
+            // Convertit la date en format YYYY-MM-DD
+            const dateStr = currentDate.toISOString().split('T')[0];
+      
+            // Incrémente le compteur d'événements pour cette date
+            eventsPerDay[dateStr] = (eventsPerDay[dateStr] || 0) + 1;
+      
+            // Passe au jour suivant
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
         });
-        console.log('Events per day:', eventsPerDay); // Debugging
+      
+        console.log('Events per day (UTC):', eventsPerDay);
         return eventsPerDay;
       };
-    
+      
+      // Utilisation avec les événements ajustés
       const eventsPerDay = countEventsPerDay(adjustedEvents);
-    
+      
       // Custom render function for day cells
-      const renderDayCellContent = (cellInfo: { date: Date; dayNumberText: string }) => {
-        const dateStr = cellInfo.date.toISOString().split('T')[0];
-        const eventCount = eventsPerDay[dateStr] || 0;
-        return (
-          <div>
-            <div>{cellInfo.dayNumberText}</div>
-            {eventCount > 0 && <div className="fc-daygrid-event-count">{eventCount} events</div>}
-          </div>
-        );
-      };
+
+  // Render day cell content (UTC)
+  const renderDayCellContent = (cellInfo: { date: Date; dayNumberText: string }) => {
+    const utcDate = new Date(Date.UTC(
+      cellInfo.date.getUTCFullYear(),
+      cellInfo.date.getUTCMonth(),
+      cellInfo.date.getUTCDate()
+    ));
+    const dateStr = utcDate.toISOString().split('T')[0];
+    const eventCount = eventsPerDay[dateStr] || 0;
+    return (
+      <div>
+        <div>{cellInfo.dayNumberText}</div>
+        {eventCount > 0 && <div className="fc-daygrid-event-count">{eventCount} events</div>}
+      </div>
+    );
+  };
+
     
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
@@ -555,10 +579,10 @@ export function Training() {
       </div>
       <FullCalendar
       ref={calendarRef}
-      key={adjustedEvents.length} // Use the adjusted events
+      key={adjustedEvents.length}
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
       initialView="dayGridMonth"
-      events={adjustedEvents} // Pass the adjusted events
+      events={adjustedEvents}
       eventClick={(info: { event: { id: number; }; }) => handleEditTrainingModal(info.event.id)}
       dayCellContent={renderDayCellContent}
     />
