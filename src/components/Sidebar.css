@@ -2519,3 +2519,12 @@ body.light-theme .report {
 }
 
 
+body.dark-theme .form {
+  background-color: #202123 !important;
+}
+
+body.light-theme .form {
+  background-color: #fbfbfb  !important;
+}
+
+

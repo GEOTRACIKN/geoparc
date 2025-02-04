@@ -51,11 +51,14 @@ const SelectGroup: React.FC<SelectGroupProps> = ({
   };
 
   return (
-    <Form.Group controlId={controlId} as={Row} style={{ marginTop: "15px" }}>
+    <Form.Group className="form-group" controlId={name}>
+      <Row>
+      <Col column sm="4" md="4" lg="4">
       <Form.Label>
         <i className={icon}></i> {label}
       </Form.Label>
-      <Col sm="12" md="12" lg="12">
+      </Col>
+      <Col sm="8" md="8" lg="8">
         <Select
           options={options}
           value={valueType}
@@ -68,6 +71,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({
           noOptionsMessage={renderNoOptionsMessage}
         />
       </Col>
+      </Row>
     </Form.Group>
   );
 };
