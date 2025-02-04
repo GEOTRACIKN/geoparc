@@ -45,6 +45,7 @@ export function Training() {
     const [events, setEvents] = useState<any[]>([]);
     const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
     const localizer = momentLocalizer(moment);
+
     const calendarRef = useRef<FullCalendar | null>(null);
     // Fonction pour changer la vue
     const changeView = (view: string) => {
@@ -195,66 +196,53 @@ export function Training() {
         setTypeSearch(selectedValue);
     }
 
-    const adjustEndDate = (events: { start: string; end: string }[]) => {
-        return events.map(event => {
-          const endDate = new Date(event.end);
-          endDate.setDate(endDate.getDate() + 1); // Add one day to the end date
-          return {
-            ...event,
-            end: endDate.toISOString().split('T')[0], // Convert back to ISO string
-          };
-        });
+// Adjust end dates to match FullCalendar's display
+const adjustEndDate = (events: { start: string; end: string }[]) => {
+    return events.map(event => {
+      const endDate = new Date(event.end);
+      endDate.setDate(endDate.getDate() + 1); // Add one day for display
+      return {
+        ...event,
+        end: endDate.toISOString().split('T')[0],
       };
-    
-      const adjustedEvents = adjustEndDate(events);
-
-      // Count events per day (UTC)
-      const countEventsPerDay = (events: { start: string; end: string }[]) => {
-        const eventsPerDay: Record<string, number> = {};
-      
-        events.forEach(event => {
-          let currentDate = new Date(event.start);
-          const endDate = new Date(event.end);
-      
-          while (currentDate <= endDate) {
-            // Convertit la date en format YYYY-MM-DD
-            const dateStr = currentDate.toISOString().split('T')[0];
-      
-            // Incrémente le compteur d'événements pour cette date
-            eventsPerDay[dateStr] = (eventsPerDay[dateStr] || 0) + 1;
-      
-            // Passe au jour suivant
-            currentDate.setDate(currentDate.getDate() + 1);
-          }
-        });
-      
-        console.log('Events per day (UTC):', eventsPerDay);
-        return eventsPerDay;
-      };
-      
-      // Utilisation avec les événements ajustés
-      const eventsPerDay = countEventsPerDay(adjustedEvents);
-      
-      // Custom render function for day cells
-
-  // Render day cell content (UTC)
+    });
+  };
+  
+  const adjustedEvents = adjustEndDate(events);
+  
+  // Count events per day (using local dates)
+  const countEventsPerDay = (events: { start: string; end: string }[]) => {
+    const eventsPerDay: Record<string, number> = {};
+  
+    events.forEach(event => {
+      let currentDate = new Date(event.start);
+      const endDate = new Date(event.end);
+      endDate.setDate(endDate.getDate() - 1); // Adjust for FullCalendar's display
+  
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toLocaleDateString('en-CA'); // Local date string
+        eventsPerDay[dateStr] = (eventsPerDay[dateStr] || 0) + 1;
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+  
+    return eventsPerDay;
+  };
+  
+  const eventsPerDay = countEventsPerDay(adjustedEvents);
+  
+  // Render day cells with local dates
   const renderDayCellContent = (cellInfo: { date: Date; dayNumberText: string }) => {
-    const utcDate = new Date(Date.UTC(
-      cellInfo.date.getUTCFullYear(),
-      cellInfo.date.getUTCMonth(),
-      cellInfo.date.getUTCDate()
-    ));
-    const dateStr = utcDate.toISOString().split('T')[0];
+    const dateStr = cellInfo.date.toLocaleDateString('en-CA'); // Local date string
     const eventCount = eventsPerDay[dateStr] || 0;
+  
     return (
       <div>
         <div>{cellInfo.dayNumberText}</div>
-        {eventCount > 0 && <div className="fc-daygrid-event-count">{eventCount} events</div>}
+        {eventCount > 0 && <div>{eventCount} event(s)</div>}
       </div>
     );
   };
-
-    
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
         setCurrentPage(1);
@@ -578,14 +566,14 @@ export function Training() {
 </Dropdown>
       </div>
       <FullCalendar
-      ref={calendarRef}
-      key={adjustedEvents.length}
-      plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-      initialView="dayGridMonth"
-      events={adjustedEvents}
-      eventClick={(info: { event: { id: number; }; }) => handleEditTrainingModal(info.event.id)}
-      dayCellContent={renderDayCellContent}
-    />
+  ref={calendarRef}
+  key={adjustedEvents.length}
+  plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+  initialView="dayGridMonth"
+  events={adjustedEvents}
+  eventClick={(info: { event: { id: number } }) => handleEditTrainingModal(info.event.id)}
+  dayCellContent={renderDayCellContent}  // Custom rendering for day cells
+/>
 
               </div>        
              )}
