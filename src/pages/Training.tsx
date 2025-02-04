@@ -15,7 +15,6 @@ import moment from "moment";
 import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
 import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
 
-
 interface Training {
     id_training: number;
     conducteur_prenom: string;
@@ -196,6 +195,42 @@ export function Training() {
         setTypeSearch(selectedValue);
     }
 
+    const adjustEndDate = (events: { start: string; end: string }[]) => {
+        return events.map(event => {
+          const endDate = new Date(event.end);
+          endDate.setDate(endDate.getDate() + 1); // Add one day to the end date
+          return {
+            ...event,
+            end: endDate.toISOString().split('T')[0], // Convert back to ISO string
+          };
+        });
+      };
+    
+      const adjustedEvents = adjustEndDate(events);
+      const countEventsPerDay = (events: { start: string }[]) => {
+        const eventsPerDay: Record<string, number> = {};
+        events.forEach(event => {
+          const date = event.start.split('T')[0]; // Extract the date part from the ISO string
+          eventsPerDay[date] = (eventsPerDay[date] || 0) + 1;
+        });
+        console.log('Events per day:', eventsPerDay); // Debugging
+        return eventsPerDay;
+      };
+    
+      const eventsPerDay = countEventsPerDay(adjustedEvents);
+    
+      // Custom render function for day cells
+      const renderDayCellContent = (cellInfo: { date: Date; dayNumberText: string }) => {
+        const dateStr = cellInfo.date.toISOString().split('T')[0];
+        const eventCount = eventsPerDay[dateStr] || 0;
+        return (
+          <div>
+            <div>{cellInfo.dayNumberText}</div>
+            {eventCount > 0 && <div className="fc-daygrid-event-count">{eventCount} events</div>}
+          </div>
+        );
+      };
+    
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
         setCurrentPage(1);
@@ -519,14 +554,14 @@ export function Training() {
 </Dropdown>
       </div>
       <FullCalendar
-        ref={calendarRef}
-        key={events.length} // Force le re-render quand les événements changent
-        plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} // Ajoutez les plugins nécessaires
-        initialView="dayGridMonth" // Vue par défaut
-        events={events}
-        eventClick={(info: { event: { id: number; }; }) => handleEditTrainingModal(info.event.id)}
-      />
-
+      ref={calendarRef}
+      key={adjustedEvents.length} // Use the adjusted events
+      plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+      initialView="dayGridMonth"
+      events={adjustedEvents} // Pass the adjusted events
+      eventClick={(info: { event: { id: number; }; }) => handleEditTrainingModal(info.event.id)}
+      dayCellContent={renderDayCellContent}
+    />
 
               </div>        
              )}
@@ -563,14 +598,7 @@ export function Training() {
 />
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
-
             <ModalShowTraining show={showShowTrainingModal} onHide={handleCloseShowTrainingModal} id_training={selectedTrainingId} />
-
-            
-         
-            
-
-           
 
         </>
     );
