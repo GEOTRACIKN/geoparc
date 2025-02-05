@@ -230,21 +230,22 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
     return (
         <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <div className="d-flex justify-content-between w-100">
-                    <Modal.Title>{isEditable ? translate("Edit Training") : translate("View Training")}</Modal.Title>
-                    {!isEditable && (
-                        <>
-                            <Button variant="outline-primary" onClick={() => setIsEditable(true)}>
-                                <FaEdit />
-                            </Button>
-                            <Button variant="outline-danger" onClick={() => setShowDeleteModal(true)}>
-                                <FaTrash />
-                            </Button>
-                        </>
-                    )}
-                </div>
-            </Modal.Header>
+          <Modal.Header closeButton>
+    <div className="d-flex justify-content-between align-items-center w-100">
+        <Modal.Title>{isEditable ? translate("Edit Training") : translate("View Training")}</Modal.Title>
+        {!isEditable && (
+            <>
+                <Button variant="outline-primary" onClick={() => setIsEditable(true)} className="mx-1">
+                    <FaEdit />
+                </Button>
+                <Button variant="outline-danger" onClick={() => setShowDeleteModal(true)} className="mx-1">
+                    <FaTrash />
+                </Button>
+            </>
+        )}
+    </div>
+</Modal.Header>
+
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <Form.Group controlId="id_conducteur">
