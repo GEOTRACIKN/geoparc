@@ -42,7 +42,7 @@ export function Dashboard() {
   const [totalVehicles, setTotalVehicles] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState(localStorage.getItem("Geopusername"));
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<ImmatriSuggestion[]>([]);
@@ -198,25 +198,25 @@ export function Dashboard() {
     setLoading(false);
   };
 
-  const fetchUserName = async (userID: any) => {
-    try {
-      const response = await fetch(`${backendUrl}/api/getUserName/${userID}`);
-      if (response.ok) {
-        const userData = await response.json();
-        // Concatenate nom_user and username_user to form the userName
-        const userName = `${userData.nom_user} ${userData.prenom_user}`;
-        setUserName(userName);
-      } else {
-        console.error("Failed to fetch user data");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+  // const fetchUserName = async (userID: any) => {
+  //   try {
+  //     const response = await fetch(`${backendUrl}/api/getUserName/${userID}`);
+  //     if (response.ok) {
+  //       const userData = await response.json();
+  //       // Concatenate nom_user and username_user to form the userName
+  //       const userName = `${userData.nom_user} ${userData.prenom_user}`;
+  //       setUserName(userName);
+  //     } else {
+  //       console.error("Failed to fetch user data");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchUserName(userID); // Add this line to fetch the user's name
-  }, [userID]);
+  // useEffect(() => {
+  //   fetchUserName(userID); // Add this line to fetch the user's name
+  // }, [userID]);
 
   useEffect(() => {
     const fetchdashData = async () => {
@@ -653,7 +653,7 @@ export function Dashboard() {
           />
         </div>
         <div className="col-lg-6">
-          <FleetCo2 />
+          {/* <FleetCo2 /> */}
         </div>
         <div className="col-lg-12" >
           <div className="card">

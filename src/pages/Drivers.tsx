@@ -57,7 +57,7 @@ export function Drivers() {
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
   let [total, setTotal] = useState(0);
-  const [colum, setSortColum] = useState("id_conducteur");
+  const [column, setSortcolumn] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
@@ -182,7 +182,7 @@ export function Drivers() {
   };
 
 
-  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
+  const getDrivers = async (limitValue: number, currentPage: number, search: string, type: number, column: string, sort: string) => {
     try {
       setLoading(true);
 
@@ -193,7 +193,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        colum: searchColum[colum],
+        column: searchcolumn[column],
         sort
       });
 
@@ -239,13 +239,13 @@ export function Drivers() {
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    await getDrivers(limit, currentPage, search, type, colum, sort);
+    await getDrivers(limit, currentPage, search, type, column, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
   useEffect(() => {
-    getDrivers(limit, currentPage, search, type, colum, sort);
+    getDrivers(limit, currentPage, search, type, column, sort);
   }, []);
 
 
@@ -253,13 +253,13 @@ export function Drivers() {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); // Ajouter await ici
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
 
-  const [selectedColumns, setSelectedColumns] = useState({
+  const [selectedColumnns, setSelectedColumnns] = useState({
     id_conducteur: true,
     code_conducteur: true,
     nom_conducteur: true,
@@ -270,15 +270,15 @@ export function Drivers() {
     id_parc: true
   });
 
-  const handleColumnChange = (column: string) => {
-    setSelectedColumns((prevState: any) => ({
+  const handlecolumnnChange = (columnn: string) => {
+    setSelectedColumnns((prevState: any) => ({
       ...prevState,
-      [column]: !prevState[column],
+      [columnn]: !prevState[columnn],
     }));
   };
 
 
-  const searchColum: { [key: string]: number } = {
+  const searchcolumn: { [key: string]: number } = {
     id_conducteur: 0,
     code_conducteur: 1,
     nom_conducteur: 2,
@@ -335,15 +335,15 @@ export function Drivers() {
 
     const newValue = event.target.value;
     setSearch(newValue)
-    await getDrivers(limit, currentPage, newValue, type, colum, sort);
+    await getDrivers(limit, currentPage, newValue, type, column, sort);
   };
 
 
-  const handleSortingColum = (curentColum: string) => {
+  const handleSortingcolumn = (curentcolumn: string) => {
 
-    setSortColum(curentColum)
+    setSortcolumn(curentcolumn)
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getDrivers(limit, currentPage, search, type, colum, sort);
+    getDrivers(limit, currentPage, search, type, column, sort);
   };
 
 
@@ -444,7 +444,7 @@ export function Drivers() {
   };
 
   const handleUpdateDriverList = () => {
-    getDrivers(limit, currentPage, search, type, colum, sort).catch(error => {
+    getDrivers(limit, currentPage, search, type, column, sort).catch(error => {
       console.error('Failed to update driver list:', error);
     });
   };
@@ -452,7 +452,7 @@ export function Drivers() {
   const handleResetSearch = async () => {
     setSearch("")
 
-    await getDrivers(limit, currentPage, search, type, colum, sort)
+    await getDrivers(limit, currentPage, search, type, column, sort)
   };
 
   interface TrainingEvent {
@@ -595,7 +595,7 @@ export function Drivers() {
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
-              title={translate("Display columns")}
+              title={translate("Display columnns")}
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
@@ -607,8 +607,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_conducteur}
-                  onChange={() => handleColumnChange("id_conducteur")}
+                  checked={selectedColumnns.id_conducteur}
+                  onChange={() => handlecolumnnChange("id_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("ID")}
@@ -621,8 +621,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.code_conducteur}
-                  onChange={() => handleColumnChange("code_conducteur")}
+                  checked={selectedColumnns.code_conducteur}
+                  onChange={() => handlecolumnnChange("code_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Code")}
@@ -635,8 +635,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.nom_conducteur}
-                  onChange={() => handleColumnChange("nom_conducteur")}
+                  checked={selectedColumnns.nom_conducteur}
+                  onChange={() => handlecolumnnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Last and first name")}
@@ -649,8 +649,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.date_naissance_conducteur}
-                  onChange={() => handleColumnChange("date_naissance_conducteur")}
+                  checked={selectedColumnns.date_naissance_conducteur}
+                  onChange={() => handlecolumnnChange("date_naissance_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Date of birth")}
@@ -663,8 +663,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.telephone_conducteur}
-                  onChange={() => handleColumnChange("telephone_conducteur")}
+                  checked={selectedColumnns.telephone_conducteur}
+                  onChange={() => handlecolumnnChange("telephone_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Phone")}
@@ -678,8 +678,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.email_conducteur}
-                  onChange={() => handleColumnChange("email_conducteur")}
+                  checked={selectedColumnns.email_conducteur}
+                  onChange={() => handlecolumnnChange("email_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Email")}
@@ -705,13 +705,13 @@ export function Drivers() {
                 </div>
               </th>
 
-              {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingColum("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingColum("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Last and first name")}</th>)}
-              {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
-              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingColum("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingColum("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingColum("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumnns.id_conducteur && <th className="sorting" onClick={() => handleSortingcolumn("id_conducteur")}>{translate("Id")}</th>}
+              {selectedColumnns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
+              {selectedColumnns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("nom_conducteur")}>{translate("Last and first name")}</th>)}
+              {selectedColumnns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
+              {selectedColumnns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
+              {selectedColumnns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
+              {selectedColumnns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -743,13 +743,13 @@ export function Drivers() {
                           <label htmlFor={`checkbox-${driver.id_conducteur}`} className="mb-0"></label>
                         </div>
                       </td>
-                      {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
-                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
-                      {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
-                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
-                      {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
-                      {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                      {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumnns.id_conducteur && <td>{driver.id_conducteur}</td>}
+                      {selectedColumnns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
+                      {selectedColumnns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
+                      {selectedColumnns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
+                      {selectedColumnns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
+                      {selectedColumnns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
+                      {selectedColumnns.id_parc && (<td>{driver.nom_parc}</td>)}
 
                       <td>
                         <div className="d-flex align-items-center list-action">
