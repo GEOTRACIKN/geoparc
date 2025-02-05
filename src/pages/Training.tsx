@@ -4,6 +4,7 @@ import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewTraining from "../components/Training/NewTraining";
+import CalendarTrainingModal from "../components/Training/CalendarTraining";
 import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
@@ -45,6 +46,9 @@ export function Training() {
     const [events, setEvents] = useState<any[]>([]);
     const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
     const localizer = momentLocalizer(moment);
+    type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
+const [mode, setMode] = useState<ModeType>("create");
+
 
     const calendarRef = useRef<FullCalendar | null>(null);
     // Fonction pour changer la vue
@@ -96,6 +100,8 @@ export function Training() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewTrainingModal, setShowNewTrainingModal] = useState(false);
     const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
+    const [showCalendarTrainingModal, setShowCalendarTrainingModal] = useState(false);
+
     const [showShowTrainingModal, setShowShowTrainingModal] = useState(false);
     const [showDeleteTrainingModal, setShowDeleteTrainingModal] = useState(false);
     const handleShowNewTrainingModal = () => setShowNewTrainingModal(true);
@@ -109,7 +115,14 @@ export function Training() {
         setSelectedTrainingId(id);
         setShowEditTrainingModal(true);
     };
+
     const handleCloseEditTrainingModal = () => setShowEditTrainingModal(false);
+    const handleCalendarTrainingModal = (id: number) => {
+        setSelectedTrainingId(id);
+        setShowCalendarTrainingModal(true);
+    };
+    const handleCloseCalendarTrainingModal = () => setShowCalendarTrainingModal(false);
+    
     const [trainingDetails, setTrainingDetails] = useState(null); // For storing the selected training data
 
     const handleShowShowTrainingModal = (id: number) => {
@@ -571,7 +584,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
   plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
   initialView="dayGridMonth"
   events={adjustedEvents}
-  eventClick={(info: { event: { id: number } }) => handleEditTrainingModal(info.event.id)}
+  eventClick={(info: { event: { id: number } }) => handleCalendarTrainingModal(info.event.id)}
   dayCellContent={renderDayCellContent}  // Custom rendering for day cells
 />
 
@@ -607,7 +620,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
             </div>
             <ModalNewTraining
   show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} // Refresh when a new training is successfully added
+  
 />
+<CalendarTrainingModal mode="create" show={showCalendarTrainingModal} onHide={handleCloseCalendarTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
+
+
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
             <ModalShowTraining show={showShowTrainingModal} onHide={handleCloseShowTrainingModal} id_training={selectedTrainingId} />
