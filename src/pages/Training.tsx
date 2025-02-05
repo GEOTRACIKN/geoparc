@@ -420,7 +420,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                             {selectedColumns.Name && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("nom_training")}
+                                    onClick={() => handleSortingColumn("conducteur_nom")}
                                 >
                                     {translate("Name")}
                                 </th>
