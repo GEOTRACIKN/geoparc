@@ -79,7 +79,7 @@ export function Vehicles() {
     username_user: true,
   });
 
-    const [showDownloadModal, setShowDownloadModal] = useState(false); 
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -290,7 +290,7 @@ export function Vehicles() {
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const [isVehiclesSelected, setIsVehiclesSelected] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  // In the handleSelectAllDrivers function
+
   const handleSelectAllVehicles = (checked: boolean) => {
     setSelectAll(checked);
     console.log(checked);
@@ -360,7 +360,7 @@ export function Vehicles() {
       vehicle.immatriculation_vehicule,
       vehicle.etat_vehicule,
       vehicle.affectation,
-      vehicle.driver_first_name+' '+vehicle.driver_last_name,
+      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
       vehicle.username_user,
     ]);
 
@@ -378,7 +378,7 @@ export function Vehicles() {
       vehicle.immatriculation_vehicule,
       vehicle.etat_vehicule,
       vehicle.affectation,
-      vehicle.driver_first_name+' '+vehicle.driver_last_name,
+      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
       vehicle.username_user,
     ]);
     generatePDFFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
@@ -389,7 +389,7 @@ export function Vehicles() {
     if (selectedVehicles.length > 0) {
       handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
     } else {
-      toast.warn("Please select at least one driver", {
+      toast.warn("Please select at least one vehicle", {
         position: "bottom-right",
         autoClose: 3000,
       });
@@ -415,16 +415,16 @@ export function Vehicles() {
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
-             
-             
-            <button
-            className="btn btn-outline-secondary  mt-2 mr-1"
-            onClick={() => setShowDownloadModal(true)}
-          >
-            <i className="las la-download"></i>
-            {translate("Export")} {translate("Vehicle")}
-          </button>
-             
+
+
+              <button
+                className="btn btn-outline-secondary  mt-2 mr-1"
+                onClick={() => setShowDownloadModal(true)}
+              >
+                <i className="las la-download"></i>
+                {translate("Export")} {translate("Vehicle")}
+              </button>
+
               <ButtonCustomHover
                 text={translate("Add vehicule")}
                 icon={<FaPlus />}
@@ -779,12 +779,12 @@ export function Vehicles() {
           </div>
         </div>
       </div>
-         <DownloadModal
-                show={showDownloadModal}
-                onHide={() => setShowDownloadModal(false)}
-                onDownloadConfirm={onDownloadConfirm}
-              />
-      
+      <DownloadModal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        onDownloadConfirm={onDownloadConfirm}
+      />
+
     </>
   );
 }
