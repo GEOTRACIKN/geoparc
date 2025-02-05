@@ -1,37 +1,52 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect, useLayoutEffect } from "react";
-import { Table, Modal, Form, Col, Row, Dropdown, Button, } from "react-bootstrap";
-import { FaPlus, FaRedo, FaCar, FaShieldAlt, FaStickyNote, FaTachometerAlt, FaWrench, } from "react-icons/fa";
+import {
+  Table,
+  Modal,
+  Form,
+  Col,
+  Row,
+  Dropdown,
+  Button,
+} from "react-bootstrap";
+import {
+  FaPlus,
+  FaRedo,
+  FaCar,
+  FaShieldAlt,
+  FaStickyNote,
+  FaTachometerAlt,
+  FaWrench,
+} from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { Link, NavLink } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 import { ButtonCustomHover } from "../components/ButtonHover";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import { toast } from "react-toastify";
 
-
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL + '/api/geop';
+const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
 
 interface VehiculeListInterface {
-  id_vehicule: number,
-  vehicule_type: string,
-  modele_vehicule: string,
-  immatriculation_vehicule: string,
-  couleur_vehicule: string,
-  etat_vehicule: string,
-  id_conducteur_vehicule?: number,
-  driver_first_name?: string,
-  driver_last_name?: string
-  affectation?: string,
-  username_user: string,
-  id_user: string,
+  id_vehicule: number;
+  vehicule_type: string;
+  modele_vehicule: string;
+  immatriculation_vehicule: string;
+  couleur_vehicule: string;
+  etat_vehicule: string;
+  id_conducteur_vehicule?: number;
+  driver_first_name?: string;
+  driver_last_name?: string;
+  affectation?: string;
+  username_user: string;
+  id_user: string;
 }
 
 // let currentPage = 1;
 
 export function Vehicles() {
-
   const { translate } = useTranslate();
 
   const [type, setType] = useState(1);
@@ -39,7 +54,6 @@ export function Vehicles() {
   const [search, setSearch] = useState("");
   const [colum, setSortColum] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
-
   const userID = localStorage.getItem("GeopUserID");
   //const userID = 1;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -65,6 +79,8 @@ export function Vehicles() {
     username_user: true,
   });
 
+    const [showDownloadModal, setShowDownloadModal] = useState(false); 
+
   const navigate = useNavigate();
 
   const handleClickLink = (navigateTo: string) => {
@@ -81,22 +97,16 @@ export function Vehicles() {
     setSortDirection(sortOrder);
   };
 
-
   const handleSortingColum = (curentColum: string) => {
-
-    setSortColum(curentColum)
+    setSortColum(curentColum);
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getVehicles(limit, currentPage, search, type, colum, sort);
   };
-
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectAllChecked(e.target.checked);
     setSelectedRows(new Map()); // or handle setting all items as selected
   };
-
-
-
 
   const searchColum: { [key: string]: number } = {
     id_vehicule: 0,
@@ -104,7 +114,6 @@ export function Vehicles() {
     vehicule_type: 2,
     // nom_conducteur: 3,
     username_user: 4,
-
   };
 
   const HandleDelete = async (id_conducteur: number) => {
@@ -124,26 +133,31 @@ export function Vehicles() {
     }
   };
 
-
-
-  const getVehicles = async (limit: number, page: number, search: string, type: number, column: string, sort: string) => {
+  const getVehicles = async (
+    limit: number,
+    page: number,
+    search: string,
+    type: number,
+    column: string,
+    sort: string
+  ) => {
     try {
       setLoading(true);
       const [countData, vehicleData] = await Promise.all([
         fetch(`${backendUrl}/vehicles/count`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id_user: parseInt(userID ?? '0') || 0,
+            id_user: parseInt(userID ?? "0") || 0,
             search: search,
-          })
+          }),
         }).then((res) => res.json()),
         fetch(`${backendUrl}/vehicles/search`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             id_user: userID,
@@ -152,9 +166,9 @@ export function Vehicles() {
             column: searchColum[column],
             sort: sort,
             search: search,
-            type: type
-          })
-        }).then((res) => res.json())
+            type: type,
+          }),
+        }).then((res) => res.json()),
       ]);
 
       const total = countData[0].total;
@@ -170,15 +184,15 @@ export function Vehicles() {
     } finally {
       setLoading(false); // Set loading to false on data fetch completion
     }
-  }
+  };
 
   const refreshVehiculeData = async () => {
     getVehicles(limit, currentPage, search, type, colum, sort);
-  }
+  };
 
   useLayoutEffect(() => {
-    refreshVehiculeData()
-  }, [userID, limit, limit, search, type, colum, sort])
+    refreshVehiculeData();
+  }, [userID, limit, limit, search, type, colum, sort]);
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -198,17 +212,15 @@ export function Vehicles() {
     translate("User"),
   ];
 
-
   const handleTypeSearch = (selectedValue: string) => {
-
-    console.log(selectedValue)
+    console.log(selectedValue);
     switch (selectedValue) {
       case translate("ID"):
-        console.log(0)
+        console.log(0);
         setType(0);
         break;
       case translate("Immatriculation"):
-        console.log(1)
+        console.log(1);
         setType(1);
         break;
       // case translate("Driver"):
@@ -216,16 +228,16 @@ export function Vehicles() {
       //   setType(2);
       //  break;
       case translate("User"):
-        console.log(3)
+        console.log(3);
         setType(3);
         break;
       default:
-        console.log('Unknown selection');
-        console.log(selectedValue)
+        console.log("Unknown selection");
+        console.log(selectedValue);
         break;
     }
     setTypeSearch(selectedValue);
-    console.log('Selected value:', selectedValue);
+    console.log("Selected value:", selectedValue);
   };
 
   const [selectedColumns, setSelectedColumns] = useState({
@@ -248,53 +260,152 @@ export function Vehicles() {
   };
 
   const handleAdvancedSearch = async (event: any) => {
-
     const newValue = event.target.value;
-    setSearch(newValue)
+    setSearch(newValue);
     await getVehicles(limit, currentPage, newValue, type, colum, sort);
   };
-
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getVehicles(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getVehicles(
+      parseInt(newValue),
+      1,
+      search,
+      type,
+      colum,
+      sort
+    ); // Ajouter await ici
     setVehicles(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
   const handleResetSearch = async () => {
-    setSearch("")
+    setSearch("");
 
-    await getVehicles(limit, currentPage, search, type, colum, sort)
+    await getVehicles(limit, currentPage, search, type, colum, sort);
   };
 
-  const [selectedDrivers, setSelectedDrivers] = useState<string[]>([]);
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const [isVehiclesSelected, setIsVehiclesSelected] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   // In the handleSelectAllDrivers function
   const handleSelectAllVehicles = (checked: boolean) => {
     setSelectAll(checked);
-    console.log(checked)
+    console.log(checked);
     if (checked) {
       // Select all POIs
-      const allVehicleIDs = vehicles.map((vehicle) => vehicle.id_vehicule.toString()); // Convert to strings
-      setSelectedDrivers(allVehicleIDs);
-      setIsVehiclesSelected(true);// Mark as selected
+      const allVehicleIDs = vehicles.map((vehicle) =>
+        vehicle.id_vehicule.toString()
+      ); // Convert to strings
+      setSelectedVehicles(allVehicleIDs);
+      setIsVehiclesSelected(true); // Mark as selected
     } else {
       // Select all POIs
-      setSelectedDrivers([]);
+      setSelectedVehicles([]);
       setIsVehiclesSelected(false); // Mark as unselected
+    }
+  };
+
+
+
+
+  const handleVehiclesSelect = (DriverID: string) => {
+    let updatedsetSelectedVehicles: string[] = [];
+
+    // If "Select All Vehicles" is enabled, selects or deselects all vehicles
+    if (selectAll) {
+      updatedsetSelectedVehicles = selectedVehicles.includes(DriverID)
+        ? selectedVehicles.filter(id => id !== DriverID) //Deselect if already selected
+        : vehicles.map(vehicle => vehicle.id_vehicule.toString()); // Select all vehicles
+    } else {
+      //Managing selection/normal selection of an individual vehicle
+      if (selectedVehicles.includes(DriverID)) {
+        updatedsetSelectedVehicles = selectedVehicles.filter(id => id !== DriverID);
+      } else {
+        updatedsetSelectedVehicles = [...selectedVehicles, DriverID];
+      }
+    }
+
+    // Updates the list of selected vehicles
+    setSelectedVehicles(updatedsetSelectedVehicles);
+
+    // Updates the Vehicles Selected state (activate if at least one is selected)
+    setIsVehiclesSelected(updatedsetSelectedVehicles.length > 0);
+
+    console.log(updatedsetSelectedVehicles);
+  };
+
+
+  const vehicleHeaders = [
+    translate("ID"),
+    translate("Model"),
+    translate("Matriculation"),
+    translate("State"),
+    translate("Assignment"),
+    translate("Driver"),
+    translate("User"),
+    translate("Trailer"),
+  ];
+
+
+  const downloadVehicleExcel = () => {
+
+    const selectedData = vehicles.filter((vehicle) =>
+      selectedVehicles.includes(vehicle.id_vehicule.toString())
+    ).map((vehicle) => [
+      vehicle.id_vehicule,
+      vehicle.modele_vehicule,
+      vehicle.immatriculation_vehicule,
+      vehicle.etat_vehicule,
+      vehicle.affectation,
+      vehicle.driver_first_name+' '+vehicle.driver_last_name,
+      vehicle.username_user,
+    ]);
+
+
+    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+  };
+
+  const downloadVehiclePDF = () => {
+
+    const selectedData = vehicles.filter((vehicle) =>
+      selectedVehicles.includes(vehicle.id_vehicule.toString())
+    ).map((vehicle) => [
+      vehicle.id_vehicule,
+      vehicle.modele_vehicule,
+      vehicle.immatriculation_vehicule,
+      vehicle.etat_vehicule,
+      vehicle.affectation,
+      vehicle.driver_first_name+' '+vehicle.driver_last_name,
+      vehicle.username_user,
+    ]);
+    generatePDFFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+  };
+
+
+  const onDownloadConfirm = (format: string) => {
+    if (selectedVehicles.length > 0) {
+      handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    } else {
+      toast.warn("Please select at least one driver", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
     }
   };
 
 
   return (
     <>
-      <div id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer" >
+      <div
+        id="DataTables_Table_0_wrapper"
+        className="dataTables_wrapper dt-bootstrap4 no-footer"
+      >
         <div className="row">
-          <div className="col-sm-12 col-md-6 dataTables_length"
+          <div
+            className="col-sm-12 col-md-6 dataTables_length"
             id="DataTables_Table_0_length"
           >
             <h4 className="mb-3 text-nowrap">
@@ -304,23 +415,48 @@ export function Vehicles() {
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
-              <ButtonCustomHover text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success' onClick={() => handleClickLink('/vehicle/add')} />
+             
+             
+            <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            {translate("Export")} {translate("Vehicle")}
+          </button>
+             
+              <ButtonCustomHover
+                text={translate("Add vehicule")}
+                icon={<FaPlus />}
+                ClasStyle="bg-success"
+                onClick={() => handleClickLink("/vehicle/add")}
+              />
 
-              <ButtonCustomHover text={translate("Initialisation des Affectations")} icon={<FaRedo />} />
-              <ButtonCustomHover text={translate("Affectations Vehicule")} icon={<FaCar />} />
-              <ButtonCustomHover text={translate("Maj Assurance")} icon={<FaShieldAlt />} />
-              <ButtonCustomHover text={translate("Maj Vignette")} icon={<FaStickyNote />} />
-              <ButtonCustomHover text={translate("Maj Kilometrage")} icon={<FaTachometerAlt />} />
-              <ButtonCustomHover text={translate("Maj Controle Thechnique")} icon={<FaWrench />} />
+              <ButtonCustomHover
+                text={translate("Assurance")}
+                icon={<FaShieldAlt />}
+              />
+              <ButtonCustomHover
+                text={translate("Vignette")}
+                icon={<FaStickyNote />}
+              />
+              <ButtonCustomHover
+                text={translate("Mileage")}
+                icon={<FaTachometerAlt />}
+              />
+              <ButtonCustomHover
+                text={translate("Control Technic")}
+                icon={<FaWrench />}
+              />
             </div>
           </div>
 
           <div className="col-sm-12 col-md-12">
             <div className="row">
-              <div className="col-sm-12 col-md-6"  >
-                <div className="input-group" >
+              <div className="col-sm-12 col-md-6">
+                <div className="input-group">
                   <Dropdown>
-                    <Dropdown.Toggle variant="link" id="dropdown-basic" >
+                    <Dropdown.Toggle variant="link" id="dropdown-basic">
                       <i
                         className="fas fa-chevron-down"
                         style={{ fontSize: "20" }}
@@ -340,7 +476,14 @@ export function Vehicles() {
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
-                  <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+                  <input
+                    type="text"
+                    placeholder={` ${translate("Search by")} ${translate(
+                      typeSearch
+                    )}`}
+                    onChange={handleAdvancedSearch}
+                    className="form-control"
+                  />
                   <Button
                     variant="secondary"
                     onClick={handleResetSearch}
@@ -351,7 +494,10 @@ export function Vehicles() {
                 </div>
               </div>
               <div className="col-md-6 d-flex justify-content-end align-items-center">
-                <div className="dataTables_length" id="DataTables_Table_0_length">
+                <div
+                  className="dataTables_length"
+                  id="DataTables_Table_0_length"
+                >
                   <label style={{ marginBottom: "0" }}>
                     {translate("Show")}
                     <select
@@ -402,7 +548,9 @@ export function Vehicles() {
                         type="checkbox"
                         className="form-check-input"
                         checked={selectedColumns.immatriculation_vehicule}
-                        onChange={() => handleColumnChange("immatriculation_vehicule")}
+                        onChange={() =>
+                          handleColumnChange("immatriculation_vehicule")
+                        }
                       />
                       <span style={{ marginLeft: "10px" }}>
                         {translate("Matriculation")}
@@ -445,7 +593,6 @@ export function Vehicles() {
         </div>
       </div>
       <div>
-
         <div className="row m-1 table-responsive">
           <Table className="dataTable">
             <thead className="bg-white text-uppercase">
@@ -456,20 +603,80 @@ export function Vehicles() {
                       className="form-check-input"
                       type="checkbox"
                       checked={selectAll}
-                      onChange={(e) => handleSelectAllVehicles(e.target.checked)}
+                      onChange={(e) =>
+                        handleSelectAllVehicles(e.target.checked)
+                      }
                     />
                     <label className="form-check-label"></label>
                   </div>
                 </th>
 
-                {selectedColumns.id_vehicule && <th className="sorting" onClick={() => handleSortingColum("id_vehicule")}>{translate("Id")}</th>}
-                {selectedColumns.model && (<th className="sorting" onClick={() => handleSortingColum("model")}>{translate("Model")}</th>)}
-                {selectedColumns.immatriculation_vehicule && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule")}>{translate("Matriculation")}</th>)}
-                {selectedColumns.state && (<th className="sorting" onClick={() => handleSortingColum("state")}>{translate("State")}</th>)}
-                {selectedColumns.assignment && (<th className="assignment" onClick={() => handleSortingColum("assignment")}>{translate("Assignment")}</th>)}
-                {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingColum("nom_conducteur")}>{translate("Driver")}</th>)}
-                {selectedColumns.username_user && (<th className="sorting" onClick={() => handleSortingColum("username_user")}>{translate("User")}</th>)}
-                {selectedColumns.trailer && (<th className="sorting" onClick={() => handleSortingColum("trailer")}>{translate("Trailer")}</th>)}
+                {selectedColumns.id_vehicule && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("id_vehicule")}
+                  >
+                    {translate("Id")}
+                  </th>
+                )}
+                {selectedColumns.model && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("model")}
+                  >
+                    {translate("Model")}
+                  </th>
+                )}
+                {selectedColumns.immatriculation_vehicule && (
+                  <th
+                    className="sorting"
+                    onClick={() =>
+                      handleSortingColum("immatriculation_vehicule")
+                    }
+                  >
+                    {translate("Matriculation")}
+                  </th>
+                )}
+                {selectedColumns.state && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("state")}
+                  >
+                    {translate("State")}
+                  </th>
+                )}
+                {selectedColumns.assignment && (
+                  <th
+                    className="assignment"
+                    onClick={() => handleSortingColum("assignment")}
+                  >
+                    {translate("Assignment")}
+                  </th>
+                )}
+                {selectedColumns.nom_conducteur && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("nom_conducteur")}
+                  >
+                    {translate("Driver")}
+                  </th>
+                )}
+                {selectedColumns.username_user && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("username_user")}
+                  >
+                    {translate("User")}
+                  </th>
+                )}
+                {selectedColumns.trailer && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("trailer")}
+                  >
+                    {translate("Trailer")}
+                  </th>
+                )}
                 {<th>{translate("Action")}</th>}
               </tr>
             </thead>
@@ -490,68 +697,47 @@ export function Vehicles() {
                 vehicles.map((item) => (
                   <tr key={item.id_vehicule}>
                     <td>
-                      <input
-                        type="checkbox"
-                        className="checkbox-input"
-                        id={`checkbox-${item.id_vehicule}`}
-                      />
+                      <div className="form-check form-check-inline">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id={`checkbox-${item.id_vehicule}`}
+                          checked={selectedVehicles.includes(item.id_vehicule.toString())}
+                          onChange={() => handleVehiclesSelect(item.id_vehicule.toString())}
+                        />
+                        <label htmlFor={`checkbox-${item.id_vehicule}`} className="mb-0"></label>
+                      </div>
                     </td>
 
-                    {visibleColumns.id_vehicule && <td>{item.id_vehicule}</td>}
-                    {visibleColumns.model && <td className="text-center">{item.modele_vehicule}</td>}
-                    {visibleColumns.imatriculation && (
-                      <td className="text-center">{item.immatriculation_vehicule}</td>
-                    )}
-                    {visibleColumns.state && (
-                      <td className="text-center">
-                        <span className="badge p-1 fs-6 btn">
-                          {item.etat_vehicule}
-                        </span>
-                      </td>
-                    )}
-                    {visibleColumns.assignment && (
-                      <td className="text-center">
-                        {item.affectation}
-                      </td>
-                    )}
-                    {visibleColumns.conducteur && (
-                      <td className="text-center">
-                        {item.driver_first_name} - {item.driver_last_name}
-                      </td>
-                    )}
-                        {visibleColumns.username_user && (
-                      <td className="text-center">
-                        {item.username_user} 
-                      </td>
-                    )}
-                    {visibleColumns.trailer && (
-                      <td className="text-center">
-                        {/* {item.trailer} */}
-                      </td>
-                    )}
-                    {visibleColumns.actions && (
-                      <td>
-                        <div className="d-flex align-items-center list-action">
-                          <NavLink
-                            to={`/vehicle/edit/${item.id_vehicule}`}
-                            className="badge bg-success mr-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title={translate("Edit")}
-                          >
-                            <i className="ri-pencil-line mr-0"></i>
-                          </NavLink>
-                          <a
-                            className="badge bg-warning mr-2 nav-link"
-                            data-toggle="tooltip"
-                            title="Delete"
-                            onClick={() => HandleDelete(item.id_vehicule)}
-                          >
-                            <i className="ri-delete-bin-line mr-0"></i>
-                          </a>
-                        </div>
-                      </td>
-                    )}
+                    {selectedColumns.id_vehicule && <td>{item.id_vehicule}</td>}
+                    {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
+                    {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
+                    {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}
+                    {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)}
+                    {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
+                    {selectedColumns.username_user && (<td className="text-center">{item.username_user}</td>)}
+                    {selectedColumns.trailer && (<td className="text-center">{/* {item.trailer} */}</td>)}
+                    <td>
+                      <div className="d-flex align-items-center list-action">
+                        <NavLink
+                          to={`/vehicle/edit/${item.id_vehicule}`}
+                          className="badge bg-success mr-2"
+                          data-toggle="tooltip"
+                          data-placement="top"
+                          title={translate("Edit")}
+                        >
+                          <i className="ri-pencil-line mr-0"></i>
+                        </NavLink>
+                        <a
+                          className="badge bg-warning mr-2 nav-link"
+                          data-toggle="tooltip"
+                          title="Delete"
+                          onClick={() => HandleDelete(item.id_vehicule)}
+                        >
+                          <i className="ri-delete-bin-line mr-0"></i>
+                        </a>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -560,7 +746,6 @@ export function Vehicles() {
                 </tr>
               )}
             </tbody>
-
           </Table>
           <div className="row">
             <div className="col-md-6 d-flex align-items-center">
@@ -594,6 +779,12 @@ export function Vehicles() {
           </div>
         </div>
       </div>
+         <DownloadModal
+                show={showDownloadModal}
+                onHide={() => setShowDownloadModal(false)}
+                onDownloadConfirm={onDownloadConfirm}
+              />
+      
     </>
   );
 }
