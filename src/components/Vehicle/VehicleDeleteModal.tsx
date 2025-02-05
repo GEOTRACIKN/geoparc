@@ -1,4 +1,4 @@
-// DriverModal.tsx
+// VehicleModal.tsx
 
 import React from "react";
 import Modal from "react-bootstrap/Modal";
@@ -6,26 +6,26 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-interface DriverModalProps {
+interface VehicleModalProps {
   show: boolean;
   onHide: () => void;
   status: string | null; 
   title?: string | null; 
   IdUser: number; 
-  IdDriver: number; 
-  updateDriverList: () => void | Promise<void>;
+  IdVehicle: number; 
+  updateVehicleList: () => void | Promise<void>;
 }
 
-const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,IdUser, IdDriver,updateDriverList  }) => {
+const VehicleModal: React.FC<VehicleModalProps> = ({ show, onHide, status, title,IdUser, IdVehicle,updateVehicleList  }) => {
   
   const { translate } = useTranslate();
 
 
-  const deletedriver = async (id_vehicule: number, id_user: number) => {
+  const deleteVehicle = async (id_vehicule: number, id_user: number) => {
 
 
     try { 
-      const res = await fetch(`${backendUrl}/api/geop/driver/delete/${IdDriver}/${id_user}`, {
+      const res = await fetch(`${backendUrl}/api/geop/vehicle/delete/${IdVehicle}/${id_user}`, {
         method: "DELETE",
         mode: "cors",
       });
@@ -33,9 +33,9 @@ const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,I
       if (!res.ok) {
        
   
-        console.error("Error deleting driver");
+        console.error("Error deleting Vehicle");
         status=null;
-        toast.warn("Can't deleting driver", {
+        toast.warn("Can't deleting Vehicle", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -52,9 +52,9 @@ const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,I
 
       if (res.ok) {
        
-        console.error("driver deleted successfully");
-        updateDriverList();  
-        toast.success("driver deleted successfully !", {
+        console.error("Vehicle deleted successfully");
+        updateVehicleList();  
+        toast.success("Vehicle deleted successfully !", {
           position: "bottom-right",
           autoClose: 2500,
           hideProgressBar: false,
@@ -72,10 +72,10 @@ const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,I
 
 
     } catch (error) {
-      console.error("Error deleting driver", error);
+      console.error("Error deleting Vehicle", error);
 
 
-      toast.warn("Can't deleting driver", {
+      toast.warn("Can't deleting Vehicle", {
         position: "bottom-right",
         autoClose: 2500, 
         hideProgressBar: false,
@@ -104,7 +104,7 @@ const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,I
         <button  className="btn btn-outline-danger mt-2 mx-auto" onClick={onHide}> 
             {translate("Close")}
         </button>
-        <button   className="btn btn-outline-success mt-2 mx-auto" onClick={() =>deletedriver(IdDriver,IdUser)}> 
+        <button   className="btn btn-outline-success mt-2 mx-auto" onClick={() =>deleteVehicle(IdVehicle,IdUser)}> 
           {translate("Delete")} 
         </button>
       </Modal.Footer>
@@ -118,4 +118,4 @@ const DriverModal: React.FC<DriverModalProps> = ({ show, onHide, status, title,I
 
 
 
-export default DriverModal;
+export default VehicleModal;

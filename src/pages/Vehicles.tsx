@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect, useLayoutEffect } from "react";
@@ -25,7 +26,8 @@ import { PropagateLoader } from "react-spinners";
 import { ButtonCustomHover } from "../components/ButtonHover";
 import { useNavigate } from "react-router-dom";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify";import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
+;
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
 
@@ -44,7 +46,6 @@ interface VehiculeListInterface {
   id_user: string;
 }
 
-// let currentPage = 1;
 
 export function Vehicles() {
   const { translate } = useTranslate();
@@ -52,36 +53,24 @@ export function Vehicles() {
   const [type, setType] = useState(1);
   const [typeSearch, setTypeSearch] = useState(translate("Immatriculation"));
   const [search, setSearch] = useState("");
-  const [colum, setSortColum] = useState("id_conducteur");
+  const [column, setSortColumn] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const userID = localStorage.getItem("GeopUserID");
-  //const userID = 1;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [vehicles, setVehicles] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
-  const [selectedRows, setSelectedRows] = useState(new Map());
   const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [sortColumn, setSortColumn] = useState("id_vehicule");
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [showText, setShowText] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState({
-    id_vehicule: true,
-    model: true,
-    imatriculation: true,
-    state: true,
-    assignment: true,
-    conducteur: true,
-    trailer: true,
-    actions: true,
-    username_user: true,
-  });
-
   const [showDownloadModal, setShowDownloadModal] = useState(false);
-
   const navigate = useNavigate();
+  const [modalStatus, setModalStatus] = useState<string | null>(null);
+  const [titleStatus, setTitleStatus] = useState<string | null>(null);
+  const [IdUser, setIdUser] = useState<number>(0);
+  const [IdVehicle, setIdDVehicle] = useState<number>(0);
+  const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
+  const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+  
 
   const handleClickLink = (navigateTo: string) => {
     if (navigateTo) {
@@ -90,22 +79,10 @@ export function Vehicles() {
   };
 
 
-  const handleSort = (type: string) => {
-    let sortOrder = sortDirection === "asc" ? "desc" : "asc";
-    if (type !== sortColumn) sortOrder = "asc";
-    setSortColumn(type);
-    setSortDirection(sortOrder);
-  };
-
-  const handleSortingColum = (curentColum: string) => {
-    setSortColum(curentColum);
-    sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getVehicles(limit, currentPage, search, type, colum, sort);
-  };
-
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectAllChecked(e.target.checked);
-    setSelectedRows(new Map()); // or handle setting all items as selected
+  const handleSortingColum = (currentColumn: string) => {
+    setSortColumn(currentColumn);
+    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    getVehicles(limit, currentPage, search, type, column, sort);
   };
 
   const searchColum: { [key: string]: number } = {
@@ -116,16 +93,15 @@ export function Vehicles() {
     username_user: 4,
   };
 
-  const HandleDelete = async (id_conducteur: number) => {
+  const HandleDelete = async (id_vehicle: number) => {
     try {
-      console.log(id_conducteur);
-      // setModalStatus('Do you want to delete this Driver');
-      // setTitleStatus('Delete Driver');
-      // setIdUser(parseInt(id_user || '0', 0));
-      // setIdDriver(id_conducteur);
+      console.log(id_vehicle);
+       setModalStatus('Do you want to delete this vehicle');
+       setTitleStatus('Delete vehicle');
+       setIdUser(userID ? Number(userID) : 0);
+       setIdDVehicle(id_vehicle);
 
-      // Perform deletion logic here...
-
+    
       // After successful deletion, update the vehicle list
       //  await updateVehicleList();
     } catch (error) {
@@ -187,23 +163,20 @@ export function Vehicles() {
   };
 
   const refreshVehiculeData = async () => {
-    getVehicles(limit, currentPage, search, type, colum, sort);
+    getVehicles(limit, currentPage, search, type, column, sort);
   };
 
   useLayoutEffect(() => {
     refreshVehiculeData();
-  }, [userID, limit, limit, search, type, colum, sort]);
+  }, [userID, limit, limit, search, type, column, sort]);
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-    await getVehicles(limit, currentPage, search, type, colum, sort);
+    await getVehicles(limit, currentPage, search, type, column, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
-  const handleClick = () => {
-    console.log("Button clicked!");
-  };
 
   const menuItems = [
     translate("ID"),
@@ -262,7 +235,7 @@ export function Vehicles() {
   const handleAdvancedSearch = async (event: any) => {
     const newValue = event.target.value;
     setSearch(newValue);
-    await getVehicles(limit, currentPage, newValue, type, colum, sort);
+    await getVehicles(limit, currentPage, newValue, type, column, sort);
   };
 
   const handleSelectChange = async (event: any) => {
@@ -274,7 +247,7 @@ export function Vehicles() {
       1,
       search,
       type,
-      colum,
+      column,
       sort
     ); // Ajouter await ici
     setVehicles(commentsFormServer);
@@ -284,7 +257,7 @@ export function Vehicles() {
   const handleResetSearch = async () => {
     setSearch("");
 
-    await getVehicles(limit, currentPage, search, type, colum, sort);
+    await getVehicles(limit, currentPage, search, type, column, sort);
   };
 
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
@@ -312,29 +285,29 @@ export function Vehicles() {
 
 
   const handleVehiclesSelect = (DriverID: string) => {
-    let updatedsetSelectedVehicles: string[] = [];
+    let updatedSetSelectedVehicles: string[] = [];
 
     // If "Select All Vehicles" is enabled, selects or deselects all vehicles
     if (selectAll) {
-      updatedsetSelectedVehicles = selectedVehicles.includes(DriverID)
+      updatedSetSelectedVehicles = selectedVehicles.includes(DriverID)
         ? selectedVehicles.filter(id => id !== DriverID) //Deselect if already selected
         : vehicles.map(vehicle => vehicle.id_vehicule.toString()); // Select all vehicles
     } else {
       //Managing selection/normal selection of an individual vehicle
       if (selectedVehicles.includes(DriverID)) {
-        updatedsetSelectedVehicles = selectedVehicles.filter(id => id !== DriverID);
+        updatedSetSelectedVehicles = selectedVehicles.filter(id => id !== DriverID);
       } else {
-        updatedsetSelectedVehicles = [...selectedVehicles, DriverID];
+        updatedSetSelectedVehicles = [...selectedVehicles, DriverID];
       }
     }
 
     // Updates the list of selected vehicles
-    setSelectedVehicles(updatedsetSelectedVehicles);
+    setSelectedVehicles(updatedSetSelectedVehicles);
 
     // Updates the Vehicles Selected state (activate if at least one is selected)
-    setIsVehiclesSelected(updatedsetSelectedVehicles.length > 0);
+    setIsVehiclesSelected(updatedSetSelectedVehicles.length > 0);
 
-    console.log(updatedsetSelectedVehicles);
+    console.log(updatedSetSelectedVehicles);
   };
 
 
@@ -395,6 +368,16 @@ export function Vehicles() {
       });
     }
   };
+
+
+  const closeModal = () => {
+    setModalStatus(null);
+  };
+
+  const closeDetailModal = () => {
+    setModalStatusDetail(null);
+  };
+
 
 
   return (
@@ -779,6 +762,15 @@ export function Vehicles() {
           </div>
         </div>
       </div>
+      <VehicleModal
+          show={modalStatus !== null}
+          onHide={closeModal}
+          status={modalStatus}
+          title={titleStatus}
+          IdUser={IdUser}
+          IdVehicle={IdVehicle}
+          updateVehicleList={refreshVehiculeData}
+        />
       <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
