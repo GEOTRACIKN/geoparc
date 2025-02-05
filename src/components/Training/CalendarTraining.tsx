@@ -224,6 +224,10 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
         setIsEditable(false);  // Reset to view mode when modal is closed
     };
 
+    const handleDeleteSuccess = () => {
+        onHide();  // Close the modal when delete is successful
+    };
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -306,11 +310,15 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             </Form>
 
             <ModalDeleteTraining
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                id_training={id_training}
-                onSuccess={onSuccess}
-            />
+    show={showDeleteModal}
+    onHide={() => setShowDeleteModal(false)}
+    id_training={id_training}
+    onSuccess={() => {
+        handleDeleteSuccess();
+        onSuccess?.();  // Call the parent onSuccess as well
+    }}
+/>
+
         </Modal>
     );
 };
