@@ -40,7 +40,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     date: "",
     cost: 0,
     description: "",
-    customType: "",
   });
 
   const { translate } = useTranslate();
@@ -130,7 +129,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     { value: "Insufficient Break", label: translate("Insufficient Break") },
     { value: "Night Driving", label: translate("Night Driving")},
     { value: "Overtime Driving", label: translate("Overtime Driving") },
-    { value: "Other", label: translate("Other")},
   ];
 
   const handleViolationTypeChange = (selectedOption: any, actionMeta: any) => {
@@ -140,7 +138,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     setFormData({
       ...formData,
       [name]: value,
-      customType: value === "Other" ? formData.customType : "", 
     });
     console.log(formData); 
 
@@ -153,7 +150,6 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     date: "",
     cost: 0,
     description: "",
-    customType: "",
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -234,7 +230,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
 
   const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, customType: e.target.value });
+    setFormData({ ...formData});
     console.log(formData);  // Affiche les données dans la console
   };
 
@@ -259,18 +255,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
               isClearable
             />
           </Form.Group>
-          {formData.type === "Other" && (
-            <Form.Group controlId="customType">
-              <Form.Label>{translate("Custom Violation Type")}</Form.Label>
-              <Form.Control
-                type="text"
-                name="customType"
-                value={formData.customType}
-                onChange={handleCustomTypeChange}
-                placeholder="Enter custom violation type"
-              />
-            </Form.Group>
-          )}
+          
        
        <Form.Group controlId="id_conducteur">
     <Form.Label>{translate("Driver")}</Form.Label>
