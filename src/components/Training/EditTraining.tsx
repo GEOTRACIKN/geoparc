@@ -199,11 +199,12 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     };
 
     const validateForm = () => {
+        // Vérifier si tous les champs sont remplis
         if (
             !formData.id_conducteur ||
             !formData.date_start_training ||
             !formData.date_end_training ||
-            !formData.type_training 
+            !formData.type_training
         ) {
             toast.error("Please fill out all fields.", {
                 position: "bottom-right",
@@ -217,10 +218,28 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             });
             return false;
         }
-
+    
+        // Vérifier que la date de début est antérieure à la date de fin
+        const startDate = new Date(formData.date_start_training); // Convertir en objet Date
+        const endDate = new Date(formData.date_end_training); // Convertir en objet Date
+    
+        if (startDate > endDate) {
+            toast.error("Start date must be earlier than end date.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+    
         return true;
     };
-
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
