@@ -1,29 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewTraining from "../components/Training/NewTraining";
-
+import CalendarTrainingModal from "../components/Training/CalendarTraining";
 import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
 import ModalDeleteTraining from "../components/Training/DeleteTraining";
-
-
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import moment from "moment";
+import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
+import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
 
 interface Training {
     id_training: number;
-    nom_training: number;
+    conducteur_prenom: string;
+    conducteur_nom: string;
     date_start_training: string;
     date_end_training: string;
     type_training: string;
 }
 
-
 export function Training() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
     const { translate } = useTranslate();
     const [list_training, setTraining] = useState<Training[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
@@ -39,14 +42,38 @@ export function Training() {
     const [selectedTrainingId, setSelectedTrainingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const [isGridView, setIsGridView] = useState(true);
+    const [events, setEvents] = useState<any[]>([]);
+    const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
+    const localizer = momentLocalizer(moment);
+    type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
+const [mode, setMode] = useState<ModeType>("create");
+
+
+    const calendarRef = useRef<FullCalendar | null>(null);
+    // Fonction pour changer la vue
+    const changeView = (view: string) => {
+        if (calendarRef.current) {
+          const calendarApi = calendarRef.current.getApi();
+          calendarApi.changeView(view);
+          setCurrentView(view); // Met à jour le texte du Dropdown
+        }
+      };
+      const viewTranslations: Record<string, string> = {
+        timeGridDay: "day",
+        timeGridWeek: "week",
+        dayGridMonth: "month",
+        listYear: "year",
+      };
+      
+    // Define the calendar events (empty for now)
     const initialColumns = {
         ID: true,
         Name: true,
         Type: true,
        "Start Date": true, 
        "End Date": true,
-    };
-    
+    };    
     // Load selected columns from localStorage or use initial state
     const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
@@ -69,8 +96,12 @@ export function Training() {
         setSort(newSortOrder);
         getTraining();
     };
+
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewTrainingModal, setShowNewTrainingModal] = useState(false);
     const [showEditTrainingModal, setShowEditTrainingModal] = useState(false);
+    const [showCalendarTrainingModal, setShowCalendarTrainingModal] = useState(false);
+
     const [showShowTrainingModal, setShowShowTrainingModal] = useState(false);
     const [showDeleteTrainingModal, setShowDeleteTrainingModal] = useState(false);
     const handleShowNewTrainingModal = () => setShowNewTrainingModal(true);
@@ -84,12 +115,22 @@ export function Training() {
         setSelectedTrainingId(id);
         setShowEditTrainingModal(true);
     };
+
     const handleCloseEditTrainingModal = () => setShowEditTrainingModal(false);
+    const handleCalendarTrainingModal = (id: number) => {
+        setSelectedTrainingId(id);
+        setShowCalendarTrainingModal(true);
+    };
+    const handleCloseCalendarTrainingModal = () => setShowCalendarTrainingModal(false);
+    
+    const [trainingDetails, setTrainingDetails] = useState(null); // For storing the selected training data
+
     const handleShowShowTrainingModal = (id: number) => {
         setSelectedTrainingId(id);
         setShowShowTrainingModal(true);
     };
     const handleCloseShowTrainingModal = () => setShowShowTrainingModal(false);
+    
     const getCountTraining = async () => {
         try {
             setLoading(true);
@@ -107,16 +148,15 @@ export function Training() {
             setLoading(false);
         }
     };
-
     const getTraining = async () => {
         try {
             const response = await fetch(
                 `${backendUrl}/api/geop/training/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
-
             const data = await response.json();
             console.log("Fetched data:", data);
             setTraining(data);
+            
             console.log("Updated training list:", data);
         } catch (error) {
             console.error(error);
@@ -125,9 +165,21 @@ export function Training() {
             setLoading(false);
         }
     };
+    
+    const getCalendarTrainings = async () => {
+        try {
+            const response = await fetch(`${backendUrl}/api/geop/calendar/${id_user}`);
+            const data = await response.json();
+            setEvents(data);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des trainings :", error);
+        }
+    };
+
     useEffect(() => {
         getCountTraining();
         getTraining();
+        getCalendarTrainings();
     }, [currentPage, limit, search, type, column, sort]);
    
     const handleTypeSearch = (event: any) => {
@@ -155,9 +207,55 @@ export function Training() {
                 break;
         }
         setTypeSearch(selectedValue);
-
     }
 
+// Adjust end dates to match FullCalendar's display
+const adjustEndDate = (events: { start: string; end: string }[]) => {
+    return events.map(event => {
+      const endDate = new Date(event.end);
+      endDate.setDate(endDate.getDate() + 1); // Add one day for display
+      return {
+        ...event,
+        end: endDate.toISOString().split('T')[0],
+      };
+    });
+  };
+  
+  const adjustedEvents = adjustEndDate(events);
+  
+  // Count events per day (using local dates)
+  const countEventsPerDay = (events: { start: string; end: string }[]) => {
+    const eventsPerDay: Record<string, number> = {};
+  
+    events.forEach(event => {
+      let currentDate = new Date(event.start);
+      const endDate = new Date(event.end);
+      endDate.setDate(endDate.getDate() - 1); // Adjust for FullCalendar's display
+  
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toLocaleDateString('en-CA'); // Local date string
+        eventsPerDay[dateStr] = (eventsPerDay[dateStr] || 0) + 1;
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+  
+    return eventsPerDay;
+  };
+  
+  const eventsPerDay = countEventsPerDay(adjustedEvents);
+  
+  // Render day cells with local dates
+  const renderDayCellContent = (cellInfo: { date: Date; dayNumberText: string }) => {
+    const dateStr = cellInfo.date.toLocaleDateString('en-CA'); // Local date string
+    const eventCount = eventsPerDay[dateStr] || 0;
+  
+    return (
+      <div>
+        <div>{cellInfo.dayNumberText}</div>
+        {eventCount > 0 && <div>{eventCount} event(s)</div>}
+      </div>
+    );
+  };
     const handleAdvancedSearch = (event: any) => {
         setSearch(event.target.value);
         setCurrentPage(1);
@@ -171,12 +269,13 @@ export function Training() {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
-
+    
     const refreshData = () => {
         getCountTraining();
         getTraining();
-    };
+        getCalendarTrainings();
 
+    };
 
     return (
         <>
@@ -184,12 +283,33 @@ export function Training() {
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Training")} ({total})</h4>
                 </div>
-                <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewTrainingModal} className="btn btn-primary mt-2 mr-1">
-                        <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
-                    </Button>
-                </div>
+                <div className="col-md-6 col-sm-12 text-right d-flex justify-content-end">
+    <Button 
+        onClick={handleShowNewTrainingModal} 
+        className="btn btn-primary mt-2 mr-1"
+    >
+        <i className="las la-plus mr-3"></i>
+        {translate("New Request")}
+    </Button>
+
+    <Button 
+        onClick={() => setIsGridView(!isGridView)}  
+        style={{background: "no-repeat", color: "#000", border: "1px solid #ddd"}}   
+        className={`mt-2 ${isGridView ? 'active' : ''}`}
+    >
+        {isGridView ? (
+            <>
+                <i className="las la-icons"></i>
+                <span>{translate("Calendar View")}</span>
+            </>
+        ) : ( 
+            <>
+                <i className="las la-list"></i>
+                <span>{translate("List view")}</span> 
+            </>
+        )}
+    </Button>
+</div>
       
             </div>
             <div className="row">
@@ -208,12 +328,9 @@ export function Training() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Name")}</Dropdown.Item>
-
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Start Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("End Date")}</Dropdown.Item>
-
-                              
+                                <Dropdown.Item>{translate("End Date")}</Dropdown.Item>       
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -227,6 +344,8 @@ export function Training() {
                 </div>
                 <div className="col-md-8 d-flex justify-content-end align-items-center">
                     <div className="dataTables_length">
+
+                        
                         <label style={{ marginBottom: "0" }}>
                             {translate("Show")}
                             <select
@@ -270,9 +389,12 @@ export function Training() {
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
+               
             </div>
 
-            <div className="row m-1">
+            {isGridView ? (
+
+                <div className="row m-1">
                 <Table className="dataTable" responsive>
                     <thead className="bg-white text-uppercase">
                         <tr className="ligth ligth-data">
@@ -281,11 +403,11 @@ export function Training() {
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
-                                  
+                                
                                     />
                                 </div>
                             </th>
-                         
+                        
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
@@ -294,19 +416,15 @@ export function Training() {
                                     {translate("ID")}
                                 </th>
                             )}
-                           
-                       
-                            
-                             {selectedColumns.Name && (
+
+                            {selectedColumns.Name && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("nom_training")}
+                                    onClick={() => handleSortingColumn("conducteur_nom")}
                                 >
                                     {translate("Name")}
                                 </th>
                             )}
-                           
-                            
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -315,7 +433,7 @@ export function Training() {
                                     {translate("Type")}
                                 </th>
                             )}
-                                 {selectedColumns["Start Date"] && (
+                                {selectedColumns["Start Date"] && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("date_start_training")}
@@ -357,7 +475,7 @@ export function Training() {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
-                                           
+                                        
                                             />
                                         </div>
                                     </td>
@@ -365,27 +483,24 @@ export function Training() {
                                             {selectedColumns.ID && (
                                                 <td>{Training.id_training}</td>
                                             )}
-                                          
-                                           
-                                            
-                                              {selectedColumns.Name && (
-                                                <td>{Training.nom_training}</td>
+                                                            
+                                            {selectedColumns.Name && (
+                                                <td>{Training.conducteur_nom} {Training.conducteur_prenom}</td>
                                             )}
 
-                                          
+                                        
                                             {selectedColumns.Type && (
                                                 <td>{Training.type_training}</td>
                                             )}
-                                              {selectedColumns["Start Date"] && (
+                                            {selectedColumns["Start Date"] && (
                                                 <td>{(Training.date_start_training)}</td>
 
                                             )}
-                                             {selectedColumns["End Date"] && (
+                                            {selectedColumns["End Date"] && (
                                                 <td>{Training.date_end_training}</td>
                                             )}
-                                            
-                                           
-                                          <td className="text-center">
+                                                                                    
+                                        <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">
                                                 {/* View Button */}
                                                 <Link
@@ -436,7 +551,45 @@ export function Training() {
                         )}
                     </tbody>
                 </Table>
-            </div>
+               
+                </div>
+                
+            ) : ( 
+
+                <div>
+                <div style={{ marginBottom: "10px" }}>
+                <Dropdown>
+                <Dropdown.Toggle variant="primary" id="dropdown-view">
+  {translate(viewTranslations[currentView] || currentView)}
+</Dropdown.Toggle>
+  <Dropdown.Menu>
+    <Dropdown.Item onClick={() => changeView("timeGridDay")}>
+      {translate("day")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("timeGridWeek")}>
+      {translate("week")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("dayGridMonth")}>
+      {translate("month")}
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => changeView("listYear")}>
+      {translate("year")}
+    </Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
+      </div>
+      <FullCalendar
+  ref={calendarRef}
+  key={adjustedEvents.length}
+  plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+  initialView="dayGridMonth"
+  events={adjustedEvents}
+  eventClick={(info: { event: { id: number } }) => handleCalendarTrainingModal(info.event.id)}
+  dayCellContent={renderDayCellContent}  // Custom rendering for day cells
+/>
+
+              </div>        
+             )}
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
@@ -465,17 +618,16 @@ export function Training() {
                 </div>
                 
             </div>
-            <ModalNewTraining show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} />
+            <ModalNewTraining
+  show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} // Refresh when a new training is successfully added
+  
+/>
+<CalendarTrainingModal mode="create" show={showCalendarTrainingModal} onHide={handleCloseCalendarTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
+
+
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
-
             <ModalShowTraining show={showShowTrainingModal} onHide={handleCloseShowTrainingModal} id_training={selectedTrainingId} />
-
-            
-         
-            
-
-           
 
         </>
     );

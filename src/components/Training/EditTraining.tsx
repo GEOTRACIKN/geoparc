@@ -13,6 +13,13 @@ interface EditTrainingModalProps {
     onSuccess?: () => void;
 }
 
+interface Driver {
+    id_conducteur: number;
+    nom_conducteur: string;
+    prenom_conducteur: string;
+}
+const geopuserID = localStorage.getItem("GeopUserID");
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     show,
@@ -22,7 +29,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_training: "",
-        nom_training: "",
+        id_conducteur: "",
         date_start_training: "",
         date_end_training: "",
         type_training: "",
@@ -30,6 +37,45 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     });
 
     const { translate } = useTranslate();
+    const [drivers, setDrivers] = useState<Driver[]>([]);
+
+       useEffect(() => {
+            if (show) {
+              const fetchDrivers = async () => {
+                try {
+                  const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+          
+                  if (!response.ok) {
+                    throw new Error("Failed to fetch drivers");
+                  }
+          
+                  const data = await response.json();
+                  console.log("Drivers data received from API:", data);
+          
+                  const drivers = Array.isArray(data.vehicles)
+                    ? data.vehicles
+                        .filter(
+                          (driver: any) =>
+                            driver.nom_conducteur?.trim() !== "" &&
+                            driver.prenom_conducteur?.trim() !== ""
+                        )
+                        .map((driver: any) => ({
+                          id_conducteur: driver.id_conducteur,
+                          nom_conducteur: driver.nom_conducteur,
+                          prenom_conducteur: driver.prenom_conducteur,
+                        }))
+                    : [];
+          
+                  setDrivers(drivers);
+                } catch (error) {
+                  console.error("Error fetching drivers:", error);
+                  setDrivers([]);
+                }
+              };
+          
+              fetchDrivers();
+            }
+          }, [show, backendUrl, geopuserID]);
    
     useEffect(() => {
         // Vérifie si l'id_training est valide avant de faire l'appel API
@@ -105,9 +151,44 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     
         fetchTraining();
     }, [id_training, backendUrl]);
-    
-    
 
+    useEffect(() => {
+        if (show) {
+          const fetchDrivers = async () => {
+            try {
+              const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+      
+              if (!response.ok) {
+                throw new Error("Failed to fetch drivers");
+              }
+      
+              const data = await response.json();
+              console.log("Drivers data received from API:", data);
+      
+              const drivers = Array.isArray(data.vehicles)
+                ? data.vehicles
+                    .filter(
+                      (driver: any) =>
+                        driver.nom_conducteur?.trim() !== "" &&
+                        driver.prenom_conducteur?.trim() !== ""
+                    )
+                    .map((driver: any) => ({
+                      id_conducteur: driver.id_conducteur,
+                      nom_conducteur: driver.nom_conducteur,
+                      prenom_conducteur: driver.prenom_conducteur,
+                    }))
+                : [];
+      
+              setDrivers(drivers);
+            } catch (error) {
+              console.error("Error fetching drivers:", error);
+              setDrivers([]);
+            }
+          };
+      
+          fetchDrivers();
+        }
+      }, [show, backendUrl, geopuserID]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -118,11 +199,12 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     };
 
     const validateForm = () => {
+        // Vérifier si tous les champs sont remplis
         if (
-            !formData.nom_training ||
+            !formData.id_conducteur ||
             !formData.date_start_training ||
             !formData.date_end_training ||
-            !formData.type_training 
+            !formData.type_training
         ) {
             toast.error("Please fill out all fields.", {
                 position: "bottom-right",
@@ -136,14 +218,28 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             });
             return false;
         }
-
-       
-
-       
-
+    
+        // Vérifier que la date de début est antérieure à la date de fin
+        const startDate = new Date(formData.date_start_training); // Convertir en objet Date
+        const endDate = new Date(formData.date_end_training); // Convertir en objet Date
+    
+        if (startDate > endDate) {
+            toast.error("Start date must be earlier than end date.", {
+                position: "bottom-right",
+                autoClose: 2400,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return false;
+        }
+    
         return true;
     };
-
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -208,14 +304,25 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     
-                    <Form.Group controlId="nom_training">
-                        <Form.Label>{translate("Name")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.nom_training}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                    <Form.Group controlId="id_conducteur">
+                     <Form.Label>{translate("Driver")}</Form.Label>
+                     <Form.Control
+                         as="select"
+                         value={formData.id_conducteur}
+                         onChange={handleChange}
+                     >
+                         <option value="">{translate("Select Driver")}</option>
+                         {drivers.length === 0 ? (
+                             <option value="">{translate("No drivers available")}</option>
+                         ) : (
+                             drivers.map((driver) => (
+                                 <option key={driver.id_conducteur} value={driver.id_conducteur}>
+                                     {`${driver.nom_conducteur} ${driver.prenom_conducteur} `}
+                                 </option>
+                             ))
+                         )}
+                     </Form.Control>
+                 </Form.Group>
                    
 
                     <Form.Group controlId="date_start_training">
