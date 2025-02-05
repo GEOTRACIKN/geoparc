@@ -34,6 +34,7 @@
     "bootstrap-steps": "^1.0.3",
     "date-fns-tz": "^2.0.0",
     "exceljs": "^4.4.0",
+    "fullcalendar": "^6.1.15",
     "geoparc": "file:",
     "highcharts": "^11.2.0",
     "highcharts-gantt": "^0.1.7",
