@@ -669,7 +669,6 @@ export function Vehicle() {
   ];
 
 
-
   const fieldsTab6: Field[] = [
     { id: "dernier_vidange_vehicule", label: "Dernier Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: true },
     { id: "prochain_vidange_vehicule", label: "Prochain Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: true },
