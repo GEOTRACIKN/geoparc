@@ -84,9 +84,16 @@ export interface VehicleInterface {
   nom_user?: string | null;
   prenom_user?: string | null;
   nom_conducteur?: string | null;
-  prenom_conducteur?: string | null;
   nom_parc?: string | null;
+  date_dernier_vidange?: string;
+  dernier_vidange_vehicule?: number;
+  kilometrage_prochain_entretien?: number;
+  nom_marque?: string | null;
+  reference_ctr_tech_vehicule?: string | null;
 }
+
+
+
 
 interface UserInterface {
   id_user: number;
@@ -332,6 +339,7 @@ export function Vehicle() {
     setVehicle((prevData) => ({
       ...prevData!,
       id_marque: selectedOption.value,
+      nom_marque: selectedOption.label,
     }));
   };
 
@@ -352,8 +360,8 @@ export function Vehicle() {
   const handleDriverChange = (selectedOption: any) => {
     setVehicle((prevData) => {
       const newData: VehicleInterface = { ...prevData! };
+      newData.nom_conducteur = selectedOption.label;
       newData.id_conducteur_vehicule = selectedOption.value;
-      //    getGroup(selectedOption.value);
       return newData;
     });
   };
@@ -381,7 +389,7 @@ export function Vehicle() {
 
 
 
-  
+
 
   const brandOptions = [
     { value: 1, label: "Marque" },
@@ -581,11 +589,11 @@ export function Vehicle() {
     { value: 195, label: "Willys Overland" },
     { value: 196, label: "Yamaha" },
     { value: 197, label: "Zagato" },
-    { value: 198 ,label: "Zastava" },
+    { value: 198, label: "Zastava" },
     { value: 199, label: "Zaz" },
     { value: 200, label: "Zest" },
   ];
-  
+
 
 
   const [typesOptions, setTypesOptions] = useState<any[]>([{ value: "Aucun", label: "Aucun" }]);
@@ -595,17 +603,18 @@ export function Vehicle() {
     tab_2: translate("Technical characteristics"),
     tab_3: translate("Insurance"),
     tab_4: translate("Technical control"),
-    tab_5: translate("Vehicle sticker")
+    tab_5: translate("Vehicle sticker"),
+    tab_6: translate("Draining & Maintenance")
   };
 
   const fieldsTab1: Field[] = [
     { id: "immatriculation_vehicule", label: translate("Immatriculation") + " *", type: "text", placeholder: "Immatriculation", icon: "fas fa-barcode", required: true },
     { id: "id_parc", label: "Parc", type: "SelectGroup", options: parksOptions, onChange: handleParkChange, icon: "fas fa-warehouse", required: false, mode: true },
-    { id: "id_conducteur_vehicule", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
+    { id: "nom_conducteur", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
     { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
     { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
     { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
-    { id: "id_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
+    { id: "nom_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
     { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], onChange: handleStateVehiculeChange, icon: "fas fa-info-circle", required: true, },
     { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
     { id: "inService_vehicule", label: "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, mode: true },
@@ -617,7 +626,7 @@ export function Vehicle() {
     { id: "couleur_vehicule", label: "Couleur vehicule", type: "text", placeholder: "Couleur vehicule", icon: "fas fa-paint-brush", required: true, mode: true },
     { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true, mode: true },
     { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false, mode: true },
-    { id: "nom_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false,mode: true },
+    { id: "nom_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false, mode: true },
   ];
 
   const fieldsTab2: Field[] = [
@@ -660,6 +669,16 @@ export function Vehicle() {
   ];
 
 
+
+  const fieldsTab6: Field[] = [
+    { id: "dernier_vidange_vehicule", label: "Dernier Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: true },
+    { id: "prochain_vidange_vehicule", label: "Prochain Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: true },
+    { id: "date_dernier_vidange", label: "Date du Dernier Vidange *", type: "date", placeholder: "Sélectionnez la date", icon: "fas fa-calendar", required: true },
+    { id: "kilometrage_prochain_entretien", label: "Prochain Entretien *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tools", required: true },
+  ];
+
+
+
   const tab1Fields: Field[] = [
     { id: "fournisseur", label: "Fournisseur", type: "text", placeholder: "Fournisseur", tooltip: "Nom du fournisseur", icon: "fas fa-building", required: false },
     { id: "numContrat", label: "N° du contrat", type: "text", placeholder: "N° du contrat", tooltip: "Numéro du contrat", icon: "fas fa-file-contract", required: false },
@@ -688,7 +707,7 @@ export function Vehicle() {
     { id: "dateAcquis", label: "Date acquisition", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
     { id: "taxe", label: "Taxe véhicule neuf", type: "text", placeholder: "Taxe véhicule neuf", tooltip: "Taxe véhicule neuf", icon: "fas fa-file-invoice-dollar", required: false },
     { id: "totalAchat", label: "Total achat", type: "text", placeholder: "Total achat", tooltip: "Total achat", icon: "fas fa-calculator", required: false },
-  ]; 
+  ];
 
 
   const fieldsConfig: { [tabName: string]: Field[] } = {
@@ -697,8 +716,7 @@ export function Vehicle() {
     tab_3: fieldsTab3,
     tab_4: fieldsTab4,
     tab_5: fieldsTab5,
-    tab_6: fieldsTab5,
-    //  tab_6: navTabsCustom
+    tab_6: fieldsTab6,
   };
 
 
@@ -793,7 +811,7 @@ export function Vehicle() {
         emailElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
-  
+
 
 
       toast.warn("Please fill in all required fields", {
@@ -815,10 +833,10 @@ export function Vehicle() {
     try {
 
 
-      console.log("Vehicle",Vehicle.immatriculation_vehicule);
-      console.log("updateMatriculation",updateMatriculation);
-      console.log("test",Vehicle.immatriculation_vehicule == updateMatriculation );
-      
+      console.log("Vehicle", Vehicle.immatriculation_vehicule);
+      console.log("updateMatriculation", updateMatriculation);
+      console.log("test", Vehicle.immatriculation_vehicule == updateMatriculation);
+
 
       const rescheck = await fetch(`${backendUrl}/api/geop/Vehicle/check`, {
         method: "POST",
@@ -827,15 +845,15 @@ export function Vehicle() {
         },
         mode: "cors",
         body: JSON.stringify({
-          immatriculation_vehicule:updateMatriculation ,
-          updated_immatriculation_vehicule:  Vehicle.immatriculation_vehicule ,
+          immatriculation_vehicule: updateMatriculation,
+          updated_immatriculation_vehicule: Vehicle.immatriculation_vehicule,
           updated: Vehicle.immatriculation_vehicule == updateMatriculation ? 0 : 1,
         }),
       });
 
 
 
-   
+
       if (rescheck.ok) {
         const jsonResponse = await rescheck.json();
 
@@ -873,9 +891,20 @@ export function Vehicle() {
           'date_suppression_vehicule'
         ];
 
+
+        const excludeFields = [
+          'nom_user',
+          'prenom_user',
+          'nom_conducteur',
+          'nom_marque'
+        ];
+
+
+
+
         VehicleData = Object.fromEntries(
           Object.entries(Vehicle)
-            .filter(([_, value]) => value !== null)
+            .filter(([key, value]) => value !== null && !excludeFields.includes(key)) // Exclure les champs
             .map(([key, value]) => {
               // Check if the key is one of the specific date fields
               if (dateFields.includes(key)) {
@@ -1057,9 +1086,18 @@ export function Vehicle() {
             'date_suppression_vehicule'
           ];
 
+          const excludeFields = [
+            'nom_user',
+            'prenom_user',
+            'nom_conducteur',
+            'nom_marque'
+          ];
+
+
+
           VehicleData = Object.fromEntries(
             Object.entries(Vehicle)
-              .filter(([_, value]) => value !== null)
+              .filter(([key, value]) => value !== null && !excludeFields.includes(key))
               .map(([key, value]) => {
                 // Check if the key is one of the specific date fields
                 if (dateFields.includes(key)) {
