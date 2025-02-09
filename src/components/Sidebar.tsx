@@ -178,6 +178,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           to: "/contrat",
           permissionId: 38,
         },
+        {
+          id: 10,
+          label: "Training",
+          icon: "las la-user-nurse",
+          to: "/training",
+          permissionId: 38,
+        },
       ],
     },
     {
@@ -255,7 +262,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 21,
           label: "Management of fire extinguishers",
           icon: "las la-fire-extinguisher",
-          to: "/extinguisher",
+          to: "/fire-ext",
           permissionId: 40,
         },
         {

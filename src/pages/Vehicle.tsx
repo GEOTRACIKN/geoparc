@@ -84,9 +84,16 @@ export interface VehicleInterface {
   nom_user?: string | null;
   prenom_user?: string | null;
   nom_conducteur?: string | null;
-  prenom_conducteur?: string | null;
   nom_parc?: string | null;
+  date_dernier_vidange?: string;
+  dernier_vidange_vehicule?: number;
+  kilometrage_prochain_entretien?: number;
+  nom_marque?: string | null;
+  reference_ctr_tech_vehicule?: string | null;
 }
+
+
+
 
 interface UserInterface {
   id_user: number;
@@ -332,6 +339,7 @@ export function Vehicle() {
     setVehicle((prevData) => ({
       ...prevData!,
       id_marque: selectedOption.value,
+      nom_marque: selectedOption.label,
     }));
   };
 
@@ -341,6 +349,7 @@ export function Vehicle() {
   const handleUserChange = (selectedOption: any) => {
     setVehicle((prevData) => {
       const newData: VehicleInterface = { ...prevData! };
+      newData.nom_user = selectedOption.label;
       newData.id_user = selectedOption.value;
       //    getGroup(selectedOption.value);
       return newData;
@@ -351,8 +360,8 @@ export function Vehicle() {
   const handleDriverChange = (selectedOption: any) => {
     setVehicle((prevData) => {
       const newData: VehicleInterface = { ...prevData! };
+      newData.nom_conducteur = selectedOption.label;
       newData.id_conducteur_vehicule = selectedOption.value;
-      //    getGroup(selectedOption.value);
       return newData;
     });
   };
@@ -380,7 +389,7 @@ export function Vehicle() {
 
 
 
-  
+
 
   const brandOptions = [
     { value: 1, label: "Marque" },
@@ -580,11 +589,11 @@ export function Vehicle() {
     { value: 195, label: "Willys Overland" },
     { value: 196, label: "Yamaha" },
     { value: 197, label: "Zagato" },
-    { value: 198 ,label: "Zastava" },
+    { value: 198, label: "Zastava" },
     { value: 199, label: "Zaz" },
     { value: 200, label: "Zest" },
   ];
-  
+
 
 
   const [typesOptions, setTypesOptions] = useState<any[]>([{ value: "Aucun", label: "Aucun" }]);
@@ -594,18 +603,18 @@ export function Vehicle() {
     tab_2: translate("Technical characteristics"),
     tab_3: translate("Insurance"),
     tab_4: translate("Technical control"),
-    tab_5: translate("Vehicle sticker")
+    tab_5: translate("Vehicle sticker"),
+    tab_6: translate("Draining & Maintenance")
   };
 
   const fieldsTab1: Field[] = [
     { id: "immatriculation_vehicule", label: translate("Immatriculation") + " *", type: "text", placeholder: "Immatriculation", icon: "fas fa-barcode", required: true },
-    //   { id: "id_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false },
     { id: "id_parc", label: "Parc", type: "SelectGroup", options: parksOptions, onChange: handleParkChange, icon: "fas fa-warehouse", required: false, mode: true },
-    { id: "id_conducteur_vehicule", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
+    { id: "nom_conducteur", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
     { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
     { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
     { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
-    { id: "id_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
+    { id: "nom_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
     { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], onChange: handleStateVehiculeChange, icon: "fas fa-info-circle", required: true, },
     { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
     { id: "inService_vehicule", label: "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, mode: true },
@@ -617,46 +626,57 @@ export function Vehicle() {
     { id: "couleur_vehicule", label: "Couleur vehicule", type: "text", placeholder: "Couleur vehicule", icon: "fas fa-paint-brush", required: true, mode: true },
     { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true, mode: true },
     { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false, mode: true },
+    { id: "nom_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false, mode: true },
   ];
 
   const fieldsTab2: Field[] = [
-    { id: "psn", label: "PSN", type: "text", placeholder: "PSN", icon: "fas fa-barcode", tooltip: "N° série gps", required: false },
-    { id: "dateCirculation", label: "Date de circulation", type: "date", placeholder: "", icon: "fas fa-calendar-day", tooltip: "Date circulation", required: false },
-    { id: "anne", label: "Année", type: "text", placeholder: "Année", icon: "fas fa-calendar", tooltip: "Année", required: false },
-    { id: "numChassis", label: "N° Châssis", type: "text", placeholder: "N° Châssis", icon: "fas fa-car", tooltip: "N° Châssis du véhicule", required: false },
-    { id: "nbrePorte", label: "Nombre de Portes", type: "text", placeholder: "Nombre de Portes", icon: "fas fa-door-open", tooltip: "Nombre de portes", required: false },
-    { id: "nbrePlace", label: "Nombre de Places", type: "text", placeholder: "Nombre de Places", icon: "fas fa-chair", tooltip: "Nombre de places", required: false },
-    { id: "puissance", label: "Puissance", type: "text", placeholder: "Puissance", icon: "fas fa-bolt", tooltip: "Puissance", required: false },
-    { id: "ptac", label: "PTAC", type: "text", placeholder: "Poids total autorisé en charge", icon: "fas fa-weight-hanging", tooltip: "Poids total autorisé en charge", required: false },
-    { id: "longueur", label: "Longueur (m)", type: "text", placeholder: "Longueur (m)", icon: "fas fa-ruler-horizontal", tooltip: "Longueur en mètres", required: false },
-    { id: "largeur", label: "Largeur (m)", type: "text", placeholder: "Largeur (m)", icon: "fas fa-ruler-combined", tooltip: "Largeur en mètres", required: false },
-    { id: "hauteur", label: "Hauteur (m)", type: "text", placeholder: "Hauteur (m)", icon: "fas fa-ruler-vertical", tooltip: "Hauteur en mètres", required: false },
-    { id: "poids", label: "Poids (Kg)", type: "text", placeholder: "Poids (Kg)", icon: "fas fa-dumbbell", tooltip: "Poids du véhicule en kg", required: false },
-    { id: "co2", label: "Émission de CO2", type: "text", placeholder: "Émission de CO2", icon: "fas fa-cloud", tooltip: "Émission de CO2", required: false },
+    { id: "PSN", label: "PSN", type: "text", placeholder: "PSN", icon: "fas fa-barcode", tooltip: "N° série gps", required: false },
+    { id: "date_circulation_vehicule", label: "Date de circulation", type: "date", placeholder: "", icon: "fas fa-calendar-day", tooltip: "Date circulation", required: false },
+    { id: "annee_vehicule", label: "Année", type: "date", placeholder: "Année", icon: "fas fa-calendar", tooltip: "Année", required: false },
+    { id: "num_chassis_vehicule", label: "N° Châssis", type: "text", placeholder: "N° Châssis", icon: "fas fa-car", tooltip: "N° Châssis du véhicule", required: false },
+    { id: "nbre_porte_vehicule", label: "Nombre de Portes", type: "number", placeholder: "Nombre de Portes", icon: "fas fa-door-open", tooltip: "Nombre de portes", required: false },
+    { id: "nbre_place_vehicule", label: "Nombre de Places", type: "number", placeholder: "Nombre de Places", icon: "fas fa-chair", tooltip: "Nombre de places", required: false },
+    { id: "puissance_vehicule", label: "Puissance", type: "number", placeholder: "Puissance", icon: "fas fa-bolt", tooltip: "Puissance", required: false },
+    { id: "maximum_allowed_total", label: "PTAC", type: "number", placeholder: "Poids total autorisé en charge", icon: "fas fa-weight-hanging", tooltip: "Poids total autorisé en charge", required: false },
+    { id: "longueur_vehicule", label: "Longueur (m)", type: "number", placeholder: "Longueur (m)", icon: "fas fa-ruler-horizontal", tooltip: "Longueur en mètres", required: false },
+    { id: "largeur_vehicule", label: "Largeur (m)", type: "number", placeholder: "Largeur (m)", icon: "fas fa-ruler-combined", tooltip: "Largeur en mètres", required: false },
+    { id: "hauteur_vehicule", label: "Hauteur (m)", type: "number", placeholder: "Hauteur (m)", icon: "fas fa-ruler-vertical", tooltip: "Hauteur en mètres", required: false },
+    { id: "poid_vehicule", label: "Poids (Kg)", type: "number", placeholder: "Poids (Kg)", icon: "fas fa-dumbbell", tooltip: "Poids du véhicule en kg", required: false },
+    { id: "co2_vehicule", label: "Émission de CO2", type: "number", placeholder: "Émission de CO2", icon: "fas fa-cloud", tooltip: "Émission de CO2", required: false },
   ];
   const fieldsTab3: Field[] = [
-    { id: "agenceAssurance", label: "Agence assurance", type: "text", placeholder: "Agence assurance", icon: "fas fa-building", tooltip: "Agence assurance", required: false },
-    { id: "typeAssurance", label: "Type assurance", type: "text", placeholder: "Type assurance", icon: "fas fa-shield-alt", tooltip: "Type assurance", required: false },
-    { id: "dateDebutAssurance", label: "Date début", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
-    { id: "dateExpAssurance", label: "Date expiration", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
-    { id: "coutAss", label: "Coût", type: "text", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
-    { id: "delai", label: "Délai (Mois)", type: "text", placeholder: "Délai (Mois)", icon: "fas fa-clock", tooltip: "Délai (Mois)", required: false },
-    { id: "referenceAssurance", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
+    { id: "companie_assurance_vehicule", label: "Agence assurance", type: "text", placeholder: "Agence assurance", icon: "fas fa-building", tooltip: "Agence assurance", required: false },
+    { id: "type_assurance_vehicule", label: "Type assurance", type: "text", placeholder: "Type assurance", icon: "fas fa-shield-alt", tooltip: "Type assurance", required: false },
+    { id: "date_debut_assurance_vehicule", label: "Date début", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "date_expir_assurance_vehicule", label: "Date expiration", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "cout_assurance_vehicule", label: "Coût", type: "number", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
+    { id: "delai_assurance_vehicule", label: "Délai (Mois)", type: "text", placeholder: "Délai (Mois)", icon: "fas fa-clock", tooltip: "Délai (Mois)", required: false },
+    { id: "reference_assurance_vehicule", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
   ];
 
   const fieldsTab4: Field[] = [
-    { id: "etabControle", label: "Etablissement de contrôle", type: "text", placeholder: "Etablissement de contrôle", icon: "fas fa-building", tooltip: "Etablissement de contrôle", required: false },
-    { id: "referenceControle", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
-    { id: "dateControle", label: "Date du contrôle", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
-    { id: "dateFinControle", label: "Date fin", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
-    { id: "coutControle", label: "Coût", type: "text", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
+    { id: "etat_ctr_tech_vehicule", label: "Etablissement de contrôle", type: "text", placeholder: "Etablissement de contrôle", icon: "fas fa-building", tooltip: "Etablissement de contrôle", required: false },
+    { id: "reference_ctr_tech_vehicule", label: "Référence", type: "text", placeholder: "Référence", icon: "fas fa-barcode", tooltip: "Référence", required: false },
+    { id: "date_debut_ctr_tech_vehicule", label: "Date du contrôle", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "date_fin_ctr_tech_vehicule", label: "Date fin", type: "date", placeholder: "", icon: "fas fa-calendar-day", required: false },
+    { id: "cout_ctr_tech_vehicule", label: "Coût", type: "number", placeholder: "Coût", icon: "fas fa-money-bill-alt", tooltip: "Coût", required: false },
   ];
 
   const fieldsTab5: Field[] = [
-    { id: "numVignette", label: "N° Vignette", type: "text", placeholder: "N° Vignette", tooltip: "N° Vignette", icon: "fas fa-barcode", required: false },
-    { id: "dateVignette", label: "Date vignette", type: "date", placeholder: "", tooltip: "Date vignette", icon: "fas fa-calendar", required: false },
-    { id: "coutVignette", label: "Coût", type: "text", placeholder: "Coût", tooltip: "Coût", icon: "fas fa-money-bill", required: false },
+    { id: "num_vignette_vehicule", label: "N° Vignette", type: "text", placeholder: "N° Vignette", tooltip: "N° Vignette", icon: "fas fa-barcode", required: false },
+    { id: "date_vignette_vehicule", label: "Date vignette", type: "date", placeholder: "", tooltip: "Date vignette", icon: "fas fa-calendar", required: false },
+    { id: "cout_vignette_vehicule", label: "Coût", type: "number", placeholder: "Coût", tooltip: "Coût", icon: "fas fa-money-bill", required: false },
   ];
+
+
+
+  const fieldsTab6: Field[] = [
+    { id: "dernier_vidange_vehicule", label: "Dernier Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: true },
+    { id: "prochain_vidange_vehicule", label: "Prochain Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: true },
+    { id: "date_dernier_vidange", label: "Date du Dernier Vidange *", type: "date", placeholder: "Sélectionnez la date", icon: "fas fa-calendar", required: true },
+    { id: "kilometrage_prochain_entretien", label: "Prochain Entretien *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tools", required: true },
+  ];
+
 
 
   const tab1Fields: Field[] = [
@@ -690,16 +710,13 @@ export function Vehicle() {
   ];
 
 
-
-
   const fieldsConfig: { [tabName: string]: Field[] } = {
     tab_1: fieldsTab1,
     tab_2: fieldsTab2,
     tab_3: fieldsTab3,
     tab_4: fieldsTab4,
     tab_5: fieldsTab5,
-    tab_6: fieldsTab5,
-    //  tab_6: navTabsCustom
+    tab_6: fieldsTab6,
   };
 
 
@@ -782,7 +799,7 @@ export function Vehicle() {
 
   const updateVehicle = async (Vehicle: VehicleInterface) => {
 
-    const isimmatriculationVehiculeValid = validateEmail(Vehicle.immatriculation_vehicule ?? "");
+    const isimmatriculationVehiculeValid = validateString(Vehicle.immatriculation_vehicule ?? "");
 
 
     // Validation échouée
@@ -794,7 +811,7 @@ export function Vehicle() {
         emailElement.style.borderColor = isimmatriculationVehiculeValid ? "#ced4da" : "red";
       }
 
-  
+
 
 
       toast.warn("Please fill in all required fields", {
@@ -815,6 +832,12 @@ export function Vehicle() {
 
     try {
 
+
+      console.log("Vehicle", Vehicle.immatriculation_vehicule);
+      console.log("updateMatriculation", updateMatriculation);
+      console.log("test", Vehicle.immatriculation_vehicule == updateMatriculation);
+
+
       const rescheck = await fetch(`${backendUrl}/api/geop/Vehicle/check`, {
         method: "POST",
         headers: {
@@ -822,19 +845,19 @@ export function Vehicle() {
         },
         mode: "cors",
         body: JSON.stringify({
-          immatriculation_vehicule: Vehicle.immatriculation_vehicule,
-          updated_immatriculation_vehicule: updateMatriculation,
-          updated: Vehicle.immatriculation_vehicule === updateMatriculation ? 0 : 1,
+          immatriculation_vehicule: updateMatriculation,
+          updated_immatriculation_vehicule: Vehicle.immatriculation_vehicule,
+          updated: Vehicle.immatriculation_vehicule == updateMatriculation ? 0 : 1,
         }),
       });
 
 
 
-   
+
       if (rescheck.ok) {
         const jsonResponse = await rescheck.json();
 
-        if (jsonResponse.Vehicle_count !== 0) {
+        if (jsonResponse.vehicle_count !== 0) {
           toast.warn("Vehicle matriculation already exists", {
             position: "bottom-right",
             autoClose: 2400,
@@ -868,9 +891,20 @@ export function Vehicle() {
           'date_suppression_vehicule'
         ];
 
+
+        const excludeFields = [
+          'nom_user',
+          'prenom_user',
+          'nom_conducteur',
+          'nom_marque'
+        ];
+
+
+
+
         VehicleData = Object.fromEntries(
           Object.entries(Vehicle)
-            .filter(([_, value]) => value !== null)
+            .filter(([key, value]) => value !== null && !excludeFields.includes(key)) // Exclure les champs
             .map(([key, value]) => {
               // Check if the key is one of the specific date fields
               if (dateFields.includes(key)) {
@@ -1052,9 +1086,18 @@ export function Vehicle() {
             'date_suppression_vehicule'
           ];
 
+          const excludeFields = [
+            'nom_user',
+            'prenom_user',
+            'nom_conducteur',
+            'nom_marque'
+          ];
+
+
+
           VehicleData = Object.fromEntries(
             Object.entries(Vehicle)
-              .filter(([_, value]) => value !== null)
+              .filter(([key, value]) => value !== null && !excludeFields.includes(key))
               .map(([key, value]) => {
                 // Check if the key is one of the specific date fields
                 if (dateFields.includes(key)) {

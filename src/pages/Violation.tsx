@@ -29,7 +29,6 @@ export function Violation() {
     const { translate } = useTranslate();
     const [list_violation, setViolation] = useState<Violation[]>([]);
     const [count, setCount] = useState<number>();
-
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
@@ -44,7 +43,6 @@ export function Violation() {
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
     const [error, setError] = useState<string | null>(null);
-
 
     const initialColumns = {
         ID: true,
@@ -104,7 +102,6 @@ export function Violation() {
                 `${backendUrl}/api/geop/violation/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-    
             // Make sure to extract the count if the API returns an object
             const count = result.count || 0; // Default to 0 if count is undefined
             setTotal(count); // Pass the count value directly
@@ -116,9 +113,7 @@ export function Violation() {
             setLoading(false);
         }
     };
-    
-
-    
+        
     const getViolation = async () => {
         try {
             const response = await fetch(
@@ -127,8 +122,7 @@ export function Violation() {
     
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
+            }   
             const data = await response.json();
             console.log("Fetched data:", data);
             setViolation(data);
@@ -145,8 +139,7 @@ export function Violation() {
             setLoading(false);
         }
     };
-    
-    
+      
     useEffect(() => {
         getViolation();
         getCountViolation();
@@ -159,19 +152,24 @@ export function Violation() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Name"):
+            case translate("Vehicle"):
                 setType(1);
                     break;
-            case translate("Type"):
+            case translate("Driver"):
                 setType(2);
                 break;
-            case translate("Date"):
+
+            case translate("Type"):
                 setType(3);
                 break;
-            case translate("Cost"):
+            case translate("Description"):
                 setType(4);
                 break;
-            case translate("Type"):
+            case translate("Date"):
+                setType(5);
+                break;
+          
+            case translate("Cost"):
                 setType(6);
                 break;     
                     
@@ -229,10 +227,12 @@ export function Violation() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Description")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
+
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -392,21 +392,16 @@ export function Violation() {
                                     
                                             {selectedColumns.ID && (
                                                 <td>{Violation.id_violation}</td>
-                                            )}
-                                          
+                                            )}                                          
                                           {selectedColumns.Driver && (
-                                         <td>{Violation.conducteur_prenom} {Violation.conducteur_nom}</td>
-      
-                                            )}
-                                            
+                                         <td>{Violation.conducteur_prenom} {Violation.conducteur_nom}</td>  
+                                            )}                                            
                                                {selectedColumns.Vehicle && (
                                                 <td>{Violation.immatriculation_vehicule}</td>
                                             )}
                                               {selectedColumns.Date && (
                                                 <td>{(Violation.date_violation)}</td>
-
-                                            )}
-                                           
+                                            )}                                           
                                             {selectedColumns.Type && (
                                                 <td>{Violation.type_violation}</td>
                                             )}
@@ -416,9 +411,7 @@ export function Violation() {
                                              {selectedColumns.Description && (
                                                 <td>{Violation.description}</td>
                                             )}
-                                          
-                                            
-                                           
+                                                            
                                           <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">
                                                 {/* View Button */}
@@ -433,7 +426,6 @@ export function Violation() {
                                                     <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                                                 </Link>
 
-                                                {/* Edit Button */}
                                                 <Link
                                                     to={``}
                                                     className="badge badge-success mr-2"
@@ -445,7 +437,6 @@ export function Violation() {
                                                     <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
                                                 </Link>
 
-                                                {/* Delete Button */}
                                                 <Link
                                                     to={``}
                                                     className="badge bg-danger mr-2"
@@ -502,11 +493,7 @@ export function Violation() {
             <ModalNewViolation show={showNewViolationModal} onHide={handleCloseNewViolationModal} onSuccess={refreshData} />
             <ModalDeleteViolation show={showDeleteViolationModal} onHide={handleCloseDeleteViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
             <ModalEditViolation show={showEditViolationModal} onHide={handleCloseEditViolationModal} id_violation ={selectedViolationId} onSuccess={refreshData} />
-
-
-
-           
-
+            <ModalShowViolation show={showShowViolationModal} onHide={handleCloseShowViolationModal} id_violation ={selectedViolationId}  />
         </>
     );
 }
