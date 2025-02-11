@@ -232,6 +232,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
+      id:51,
+      label: "Deadline",
+      icon: "lar la-life-ring",
+      to: "/deadline",
+      permissionId:51, 
+    },
+    {
       id: 40,
       label: "HSE",
       icon: "las la-shield-alt",
