@@ -62,6 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
+  
   const strLang = {
     en: translate('English'),
     fr: translate('French'),

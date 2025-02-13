@@ -13,8 +13,13 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import moment from "moment";
-import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
-import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
+import frLocale from "@fullcalendar/core/locales/fr";
+import enLocale from "@fullcalendar/core/locales/en-gb";
+import deLocale from "@fullcalendar/core/locales/de";
+import arLocale from "@fullcalendar/core/locales/ar";
+import interactionPlugin from "@fullcalendar/interaction";
 
 interface DeadlineInterface {
     id_deadline: number;
@@ -27,9 +32,13 @@ interface DeadlineInterface {
 
 export function Deadline() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    const { translate } = useTranslate();
+    const { lang, translate } = useTranslate();
     const [list_Deadline, setDeadline] = useState<DeadlineInterface[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
+
+
+
+
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -51,12 +60,11 @@ export function Deadline() {
 
 
     const calendarRef = useRef<FullCalendar | null>(null);
-    // Fonction pour changer la vue
     const changeView = (view: string) => {
         if (calendarRef.current) {
             const calendarApi = calendarRef.current.getApi();
             calendarApi.changeView(view);
-            setCurrentView(view); // Met à jour le texte du Dropdown
+            setCurrentView(view); 
         }
     };
     const viewTranslations: Record<string, string> = {
@@ -123,7 +131,7 @@ export function Deadline() {
     };
     const handleCloseCalendarDeadlineModal = () => setShowCalendarDeadlineModal(false);
 
-    const [DeadlineDetails, setDeadlineDetails] = useState(null); // For storing the selected Deadline data
+    const [DeadlineDetails, setDeadlineDetails] = useState(null);
 
     const handleShowShowDeadlineModal = (id: number) => {
         setSelectedDeadlineId(id);
@@ -135,12 +143,11 @@ export function Deadline() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/Deadline/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/deadline/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
-            const result = await response.json();
-            // Assurez-vous que result est bien un nombre
-            setTotal(result); // Accède directement au nombre
-            setPageCount(Math.ceil(result / limit)); // Calcule le nombre de pages basé sur le nombre total et la limite
+            const result = await response.json(); 
+            setTotal(result);
+            setPageCount(Math.ceil(result / limit)); 
 
         } catch (error) {
             //console.error(error);
@@ -151,7 +158,7 @@ export function Deadline() {
     const getDeadline = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/Deadline/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/deadline/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
             const data = await response.json();
             console.log("Fetched data:", data);
@@ -552,8 +559,34 @@ export function Deadline() {
                         </tbody>
                     </Table>
 
-                </div>
+                    <div className="row">
+                        <div className="col-md-6 d-flex align-items-center">
+                            <span>{translate("Displaying")} {limit} {translate("on")} {total} </span>
+                        </div>
+                        <div className="col-md-6">
+                            <ReactPaginate
+                                previousLabel={translate("previous")}
+                                nextLabel={translate("next")}
+                                breakLabel={"..."}
+                                pageCount={pageCount}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={3}
+                                onPageChange={handlePageClick}
+                                containerClassName={"pagination justify-content-end"}
+                                pageClassName={"page-item"}
+                                pageLinkClassName={"page-link"}
+                                previousClassName={"page-item"}
+                                previousLinkClassName={"page-link"}
+                                nextClassName={"page-item"}
+                                nextLinkClassName={"page-link"}
+                                breakClassName={"page-item"}
+                                breakLinkClassName={"page-link"}
+                                activeClassName={"active"}
+                            />
+                        </div>
+                    </div>
 
+                </div>
             ) : (
 
                 <div>
@@ -581,7 +614,9 @@ export function Deadline() {
                     <FullCalendar
                         ref={calendarRef}
                         key={adjustedEvents.length}
-                        plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+                        plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                        locale={lang}
+                        contentHeight={600}
                         initialView="dayGridMonth"
                         events={adjustedEvents}
                         eventClick={(info: { event: { id: number } }) => handleCalendarDeadlineModal(info.event.id)}
@@ -591,37 +626,11 @@ export function Deadline() {
                 </div>
             )}
 
-            <div className="row">
-                <div className="col-md-6 d-flex align-items-center">
-                    <span>Affichage 1 à {limit} sur {total} </span>
-                </div>
-                <div className="col-md-6">
-                    <ReactPaginate
-                        previousLabel={translate("previous")}
-                        nextLabel={translate("next")}
-                        breakLabel={"..."}
-                        pageCount={pageCount}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={3}
-                        onPageChange={handlePageClick}
-                        containerClassName={"pagination justify-content-end"}
-                        pageClassName={"page-item"}
-                        pageLinkClassName={"page-link"}
-                        previousClassName={"page-item"}
-                        previousLinkClassName={"page-link"}
-                        nextClassName={"page-item"}
-                        nextLinkClassName={"page-link"}
-                        breakClassName={"page-item"}
-                        breakLinkClassName={"page-link"}
-                        activeClassName={"active"}
-                    />
-                </div>
 
-            </div>
             <ModalNewDeadline
                 show={showNewDeadlineModal}
                 onHide={handleCloseNewDeadlineModal}
-                onSuccess={refreshData} 
+                onSuccess={refreshData}
             />
             <CalendarDeadlineModal
                 mode="create"

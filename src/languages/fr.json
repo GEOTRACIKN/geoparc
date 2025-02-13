@@ -622,5 +622,17 @@
 "Location": "Localisation",
 "Start Date": "Date de début",
 "End Date": "Date de fin",
-"Training": "Formation"
+"Training": "Formation",
+"day": "Jour",
+"week": "Semaine",
+"month": "Mois",
+"year": "Année",
+"today": "Aujourd'hui",
+"event": "Événement",
+"events": "Événements",
+"previous": "Précédent",
+"next": "Suivant",
+"allDay": "Toute la journée",
+"noEvents": "Aucun événement à afficher",
+"Deadline": "Échéance"
 }
