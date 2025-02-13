@@ -63,6 +63,7 @@ import NotFound from "./pages/NotFound";
 import { Parks } from "./pages/parks";
 import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
+import { Deadline } from "./pages/Deadline";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -147,6 +148,7 @@ function App() {
           <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
+          <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
