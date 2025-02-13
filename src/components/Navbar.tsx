@@ -104,7 +104,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
       inactivityTimeout = setTimeout(() => {
         // Auto logout after 15 minutes of inactivity
         handleLogout();
-      }, 900000); // 15 minutes in milliseconds
+      }, 14400000); // 15 minutes in milliseconds
     };
 
     const handleStorageChange = (event: StorageEvent) => {
