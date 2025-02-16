@@ -284,6 +284,38 @@ export function Deadline() {
 
     };
 
+
+    const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
+
+    // Toggle "Voir plus"
+    const handleViewMore = (date: string) => {
+      setExpandedDays((prevState) => ({
+        ...prevState,
+        [date]: !prevState[date],
+      }));
+    };
+  
+    const renderEventList = (date: string) => {
+      const dayEvents = events.filter((event) => event.date === date);
+      const isExpanded = expandedDays[date];
+      const displayedEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
+  
+      return (
+        <>
+          {displayedEvents.map((event, index) => (
+            <div key={index} className="event-item">
+              {event.title}
+            </div>
+          ))}
+          {dayEvents.length > 3 && (
+            <button className="view-more-btn" onClick={() => handleViewMore(date)}>
+              {isExpanded ? "Voir moins" : "Voir plus"}
+            </button>
+          )}
+        </>
+      );
+    };
+
     return (
         <>
             <div className="row">
@@ -291,14 +323,6 @@ export function Deadline() {
                     <h4>{translate("Deadline")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right d-flex justify-content-end">
-                    <Button
-                        onClick={handleShowNewDeadlineModal}
-                        className="btn btn-primary mt-2 mr-1"
-                    >
-                        <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
-                    </Button>
-
                     <Button
                         onClick={() => setIsGridView(!isGridView)}
                         style={{ background: "no-repeat", color: "#000", border: "1px solid #ddd" }}
@@ -620,7 +644,15 @@ export function Deadline() {
                         initialView="dayGridMonth"
                         events={adjustedEvents}
                         eventClick={(info: { event: { id: number } }) => handleCalendarDeadlineModal(info.event.id)}
-                        dayCellContent={renderDayCellContent}  // Custom rendering for day cells
+                        dayCellContent={renderDayCellContent} 
+                        dayRender={(info:any) => {
+                            const date = info.dateStr;
+                            return (
+                              <div className="day-cell">
+                                {renderEventList(date)}
+                              </div>
+                            );
+                          }} // Custom rendering for day cells
                     />
 
                 </div>

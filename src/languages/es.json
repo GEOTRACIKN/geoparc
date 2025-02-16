@@ -630,9 +630,9 @@
   "today": "Hoy",
   "event": "Evento",
   "events": "Eventos",
-  "previous": "Anterior",
-  "next": "Siguiente",
   "allDay": "Todo el día",
   "noEvents": "No hay eventos para mostrar",
-  "Deadline":"Fecha límite"
+  "Deadline":"Fecha límite",
+  "Calendar View": "Vista de Calendario",
+  "List View": "Vista de Lista"
 }

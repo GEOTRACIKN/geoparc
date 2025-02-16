@@ -630,9 +630,9 @@
 "today": "Aujourd'hui",
 "event": "Événement",
 "events": "Événements",
-"previous": "Précédent",
-"next": "Suivant",
 "allDay": "Toute la journée",
 "noEvents": "Aucun événement à afficher",
-"Deadline": "Échéance"
+"Deadline": "Échéance",
+"Calendar View": "Vue Calendrier",
+"List View": "Vue Liste"
 }

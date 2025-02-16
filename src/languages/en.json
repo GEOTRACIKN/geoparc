@@ -619,9 +619,9 @@
 "today": "Today",
 "event": "Event",
 "events": "Events",
-"previous": "Previous",
-"next": "Next",
 "allDay": "All Day",
 "noEvents": "No events to display",
-"Deadline": "Deadline"
+"Deadline": "Deadline",
+"Calendar View": "Calendar View",
+"List View": "List View"
 }
