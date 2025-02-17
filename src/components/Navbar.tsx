@@ -171,7 +171,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
       // Make the fetch request
       const response = await fetch(
-        `${backendUrl}/api/notification/read`,
+        `${backendUrl}/api/geop/notification/read`,
         {
           method: "POST",
           headers: {

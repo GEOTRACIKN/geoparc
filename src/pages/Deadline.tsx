@@ -17,7 +17,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import frLocale from "@fullcalendar/core/locales/fr";
 import enLocale from "@fullcalendar/core/locales/en-gb";
-import deLocale from "@fullcalendar/core/locales/de";
+import esLocale from '@fullcalendar/core/locales/es'; 
 import arLocale from "@fullcalendar/core/locales/ar";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toTimestamp } from "../utilities/functions";
@@ -37,6 +37,14 @@ interface DeadlineInterface {
 export function Deadline() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const { lang, translate } = useTranslate();
+ 
+  const localeMap = {
+    en: enLocale,
+    fr: frLocale,
+    ar: arLocale,
+    es: esLocale,
+  };
+
   const [list_Deadline, setDeadline] = useState<DeadlineInterface[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -107,8 +115,6 @@ export function Deadline() {
     setSortColumn(currentColumn);
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getDeadlines(limit, currentPage, search, type, column, sort);
-
-
 
   };
 
@@ -227,10 +233,9 @@ export function Deadline() {
         end: deadline.date_creation
           ? moment(deadline.date_creation).format("YYYY-MM-DD")
           : null,
-        driver: `${deadline.prenom_conducteur || ""} ${deadline.nom_conducteur || ""}`.trim(),
         type: deadline.nom_type,
         color: getColorByType(deadline.id_type),
-    
+
       }));
 
       setEvents(formattedDeadlines)
@@ -682,27 +687,6 @@ export function Deadline() {
         </div>
       ) : (
         <div>
-          <div style={{ marginBottom: "10px" }}>
-            <Dropdown>
-              <Dropdown.Toggle variant="primary" id="dropdown-view">
-                {translate(viewTranslations[currentView] || currentView)}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => changeView("timeGridDay")}>
-                  {translate("day")}
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => changeView("timeGridWeek")}>
-                  {translate("week")}
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => changeView("dayGridMonth")}>
-                  {translate("month")}
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => changeView("listYear")}>
-                  {translate("year")}
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
           <FullCalendar
             ref={calendarRef}
             key={adjustedEvents.length}
@@ -712,7 +696,7 @@ export function Deadline() {
               listPlugin,
               interactionPlugin,
             ]}
-            locale={lang}
+            locale={localeMap[lang]} 
             contentHeight={600}
             initialView="dayGridMonth"
             events={adjustedEvents}
@@ -723,12 +707,28 @@ export function Deadline() {
             dayRender={(info: any) => {
               const date = info.dateStr;
               return <div className="day-cell">{renderEventList(date)}</div>;
-            }} 
-            eventLimit={true}  
-            eventLimitText={(n: number) => `+${n} événements`} 
-   
-            
-            
+            }}
+            eventContent={(arg:any) => (
+              <div title={`Type: ${arg.event.extendedProps.type}\nDate de début: ${arg.event.start}\nDate de fin: ${arg.event.end}`}>
+                <b>{arg.timeText}</b>
+                <span>{arg.event.title}</span>
+              </div>
+            )}
+            customButtons={{
+              backToMonth: {
+                text: "Retour",
+                click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
+              },
+            }}
+            headerToolbar={{
+              left: "prev,next today backToMonth",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay",
+            }}
+            moreLinkClick="day"
+            dayMaxEvents={true}
+            dayMaxEventRows={3}
+            dayMinEventRows={3}
           />
         </div>
       )}
