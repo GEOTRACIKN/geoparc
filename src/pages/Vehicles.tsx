@@ -87,7 +87,7 @@ export function Vehicles() {
 
   const searchColum: { [key: string]: number } = {
     id_vehicule: 0,
-    immatriculation_vehicule: 1,
+    immatriculation_vehicule: 1, 
     vehicule_type: 2,
     // nom_conducteur: 3,
     username_user: 4,
