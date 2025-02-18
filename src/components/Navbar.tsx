@@ -192,6 +192,19 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
       // Set the notifications state
       setNotifications(alarmResponse);
+
+        // toast.success("Nouvelles échéances détecté....", {
+        //        position: "bottom-right",
+        //        autoClose: 2400,
+        //        hideProgressBar: false,
+        //        closeOnClick: true,
+        //        pauseOnHover: true,
+        //        draggable: true,
+        //        progress: undefined,
+        //        theme: "light",
+        //        transition: Bounce,
+        //      });
+
     } catch (error) {
 
       console.error("Error fetching alarms:", error);
