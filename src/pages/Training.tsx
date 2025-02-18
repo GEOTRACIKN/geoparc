@@ -15,6 +15,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import moment from "moment";
 import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
 import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
+import interactionPlugin from "@fullcalendar/interaction";
+
 
 interface Training {
     id_training: number;
@@ -170,11 +172,21 @@ const [mode, setMode] = useState<ModeType>("create");
         try {
             const response = await fetch(`${backendUrl}/api/geop/calendar/${id_user}`);
             const data = await response.json();
-            setEvents(data);
+            console.log("Fetched calendar data:", data); // Vérifie ce que l'API retourne
+    
+            if (Array.isArray(data)) {
+                setEvents(data);
+            } else {
+                console.error("Invalid data format:", data);
+                setEvents([]); 
+            }
         } catch (error) {
             console.error("Erreur lors de la récupération des trainings :", error);
+            setEvents([]); 
         }
     };
+    
+    
 
     useEffect(() => {
         getCountTraining();
@@ -211,6 +223,12 @@ const [mode, setMode] = useState<ModeType>("create");
 
 // Adjust end dates to match FullCalendar's display
 const adjustEndDate = (events: { start: string; end: string }[]) => {
+    console.log("Events received:", events); // Débogage
+    if (!Array.isArray(events)) {
+        console.error("Error: events is not an array!", events);
+        return []; // Retourner un tableau vide pour éviter l'erreur
+    }
+  
     return events.map(event => {
       const endDate = new Date(event.end);
       endDate.setDate(endDate.getDate() + 1); // Add one day for display
@@ -219,8 +237,8 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         end: endDate.toISOString().split('T')[0],
       };
     });
-  };
-  
+};
+
   const adjustedEvents = adjustEndDate(events);
   
   // Count events per day (using local dates)
@@ -252,7 +270,6 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     return (
       <div>
         <div>{cellInfo.dayNumberText}</div>
-        {eventCount > 0 && <div>{eventCount} event(s)</div>}
       </div>
     );
   };
@@ -275,7 +292,41 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         getTraining();
         getCalendarTrainings();
 
+
     };
+    const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
+        {}
+      );
+    const handleViewMore = (date: string) => {
+        setExpandedDays((prevState) => ({
+          ...prevState,
+          [date]: !prevState[date],
+        }));
+      };
+    
+    const renderEventList = (date: string) => {
+        const dayEvents = events.filter((event) => event.date === date);
+        const isExpanded = expandedDays[date];
+        const displayedEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
+    
+        return (
+          <>
+            {displayedEvents.map((event, index) => (
+              <div key={index} className="event-item">
+                {event.title}
+              </div>
+            ))}
+            {dayEvents.length > 3 && (
+              <button
+                className="view-more-btn"
+                onClick={() => handleViewMore(date)}
+              >
+                {isExpanded ? "Voir moins" : "Voir plus"}
+              </button>
+            )}
+          </>
+        );
+      };
 
     return (
         <>
@@ -362,35 +413,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                             </select>
                         </label>
                     </div>
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            variant="link"
-                            id="dropdown-basic"
-                            title="Display Columns"
-                        >
-                            <i className="las la-eye"></i>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {Object.keys(initialColumns).map((col, idx) => (
-                                <Dropdown.Item
-                                    key={idx}
-                                    as="button"
-                                    style={{ display: "flex", alignItems: "center" }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        className="form-check-input"
-                                        checked={selectedColumns[col as keyof typeof initialColumns]}
-                                        onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
-                                    />
-                                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                  
                 </div>
                
             </div>
+
 
             {isGridView ? (
 
@@ -551,47 +578,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                         )}
                     </tbody>
                 </Table>
-               
-                </div>
-                
-            ) : ( 
-
-                <div>
-                <div style={{ marginBottom: "10px" }}>
-                <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-view">
-  {translate(viewTranslations[currentView] || currentView)}
-</Dropdown.Toggle>
-  <Dropdown.Menu>
-    <Dropdown.Item onClick={() => changeView("timeGridDay")}>
-      {translate("day")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("timeGridWeek")}>
-      {translate("week")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("dayGridMonth")}>
-      {translate("month")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("listYear")}>
-      {translate("year")}
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
-      </div>
-      <FullCalendar
-  ref={calendarRef}
-  key={adjustedEvents.length}
-  plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-  initialView="dayGridMonth"
-  events={adjustedEvents}
-  eventClick={(info: { event: { id: number } }) => handleCalendarTrainingModal(info.event.id)}
-  dayCellContent={renderDayCellContent}  // Custom rendering for day cells
-/>
-
-              </div>        
-             )}
-
-            <div className="row">
+                <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
                     <span>Affichage 1 à {limit} sur {total} </span>
                 </div>
@@ -618,6 +605,75 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 </div>
                 
             </div>
+               
+                </div>
+                
+                
+            ) : ( 
+
+                <div>
+                <div style={{ marginBottom: "10px" }}>
+                
+      </div>
+      <FullCalendar
+            ref={calendarRef}
+            key={adjustedEvents.length}
+            plugins={[
+                dayGridPlugin,
+
+              timeGridPlugin,
+              listPlugin,
+              interactionPlugin,
+            ]}
+        
+              buttonText={{
+                month: translate("Month"),
+                week: translate("Week"),
+                day: translate("Day"),
+                list: translate("Year"),
+                today: translate("Today"),
+              }}
+            
+            contentHeight={600}
+            initialView="dayGridMonth"
+            events={adjustedEvents}
+            eventClick={(info: { event: { id: number } }) =>
+                handleCalendarTrainingModal
+            (info.event.id)
+            }
+            dayCellContent={renderDayCellContent}
+            dayRender={(info: any) => {
+              const date = info.dateStr;
+              return <div className="day-cell">{renderEventList(date)}</div>;
+            }}
+            eventContent={(arg:any) => (
+              <div title={`Type: ${arg.event.extendedProps.type}\nDate de début: ${arg.event.start}\nDate de fin: ${arg.event.end}`}>
+                <b>{arg.timeText}</b>
+                <span>{arg.event.title}</span>
+              </div>
+            )}
+            customButtons={{
+              backToMonth: {
+                
+                text: translate("Back"),
+                click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
+              },
+            }}
+            headerToolbar={{
+              left: "prev,next today backToMonth",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
+            }}
+            moreLinkClick="day"
+            dayMaxEvents={true}
+            dayMaxEventRows={3}
+            dayMinEventRows={3}
+          />
+
+              </div>        
+             )}
+
+            
             <ModalNewTraining
   show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} // Refresh when a new training is successfully added
   
