@@ -130,6 +130,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 5,
+          label: "Add Vehicle",
+          icon: "las la-check-double",
+          to: "/vehicle",
+          permissionId: 37,
+        },
+        {
+          id: 5,
           label: "Vehicle checks",
           icon: "las la-check-double",
           to: "/vehicles-checks",
@@ -225,6 +232,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
+      id:51,
+      label: "Deadline",
+      icon: "lar la-life-ring",
+      to: "/deadline",
+      permissionId:51, 
+    },
+    {
       id: 40,
       label: "HSE",
       icon: "las la-shield-alt",
@@ -255,7 +269,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 21,
           label: "Management of fire extinguishers",
           icon: "las la-fire-extinguisher",
-          to: "/extinguisher",
+          to: "/fire-ext",
           permissionId: 40,
         },
         {

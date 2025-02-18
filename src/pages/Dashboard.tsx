@@ -653,7 +653,7 @@ export function Dashboard() {
           />
         </div>
         <div className="col-lg-6">
-          <FleetCo2 />
+          {/* <FleetCo2 /> */}
         </div>
         <div className="col-lg-12" >
           <div className="card">

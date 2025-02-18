@@ -52,8 +52,7 @@ import { Fire } from "./pages/Fire";
 
 
 import axios from "axios";
-import { Driver } from "./pages/Driver";
-import { Extinguisher } from "./pages/Extinguisher";
+import { Driver } from "./pages/Driver"; 
 import { Pharmacy } from "./pages/Pharmacy";
 import DashboardKPI from "./pages/DashboardKPI";
 
@@ -64,6 +63,7 @@ import NotFound from "./pages/NotFound";
 import { Parks } from "./pages/parks";
 import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
+import { Deadline } from "./pages/Deadline";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -148,6 +148,7 @@ function App() {
           <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
+          <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
@@ -156,12 +157,12 @@ function App() {
           <Route path="/cash-management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
           <Route path="/detail-vehicle-check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
           <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
-          <Route path="/extinguisher" element={<DashboardLayout>{<Extinguisher />}</DashboardLayout>} />
+          <Route path="/fire-ext" element={<DashboardLayout>{<Fire/>}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
-          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
+          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
           <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
@@ -174,11 +175,9 @@ function App() {
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="*" element={<NotFound />} />  
-          <Route path="/pharmacy" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
-          <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />  
-          <Route path="/vehicle" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
-          <Route path="/vehicle/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
-          <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+          <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
+          <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+          <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
         </Routes>
       </div>
       <ToastContainer

@@ -618,13 +618,21 @@
   "Emergency Box": "Caja de emergencia",
   "New": "Nuevo",
   "Edit": "Editar",
-
   "Location": "ubicación",
   "Volume": "Volumen",
   "Start Date": "Fecha de inicio",
   "End Date": "Fecha de fin",
-  "Training": "Formación"
-
-
-
+  "Training": "Formación",
+  "day": "Día",
+  "week": "Semana",
+  "month": "Mes",
+  "year": "Año",
+  "today": "Hoy",
+  "event": "Evento",
+  "events": "Eventos",
+  "allDay": "Todo el día",
+  "noEvents": "No hay eventos para mostrar",
+  "Deadline":"Fecha límite",
+  "Calendar View": "Vista de Calendario",
+  "List View": "Vista de Lista"
 }

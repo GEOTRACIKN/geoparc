@@ -1,61 +1,76 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect, useLayoutEffect } from "react";
-import {  Table,  Modal,   Form,  Col,  Row,  Dropdown,} from "react-bootstrap";
-import {  FaPlus,  FaRedo,  FaCar,  FaShieldAlt,  FaStickyNote,  FaTachometerAlt,  FaWrench,} from "react-icons/fa";
+import {
+  Table,
+  Modal,
+  Form,
+  Col,
+  Row,
+  Dropdown,
+  Button,
+} from "react-bootstrap";
+import {
+  FaPlus,
+  FaRedo,
+  FaCar,
+  FaShieldAlt,
+  FaStickyNote,
+  FaTachometerAlt,
+  FaWrench,
+} from "react-icons/fa";
 import ReactPaginate from "react-paginate";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 import { ButtonCustomHover } from "../components/ButtonHover";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import { toast } from "react-toastify";import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
+;
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
 
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL+'/api/geop';
-const options = [10, 20, 40, 60, 80, 100, 200, 500]; 
 interface VehiculeListInterface {
-  id_vehicule: number,
-  vehicule_type: string,
-  modele_vehicule: string,
-  immatriculation_vehicule: string,
-  couleur_vehicule: string,
-  etat_vehicule: string,
-  id_conducteur_vehicule?: number,
-  driver_first_name?: string,
-  driver_last_name?: string
-  affectation?: string,
+  id_vehicule: number;
+  vehicule_type: string;
+  modele_vehicule: string;
+  immatriculation_vehicule: string;
+  couleur_vehicule: string;
+  etat_vehicule: string;
+  id_conducteur_vehicule?: number;
+  driver_first_name?: string;
+  driver_last_name?: string;
+  affectation?: string;
+  username_user: string;
+  id_user: string;
 }
 
-// let currentPage = 1;
 
 export function Vehicles() {
-  const searchOptions = ['vehicule_type', 'immatriculation_vehicule', 'modele_vehicule',"etat_vehicule"];
   const { translate } = useTranslate();
-   const userID = localStorage.getItem("GeopUserID");
-  //const userID = 1;
+
+  const [type, setType] = useState(1);
+  const [typeSearch, setTypeSearch] = useState(translate("Immatriculation"));
+  const [search, setSearch] = useState("");
+  const [column, setSortColumn] = useState("id_conducteur");
+  const [sort, setSort] = useState("ASC");
+  const userID = localStorage.getItem("GeopUserID");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [vehiculeListList, setVehiculeListList] = useState<VehiculeListInterface[]>([]);
+  const [vehicles, setVehicles] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
-  const [selectedRows, setSelectedRows] = useState(new Map());
   const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [sortColumn, setSortColumn] = useState("id_vehicule");
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [showText, setShowText] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState({
-    id_vehicule: true,
-    model: true,
-    imatriculation: true,
-    state: true,
-    assignment: true,
-    conducteur: true,
-    trailer: true,
-    actions: true,
-  });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState(searchOptions[0]);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   const navigate = useNavigate();
+  const [modalStatus, setModalStatus] = useState<string | null>(null);
+  const [titleStatus, setTitleStatus] = useState<string | null>(null);
+  const [IdUser, setIdUser] = useState<number>(0);
+  const [IdVehicle, setIdDVehicle] = useState<number>(0);
+  const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
+  const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+  
 
   const handleClickLink = (navigateTo: string) => {
     if (navigateTo) {
@@ -63,143 +78,73 @@ export function Vehicles() {
     }
   };
 
-  const handleSearch = (term: string, type: string) => {
-    setSearchTerm(term);
-    setSearchType(type);
-};
 
-const clearSearchTerm = () => {
-    setSearchTerm("");
-};
-
-  const handleSort = (type: string) => {
-    let sortOrder = sortDirection === "asc" ? "desc" : "asc";
-    if (type !== sortColumn) sortOrder = "asc";
-    setSortColumn(type);
-    setSortDirection(sortOrder);
+  const handleSortingColum = (currentColumn: string) => {
+    setSortColumn(currentColumn);
+    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    getVehicles(limit, currentPage, search, type, column, sort);
   };
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectAllChecked(e.target.checked);
-    setSelectedRows(new Map()); // or handle setting all items as selected
+  const searchColum: { [key: string]: number } = {
+    id_vehicule: 0,
+    immatriculation_vehicule: 1, 
+    vehicule_type: 2,
+    // nom_conducteur: 3,
+    username_user: 4,
   };
 
-  const handleColumnVisibilityChange = (
-    column: keyof typeof visibleColumns
-  ) => {
-    setVisibleColumns((prevState) => ({
-      ...prevState,
-      [column]: !prevState[column],
-    }));
-  };
-
-  const TableHeader = () => {
-    const { id_vehicule, model, imatriculation, state, assignment, conducteur, trailer } = visibleColumns;
-  
-    return (
-      <thead className="bg-white text-uppercase">
-        <tr className="ligth ligth-data">
-          <th className="col-xs-3">
-            <div className="checkbox d-inline-block">
-              <input type="checkbox" checked={selectAllChecked} onChange={handleSelectAll} />
-            </div>
-          </th>
-          {id_vehicule && (
-            <th style={{ width: "60px", cursor: "pointer" }} className="col-xs-3">
-              <span onClick={() => handleSort("id_vehicule")} style={{ color: "#140A57" }}>
-                ID
-                {sortColumn === "id_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
-            </th>
-          )}
-          {model && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("vehicule_type")} style={{ color: "#140A57" }}>
-                  {translate("Model")}
-                {sortColumn === "vehicule_type" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
-            </th>
-          )}
-          {imatriculation && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("immatriculation_vehicule")} style={{ color: "#140A57" }}>
-                {translate("Immatriculation")}
-                {sortColumn === "immatriculation_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
-            </th>
-          )}
-          {state && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("etat_vehicule")} style={{ color: "#140A57" }}>
-                        {translate("Status")}
-                {sortColumn === "etat_vehicule" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
-            </th>
-          )}
-          {assignment && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              <span onClick={() => handleSort("affectation")} style={{ color: "#140A57" }}>
-
-                {translate("Assignment")}
-                {sortColumn === "affectation" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span>
-            </th>
-          )}
-          {conducteur && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              {/* <span onClick={() => handleSort("conducteur")} style={{ color: "#140A57" }}> */}
-                
-                {translate("Driver")}
-                {/* {sortColumn === "conducteur" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span> */}
-            </th>
-          )}
-          {trailer && (
-            <th style={{ width: "199px", cursor: "pointer" }} className="col-xs-3 text-center">
-              {/* <span onClick={() => handleSort("trailer")} style={{ color: "#140A57" }}> */}
-                    {translate("Trailer")}
-                {/* {sortColumn === "trailer" && (sortDirection === "asc" ? " ▲" : " ▼")}
-              </span> */}
-            </th>
-          )}
-         
-        
-          <th>{translate("Actions")}</th>
-        </tr>
-      </thead>
-      
-    );
-  };
-
-  const fetchVehiculeData = async (currentPage: number, limit: number,sortColumn:string,sortDirection:string, searchColumn: string, searchValue?:null | string) => {
+  const HandleDelete = async (id_vehicle: number) => {
     try {
-      setLoading(true); 
-      const [ countData, viheculeData ] = await Promise.all([
-        fetch(`${backendUrl}/vehicles/count/${userID}`,{
-          method: 'POST',
+      console.log(id_vehicle);
+       setModalStatus('Do you want to delete this vehicle');
+       setTitleStatus('Delete vehicle');
+       setIdUser(userID ? Number(userID) : 0);
+       setIdDVehicle(id_vehicle);
+
+    
+      // After successful deletion, update the vehicle list
+      //  await updateVehicleList();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getVehicles = async (
+    limit: number,
+    page: number,
+    search: string,
+    type: number,
+    column: string,
+    sort: string
+  ) => {
+    try {
+      setLoading(true);
+      const [countData, vehicleData] = await Promise.all([
+        fetch(`${backendUrl}/vehicles/count`, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-              searchTerm: searchValue,
-              searchType: searchColumn
-          })
-        }).then((res) =>res.json()),
-        fetch(`${backendUrl}/vehicles`,{
-          method: 'POST',
+            id_user: parseInt(userID ?? "0") || 0,
+            search: search,
+          }),
+        }).then((res) => res.json()),
+        fetch(`${backendUrl}/vehicles/search`, {
+          method: "POST",
           headers: {
-            'Content-Type':'application/json'
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id_user:userID,
-            page:currentPage,
-            limit:limit,
-            sortColumn:sortColumn,
-            sortOrder:sortDirection,
-            searchColumn:searchColumn,
-            searchValue:searchValue
-          })
-        }).then((res) => res.json())
+            id_user: userID,
+            page: page,
+            limit: limit,
+            column: searchColum[column],
+            sort: sort,
+            search: search,
+            type: type,
+          }),
+        }).then((res) => res.json()),
       ]);
 
       const total = countData[0].total;
@@ -207,39 +152,243 @@ const clearSearchTerm = () => {
 
       const calculatedPageCount = Math.ceil(total / limit);
       setPageCount(calculatedPageCount);
-      setVehiculeListList(viheculeData);
+      setVehicles(vehicleData);
+
+      return vehicleData;
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false); // Set loading to false on data fetch completion
     }
-    }
+  };
 
   const refreshVehiculeData = async () => {
-    fetchVehiculeData(currentPage, limit,sortColumn,sortDirection,searchType,searchTerm);
-  }
+    getVehicles(limit, currentPage, search, type, column, sort);
+  };
 
-  useLayoutEffect(()=> {
-    refreshVehiculeData()
-  }, [userID, limit, sortColumn, sortDirection,searchType,searchTerm,currentPage])
+  useLayoutEffect(() => {
+    refreshVehiculeData();
+  }, [userID, limit, limit, search, type, column, sort]);
 
-  const handlePageClick = async (data: { selected: number }) => {
-    const pageSelect = data.selected + 1;
-    await setCurrentPage(pageSelect); // Attendez la mise à jour de l'état
-};
+  const handlePageClick = async (data: any) => {
+    let currentPage = data.selected + 1;
+    await getVehicles(limit, currentPage, search, type, column, sort);
+    // setDrivers(commentsFormServer);
+    window.scrollTo(0, 0);
+  };
 
-const handleClick = () => {
-  console.log("Button clicked!");
-};
 
- 
+  const menuItems = [
+    translate("ID"),
+    translate("Immatriculation"),
+    //  translate("Driver"),
+    translate("User"),
+  ];
+
+  const handleTypeSearch = (selectedValue: string) => {
+    console.log(selectedValue);
+    switch (selectedValue) {
+      case translate("ID"):
+        console.log(0);
+        setType(0);
+        break;
+      case translate("Immatriculation"):
+        console.log(1);
+        setType(1);
+        break;
+      // case translate("Driver"):
+      //   console.log(2)
+      //   setType(2);
+      //  break;
+      case translate("User"):
+        console.log(3);
+        setType(3);
+        break;
+      default:
+        console.log("Unknown selection");
+        console.log(selectedValue);
+        break;
+    }
+    setTypeSearch(selectedValue);
+    console.log("Selected value:", selectedValue);
+  };
+
+  const [selectedColumns, setSelectedColumns] = useState({
+    id_vehicule: true,
+    model: true,
+    immatriculation_vehicule: true,
+    state: true,
+    assignment: true,
+    vehicule_type: true,
+    nom_conducteur: true,
+    username_user: true,
+    trailer: true,
+  });
+
+  const handleColumnChange = (column: string) => {
+    setSelectedColumns((prevState: any) => ({
+      ...prevState,
+      [column]: !prevState[column],
+    }));
+  };
+
+  const handleAdvancedSearch = async (event: any) => {
+    const newValue = event.target.value;
+    setSearch(newValue);
+    await getVehicles(limit, currentPage, newValue, type, column, sort);
+  };
+
+  const handleSelectChange = async (event: any) => {
+    const newValue = event.target.value;
+    setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
+    setLimit(newValue);
+    const commentsFormServer = await getVehicles(
+      parseInt(newValue),
+      1,
+      search,
+      type,
+      column,
+      sort
+    ); // Ajouter await ici
+    setVehicles(commentsFormServer);
+    window.scrollTo(0, 0);
+  };
+
+  const handleResetSearch = async () => {
+    setSearch("");
+
+    await getVehicles(limit, currentPage, search, type, column, sort);
+  };
+
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
+  const [isVehiclesSelected, setIsVehiclesSelected] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+
+  const handleSelectAllVehicles = (checked: boolean) => {
+    setSelectAll(checked);
+    console.log(checked);
+    if (checked) {
+      // Select all POIs
+      const allVehicleIDs = vehicles.map((vehicle) =>
+        vehicle.id_vehicule.toString()
+      ); // Convert to strings
+      setSelectedVehicles(allVehicleIDs);
+      setIsVehiclesSelected(true); // Mark as selected
+    } else {
+      // Select all POIs
+      setSelectedVehicles([]);
+      setIsVehiclesSelected(false); // Mark as unselected
+    }
+  };
+
+
+
+
+  const handleVehiclesSelect = (DriverID: string) => {
+    let updatedSetSelectedVehicles: string[] = [];
+
+    // If "Select All Vehicles" is enabled, selects or deselects all vehicles
+    if (selectAll) {
+      updatedSetSelectedVehicles = selectedVehicles.includes(DriverID)
+        ? selectedVehicles.filter(id => id !== DriverID) //Deselect if already selected
+        : vehicles.map(vehicle => vehicle.id_vehicule.toString()); // Select all vehicles
+    } else {
+      //Managing selection/normal selection of an individual vehicle
+      if (selectedVehicles.includes(DriverID)) {
+        updatedSetSelectedVehicles = selectedVehicles.filter(id => id !== DriverID);
+      } else {
+        updatedSetSelectedVehicles = [...selectedVehicles, DriverID];
+      }
+    }
+
+    // Updates the list of selected vehicles
+    setSelectedVehicles(updatedSetSelectedVehicles);
+
+    // Updates the Vehicles Selected state (activate if at least one is selected)
+    setIsVehiclesSelected(updatedSetSelectedVehicles.length > 0);
+
+    console.log(updatedSetSelectedVehicles);
+  };
+
+
+  const vehicleHeaders = [
+    translate("ID"),
+    translate("Model"),
+    translate("Matriculation"),
+    translate("State"),
+    translate("Assignment"),
+    translate("Driver"),
+    translate("User"),
+    translate("Trailer"),
+  ];
+
+
+  const downloadVehicleExcel = () => {
+
+    const selectedData = vehicles.filter((vehicle) =>
+      selectedVehicles.includes(vehicle.id_vehicule.toString())
+    ).map((vehicle) => [
+      vehicle.id_vehicule,
+      vehicle.modele_vehicule,
+      vehicle.immatriculation_vehicule,
+      vehicle.etat_vehicule,
+      vehicle.affectation,
+      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
+      vehicle.username_user,
+    ]);
+
+
+    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+  };
+
+  const downloadVehiclePDF = () => {
+
+    const selectedData = vehicles.filter((vehicle) =>
+      selectedVehicles.includes(vehicle.id_vehicule.toString())
+    ).map((vehicle) => [
+      vehicle.id_vehicule,
+      vehicle.modele_vehicule,
+      vehicle.immatriculation_vehicule,
+      vehicle.etat_vehicule,
+      vehicle.affectation,
+      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
+      vehicle.username_user,
+    ]);
+    generatePDFFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+  };
+
+
+  const onDownloadConfirm = (format: string) => {
+    if (selectedVehicles.length > 0) {
+      handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    } else {
+      toast.warn("Please select at least one vehicle", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+
+  const closeModal = () => {
+    setModalStatus(null);
+  };
+
+  const closeDetailModal = () => {
+    setModalStatusDetail(null);
+  };
+
+
 
   return (
     <>
-      <div   id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer" >
+      <div
+        id="DataTables_Table_0_wrapper"
+        className="dataTables_wrapper dt-bootstrap4 no-footer"
+      >
         <div className="row">
           <div
-            className="col-sm-12 col-md-4 dataTables_length"
+            className="col-sm-12 col-md-6 dataTables_length"
             id="DataTables_Table_0_length"
           >
             <h4 className="mb-3 text-nowrap">
@@ -247,232 +396,387 @@ const handleClick = () => {
               {translate("Vehicles")} {total}
             </h4>
           </div>
-          <div className="col-sm-12 col-md-8">
-          <div className="text-right">
-              <ButtonCustomHover text={translate("Ajouter un Vehicule")} icon={<FaPlus />} ClasStyle='bg-success'   onClick={() => handleClickLink('/vehicles-forms')}/> 
+          <div className="col-sm-12 col-md-6">
+            <div className="text-right">
 
-              <ButtonCustomHover text={translate("Initialisation des Affectations")} icon={<FaRedo />} />
-              <ButtonCustomHover text={translate("Affectations Vehicule")} icon={<FaCar />} />
-              <ButtonCustomHover text={translate("Maj Assurance")} icon={<FaShieldAlt />} />
-              <ButtonCustomHover text={translate("Maj Vignette")} icon={<FaStickyNote />} />
-              <ButtonCustomHover text={translate("Maj Kilometrage")} icon={<FaTachometerAlt />} />
-              <ButtonCustomHover text={translate("Maj Controle Thechnique")} icon={<FaWrench />} /> 
+
+              <button
+                className="btn btn-outline-secondary  mt-2 mr-1"
+                onClick={() => setShowDownloadModal(true)}
+              >
+                <i className="las la-download"></i>
+                {translate("Export")} {translate("Vehicle")}
+              </button>
+
+              <ButtonCustomHover
+                text={translate("Add vehicule")}
+                icon={<FaPlus />}
+                ClasStyle="bg-success"
+                onClick={() => handleClickLink("/vehicle/add")}
+              />
+
+              <ButtonCustomHover
+                text={translate("Assurance")}
+                icon={<FaShieldAlt />}
+              />
+              <ButtonCustomHover
+                text={translate("Vignette")}
+                icon={<FaStickyNote />}
+              />
+              <ButtonCustomHover
+                text={translate("Mileage")}
+                icon={<FaTachometerAlt />}
+              />
+              <ButtonCustomHover
+                text={translate("Control Technic")}
+                icon={<FaWrench />}
+              />
+            </div>
           </div>
 
-            <div className="row justify-content-end">
-            <div className="col-md-8 d-flex justify-content-end align-items-center">
-                 {/* Dropdown Pour le Show du tableau */}
+          <div className="col-sm-12 col-md-12">
+            <div className="row">
+              <div className="col-sm-12 col-md-6">
+                <div className="input-group">
                   <Dropdown>
-                    <Dropdown.Toggle variant="" id="dropdown-basic" title="Résultats d'affichage">
-                      <i className="fas fa-list-alt"></i>
+                    <Dropdown.Toggle variant="link" id="dropdown-basic">
+                      <i
+                        className="fas fa-chevron-down"
+                        style={{ fontSize: "20" }}
+                      ></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      {options.map((option) => (
-                        <Dropdown.Item key={option} 
-                        onClick={() => {
-                          setLimit(option);
-                          setCurrentPage(1)
-                          }}>
-                          {option}
+                      {menuItems.map((item, index) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() => handleTypeSearch(item)}
+                          eventKey={item}
+                          active={typeSearch === item}
+                          className={typeSearch === item ? "select-active" : ""}
+                        >
+                          {item}
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <i className="fas fa-eye"></i>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {/* <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show Id")}
-                          checked={visibleColumns.id_vehicule}
-                          onChange={() => handleColumnVisibilityChange("id_vehicule")}
-                        />
-                      </Dropdown.Item> */}
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show Model")}
-                          checked={visibleColumns.model}
-                          onChange={() => handleColumnVisibilityChange("model")}
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show imatriculation")}
-                          checked={visibleColumns.imatriculation}
-                          onChange={() => handleColumnVisibilityChange("imatriculation")}
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show State")}
-                          checked={visibleColumns.state}
-                          onChange={() => handleColumnVisibilityChange("state")}
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show Assignment")}
-                          checked={visibleColumns.assignment}
-                          onChange={() =>
-                            handleColumnVisibilityChange("assignment")
-                          }
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show Conducteur")}
-                          checked={visibleColumns.conducteur}
-                          onChange={() =>
-                            handleColumnVisibilityChange("conducteur")
-                          }
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item as="div">
-                        <Form.Check
-                          type="checkbox"
-                          label={translate("Show Trailer")}
-                          checked={visibleColumns.trailer}
-                          onChange={() =>
-                            handleColumnVisibilityChange("trailer")
-                          }
-                        />
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  <input
+                    type="text"
+                    placeholder={` ${translate("Search by")} ${translate(
+                      typeSearch
+                    )}`}
+                    onChange={handleAdvancedSearch}
+                    className="form-control"
+                  />
+                  <Button
+                    variant="secondary"
+                    onClick={handleResetSearch}
+                    className="btn-reset"
+                  >
+                    <i className="las la-times" style={{ color: "#fff" }}></i>
+                  </Button>
+                </div>
+              </div>
+              <div className="col-md-6 d-flex justify-content-end align-items-center">
+                <div
+                  className="dataTables_length"
+                  id="DataTables_Table_0_length"
+                >
+                  <label style={{ marginBottom: "0" }}>
+                    {translate("Show")}
+                    <select
+                      name="DataTables_Table_0_length"
+                      aria-controls="DataTables_Table_0"
+                      className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                      style={{ width: "66px" }}
+                      onChange={handleSelectChange}
+                    >
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="200">200</option>
+                      <option value="500">500</option>
+                    </select>
+                  </label>
+                </div>
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant=""
+                    id="dropdown-basic"
+                    title={translate("Display columns")}
+                    style={{ marginTop: "-13" }}
+                  >
+                    <i className="las la-eye"></i>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      as="button"
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.id_vehicule}
+                        onChange={() => handleColumnChange("id_vehicule")}
+                      />
+                      <span style={{ marginLeft: "0px" }}>
+                        {translate("ID")}
+                      </span>
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      as="button"
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.immatriculation_vehicule}
+                        onChange={() =>
+                          handleColumnChange("immatriculation_vehicule")
+                        }
+                      />
+                      <span style={{ marginLeft: "10px" }}>
+                        {translate("Matriculation")}
+                      </span>
+                    </Dropdown.Item>
+
+                    <Dropdown.Item
+                      as="button"
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.nom_conducteur}
+                        onChange={() => handleColumnChange("nom_conducteur")}
+                      />
+                      <span style={{ marginLeft: "10px" }}>
+                        {translate("Driver")}
+                      </span>
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      as="button"
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.username_user}
+                        onChange={() => handleColumnChange("username_user")}
+                      />
+                      <span style={{ marginLeft: "10px" }}>
+                        {translate("User")}
+                      </span>
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div>
-       
-        <div className="row">
-          <Table striped responsive className="table-fixed">
-            <TableHeader />
-            <tbody className="ligth-body">
-              {vehiculeListList.map((item) => (
-                <tr key={item.id_vehicule}>
-                  <td>
+        <div className="row m-1 table-responsive">
+          <Table className="dataTable">
+            <thead className="bg-white text-uppercase">
+              <tr className="ligth ligth-data">
+                <th>
+                  <div className="form-check form-check-inline">
                     <input
+                      className="form-check-input"
                       type="checkbox"
-                      className="checkbox-input"
-                      id={`checkbox-${item.id_vehicule}`}
+                      checked={selectAll}
+                      onChange={(e) =>
+                        handleSelectAllVehicles(e.target.checked)
+                      }
                     />
+                    <label className="form-check-label"></label>
+                  </div>
+                </th>
+
+                {selectedColumns.id_vehicule && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("id_vehicule")}
+                  >
+                    {translate("Id")}
+                  </th>
+                )}
+                {selectedColumns.model && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("model")}
+                  >
+                    {translate("Model")}
+                  </th>
+                )}
+                {selectedColumns.immatriculation_vehicule && (
+                  <th
+                    className="sorting"
+                    onClick={() =>
+                      handleSortingColum("immatriculation_vehicule")
+                    }
+                  >
+                    {translate("Matriculation")}
+                  </th>
+                )}
+                {selectedColumns.state && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("state")}
+                  >
+                    {translate("State")}
+                  </th>
+                )}
+                {selectedColumns.assignment && (
+                  <th
+                    className="assignment"
+                    onClick={() => handleSortingColum("assignment")}
+                  >
+                    {translate("Assignment")}
+                  </th>
+                )}
+                {selectedColumns.nom_conducteur && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("nom_conducteur")}
+                  >
+                    {translate("Driver")}
+                  </th>
+                )}
+                {selectedColumns.username_user && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("username_user")}
+                  >
+                    {translate("User")}
+                  </th>
+                )}
+                {selectedColumns.trailer && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("trailer")}
+                  >
+                    {translate("Trailer")}
+                  </th>
+                )}
+                {<th>{translate("Action")}</th>}
+              </tr>
+            </thead>
+            <tbody key="#" className="ligth-body">
+              {loading ? (
+                <tr style={{ textAlign: "center" }}>
+                  <td className="text-center" colSpan={10}>
+                    <p>
+                      <PropagateLoader
+                        color={"#123abc"}
+                        loading={loading}
+                        size={20}
+                      />
+                    </p>
                   </td>
-                  {visibleColumns.id_vehicule && <td>{item.id_vehicule}</td>}
-                  {visibleColumns.model && <td className="text-center">{item.modele_vehicule}</td>}
-                  
-                  {visibleColumns.imatriculation && (
-                    <td className="text-center">{item.immatriculation_vehicule}</td>
-                  )}
-                  {visibleColumns.state && (
-                    <td className="text-center">
-                      <span className="badge p-1 fs-6 btn">
-                        {item.etat_vehicule}
-                      </span>
+                </tr>
+              ) : vehicles.length > 0 ? (
+                vehicles.map((item) => (
+                  <tr key={item.id_vehicule}>
+                    <td>
+                      <div className="form-check form-check-inline">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id={`checkbox-${item.id_vehicule}`}
+                          checked={selectedVehicles.includes(item.id_vehicule.toString())}
+                          onChange={() => handleVehiclesSelect(item.id_vehicule.toString())}
+                        />
+                        <label htmlFor={`checkbox-${item.id_vehicule}`} className="mb-0"></label>
+                      </div>
                     </td>
-                  )}
-                  {visibleColumns.assignment && (
-                    <td className="text-center">
-                      {item.affectation}
-                    </td>
-                  )}
-                  {visibleColumns.conducteur && (
-                    <td className="text-center">
-                      {item.driver_first_name} - {item.driver_last_name}
-                    </td>
-                  )}
-                  {visibleColumns.trailer && (
-                    <td className="text-center">
-                      {/* {item.trailer} */}
-                    </td>
-                  )}
-                  {visibleColumns.actions && (
+
+                    {selectedColumns.id_vehicule && <td>{item.id_vehicule}</td>}
+                    {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
+                    {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
+                    {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}
+                    {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)}
+                    {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
+                    {selectedColumns.username_user && (<td className="text-center">{item.username_user}</td>)}
+                    {selectedColumns.trailer && (<td className="text-center">{/* {item.trailer} */}</td>)}
                     <td>
                       <div className="d-flex align-items-center list-action">
-                        <a
-                          className="badge badge-info mr-2 nav-link"
+                        <NavLink
+                          to={`/vehicle/edit/${item.id_vehicule}`}
+                          className="badge bg-success mr-2"
                           data-toggle="tooltip"
-                          title="Duplicate"
-                        >
-                          <i
-                            className="las la-copy"
-                            style={{ height: "12px", width: "12px" }}
-                          ></i>
-                        </a>
-                        <a
-                          className="badge badge-success mr-2 nav-link"
-                          data-toggle="tooltip"
-                          title="Update"
+                          data-placement="top"
+                          title={translate("Edit")}
                         >
                           <i className="ri-pencil-line mr-0"></i>
-                        </a>
+                        </NavLink>
                         <a
                           className="badge bg-warning mr-2 nav-link"
                           data-toggle="tooltip"
                           title="Delete"
+                          onClick={() => HandleDelete(item.id_vehicule)}
                         >
                           <i className="ri-delete-bin-line mr-0"></i>
                         </a>
                       </div>
                     </td>
-                  )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={10}>No vehicles available</td>
                 </tr>
-              ))}
+              )}
             </tbody>
-            <tfoot
-              style={{
-                // position: "sticky",
-                bottom: 0,
-                // backgroundColor: "#f0f0f0",
-                // zIndex: 1,
-              }}
-            >
-              <tr>
-                <td colSpan={6} align="left" >
-                  <div className="text-nowrap">
-                       
-                        <span>  {translate("Displaying")} {limit} {translate("on")}{" "}</span>
-                    {total}
-                  
-                  
-                  </div>
-                </td>
-                <td colSpan={3} align="right" >
-                  <ReactPaginate
-                    previousLabel={translate("previous")}
-                    nextLabel={translate("next")}
-                    breakLabel="..."
-                    pageCount={pageCount}
-                    marginPagesDisplayed={1}
-                    // pageRangeDisplayed={3}
-                    onPageChange={handlePageClick}
-                    containerClassName={"pagination justify-content-center"}
-                    pageClassName={"page-item"}
-                    pageLinkClassName={"page-link"}
-                    previousClassName={"page-item"}
-                    previousLinkClassName={"page-link"}
-                    nextClassName={"page-item"}
-                    nextLinkClassName={"page-link"}
-                    breakClassName={"page-item"}
-                    breakLinkClassName={"page-link"}
-                    activeClassName={"active"}
-                    forcePage={currentPage -1} // Rendre la page actuelle active visuellement
-                  />
-                </td>
-              </tr>
-            </tfoot>
           </Table>
+          <div className="row">
+            <div className="col-md-6 d-flex align-items-center">
+              <span>
+                {translate("Displaying")} {vehicles.length} {translate("on")}{" "}
+                {total}
+              </span>
+            </div>
+            <div className="col-md-6 d-flex justify-content-end">
+              <ReactPaginate
+                previousLabel={translate("previous")}
+                nextLabel={translate("next")}
+                breakLabel={"..."}
+                pageCount={pageCount}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={3}
+                onPageChange={handlePageClick}
+                containerClassName={"pagination justify-content-end"}
+                pageClassName={"page-item"}
+                pageLinkClassName={"page-link"}
+                previousClassName={"page-item"}
+                previousLinkClassName={"page-link"}
+                nextClassName={"page-item"}
+                nextLinkClassName={"page-link"}
+                breakClassName={"page-item"}
+                breakLinkClassName={"page-link"}
+                activeClassName={"active"}
+                forcePage={currentPage - 1}
+              />
+            </div>
+          </div>
         </div>
       </div>
+      <VehicleModal
+          show={modalStatus !== null}
+          onHide={closeModal}
+          status={modalStatus}
+          title={titleStatus}
+          IdUser={IdUser}
+          IdVehicle={IdVehicle}
+          updateVehicleList={refreshVehiculeData}
+        />
+      <DownloadModal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        onDownloadConfirm={onDownloadConfirm}
+      />
+
     </>
   );
 }

@@ -62,6 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
+  
   const strLang = {
     en: translate('English'),
     fr: translate('French'),
@@ -104,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
       inactivityTimeout = setTimeout(() => {
         // Auto logout after 15 minutes of inactivity
         handleLogout();
-      }, 900000); // 15 minutes in milliseconds
+      }, 14400000); // 15 minutes in milliseconds
     };
 
     const handleStorageChange = (event: StorageEvent) => {
@@ -170,7 +171,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
       // Make the fetch request
       const response = await fetch(
-        `${backendUrl}/api/notification/read`,
+        `${backendUrl}/api/geop/notification/read`,
         {
           method: "POST",
           headers: {
