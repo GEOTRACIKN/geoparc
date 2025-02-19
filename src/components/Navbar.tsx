@@ -503,7 +503,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                         <Card.Body className="p-0">
                           <div className="custom-title p-3">
                             <div className="d-flex align-items-center justify-content-between">
-                              <h5 className="mb-0">Notifications</h5>
+                              <h5 className="mb-0">{translate("Notifications")}</h5>
                               <Badge className="badge-card">{notifications && notifications.length}</Badge>
                             </div>
                           </div>

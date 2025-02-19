@@ -79,6 +79,7 @@
 "SIM type": "Tipo de SIM",
 "Type of Contract": "Fecha de creación",
 "Creation date": "Fecha de creación",
+"Deadline date ": "Fecha límite",
 "End date": "Fecha final",
 "Start date": "Fecha inicio",
 "Starting": "partida",
@@ -489,8 +490,8 @@
 "Utilisateur modifié avec succès":"Usuario modificado con éxit",
 "User Restored successfully !":"Usuario restaurado exitosamente!",
 "Reports Deleted successfully !":"Informes eliminados exitosamente!",
-"Creation Date": "Fecha de Creación",
-"Checker": "Verificador",
+"Deadline for": "Date limite pour",
+"Checker": "Fecha límite para",
 "Outgoing Driver": "Conductor Saliente",
 "Incoming Driver": "Conductor Entrante",
 "Tractor Registration": "Matrícula del Tractor",
@@ -634,5 +635,6 @@
   "noEvents": "No hay eventos para mostrar",
   "Deadline":"Fecha límite",
   "Calendar View": "Vista de Calendario",
-  "List View": "Vista de Lista"
+  "List View": "Vista de Lista",
+  "See all notifications":"Ver todas las notificaciones"
 }

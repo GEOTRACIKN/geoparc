@@ -122,7 +122,8 @@
 "Operator": "Opérateur",
 "SIM type": "Type de puce",
 "Type of Contract": "Type de Contract",
-"Creation date": "Date de création",
+"Creation date": "Date création",
+"Deadline for": "Echéance pour",
 "End date": "Date de fin", 
 "Start date": "Date de début",
 "Starting": "Départ",
@@ -492,7 +493,7 @@
 "Utilisateur modifié avec succès":"Utilisateur modifié avec succès",
 "User Restored successfully !":"Utilisateur restauré avec succès !",
 "Reports Deleted successfully !":"Rapports supprimés avec succès !",
-"Creation Date": "Date Création",
+"Deadline date ": "Date échéance",
 "Checker": "Verificateur",
 "Outgoing Driver": "Chauffeur Sortant",
 "Incoming Driver": "Chauffeur Entrant",
@@ -634,5 +635,6 @@
 "noEvents": "Aucun événement à afficher",
 "Deadline": "Échéance",
 "Calendar View": "Vue Calendrier",
-"List View": "Vue Liste"
+"List View": "Vue Liste",
+"See all notifications":"Voir toutes les notifications"
 }

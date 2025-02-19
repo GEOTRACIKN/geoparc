@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import ModalNewDeadline from "../components/Deadline/NewDeadline";
 import CalendarDeadlineModal from "../components/Deadline/CalendarDeadline";
@@ -17,7 +17,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import frLocale from "@fullcalendar/core/locales/fr";
 import enLocale from "@fullcalendar/core/locales/en-gb";
-import esLocale from '@fullcalendar/core/locales/es'; 
+import esLocale from '@fullcalendar/core/locales/es';
 import arLocale from "@fullcalendar/core/locales/ar";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toTimestamp } from "../utilities/functions";
@@ -36,8 +36,11 @@ interface DeadlineInterface {
 
 export function Deadline() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const { id_alarm } = useParams<{ id_alarm?: string }>();
+  const { id_type } = useParams<{ id_type?: string }>();
+  const typeId = id_type ? parseInt(id_type, 10) : null;
   const { lang, translate } = useTranslate();
- 
+
   const localeMap = {
     en: enLocale,
     fr: frLocale,
@@ -153,6 +156,7 @@ export function Deadline() {
     setSelectedDeadlineId(id);
     setShowShowDeadlineModal(true);
   };
+
   const handleCloseShowDeadlineModal = () => setShowShowDeadlineModal(false);
 
   const searchColumn: { [key: string]: number } = {
@@ -275,8 +279,13 @@ export function Deadline() {
   };
 
   useEffect(() => {
-    getDeadlines(limit, currentPage, search, type, column, sort);
-    getCalendarDeadlines();
+
+  if(id_alarm){ getDeadlines(limit, currentPage, id_alarm, type, column, sort);}
+  else{ getDeadlines(limit, currentPage, search, type, column, sort);}
+  if(typeId && typeId!=0){ getDeadlines(limit, currentPage, search, typeId, column, sort);}
+
+
+   // getCalendarDeadlines();
   }, []);
 
   const handleTypeSearch = (event: any) => {
@@ -289,10 +298,10 @@ export function Deadline() {
       case translate("Type"):
         setType(1);
         break;
-      case translate("Date creation"):
+      case translate("Creation date"):
         setType(2);
         break;
-      case translate("Date deadline"):
+      case translate("Deadline date"):
         setType(3);
         break;
       case translate("Deadline for"):
@@ -309,8 +318,8 @@ export function Deadline() {
   const menuItems = [
     translate("ID"),
     translate("Type"),
-    translate("Date creation"),
-    translate("Date deadline"),
+    translate("Creation date"),
+    translate("Deadline date"),
     translate("Deadline for")
   ];
 
@@ -553,8 +562,8 @@ export function Deadline() {
 
                 {selectedColumns.id_deadline && (<th className="sorting " onClick={() => handleSortingColumn("id_deadline")} > {translate("ID")} </th>)}
                 {selectedColumns.nom_type && (<th className="sorting " onClick={() => handleSortingColumn("nom_type")} > {translate("Type")} </th>)}
-                {selectedColumns.date_creation && (<th className="sorting " onClick={() => handleSortingColumn("date_creation")}> {translate("Date creation")}</th>)}
-                {selectedColumns.date_deadline && (<th className="sorting " onClick={() => handleSortingColumn("date_deadline")}> {translate("Date Deadline")}</th>)}
+                {selectedColumns.date_creation && (<th className="sorting " onClick={() => handleSortingColumn("date_creation")}> {translate("Creation date")}</th>)}
+                {selectedColumns.date_deadline && (<th className="sorting " onClick={() => handleSortingColumn("date_deadline")}> {translate("Deadline date")}</th>)}
                 {selectedColumns.id_item && (<th className="sorting " onClick={() => handleSortingColumn("id_item")}> {translate("Deadline for")}</th>)}
                 <th>{translate("Action")}</th>
 
@@ -608,7 +617,7 @@ export function Deadline() {
                         </Link>
 
                         {/* Edit Button */}
-                        <Link
+                        {/* <Link
                           to={``}
                           className="badge badge-success mr-2"
                           data-toggle="tooltip"
@@ -622,7 +631,7 @@ export function Deadline() {
                             className="las la-edit"
                             style={{ fontSize: "1.2em" }}
                           ></i>
-                        </Link>
+                        </Link> */}
 
                         {/* Delete Button */}
                         <Link
@@ -696,7 +705,7 @@ export function Deadline() {
               listPlugin,
               interactionPlugin,
             ]}
-            locale={localeMap[lang]} 
+            locale={localeMap[lang]}
             contentHeight={600}
             initialView="dayGridMonth"
             events={adjustedEvents}
@@ -708,7 +717,7 @@ export function Deadline() {
               const date = info.dateStr;
               return <div className="day-cell">{renderEventList(date)}</div>;
             }}
-            eventContent={(arg:any) => (
+            eventContent={(arg: any) => (
               <div title={`Type: ${arg.event.extendedProps.type}\nDate de début: ${arg.event.start}\nDate de fin: ${arg.event.end}`}>
                 <b>{arg.timeText}</b>
                 <span>{arg.event.title}</span>
@@ -733,7 +742,7 @@ export function Deadline() {
         </div>
       )}
 
-      <ModalNewDeadline
+      {/* <ModalNewDeadline
         show={showNewDeadlineModal}
         onHide={handleCloseNewDeadlineModal}
         onSuccess={refreshData}
@@ -756,7 +765,7 @@ export function Deadline() {
         onHide={handleCloseDeleteDeadlineModal}
         id_deadline={selectedDeadlineId}
         onSuccess={refreshData}
-      />
+      /> */}
       <ModalShowDeadline
         show={showShowDeadlineModal}
         onHide={handleCloseShowDeadlineModal}

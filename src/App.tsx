@@ -64,6 +64,7 @@ import { Parks } from "./pages/parks";
 import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
+import { Notifications } from "./pages/Notification";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -149,6 +150,7 @@ function App() {
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
           <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+          <Route path="/deadline/:id_alarm/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
@@ -174,6 +176,7 @@ function App() {
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+          <Route path="/notifications" element={ <DashboardLayout>{< Notifications />}</DashboardLayout>} /> 
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
           <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />

@@ -82,7 +82,8 @@
 "Operator": "اسم خدمات الجوال",
 "SIM type": "نوع شريحة الاتصال",
 "Type of Contract": "نوع العقد",
-"Creation date": "تاريخ الإنشاء",
+"Deadline date ": "تاريخ الموعد النهائي",
+"Deadline for": "الموعد النهائي ل",
 "End date": "تاريخ النهاية",
 "Start date": "تاريخ البداية",
 "Starting": "بداية",
@@ -359,7 +360,7 @@
 "Global statistics":"الإحصاءات الكلية",
 "Fuel type":"نوع الوقود",
 "Tank capacity":"سعة الخزان",
-"Creation Date": "تاريخ الإنشاء",
+"Creation date": "تاريخ الإنشاء",
 "Rapports": "تقارير",
 "New Report": "تقرير جديد",
 "Close": "إغلاق",
@@ -645,5 +646,7 @@
 "noEvents": "لا توجد أحداث لعرضها",
 "Deadline":"تاريخ الاستحقاق",
 "Calendar View": "عرض التقويم",
-"List View": "عرض القائمة"
+"List View": "عرض القائمة",
+"See all notifications":"مشاهدة جميع الإشعارات"
+
 }

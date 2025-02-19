@@ -89,7 +89,8 @@
 "Operator": "Operator",
 "SIM type": "SIM type",
 "Type of Contract": "Type of Contract",
-"Creation date": "Creation date",
+"Deadline for": "Deadline for",
+"Deadline date ": "Deadline date ",
 "End date": "End date",
 "Start date": "Start date",
 "Starting": "Starting",
@@ -395,7 +396,6 @@
 "Immatriculation du véhicule": "Vehicle Registration",
 "Immatriculation": "Immatriculation",
 "Turn Report": "Turn Report",
-"Date de création": "Creation Date",
 "Date/Heure": "Date/Time",
 "Vitesse": "Speed",
 " Min": "Min",
@@ -483,7 +483,7 @@
 "Utilisateur ajouté avec succès": "User added successfull",
 "User Restored successfully !":"User Restored successfully !",
 "Reports Deleted successfully !":"Reports Deleted successfully !",
-"Creation Date": "Creation Date",
+"Creation date": "Creation date",
 "Checker": "Checker",
 "Outgoing Driver": "Outgoing Driver",
 "Incoming Driver": "Incoming Driver",
@@ -623,5 +623,6 @@
 "noEvents": "No events to display",
 "Deadline": "Deadline",
 "Calendar View": "Calendar View",
-"List View": "List View"
+"List View": "List View",
+"See all notifications":"See all notifications"
 }
