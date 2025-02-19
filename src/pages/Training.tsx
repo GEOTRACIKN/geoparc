@@ -52,6 +52,7 @@ export function Training() {
     const [events, setEvents] = useState<any[]>([]);
     const [selectedTraining, setSelectedTraining] = useState<number[]>([]);
     const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+      const [selectAll, setSelectAll] = useState(false);
     
     
     const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
@@ -397,6 +398,17 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
           }
         });
       };
+
+      
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      const allWarningIds = list_training.map((Training) => Training.id_training);
+      setSelectedTraining(allWarningIds);
+    } else {
+      setSelectedTraining([]);
+    }
+  };
     
     
     const refreshData = () => {
@@ -552,6 +564,8 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
                                       
                                 
                                     />
