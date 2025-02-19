@@ -260,7 +260,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 20,
-          label: "Violation",
+          label: "Violations",
           icon: "las la-ban",
           to: "/violation",
           permissionId: 40,
