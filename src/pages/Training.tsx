@@ -9,6 +9,9 @@ import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
 import ModalDeleteTraining from "../components/Training/DeleteTraining";
+import { DownloadModal } from "../functions";
+import { generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -16,6 +19,7 @@ import moment from "moment";
 import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
 import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
 import interactionPlugin from "@fullcalendar/interaction";
+import { toast } from "react-toastify";
 
 
 interface Training {
@@ -46,6 +50,10 @@ export function Training() {
     const [pageCount, setPageCount] = useState(0);
     const [isGridView, setIsGridView] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
+    const [selectedTraining, setSelectedTraining] = useState<number[]>([]);
+    const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+    
+    
     const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
     const localizer = momentLocalizer(moment);
     type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
@@ -328,6 +336,68 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
+     //**** Partie Excel ****
+      const TrainingHeaders = [
+        translate("IDTraining"),
+        translate("Driver"),
+        translate("Type Training"),
+        translate("Start Date"),
+        translate("End Date"),
+      ];
+    
+    
+      const downloadTrainingExcel = () => {
+        const selectedData = list_training.filter((training) =>
+          selectedTraining.includes(training.id_training)
+        ).map((training) => [
+          training.id_training,
+          `${training.conducteur_nom} ${training.conducteur_prenom}`,
+          training.type_training,
+          training.date_start_training,
+          (training.date_end_training),
+        ]);
+    
+        generateExcelFile("Training", TrainingHeaders, selectedData);
+      };
+    
+    
+      const downloadTrainingPDF = () => {
+        const selectedData = list_training.filter((training) =>
+          selectedTraining.includes(training.id_training)
+        ).map((training) => [
+          training.id_training,
+          `${training.conducteur_nom} ${training.conducteur_prenom}`,
+          training.type_training,
+          training.date_start_training,
+          (training.date_end_training),
+        ]);
+    
+        generatePDFFile("Training", TrainingHeaders, selectedData);
+      };
+    
+    
+    
+      const onDownloadConfirm = (format: string) => {
+        if (selectedTraining.length > 0) {
+          handleDownloadConfirm(format, downloadTrainingExcel, downloadTrainingPDF);
+        } else {
+          toast.warn("Veuillez sélectionner au moins un Training", {
+            position: "bottom-right",
+            autoClose: 3000,
+          });
+        }
+      };
+    
+      const handleSelectTraining = (id: number) => {
+        setSelectedTraining((prev: number[]) => {
+          if (prev.includes(id)) {
+            return prev.filter((trainingId: number) => trainingId !== id);
+          } else {
+            return [...prev, id];
+          }
+        });
+      };
+    
     
     const refreshData = () => {
         getCountTraining();
@@ -383,7 +453,17 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     >
         <i className="las la-plus mr-3"></i>
         {translate("New Request")}
+      
     </Button>
+    <Button
+    className="btn mt-2 me-1"
+    style={{ backgroundColor: "#6c757d", color: "white", border: "none" }}
+    onClick={() => setShowDownloadModal(true)}
+>
+    <i className="las la-download"></i>
+    {translate("Export")}
+</Button>
+
 
     <Button 
         onClick={() => setIsGridView(!isGridView)}  
@@ -472,6 +552,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
+                                      
                                 
                                     />
                                 </div>
@@ -544,6 +625,12 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
+                                                checked={selectedTraining.includes(
+                                                    Training.id_training
+                                                  )}
+                                                  onChange={() =>
+                                                    handleSelectTraining(Training.id_training)
+                                                  }
                                         
                                             />
                                         </div>
@@ -710,6 +797,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
             <ModalShowTraining show={showShowTrainingModal} onHide={handleCloseShowTrainingModal} id_training={selectedTrainingId} />
+            <DownloadModal
+                    show={showDownloadModal}
+                    onHide={() => setShowDownloadModal(false)}
+                    onDownloadConfirm={onDownloadConfirm}
+                  />
 
         </>
     );
