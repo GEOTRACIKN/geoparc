@@ -14,6 +14,7 @@ import ModalDeleteFire from "../components/Fire/DeleteFire";
 
 interface Fire {
     id_fire: number;
+    ref_fire: string;
     volume_fire: number;
     location_fire: string;
     product_fire: number;
@@ -52,6 +53,7 @@ export function Fire() {
 
     const initialColumns = {
         ID: true,
+        Reference: true,
         Volume: true,
         Type: true,
         Vehicle: true,
@@ -192,15 +194,16 @@ export function Fire() {
             case translate("Cost"):
                 setType(5);
                 break;
-         
             case translate("Type"):
                 setType(6);
                 break;
-
-
             case translate("Volume"):
                     setType(7);
                 break;
+            case translate("Reference"):
+                setType(8);
+                break;
+
                        
             default:
                 console.log("Unknown selection");
@@ -234,7 +237,7 @@ export function Fire() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Fire")} ({total})</h4>
+                    <h4>{translate("Fire extinguisher management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewFireModal} className="btn btn-primary mt-2 mr-1">
@@ -259,6 +262,8 @@ export function Fire() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
+
                                 <Dropdown.Item>{translate("Volume")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Location")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
@@ -343,6 +348,14 @@ export function Fire() {
                                     onClick={() => handleSortingColumn("id_fire")}
                                 >
                                     {translate("ID")}
+                                </th>
+                            )}
+                             {selectedColumns.Reference && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("ref_fire")}
+                                >
+                                    {translate("Reference")}
                                 </th>
                             )}
                             
@@ -434,6 +447,9 @@ export function Fire() {
                                     
                                             {selectedColumns.ID && (
                                                 <td>{Fire.id_fire}</td>
+                                            )}
+                                             {selectedColumns.Reference && (
+                                                <td>{Fire.ref_fire}</td>
                                             )}
                                          
                                               {selectedColumns.Volume && (

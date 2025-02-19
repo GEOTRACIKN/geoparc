@@ -9,12 +9,18 @@ import ModalShowTraining from "../components/Training/ShowTraining";
 import { PropagateLoader } from "react-spinners";
 import ModalEditTraining from "../components/Training/EditTraining";
 import ModalDeleteTraining from "../components/Training/DeleteTraining";
+import { DownloadModal } from "../functions";
+import { generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import moment from "moment";
 import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
 import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
+import interactionPlugin from "@fullcalendar/interaction";
+import { toast } from "react-toastify";
+
 
 interface Training {
     id_training: number;
@@ -44,10 +50,57 @@ export function Training() {
     const [pageCount, setPageCount] = useState(0);
     const [isGridView, setIsGridView] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
+    const [selectedTraining, setSelectedTraining] = useState<number[]>([]);
+    const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
+      const [selectAll, setSelectAll] = useState(false);
+    
+    
     const [currentView, setCurrentView] = useState("dayGridMonth"); // Vue par défauts
     const localizer = momentLocalizer(moment);
     type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
 const [mode, setMode] = useState<ModeType>("create");
+const customLocale = {
+    code: "custom", // A custom code for your locale
+    buttonText: {
+      month: translate("Month"),
+      week: translate("Week"),
+      day: translate("Day"),
+      list: translate("Year"),
+      today: translate("Today"),
+    },
+    dayNames: [
+      translate("Sunday"),
+      translate("Monday"),
+      translate("Tuesday"),
+      translate("Wednesday"),
+      translate("Thursday"),
+      translate("Friday"),
+      translate("Saturday"),
+    ],
+    dayNamesShort: [
+      translate("Sun"),
+      translate("Mon"),
+      translate("Tue"),
+      translate("Wed"),
+      translate("Thu"),
+      translate("Fri"),
+      translate("Sat"),
+    ],
+    monthNames: [
+      translate("January"),
+      translate("February"),
+      translate("March"),
+      translate("April"),
+      translate("May"),
+      translate("June"),
+      translate("July"),
+      translate("August"),
+      translate("September"),
+      translate("October"),
+      translate("November"),
+      translate("December"),
+    ],
+  };
 
 
     const calendarRef = useRef<FullCalendar | null>(null);
@@ -170,11 +223,21 @@ const [mode, setMode] = useState<ModeType>("create");
         try {
             const response = await fetch(`${backendUrl}/api/geop/calendar/${id_user}`);
             const data = await response.json();
-            setEvents(data);
+            console.log("Fetched calendar data:", data); // Vérifie ce que l'API retourne
+    
+            if (Array.isArray(data)) {
+                setEvents(data);
+            } else {
+                console.error("Invalid data format:", data);
+                setEvents([]); 
+            }
         } catch (error) {
             console.error("Erreur lors de la récupération des trainings :", error);
+            setEvents([]); 
         }
     };
+    
+    
 
     useEffect(() => {
         getCountTraining();
@@ -211,6 +274,12 @@ const [mode, setMode] = useState<ModeType>("create");
 
 // Adjust end dates to match FullCalendar's display
 const adjustEndDate = (events: { start: string; end: string }[]) => {
+    console.log("Events received:", events); // Débogage
+    if (!Array.isArray(events)) {
+        console.error("Error: events is not an array!", events);
+        return []; // Retourner un tableau vide pour éviter l'erreur
+    }
+  
     return events.map(event => {
       const endDate = new Date(event.end);
       endDate.setDate(endDate.getDate() + 1); // Add one day for display
@@ -219,8 +288,8 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         end: endDate.toISOString().split('T')[0],
       };
     });
-  };
-  
+};
+
   const adjustedEvents = adjustEndDate(events);
   
   // Count events per day (using local dates)
@@ -252,7 +321,6 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     return (
       <div>
         <div>{cellInfo.dayNumberText}</div>
-        {eventCount > 0 && <div>{eventCount} event(s)</div>}
       </div>
     );
   };
@@ -269,11 +337,125 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     const handlePageClick = (data: any) => {
         setCurrentPage(data.selected + 1);
     };
+     //**** Partie Excel ****
+      const TrainingHeaders = [
+        translate("IDTraining"),
+        translate("Driver"),
+        translate("Type Training"),
+        translate("Start Date"),
+        translate("End Date"),
+      ];
     
-    const refreshData = () => {
+    
+      const downloadTrainingExcel = () => {
+        const selectedData = list_training.filter((training) =>
+          selectedTraining.includes(training.id_training)
+        ).map((training) => [
+          training.id_training,
+          `${training.conducteur_nom} ${training.conducteur_prenom}`,
+          training.type_training,
+          training.date_start_training,
+          (training.date_end_training),
+        ]);
+    
+        generateExcelFile("Training", TrainingHeaders, selectedData);
+      };
+    
+    
+      const downloadTrainingPDF = () => {
+        const selectedData = list_training.filter((training) =>
+          selectedTraining.includes(training.id_training)
+        ).map((training) => [
+          training.id_training,
+          `${training.conducteur_nom} ${training.conducteur_prenom}`,
+          training.type_training,
+          training.date_start_training,
+          (training.date_end_training),
+        ]);
+    
+        generatePDFFile("Training", TrainingHeaders, selectedData);
+      };
+    
+    
+    
+      const onDownloadConfirm = (format: string) => {
+        if (selectedTraining.length > 0) {
+          handleDownloadConfirm(format, downloadTrainingExcel, downloadTrainingPDF);
+        } else {
+          toast.warn("Veuillez sélectionner au moins un Training", {
+            position: "bottom-right",
+            autoClose: 3000,
+          });
+        }
+      };
+    
+      const handleSelectTraining = (id: number) => {
+        setSelectedTraining((prev: number[]) => {
+          if (prev.includes(id)) {
+            return prev.filter((trainingId: number) => trainingId !== id);
+          } else {
+            return [...prev, id];
+          }
+        });
+      };
+
+      
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      const allWarningIds = list_training.map((Training) => Training.id_training);
+      setSelectedTraining(allWarningIds);
+    } else {
+      setSelectedTraining([]);
+    }
+  };
+    
+    
+   
+    const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
+        {}
+      );
+    const handleViewMore = (date: string) => {
+        setExpandedDays((prevState) => ({
+          ...prevState,
+          [date]: !prevState[date],
+        }));
+      };
+    
+      const renderEventList = (date: string) => {
+        const dayEvents = events.filter((event) => event.date === date);
+        const isExpanded = expandedDays[date];
+    
+        // 👉 Corriger le problème en s'assurant que tous les événements sont bien affichés
+        const displayedEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
+    
+        return (
+          <>
+            {displayedEvents.map((event, index) => (
+              <div key={index} className="event-item">
+                {event.title}
+              </div>
+            ))}
+            
+            {/* 👉 Vérifier si TOUS les événements sont bien affichés */}
+            {dayEvents.length > displayedEvents.length && (
+              <button
+                className="view-more-btn"
+                onClick={() => handleViewMore(date)}
+              >
+                {isExpanded ? "Voir moins" : `Voir plus (${dayEvents.length - displayedEvents.length})`}
+              </button>
+            )}
+          </>
+        );
+    };
+    
+      
+      const refreshData = () => {
         getCountTraining();
         getTraining();
         getCalendarTrainings();
+
 
     };
 
@@ -290,7 +472,17 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     >
         <i className="las la-plus mr-3"></i>
         {translate("New Request")}
+      
     </Button>
+    <Button
+    className="btn mt-2 me-1"
+    style={{ backgroundColor: "#6c757d", color: "white", border: "none" }}
+    onClick={() => setShowDownloadModal(true)}
+>
+    <i className="las la-download"></i>
+    {translate("Export")}
+</Button>
+
 
     <Button 
         onClick={() => setIsGridView(!isGridView)}  
@@ -362,35 +554,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                             </select>
                         </label>
                     </div>
-                    <Dropdown>
-                        <Dropdown.Toggle
-                            variant="link"
-                            id="dropdown-basic"
-                            title="Display Columns"
-                        >
-                            <i className="las la-eye"></i>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {Object.keys(initialColumns).map((col, idx) => (
-                                <Dropdown.Item
-                                    key={idx}
-                                    as="button"
-                                    style={{ display: "flex", alignItems: "center" }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        className="form-check-input"
-                                        checked={selectedColumns[col as keyof typeof initialColumns]}
-                                        onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
-                                    />
-                                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                  
                 </div>
                
             </div>
+
 
             {isGridView ? (
 
@@ -403,6 +571,9 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                      
                                 
                                     />
                                 </div>
@@ -475,6 +646,12 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
+                                                checked={selectedTraining.includes(
+                                                    Training.id_training
+                                                  )}
+                                                  onChange={() =>
+                                                    handleSelectTraining(Training.id_training)
+                                                  }
                                         
                                             />
                                         </div>
@@ -551,47 +728,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                         )}
                     </tbody>
                 </Table>
-               
-                </div>
-                
-            ) : ( 
-
-                <div>
-                <div style={{ marginBottom: "10px" }}>
-                <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-view">
-  {translate(viewTranslations[currentView] || currentView)}
-</Dropdown.Toggle>
-  <Dropdown.Menu>
-    <Dropdown.Item onClick={() => changeView("timeGridDay")}>
-      {translate("day")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("timeGridWeek")}>
-      {translate("week")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("dayGridMonth")}>
-      {translate("month")}
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => changeView("listYear")}>
-      {translate("year")}
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
-      </div>
-      <FullCalendar
-  ref={calendarRef}
-  key={adjustedEvents.length}
-  plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-  initialView="dayGridMonth"
-  events={adjustedEvents}
-  eventClick={(info: { event: { id: number } }) => handleCalendarTrainingModal(info.event.id)}
-  dayCellContent={renderDayCellContent}  // Custom rendering for day cells
-/>
-
-              </div>        
-             )}
-
-            <div className="row">
+                <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
                     <span>Affichage 1 à {limit} sur {total} </span>
                 </div>
@@ -618,6 +755,61 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 </div>
                 
             </div>
+               
+                </div>
+                
+                
+            ) : ( 
+
+                <div>
+                <div style={{ marginBottom: "10px" }}>
+                
+      </div>
+      <FullCalendar
+      ref={calendarRef}
+      key={adjustedEvents.length}
+      plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+      locale={customLocale} // Use the custom locale object
+      contentHeight={600}
+      initialView="dayGridMonth"
+      events={adjustedEvents}
+      eventClick={(info: { event: { id: number } }) =>
+        handleCalendarTrainingModal(info.event.id)
+      }
+      dayCellContent={renderDayCellContent}
+      dayRender={(info: any) => {
+        const date = info.dateStr;
+        return <div className="day-cell">{renderEventList(date)}</div>;
+      }}
+      eventContent={(arg: any) => (
+        <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
+          <b>{arg.timeText}</b>
+          <span>{arg.event.title}</span>
+        </div>
+      )}
+      customButtons={{
+        backToMonth: {
+          text: translate("Back"),
+          click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
+        },
+      }}
+      headerToolbar={{
+        left: "prev,next today backToMonth",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
+      }}
+      moreLinkClick={(info: any) => {
+        calendarRef.current?.getApi().changeView("dayGridDay", info.date);
+      }}
+            dayMaxEventRows={true}  
+      dayMaxEvents={true}  
+      
+    />
+
+              </div>        
+             )}
+
+            
             <ModalNewTraining
   show={showNewTrainingModal} onHide={handleCloseNewTrainingModal} onSuccess={refreshData} // Refresh when a new training is successfully added
   
@@ -628,6 +820,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
             <ModalEditTraining show={showEditTrainingModal} onHide={handleCloseEditTrainingModal} id_training={selectedTrainingId} onSuccess={refreshData} />
             <ModalDeleteTraining show={showDeleteTrainingModal} onHide={handleCloseDeleteTrainingModal} id_training ={selectedTrainingId} onSuccess={refreshData} />
             <ModalShowTraining show={showShowTrainingModal} onHide={handleCloseShowTrainingModal} id_training={selectedTrainingId} />
+            <DownloadModal
+                    show={showDownloadModal}
+                    onHide={() => setShowDownloadModal(false)}
+                    onDownloadConfirm={onDownloadConfirm}
+                  />
 
         </>
     );

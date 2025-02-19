@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
 
 // Définir les types pour les props
 interface ModalNewFireProps {
@@ -27,6 +28,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_fire: "",
+        ref_fire: "",
         volume_fire: "",
         location_fire: "",
         purch_date_fire: "",
@@ -74,6 +76,9 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             fetchVehicles();
         }
     }, []);
+  
+    
+     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -82,11 +87,32 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             [id]: value,
         }));
     };
+    const fireOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+      const handleFireTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+    
 
     const validateForm = () => {
         if (
             !formData.volume_fire ||
-
+            !formData.ref_fire ||
             !formData.location_fire ||
             !formData.purch_date_fire ||
             !formData.exp_date_fire ||
@@ -166,6 +192,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             // Reset form data
             setFormData({
                 id_fire: "",
+                ref_fire: "",
                 volume_fire: "",
                 location_fire: "",
                 purch_date_fire: "",
@@ -202,11 +229,19 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
+                <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.ref_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
                     {/* Volume */}
                     <Form.Group controlId="volume_fire">
                         <Form.Label>{translate("Volume")}</Form.Label>
                         <Form.Control
-                            type="text"
+                            type="number"
                             value={formData.volume_fire}
                             onChange={handleChange}
                         />
@@ -255,11 +290,15 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                     {/* Type */}
                     <Form.Group controlId="type_fire">
                         <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_fire}
-                            onChange={handleChange}
+                        <Select
+                        options={fireOptions}
+                        onChange={handleFireTypeChange}
+                        name="type_fire"
+                        value={fireOptions.find(
+                        (option) => option.value === formData.type_fire) || null} 
+                        isClearable
                         />
+
                     </Form.Group>
 
                     {/* Vehicle */}

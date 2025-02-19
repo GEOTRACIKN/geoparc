@@ -253,14 +253,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 20,
-          label: "Violation",
+          label: "Violations",
           icon: "las la-ban",
           to: "/violation",
           permissionId: 40,
         },
         {
           id: 21,
-          label: "Management of fire extinguishers",
+          label: "Fire extinguisher management",
           icon: "las la-fire-extinguisher",
           to: "/fire-ext",
           permissionId: 40,
