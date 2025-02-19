@@ -647,5 +647,11 @@
 "noEvents": "لا توجد أحداث لعرضها",
 "Deadline":"تاريخ الاستحقاق",
 "Calendar View": "عرض التقويم",
-"List View": "عرض القائمة"
+"List View": "عرض القائمة",
+"Class A fires: dry materials (wood, paper)": "حرائق الفئة A: مواد جافة (خشب، ورق)",
+"Class B fires: flammable liquids": "حرائق الفئة B: سوائل قابلة للاشتعال",
+"Class C fires: flammable gases": "حرائق الفئة C: غازات قابلة للاشتعال",
+"Class D fires: combustible metals": "حرائق الفئة D: معادن قابلة للاحتراق",
+"Class E fires: electrical equipment": "حرائق الفئة E: معدات كهربائية",
+"Class F fires: oils and fats": "حرائق الفئة F: زيوت ودهون"
 }

@@ -220,7 +220,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
         setFormData({
           ...formData,
           [name]: value,
-          customType: value === "other" ? formData.customType : "", 
         });
         console.log(formData); 
     

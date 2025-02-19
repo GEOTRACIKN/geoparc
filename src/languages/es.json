@@ -636,5 +636,11 @@
   "NoEvents": "No hay eventos para mostrar",
   "Deadline":"Fecha límite",
   "Calendar View": "Vista de Calendario",
-  "List View": "Vista de Lista"
+  "List View": "Vista de Lista",
+  "Class A fires: dry materials (wood, paper)": "Incendios de clase A: materiales secos (madera, papel)",
+  "Class B fires: flammable liquids": "Incendios de clase B: líquidos inflamables",
+  "Class C fires: flammable gases": "Incendios de clase C: gases inflamables",
+  "Class D fires: combustible metals": "Incendios de clase D: metales combustibles",
+  "Class E fires: electrical equipment": "Incendios de clase E: equipos eléctricos",
+  "Class F fires: oils and fats": "Incendios de clase F: aceites y grasas"
 }

@@ -635,5 +635,12 @@
 "NoEvents": "Aucun événement à afficher",
 "Deadline": "Échéance",
 "Calendar View": "Vue Calendrier",
-"List View": "Vue Liste"
+"List View": "Vue Liste",
+"Class A fires: dry materials (wood, paper)": "Feux de classe A : matériaux secs (bois, papier)",
+"Class B fires: flammable liquids": "Feux de classe B : liquides inflammables",
+"Class C fires: flammable gases": "Feux de classe C : gaz inflammables",
+"Class D fires: combustible metals": "Feux de classe D : métaux combustibles",
+"Class E fires: electrical equipment": "Feux de classe E : équipements électriques",
+"Class F fires: oils and fats": "Feux de classe F : huiles et graisses"
+  
 }
