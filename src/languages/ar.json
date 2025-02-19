@@ -653,5 +653,7 @@
 "Class C fires: flammable gases": "حرائق الفئة C: غازات قابلة للاشتعال",
 "Class D fires: combustible metals": "حرائق الفئة D: معادن قابلة للاحتراق",
 "Class E fires: electrical equipment": "حرائق الفئة E: معدات كهربائية",
-"Class F fires: oils and fats": "حرائق الفئة F: زيوت ودهون"
+"Class F fires: oils and fats": "حرائق الفئة F: زيوت ودهون",
+"Fire extinguisher management": "إدارة طفايات الحريق",
+  "Emergency box management": "إدارة صناديق الطوارئ"
 }

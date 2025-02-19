@@ -267,7 +267,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 21,
-          label: "Management of fire extinguishers",
+          label: "Fire extinguisher management",
           icon: "las la-fire-extinguisher",
           to: "/fire-ext",
           permissionId: 40,

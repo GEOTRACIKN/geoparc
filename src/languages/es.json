@@ -642,5 +642,8 @@
   "Class C fires: flammable gases": "Incendios de clase C: gases inflamables",
   "Class D fires: combustible metals": "Incendios de clase D: metales combustibles",
   "Class E fires: electrical equipment": "Incendios de clase E: equipos eléctricos",
-  "Class F fires: oils and fats": "Incendios de clase F: aceites y grasas"
+  "Class F fires: oils and fats": "Incendios de clase F: aceites y grasas",
+  "Fire extinguisher management": "Gestión de extintores",
+    "Emergency box management": "Gestión de cajas de emergencia"
+
 }
