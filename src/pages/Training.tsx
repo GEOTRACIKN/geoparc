@@ -50,6 +50,48 @@ export function Training() {
     const localizer = momentLocalizer(moment);
     type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
 const [mode, setMode] = useState<ModeType>("create");
+const customLocale = {
+    code: "custom", // A custom code for your locale
+    buttonText: {
+      month: translate("Month"),
+      week: translate("Week"),
+      day: translate("Day"),
+      list: translate("Year"),
+      today: translate("Today"),
+    },
+    dayNames: [
+      translate("Sunday"),
+      translate("Monday"),
+      translate("Tuesday"),
+      translate("Wednesday"),
+      translate("Thursday"),
+      translate("Friday"),
+      translate("Saturday"),
+    ],
+    dayNamesShort: [
+      translate("Sun"),
+      translate("Mon"),
+      translate("Tue"),
+      translate("Wed"),
+      translate("Thu"),
+      translate("Fri"),
+      translate("Sat"),
+    ],
+    monthNames: [
+      translate("January"),
+      translate("February"),
+      translate("March"),
+      translate("April"),
+      translate("May"),
+      translate("June"),
+      translate("July"),
+      translate("August"),
+      translate("September"),
+      translate("October"),
+      translate("November"),
+      translate("December"),
+    ],
+  };
 
 
     const calendarRef = useRef<FullCalendar | null>(null);
@@ -616,59 +658,43 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 
       </div>
       <FullCalendar
-            ref={calendarRef}
-            key={adjustedEvents.length}
-            plugins={[
-                dayGridPlugin,
-
-              timeGridPlugin,
-              listPlugin,
-              interactionPlugin,
-            ]}
-        
-              buttonText={{
-                month: translate("Month"),
-                week: translate("Week"),
-                day: translate("Day"),
-                list: translate("Year"),
-                today: translate("Today"),
-              }}
-            
-            contentHeight={600}
-            initialView="dayGridMonth"
-            events={adjustedEvents}
-            eventClick={(info: { event: { id: number } }) =>
-                handleCalendarTrainingModal
-            (info.event.id)
-            }
-            dayCellContent={renderDayCellContent}
-            dayRender={(info: any) => {
-              const date = info.dateStr;
-              return <div className="day-cell">{renderEventList(date)}</div>;
-            }}
-            eventContent={(arg:any) => (
-              <div title={`Type: ${arg.event.extendedProps.type}\nDate de début: ${arg.event.start}\nDate de fin: ${arg.event.end}`}>
-                <b>{arg.timeText}</b>
-                <span>{arg.event.title}</span>
-              </div>
-            )}
-            customButtons={{
-              backToMonth: {
-                
-                text: translate("Back"),
-                click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
-              },
-            }}
-            headerToolbar={{
-              left: "prev,next today backToMonth",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
-            }}
-            moreLinkClick="day"
-            dayMaxEvents={true}
-            dayMaxEventRows={3}
-            dayMinEventRows={3}
-          />
+      ref={calendarRef}
+      key={adjustedEvents.length}
+      plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+      locale={customLocale} // Use the custom locale object
+      contentHeight={600}
+      initialView="dayGridMonth"
+      events={adjustedEvents}
+      eventClick={(info: { event: { id: number } }) =>
+        handleCalendarTrainingModal(info.event.id)
+      }
+      dayCellContent={renderDayCellContent}
+      dayRender={(info: any) => {
+        const date = info.dateStr;
+        return <div className="day-cell">{renderEventList(date)}</div>;
+      }}
+      eventContent={(arg: any) => (
+        <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
+          <b>{arg.timeText}</b>
+          <span>{arg.event.title}</span>
+        </div>
+      )}
+      customButtons={{
+        backToMonth: {
+          text: translate("Back"),
+          click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
+        },
+      }}
+      headerToolbar={{
+        left: "prev,next today backToMonth",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
+      }}
+      moreLinkClick="day"
+      dayMaxEvents={true}
+      dayMaxEventRows={3}
+      dayMinEventRows={3}
+    />
 
               </div>        
              )}
