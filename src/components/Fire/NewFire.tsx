@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
 
 // Définir les types pour les props
 interface ModalNewFireProps {
@@ -74,6 +75,29 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             fetchVehicles();
         }
     }, []);
+    const fireOptions = [
+        { value: "A", label: translate("Feux de classe A : matériaux secs (bois, papier)")}, 
+        { value: "B", label: translate("Feux de classe B : liquides inflammables") },
+        { value: "C", label: translate("Feux de classe C : gaz inflammables") },
+        { value: "D", label: translate("Feux de classe D : métaux combustibles")},
+        { value: "E", label: translate("Feux de classe E : équipements électriques") },
+        { value: "F", label: translate("Feux de classe F : huiles et graisses") },
+
+      ];
+      const handleFireTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+    
+    
+     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -206,7 +230,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                     <Form.Group controlId="volume_fire">
                         <Form.Label>{translate("Volume")}</Form.Label>
                         <Form.Control
-                            type="text"
+                            type="number"
                             value={formData.volume_fire}
                             onChange={handleChange}
                         />
@@ -255,11 +279,14 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                     {/* Type */}
                     <Form.Group controlId="type_fire">
                         <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_fire}
-                            onChange={handleChange}
+                        <Select
+                        options={fireOptions}
+                        onChange={handleFireTypeChange}
+                        value={fireOptions.find(
+                        (option) => option.value === formData.type_fire) || null} 
+                        isClearable
                         />
+
                     </Form.Group>
 
                     {/* Vehicle */}

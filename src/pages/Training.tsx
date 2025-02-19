@@ -411,13 +411,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
   };
     
     
-    const refreshData = () => {
-        getCountTraining();
-        getTraining();
-        getCalendarTrainings();
-
-
-    };
+   
     const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
         {}
       );
@@ -428,9 +422,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         }));
       };
     
-    const renderEventList = (date: string) => {
+      const renderEventList = (date: string) => {
         const dayEvents = events.filter((event) => event.date === date);
         const isExpanded = expandedDays[date];
+    
+        // 👉 Corriger le problème en s'assurant que tous les événements sont bien affichés
         const displayedEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
     
         return (
@@ -440,17 +436,28 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 {event.title}
               </div>
             ))}
-            {dayEvents.length > 3 && (
+            
+            {/* 👉 Vérifier si TOUS les événements sont bien affichés */}
+            {dayEvents.length > displayedEvents.length && (
               <button
                 className="view-more-btn"
                 onClick={() => handleViewMore(date)}
               >
-                {isExpanded ? "Voir moins" : "Voir plus"}
+                {isExpanded ? "Voir moins" : `Voir plus (${dayEvents.length - displayedEvents.length})`}
               </button>
             )}
           </>
         );
-      };
+    };
+    
+      
+      const refreshData = () => {
+        getCountTraining();
+        getTraining();
+        getCalendarTrainings();
+
+
+    };
 
     return (
         <>
@@ -791,10 +798,12 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         center: "title",
         right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
       }}
-      moreLinkClick="day"
-      dayMaxEvents={true}
-      dayMaxEventRows={3}
-      dayMinEventRows={3}
+      moreLinkClick={(info: any) => {
+        calendarRef.current?.getApi().changeView("dayGridDay", info.date);
+      }}
+            dayMaxEventRows={true}  
+      dayMaxEvents={true}  
+      
     />
 
               </div>        
