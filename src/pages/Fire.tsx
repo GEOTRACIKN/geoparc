@@ -16,7 +16,6 @@ interface Fire {
     id_fire: number;
     ref_fire: string;
     volume_fire: number;
-    location_fire: string;
     product_fire: number;
     purch_date_fire: string;
     exp_date_fire: string;
@@ -60,7 +59,6 @@ export function Fire() {
        "Purchase Date": true, 
        "Expiration Date": true,
         Cost: true,
-        Location: true,
     
     };
     
@@ -181,9 +179,6 @@ export function Fire() {
             case translate("Volume"):
                 setType(1);
                     break;
-            case translate("Location"):
-                setType(2);
-                    break;
        
             case translate("Vehicle"):
                 setType(3);
@@ -197,9 +192,7 @@ export function Fire() {
             case translate("Type"):
                 setType(6);
                 break;
-            case translate("Volume"):
-                    setType(7);
-                break;
+          
             case translate("Reference"):
                 setType(8);
                 break;
@@ -265,7 +258,6 @@ export function Fire() {
                                 <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
 
                                 <Dropdown.Item>{translate("Volume")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Location")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
@@ -367,14 +359,7 @@ export function Fire() {
                                     {translate("Volume")}
                                 </th>
                             )}
-                             {selectedColumns.Location && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("location_fire")}
-                                >
-                                    {translate("Location")}
-                                </th>
-                            )}
+                            
                              {selectedColumns.Cost && (
                                 <th
                                     className="sorting "
@@ -456,10 +441,7 @@ export function Fire() {
                                                 <td>{Fire.volume_fire}</td>
                                             )}
 
-                                            {selectedColumns.Location && (
-                                                <td>{Fire.location_fire}</td>
-                                            )}  
-                                          
+                                         
                                             {selectedColumns.Cost && (
                                                 <td>{Fire.cost_fire}</td>
                                             )}

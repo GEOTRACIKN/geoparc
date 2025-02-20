@@ -30,7 +30,6 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
         id_fire: "",
         ref_fire: "",
         volume_fire: "",
-        location_fire: "",
         purch_date_fire: "",
         exp_date_fire: "",
         cost_fire: "",
@@ -113,7 +112,6 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
         if (
             !formData.volume_fire ||
             !formData.ref_fire ||
-            !formData.location_fire ||
             !formData.purch_date_fire ||
             !formData.exp_date_fire ||
             !formData.cost_fire ||
@@ -194,7 +192,6 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                 id_fire: "",
                 ref_fire: "",
                 volume_fire: "",
-                location_fire: "",
                 purch_date_fire: "",
                 exp_date_fire: "",
                 cost_fire: "",
@@ -247,15 +244,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                         />
                     </Form.Group>
 
-                    {/* Location */}
-                    <Form.Group controlId="location_fire">
-                        <Form.Label>{translate("Location")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.location_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                   
 
                     {/* Purchase Date */}
                     <Form.Group controlId="purch_date_fire">
