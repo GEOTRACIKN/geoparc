@@ -24764,7 +24764,10 @@ r
     padding-bottom: 0;
 }
 
-
+.w-100 {
+    width: 100% !important;
+  }
+  
 
 @media only screen and (min-width: 768px) {
    

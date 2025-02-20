@@ -2528,3 +2528,8 @@ body.light-theme .form {
 }
 
 
+.react-datepicker-wrapper{
+  width: 100% !important;
+}
+
+

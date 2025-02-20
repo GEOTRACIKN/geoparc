@@ -8,6 +8,7 @@ import { polygon } from '@turf/helpers';
 import area from '@turf/area';
 import { lineString } from '@turf/helpers';
 import length from '@turf/length';
+import { format, parseISO, isValid } from "date-fns";
 
 export function formatDateToTimestamp(dateString: string): string {
     if (!dateString) {
@@ -493,3 +494,29 @@ export const calculateSurfaceOrLength = (geofence: Geofencing): number => {
   
 };
 
+
+export const formatDate = (inputDate: string | Date | null | undefined) => {
+  if (!inputDate) return "--/--/----"; // Valeur par défaut si null ou undefined
+
+  if (inputDate instanceof Date) {
+    // Si c'est un objet Date, on formate directement
+    return format(inputDate, "dd/MM/yyyy");
+  }
+
+  if (typeof inputDate === "string") {
+    // Vérifier si la chaîne est bien une date
+    const parsedDate = parseISO(inputDate);
+    if (isValid(parsedDate)) {
+      return format(parsedDate, "dd/MM/yyyy");
+    }
+
+    // Si la date est sous format MM/DD/YYYY, on la convertit
+    const parts = inputDate.split("/");
+    if (parts.length === 3) {
+      const [month, day, year] = parts;
+      return `${day}/${month}/${year}`; // Conversion MM/DD/YYYY -> DD/MM/YYYY
+    }
+  }
+
+  return "--/--/----"; // Si aucun format valide
+};
