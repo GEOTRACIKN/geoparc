@@ -30,7 +30,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     });
 
     const { translate } = useTranslate();
-    const trainingOptions = [
+    const fireOptions = [
         { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
         { value: "B", label: translate("Class B fires: flammable liquids") },
         { value: "C", label: translate("Class C fires: flammable gases") },
@@ -40,7 +40,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     ];
     
     const mapFireType = (type: string) => {
-        const found = trainingOptions.find(option => option.value === type);
+        const found = fireOptions.find(option => option.value === type);
         return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
     };
 

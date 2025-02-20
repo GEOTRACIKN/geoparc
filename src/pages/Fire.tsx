@@ -61,6 +61,20 @@ export function Fire() {
         Cost: true,
     
     };
+
+    const trainingOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+    const mapFireType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
     
     
 
@@ -446,7 +460,7 @@ export function Fire() {
                                                 <td>{Fire.cost_fire}</td>
                                             )}
                                             {selectedColumns.Type && (
-                                                <td>{Fire.type_fire}</td>
+                                                <td>{mapFireType(Fire.type_fire)}</td>
                                             )}
                                                {selectedColumns.Vehicle && (
                                                 <td>{Fire.immatriculation_vehicule}</td>
