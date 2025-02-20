@@ -31,7 +31,15 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
     });
 
     const { translate } = useTranslate();
-
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test") },
+    ];
+    
+    const mapTrainingType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
+    
     // Fetch data from API and set form data
     const fetchTraining = async () => {
         try {
@@ -61,7 +69,7 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
                     date_end_training: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     prenom_conducteur: data.prenom_conducteur,
                     nom_conducteur: data.nom_conducteur,
-                    type_training: data.type_training               });
+                    type_training: mapTrainingType(data.type_training)        });
             } else {
                 console.warn('No training data found for the provided ID.');
             }

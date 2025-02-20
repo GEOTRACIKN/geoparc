@@ -51,7 +51,6 @@ export function Violation() {
         Vehicle: true,
         Date: true, 
         Description: true,
-        Cost: true,
     
     };
     // Load selected columns from localStorage or use initial state
@@ -169,9 +168,7 @@ export function Violation() {
                 setType(5);
                 break;
           
-            case translate("Cost"):
-                setType(6);
-                break;     
+            
                     
             default:
                 console.log("Unknown selection");
@@ -231,7 +228,6 @@ export function Violation() {
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Description")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Cost")}</Dropdown.Item>
 
                             </Dropdown.Menu>
                         </Dropdown>
@@ -345,14 +341,7 @@ export function Violation() {
                                     {translate("Type")}
                                 </th>
                             )}
-                              {selectedColumns.Cost && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("cost_violation")}
-                                >
-                                    {translate("Cost")}
-                                </th>
-                            )}
+                             
                            
                             {selectedColumns.Description && (
                                 <th
@@ -405,9 +394,7 @@ export function Violation() {
                                             {selectedColumns.Type && (
                                                 <td>{Violation.type_violation}</td>
                                             )}
-                                             {selectedColumns.Cost && (
-                                                <td>{Violation.cost}</td>
-                                            )}
+                                            
                                              {selectedColumns.Description && (
                                                 <td>{Violation.description}</td>
                                             )}

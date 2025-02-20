@@ -59,6 +59,17 @@ export function Training() {
     const localizer = momentLocalizer(moment);
     type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
 const [mode, setMode] = useState<ModeType>("create");
+
+const trainingOptions = [
+    { value: "DT", label: translate("Driving Test")}, 
+  ];
+
+  const mapTrainingType = (type: string) => {
+    const found = trainingOptions.find(option => option.value === type);
+    return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+};
+
+
 const customLocale = {
     code: "custom", // A custom code for your locale
     buttonText: {
@@ -100,7 +111,23 @@ const customLocale = {
       translate("November"),
       translate("December"),
     ],
+
   };
+
+ 
+  
+  
+  const getColorByType = (type: string) => {
+    const colors: Record<string, string> = {
+      "1": "#FF5733", // Rouge vif
+      "2": "#1E7D22", // Vert foncé 🍃
+      "3": "#3357FF", // Bleu classique
+      "4": "#FFC300", // Jaune
+      "5": "#8E44AD", // Violet
+    };
+    return colors[type] || "#808080"; // Gris par défaut
+  };
+
 
 
     const calendarRef = useRef<FullCalendar | null>(null);
@@ -431,12 +458,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     
         return (
           <>
-            {displayedEvents.map((event, index) => (
-              <div key={index} className="event-item">
-                {event.title}
-              </div>
-            ))}
-            
+          {displayedEvents.map((event, index) => (
+  <div key={index} className="event-item">
+    {mapTrainingType(event.title)}
+  </div>
+))}
             {/* 👉 Vérifier si TOUS les événements sont bien affichés */}
             {dayEvents.length > displayedEvents.length && (
               <button
@@ -665,9 +691,9 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                                 <td>{Training.conducteur_nom} {Training.conducteur_prenom}</td>
                                             )}
 
-                                        
+
                                             {selectedColumns.Type && (
-                                                <td>{Training.type_training}</td>
+                                                <td>{mapTrainingType(Training.type_training)}</td>
                                             )}
                                             {selectedColumns["Start Date"] && (
                                                 <td>{(Training.date_start_training)}</td>
@@ -783,10 +809,12 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
       }}
       eventContent={(arg: any) => (
         <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
+            
           <b>{arg.timeText}</b>
-          <span>{arg.event.title}</span>
+          <span>{mapTrainingType(arg.event.title)}</span>
         </div>
       )}
+      
       customButtons={{
         backToMonth: {
           text: translate("Back"),

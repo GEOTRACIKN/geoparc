@@ -33,12 +33,19 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   const [drivers, setDrivers] = useState<Driver[]>([]);
 
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    id_conducteur: string ;
+    type: string | null;
+    id_vehicule: string;
+    date: string;
+    cost: number | null; // Accepte maintenant null
+    description: string ;
+  }>({
     id_conducteur: "",
     type: "",
     id_vehicule: "",
     date: "",
-    cost: 0,
+    cost: null, // Null est maintenant accepté
     description: "",
   });
 
@@ -148,7 +155,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     type: "",
     id_vehicule: "",
     date: "",
-    cost: 0,
+    cost: null, 
     description: "",
   };
 
@@ -308,16 +315,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
             />
           </Form.Group>
 
-          <Form.Group controlId="cost">
-            <Form.Label>{translate("Cost")}</Form.Label>
-            <Form.Control
-              type="text"
-              name="cost"
-              value={formData.cost}
-              onChange={handleInputChange}
-              placeholder="Enter Cost here"
-            />
-          </Form.Group>
+        
           <Form.Group controlId="description">
             <Form.Label>{translate("Description")}</Form.Label>
             <Form.Control
