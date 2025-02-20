@@ -76,8 +76,8 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             fetchDrivers();
           }
         }, [show, backendUrl, geopuserID]);
+
     
-   
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -133,18 +133,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
         { value: "DT", label: translate("Driving Test")}, 
       ];
     
-      const handletrainingTypeChange = (selectedOption: any, actionMeta: any) => {
-        const { name } = actionMeta;
-        const value = selectedOption ? selectedOption.value : "";
-    
-        setFormData({
-          ...formData,
-          [name]: value,
-        });
-        console.log(formData); 
-    
-      };
-    
+      const mappedTrainingType = trainingOptions.find(option => option.value === formData.type_training)?.label || formData.type_training;
     
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -260,17 +249,9 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
                     {/* Type */}
                     <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Type")}</Form.Label>
-                        <Select
-              options={trainingOptions}
-              onChange={handletrainingTypeChange}
-              name="type_training"
-              value={trainingOptions.find(
-                (option) => option.value === formData.type_training
-              )}
-              isClearable
-            />
-                    </Form.Group>
+    <Form.Label>{translate("Type")}</Form.Label>
+    <Form.Control value={formData.type_training} readOnly />
+</Form.Group>
 
                    
                 </Modal.Body>
@@ -288,3 +269,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 };
 
 export default ModalNewTraining;
+function setSelectedTrainingType(arg0: { value: string; label: string; } | null) {
+    throw new Error("Function not implemented.");
+}
+

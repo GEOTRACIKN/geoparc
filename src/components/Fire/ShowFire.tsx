@@ -30,6 +30,19 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     });
 
     const { translate } = useTranslate();
+    const trainingOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+    const mapFireType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
 
     // Fetch data from API and set form data
     const fetchFire = async () => {
@@ -60,7 +73,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                     purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
                     exp_date_fire: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     cost_fire: data.cost_fire,
-                    type_fire: data.type_fire,
+                    type_fire: mapFireType(data.type_fire),
                     immatriculation_vehicule: data.immatriculation_vehicule
                 });
             } else {

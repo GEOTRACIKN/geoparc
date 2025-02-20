@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
+import Select from "react-select";
+
 
 
 interface EditTrainingModalProps {
@@ -239,6 +241,24 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     
         return true;
     };
+
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test")}, 
+      ];
+    
+      const handletrainingTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+    
+    
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -346,11 +366,15 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                     
                     <Form.Group controlId="type_training">
                         <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_training}
-                            onChange={handleChange}
-                        />
+                        <Select
+              options={trainingOptions}
+              onChange={handletrainingTypeChange}
+              name="type_training"
+              value={trainingOptions.find(
+                (option) => option.value === formData.type_training
+              )}
+              isClearable
+            />
                     </Form.Group>
                    
                 </Modal.Body>
