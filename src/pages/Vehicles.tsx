@@ -628,14 +628,14 @@ export function Vehicles() {
                     {translate("State")}
                   </th>
                 )}
-                {selectedColumns.assignment && (
+                {/* {selectedColumns.assignment && (
                   <th
                     className="assignment"
                     onClick={() => handleSortingColum("assignment")}
                   >
                     {translate("Assignment")}
                   </th>
-                )}
+                )} */}
                 {selectedColumns.nom_conducteur && (
                   <th
                     className="sorting"
@@ -652,14 +652,14 @@ export function Vehicles() {
                     {translate("User")}
                   </th>
                 )}
-                {selectedColumns.trailer && (
+                {/* {selectedColumns.trailer && (
                   <th
                     className="sorting"
                     onClick={() => handleSortingColum("trailer")}
                   >
                     {translate("Trailer")}
                   </th>
-                )}
+                )} */}
                 {<th>{translate("Action")}</th>}
               </tr>
             </thead>
@@ -696,10 +696,10 @@ export function Vehicles() {
                     {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
                     {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
                     {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}
-                    {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)}
+                    {/* {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)} */}
                     {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
                     {selectedColumns.username_user && (<td className="text-center">{item.username_user}</td>)}
-                    {selectedColumns.trailer && (<td className="text-center">{/* {item.trailer} */}</td>)}
+                    {/* {selectedColumns.trailer && (<td className="text-center">{}</td>)} */}
                     <td>
                       <div className="d-flex align-items-center list-action">
                         <NavLink

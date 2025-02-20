@@ -148,11 +148,11 @@ export function Driver() {
 
   const updateDriver = async (driver: DriverInterface) => {
 
-    const isEmailValid = validateEmail(driver.email_conducteur ?? "");
-    const isPhoneValid = validatePhone(driver.telephone_conducteur ?? "");
+    const isEmailValid = true;//validateEmail(driver.email_conducteur ?? "");
+    const isPhoneValid =true; //validatePhone(driver.telephone_conducteur ?? "");
     const isNomConducteurValid = validateString(driver.nom_conducteur ?? "");
     const isPreNomConducteurValid = validateString(driver.prenom_conducteur ?? "");
-    const isCodeConducteurValid = validateString(driver.code_conducteur ?? "");
+    const isCodeConducteurValid =true;// validateString(driver.code_conducteur ?? "");
 
     // Validation échouée
     if (!isEmailValid || !isPhoneValid || !isNomConducteurValid || !isPreNomConducteurValid || !isCodeConducteurValid) {
@@ -349,11 +349,11 @@ export function Driver() {
   };
 
   const createDriver = async (driver: DriverInterface) => {
-    const isEmailValid = validateEmail(driver.email_conducteur ?? "");
-    const isPhoneValid = validatePhone(driver.telephone_conducteur ?? "");
+    const isEmailValid = true;//validateEmail(driver.email_conducteur ?? "");
+    const isPhoneValid =true; //validatePhone(driver.telephone_conducteur ?? "");
     const isNomConducteurValid = validateString(driver.nom_conducteur ?? "");
     const isPreNomConducteurValid = validateString(driver.prenom_conducteur ?? "");
-    const isCodeConducteurValid = validateString(driver.code_conducteur ?? "");
+    const isCodeConducteurValid =true;// validateString(driver.code_conducteur ?? "");
 
 
 

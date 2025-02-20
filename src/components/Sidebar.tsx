@@ -237,13 +237,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       icon: "las la-shield-alt",
       permissionId: 40, // ID de permission à ajuster
       subItems: [
-        {
-          id: 40,
-          label: "HSE dashboard",
-          icon: "fas fa-shield-alt",
-          to: "/hse-dashboard",
-          permissionId: 40,
-        },
+        // {
+        //   id: 40,
+        //   label: "HSE dashboard",
+        //   icon: "fas fa-shield-alt",
+        //   to: "/hse-dashboard",
+        //   permissionId: 40,
+        // },
         {
           id: 40,
           label: "Warnings",

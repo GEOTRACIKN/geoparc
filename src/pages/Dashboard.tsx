@@ -170,12 +170,12 @@ export function Dashboard() {
             { id: "4", value: counts["4"], max: 10, color: "#00a65a", label: "Formation", modalId: "detailFormation" },
             { id: "5", value: counts["5"], max: 10, color: "#3c8dbc", label: "Extincteur", modalId: "detailExt" },
             { id: "6", value: counts["6"], max: 10, color: "#00a65a", label: "Vidange", modalId: "detailVidange" },
-            { id: "7", value: counts["7"], max: 10, color: "purple", label: "Entretiens planifiés par kilométrage", modalId: "detailEntretienKlm" },
-            { id: "8", value: counts["8"], max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
-            { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
-            { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
-            { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
-            { id: "12", value: counts["12"], max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
+            { id: "7", value: counts["7"], max: 10, color: "purple", label: "Entretiens par Km", modalId: "detailEntretienKlm" },
+            // { id: "8", value: counts["8"], max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
+            // { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
+            // { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
+            // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
+            // { id: "12", value: counts["12"], max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
           ]);
           console.log(setTotalDrivingLicense)
 
@@ -231,11 +231,11 @@ export function Dashboard() {
     { id: "5", value: 0, max: 10, color: "#3c8dbc", label: "Extincteur", modalId: "detailExt" },
     { id: "6", value: 0, max: 10, color: "#00a65a", label: "Vidange", modalId: "detailVidange" },
     { id: "7", value: 0, max: 10, color: "purple", label: "Entretiens planifiés par kilométrage", modalId: "detailEntretienKlm" },
-    { id: "8", value: 0, max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
-    { id: "9", value: 0, max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
-    { id: "10", value: 0, max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
-    { id: "11", value: 0, max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
-    { id: "12", value: 0, max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
+    // { id: "8", value: 0, max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
+    // { id: "9", value: 0, max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
+    // { id: "10", value: 0, max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
+    // { id: "11", value: 0, max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
+    // { id: "12", value: 0, max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
   ]);
 
   const handleSearch = async () => {
