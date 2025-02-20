@@ -657,5 +657,11 @@
 "Class E fires: electrical equipment": "حرائق الفئة E: معدات كهربائية",
 "Class F fires: oils and fats": "حرائق الفئة F: زيوت ودهون",
 "Fire extinguisher management": "إدارة طفايات الحريق",
-  "Emergency box management": "إدارة صناديق الطوارئ"
+  "Emergency box management": "إدارة صناديق الطوارئ",
+  "License expiration": "انتهاء صلاحية الرخصة",
+  "Vehicle insurance renewal": "تجديد تأمين السيارة",
+  "Next maintenance due": "الصيانة القادمة المستحقة",
+  "Training certificate expiration": "انتهاء صلاحية شهادة التدريب",
+  "Fire extinguisher verification": "التحقق من طفاية الحريق"
+
 }

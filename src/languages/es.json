@@ -646,6 +646,10 @@
   "Class E fires: electrical equipment": "Incendios de clase E: equipos eléctricos",
   "Class F fires: oils and fats": "Incendios de clase F: aceites y grasas",
   "Fire extinguisher management": "Gestión de extintores",
-  "Emergency box management": "Gestión de cajas de emergencia"
-
+  "Emergency box management": "Gestión de cajas de emergencia",
+  "License expiration": "Expiración de la licencia",
+  "Vehicle insurance renewal": "Renovación del seguro del vehículo",
+  "Next maintenance due": "Próximo mantenimiento programado",
+  "Training certificate expiration": "Expiración del certificado de formación",
+  "Fire extinguisher verification": "Verificación del extintor"
 }

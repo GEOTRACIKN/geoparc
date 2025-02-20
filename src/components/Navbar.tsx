@@ -62,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
-  
+
   const strLang = {
     en: translate('English'),
     fr: translate('French'),
@@ -70,8 +70,22 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     es: translate('Espagnol'),
   };
 
+
+  const notificationType = [
+    translate('License expiration'),
+    translate('Vehicle insurance renewal'),
+    translate('Next maintenance due'),
+    translate('Training certificate expiration'),
+    translate('Training certificate expiration'),
+    translate('Fire extinguisher verification')
+  ];
+
+
+
+
+
   const { isDarkMode, toggleTheme } = useTheme();
-   // Utilisation du hook
+  // Utilisation du hook
   const handleLogout = () => {
     localStorage.removeItem("authToken"); // Remove the token from localStorage
     localStorage.removeItem("userID"); // Remove the token from localStorage
@@ -193,17 +207,17 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
       // Set the notifications state
       setNotifications(alarmResponse);
 
-        // toast.success("Nouvelles échéances détecté....", {
-        //        position: "bottom-right",
-        //        autoClose: 2400,
-        //        hideProgressBar: false,
-        //        closeOnClick: true,
-        //        pauseOnHover: true,
-        //        draggable: true,
-        //        progress: undefined,
-        //        theme: "light",
-        //        transition: Bounce,
-        //      });
+      // toast.success("Nouvelles échéances détecté....", {
+      //        position: "bottom-right",
+      //        autoClose: 2400,
+      //        hideProgressBar: false,
+      //        closeOnClick: true,
+      //        pauseOnHover: true,
+      //        draggable: true,
+      //        progress: undefined,
+      //        theme: "light",
+      //        transition: Bounce,
+      //      });
 
     } catch (error) {
 
@@ -366,13 +380,13 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             > </i>
 
             <Nav.Link to="/" className={`header-logo`} as={NavLink}>
-              <Image 
-              className="img-fluid rounded-normal light-logo" 
-              style={{ height: "22px", width: "136px", paddingLeft: 15 }}
-              src={isDarkMode ? "asset/images/logo_dark.png" : "asset/images/logo.png"}
-              alt="Logo" />
-            
-           
+              <Image
+                className="img-fluid rounded-normal light-logo"
+                style={{ height: "22px", width: "136px", paddingLeft: 15 }}
+                src={isDarkMode ? "asset/images/logo_dark.png" : "asset/images/logo.png"}
+                alt="Logo" />
+
+
             </Nav.Link>
 
 
@@ -425,8 +439,8 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             </button>
             <div className={`navbar-collapse collapse ${showMenu}`} id="navbarSupportedContent">
               <ul className="navbar-nav ml-auto navbar-list align-items-center">
-               
-              { checkPermission(27) && ( <li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
+
+                {checkPermission(27) && (<li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
                   {userID === "1" && (
                     <a href={`https://geoparc.geotrackin.com?apikey=${APIkey}`} className="gp">
                       <i className="las la-sign-in-alt" style={{ fontSize: "29px" }}></i>
@@ -517,7 +531,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                     </div>
                                     <div className="media-body ml-3">
                                       <div className="d-flex align-items-center justify-content-between">
-                                        <h6 className="mb-0">{notification.type}</h6>
+                                        <h6 className="mb-0">{notificationType[Number(notification.type)]}</h6>
                                         <small className="">
                                           <b>{new Date(notification.timestamp).toLocaleTimeString()}</b>
                                         </small>
