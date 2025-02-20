@@ -20,7 +20,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     const [formData, setFormData] = useState({
         id_fire: "",
         volume_fire: "",
-        location_fire: "",
+        ref_fire: "",
 
         purch_date_fire: "",
         exp_date_fire: "",
@@ -56,7 +56,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                 setFormData({
                     id_fire: data.id_fire,
                     volume_fire: data.volume_fire,
-                    location_fire: data.location_fire,
+                    ref_fire: data.ref_fire,
                     purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
                     exp_date_fire: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     cost_fire: data.cost_fire,
@@ -106,10 +106,10 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                     </Form.Group>
 
 
-                    <Form.Group controlId="location_fire">
-                        <Form.Label>{translate("Location")}</Form.Label>
+                    <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
                         <Form.Control
-                            value={formData.location_fire}
+                            value={formData.ref_fire}
                             readOnly
                         />
                     </Form.Group>

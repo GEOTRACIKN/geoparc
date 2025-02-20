@@ -35,7 +35,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         id_fire: "",
         ref_fire: "",
         volume_fire: "",
-        location_fire: "",
         purch_date_fire: "",
         exp_date_fire: "",
         cost_fire: "",
@@ -201,7 +200,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         if (
             !formData.volume_fire ||
             !formData.ref_fire ||
-            !formData.location_fire ||
             !formData.purch_date_fire ||
             !formData.exp_date_fire ||
             !formData.cost_fire ||
@@ -321,14 +319,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="location_fire">
-                        <Form.Label>{translate("Location")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.location_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                   
                     <Form.Group controlId="purch_date_fire">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control

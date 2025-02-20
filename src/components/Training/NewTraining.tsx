@@ -3,6 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
+
 
 // Définir les types pour les props
 interface ModalNewTrainingProps {
@@ -126,6 +128,22 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
     
         return true;
     };
+
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test")}, 
+      ];
+    
+      const handletrainingTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
     
     
 
@@ -243,11 +261,15 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
                     {/* Type */}
                     <Form.Group controlId="type_training">
                         <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_training}
-                            onChange={handleChange}
-                        />
+                        <Select
+              options={trainingOptions}
+              onChange={handletrainingTypeChange}
+              name="type_training"
+              value={trainingOptions.find(
+                (option) => option.value === formData.type_training
+              )}
+              isClearable
+            />
                     </Form.Group>
 
                    
