@@ -43,6 +43,16 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
     const geopuserID = localStorage.getItem("GeopUserID");
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test") },
+    ];
+    
+    const mapTrainingType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
+
+
 
     useEffect(() => {
         if (show) {
@@ -294,11 +304,12 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                         <Form.Label>{translate("Training Type")}</Form.Label>
                         <Form.Control
                             type="text"
-                            value={formData.type_training}
+                            value={isEditable ? formData.type_training : mapTrainingType(formData.type_training)}
                             onChange={handleChange}
                             disabled={!isEditable}
                         />
                     </Form.Group>
+
                 </Modal.Body>
                 <Modal.Footer>
                     {isEditable ? (

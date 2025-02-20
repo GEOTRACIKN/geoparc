@@ -133,7 +133,18 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
         { value: "DT", label: translate("Driving Test")}, 
       ];
     
-      const mappedTrainingType = trainingOptions.find(option => option.value === formData.type_training)?.label || formData.type_training;
+      const handletrainingTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+    
     
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -249,9 +260,17 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
                     {/* Type */}
                     <Form.Group controlId="type_training">
-    <Form.Label>{translate("Type")}</Form.Label>
-    <Form.Control value={formData.type_training} readOnly />
-</Form.Group>
+                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Select
+              options={trainingOptions}
+              onChange={handletrainingTypeChange}
+              name="type_training"
+              value={trainingOptions.find(
+                (option) => option.value === formData.type_training
+              )}
+              isClearable
+            />
+                    </Form.Group>
 
                    
                 </Modal.Body>
