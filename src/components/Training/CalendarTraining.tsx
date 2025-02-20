@@ -125,6 +125,40 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
         fetchTraining();
     }, [id_training, backendUrl]);
 
+
+     useEffect(() => {
+                  if (formData.date_start_training) {
+                    const startDate = new Date(formData.date_start_training);
+                    if (!isNaN(startDate.getTime())) {
+                      const endDate = new Date(startDate);
+                      endDate.setFullYear(endDate.getFullYear() + 3);
+                      // On utilise toISOString pour obtenir le format YYYY-MM-DD
+                      const formattedEndDate = endDate.toISOString().split("T")[0];
+                      setFormData(prev => ({
+                        ...prev,
+                        date_end_training: formattedEndDate,
+                      }));
+                    } else {
+                      setFormData(prev => ({
+                        ...prev,
+                        date_end_training: "",
+                      }));
+                    }
+                  } else {
+                    setFormData(prev => ({
+                      ...prev,
+                      date_end_training: "",
+                    }));
+                  }
+                }, [formData.date_start_training]);
+              
+                // Mise à jour de la date de début via onChange
+                const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const { value } = e.target;
+                  setFormData(prev => ({ ...prev, date_start_training: value }));
+                };
+          
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prevState) => ({
@@ -285,7 +319,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
-                            onChange={handleChange}
+                            onChange={handleStartDateChange}
                             disabled={!isEditable}
                         />
                     </Form.Group>
@@ -295,8 +329,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                         <Form.Control
                             type="date"
                             value={formData.date_end_training}
-                            onChange={handleChange}
-                            disabled={!isEditable}
+                            readOnly
                         />
                     </Form.Group>
 
