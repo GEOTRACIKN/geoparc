@@ -111,7 +111,23 @@ const customLocale = {
       translate("November"),
       translate("December"),
     ],
+
   };
+
+ 
+  
+  
+  const getColorByType = (type: string) => {
+    const colors: Record<string, string> = {
+      "1": "#FF5733", // Rouge vif
+      "2": "#1E7D22", // Vert foncé 🍃
+      "3": "#3357FF", // Bleu classique
+      "4": "#FFC300", // Jaune
+      "5": "#8E44AD", // Violet
+    };
+    return colors[type] || "#808080"; // Gris par défaut
+  };
+
 
 
     const calendarRef = useRef<FullCalendar | null>(null);
@@ -793,6 +809,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
       }}
       eventContent={(arg: any) => (
         <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
+            
           <b>{arg.timeText}</b>
           <span>{mapTrainingType(arg.event.title)}</span>
         </div>
