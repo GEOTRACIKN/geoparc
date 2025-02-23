@@ -100,8 +100,6 @@ export function Vehicles() {
        setTitleStatus('Delete vehicle');
        setIdUser(userID ? Number(userID) : 0);
        setIdDVehicle(id_vehicle);
-
-    
       // After successful deletion, update the vehicle list
       //  await updateVehicleList();
     } catch (error) {
