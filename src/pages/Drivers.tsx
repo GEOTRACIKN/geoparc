@@ -25,6 +25,7 @@ interface Drivers {
   telephone_conducteur: string;
   id_parc: number;
   nom_parc: string;
+  service_conducteur: string;
 }
 
 
@@ -62,7 +63,7 @@ export function Drivers() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
-  const [showDownloadModal, setShowDownloadModal] = useState(false); 
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -74,11 +75,12 @@ export function Drivers() {
     translate("Date of birth"),
     translate("Phone"),
     translate("Email"),
-    translate("Park")
+    translate("Park"),
+    translate("Assigned service")
   ];
 
 
-  
+
   const downloadVehicleExcel = () => {
 
     const selectedData = list_Drivers.filter((driver) =>
@@ -86,7 +88,7 @@ export function Drivers() {
     ).map((driver) => [
       driver.id_conducteur,
       driver.code_conducteur,
-      driver.nom_conducteur+' '+ driver.prenom_conducteur,
+      driver.nom_conducteur + ' ' + driver.prenom_conducteur,
       toTimestamp(driver.date_naissance_conducteur),
       driver.telephone_conducteur,
       driver.email_conducteur,
@@ -103,12 +105,12 @@ export function Drivers() {
       selectedDrivers.includes(driver.id_conducteur.toString())
     ).map((driver) => [
       driver.id_conducteur,
-    driver.code_conducteur,
-    driver.nom_conducteur+' '+ driver.prenom_conducteur,
-    toTimestamp(driver.date_naissance_conducteur),
-    driver.telephone_conducteur,
-    driver.email_conducteur,
-    driver.nom_parc,
+      driver.code_conducteur,
+      driver.nom_conducteur + ' ' + driver.prenom_conducteur,
+      toTimestamp(driver.date_naissance_conducteur),
+      driver.telephone_conducteur,
+      driver.email_conducteur,
+      driver.nom_parc,
     ]);
     generatePDFFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
   };
@@ -158,7 +160,7 @@ export function Drivers() {
 
 
   useEffect(() => {
-   // If the list of selected POIs is empty, disable general selection
+    // If the list of selected POIs is empty, disable general selection
     if (setSelectedDrivers.length === 0 && selectAll) {
       setSelectAll(false);
     }
@@ -251,9 +253,9 @@ export function Drivers() {
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
-    setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
+    setCurrentPage(1); 
     setLimit(newValue);
-    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); // Ajouter await ici
+    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); 
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -267,7 +269,8 @@ export function Drivers() {
     date_naissance_conducteur: true,
     email_conducteur: true,
     telephone_conducteur: true,
-    id_parc: true
+    id_parc: true,
+    service_conducteur: true,
   });
 
   const handleColumnChange = (column: string) => {
@@ -285,7 +288,8 @@ export function Drivers() {
     date_naissance_conducteur: 3,
     email_conducteur: 4,
     telephone_conducteur: 5,
-    id_sousParc: 6
+    id_sousParc: 6,
+    service_conducteur:7
   };
 
 
@@ -321,6 +325,10 @@ export function Drivers() {
       case translate("Park"):
         console.log(6)
         setType(6);
+        break;
+      case translate("Assigned service"):
+        console.log(7)
+        setType(7);
         break;
       default:
         console.log('Unknown selection');
@@ -463,7 +471,8 @@ export function Drivers() {
     translate("Date of birth"),
     translate("Email"),
     translate("Phone"),
-    translate("Park")
+    translate("Park"),
+    translate("Assigned service")
   ];
 
   return (
@@ -647,6 +656,21 @@ export function Drivers() {
                   {translate("Email")}
                 </span>
               </Dropdown.Item>
+
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.service_conducteur}
+                  onChange={() => handleColumnChange("service_conducteur")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Assigned service")}
+                </span>
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -657,13 +681,13 @@ export function Drivers() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={(e) => handleSelectAllDrivers(e.target.checked)}
-                      />
-                      <label className="form-check-label"></label>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={(e) => handleSelectAllDrivers(e.target.checked)}
+                  />
+                  <label className="form-check-label"></label>
                 </div>
               </th>
 
@@ -674,6 +698,8 @@ export function Drivers() {
               {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
               {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
               {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.service_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("service_conducteur")}>{translate("Assigned service")}</th>)}
+            
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -695,7 +721,7 @@ export function Drivers() {
                     <tr key={driver.id_conducteur}>
                       <td>
                         <div className="form-check form-check-inline">
-                        <input
+                          <input
                             type="checkbox"
                             className="form-check-input"
                             id={`checkbox-${driver.id_conducteur}`}
@@ -712,6 +738,7 @@ export function Drivers() {
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
                       {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumns.service_conducteur && (<td>{driver.service_conducteur}</td>)}
 
                       <td>
                         <div className="d-flex align-items-center list-action">
@@ -733,8 +760,8 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-warning mr-2" 
-                          onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
+                          <a className="badge bg-warning mr-2"
+                            onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -774,24 +801,24 @@ export function Drivers() {
         </div>
         <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
-           previousLabel={translate("previous")}
-           nextLabel={translate("next")}
-           breakLabel={"..."}
-           pageCount={pageCount}
-           marginPagesDisplayed={2}
-           pageRangeDisplayed={3}
-           onPageChange={handlePageClick}
-           containerClassName={"pagination justify-content-end"}
-           pageClassName={"page-item"}
-           pageLinkClassName={"page-link"}
-           previousClassName={"page-item"}
-           previousLinkClassName={"page-link"}
-           nextClassName={"page-item"}
-           nextLinkClassName={"page-link"}
-           breakClassName={"page-item"}
-           breakLinkClassName={"page-link"}
-           activeClassName={"active"}
-           forcePage={currentPage - 1}
+            previousLabel={translate("previous")}
+            nextLabel={translate("next")}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-end"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
+            forcePage={currentPage - 1}
           />
         </div>
         <DriverDeleteModal
@@ -803,7 +830,7 @@ export function Drivers() {
           IdDriver={IdDriver}
           updateDriverList={handleUpdateDriverList}
         />
-        
+
         <DriverDetailsModal
           show={modalStatusDetail !== null}
           onHide={closeDetailModal}

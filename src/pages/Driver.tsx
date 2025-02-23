@@ -93,7 +93,7 @@ export function Driver() {
   useEffect(() => {
     const getDriver = async () => {
       try {
-        // Récupération des informations du conducteur
+
         const res = await fetch(
           `${backendUrl}/api/geop/driver/find/${id_conducteur}`,
           {
@@ -127,15 +127,15 @@ export function Driver() {
 
   }, [id_conducteur]);
 
-  // Fonction de validation des emails
+
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
-  // Fonction de validation des numéros de téléphone
+
   const validatePhone = (phone: string): boolean => {
-    const re = /^[0-9]{10}$/; // Exemple pour des numéros de téléphone à 10 chiffres
+    const re = /^[0-9]{10}$/; 
     return re.test(phone);
   };
 
@@ -185,7 +185,7 @@ export function Driver() {
         codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
       }
 
-      toast.warn("Please fill in all required fields", {
+      toast.warn(translate("Please fill in all required fields"), {
         position: "bottom-right",
         autoClose: 2400,
         hideProgressBar: false,
@@ -220,7 +220,7 @@ export function Driver() {
         const jsonResponse = await rescheck.json();
 
         if (jsonResponse.driver_count !== 0) {
-          toast.warn("Driver code already exists", {
+          toast.warn(translate("Driver code already exists"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -285,7 +285,7 @@ export function Driver() {
         });
 
         if (!res.ok) {
-          toast.warn("Can't update driver", {
+          toast.warn(translate("Can't update driver"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -302,7 +302,7 @@ export function Driver() {
           return;
         }
 
-        toast.success("Driver updated successfully", {
+        toast.success(translate("Driver updated successfully"), {
           position: "bottom-right",
           autoClose: 2400,
           hideProgressBar: false,
@@ -390,7 +390,7 @@ export function Driver() {
         codeElement.style.borderColor = isCodeConducteurValid ? "#ced4da" : "red";
       }
 
-      toast.warn("Please fill in all required fields", {
+      toast.warn(translate("Please fill in all required fields"), {
         position: "bottom-right",
         autoClose: 2400,
         hideProgressBar: false,
@@ -425,7 +425,7 @@ export function Driver() {
           const jsonResponse = await rescheck.json();
 
           if (jsonResponse.driver_count != 0) {
-            toast.warn("Driver code already exists", {
+            toast.warn(translate("Driver code already exists"), {
               position: "bottom-right",
               autoClose: 2400,
               hideProgressBar: false,
@@ -492,7 +492,7 @@ export function Driver() {
           });
 
           if (!res.ok) {
-            toast.warn("Can't create driver", {
+            toast.warn(translate("Can't create driver"), {
               position: "bottom-right",
               autoClose: 2400,
               hideProgressBar: false,
@@ -509,7 +509,7 @@ export function Driver() {
             return;
           }
 
-          toast.success("Driver created successfully", {
+          toast.success(translate("Driver created successfully"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -524,7 +524,7 @@ export function Driver() {
           setButtonClicked(false);
           navigate("/drivers");
         } else {
-          toast.warn("Can't create driver", {
+          toast.warn(translate("Can't create driver"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -541,7 +541,7 @@ export function Driver() {
       } catch (error) {
         console.error("Can't create driver", error);
 
-        toast.warn("Can't create driver", {
+        toast.warn(translate("Can't create driver"), {
           position: "bottom-right",
           autoClose: 2400,
           hideProgressBar: false,
@@ -606,7 +606,7 @@ export function Driver() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-user-nurse"></i>
-            {isEditing ? "Modifier un conducteur" : "Ajouter un conducteur"}
+            {isEditing ? translate("Edit a Driver") : translate("Add a Driver")}
           </h4>
         </div>
 
@@ -621,18 +621,18 @@ export function Driver() {
               id="uncontrolled-tab-example"
               className="mb-3"
             >
-              <Tab eventKey="tab_1" title="Informations Générales">
+              <Tab eventKey="tab_1" title={translate("General Information")}>
                 <div className="row">
                   <div className="col-md-6">
                     <Form.Group className="form-group" controlId="formNom">
                       <Form.Label>
-                        <i className="fas fa-user"></i> Nom du conducteur (*)
+                        <i className="fas fa-user"></i> {translate("Driver's Last Name (*)")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="nom_conducteur"
                         id="nom_conducteur"
-                        placeholder="Entrez le nom du conducteur"
+                        placeholder={translate("Enter driver's last name")}
                         value={driver?.nom_conducteur || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                         required
@@ -640,42 +640,42 @@ export function Driver() {
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formPrenom">
                       <Form.Label>
-                        <i className="fas fa-user"></i> Prénom du conducteur (*)
+                        <i className="fas fa-user"></i> {translate("Driver's First Name (*)")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="prenom_conducteur"
                         id="prenom_conducteur"
                         value={driver?.prenom_conducteur || ''}
-                        placeholder="Entrez le prénom du conducteur"
+                        placeholder= {translate("Enter driver's first name")}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                         required
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formCodec">
                       <Form.Label>
-                        <i className="fas fa-id-card"></i> Code d'identification (*)
+                        <i className="fas fa-id-card"></i> {translate("Identification Code (*)")}
                       </Form.Label>
                       <Form.Control
                         type="number"
                         name="code_conducteur"
                         id="code_conducteur"
                         value={driver?.code_conducteur || ''}
-                        placeholder="Entrez le code d'identification"
+                        placeholder= {translate("Enter the identification code")}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                         required
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formFonction">
                       <Form.Label>
-                        <i className="fas fa-briefcase"></i> Fonction du conducteur
+                        <i className="fas fa-briefcase"></i> {translate("Driver's Role")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="role_conducteur"
                         id="role_conducteur"
                         value={driver?.role_conducteur || ''}
-                        placeholder="Entrez la fonction du conducteur"
+                        placeholder={translate("Enter the function of the driver")}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
@@ -684,13 +684,13 @@ export function Driver() {
                       controlId="formDateNaissance"
                     >
                       <Form.Label>
-                        <i className="fas fa-calendar-day"></i> Date de naissance
+                        <i className="fas fa-calendar-day"></i> {translate("Date of birth")}
                       </Form.Label>
                       <Form.Control
                         type="date"
                         name="date_naissance_conducteur"
                         id="date_naissance_conducteur"
-                        placeholder="Sélectionnez la date de naissance"
+                        placeholder= {translate("Select date of birth")}
                         value={driver?.date_naissance_conducteur?.split("T")[0] || ''} 
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -699,33 +699,33 @@ export function Driver() {
                   <div className="col-md-6">
                     <Form.Group className="form-group" controlId="formAdresse">
                       <Form.Label>
-                        <i className="fas fa-home"></i> Adresse du conducteur
+                        <i className="fas fa-home"></i> {translate("Driver's Address")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="adresse_conducteur"
                         id="adresse_conducteur"
-                        placeholder="Entrez l'adresse du conducteur"
+                        placeholder=  {translate("Enter the driver's address")} 
                         value={driver?.adresse_conducteur || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formTel">
                       <Form.Label>
-                        <i className="fas fa-phone"></i> Numéro de téléphone
+                        <i className="fas fa-phone"></i> {translate("Phone Number")}
                       </Form.Label>
                       <Form.Control
                         type="number"
                         name="telephone_conducteur"
                         id="telephone_conducteur"
-                        placeholder="Entrez le numéro de téléphone"
+                        placeholder={translate("Enter the phone number")}
                         value={driver?.telephone_conducteur || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formGroupeS">
                       <Form.Label>
-                        <i className="fas fa-heart"></i> Groupe sanguin
+                        <i className="fas fa-heart"></i> {translate("Blood Group")}
                       </Form.Label>
                       <Form.Control
                         as="select"
@@ -733,7 +733,7 @@ export function Driver() {
                         value={driver?.groupe_sanguin || ''}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       >
-                        <option value="0">Sélectionnez le groupe sanguin</option>
+                        <option value="0">{translate("Select blood type")}</option>
                         <option>A+</option>
                         <option>A-</option>
                         <option>AB+</option>
@@ -746,25 +746,25 @@ export function Driver() {
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formEmail">
                       <Form.Label>
-                        <i className="fas fa-envelope"></i> Adresse email
+                        <i className="fas fa-envelope"></i> {translate("Email Address")}
                       </Form.Label>
                       <Form.Control
                         type="email"
                         id="email_conducteur"
                         name="email_conducteur"
-                        placeholder="Entrez l'adresse email"
+                        placeholder={translate("Enter the email address")}
                         value={driver?.email_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formService">
                       <Form.Label>
-                        <i className="fas fa-cogs"></i> Service attribué
+                        <i className="fas fa-cogs"></i> {translate("Assigned Service")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="service_conducteur"
-                        placeholder="Entrez le service attribué"
+                        placeholder={translate("Enter the assigned service")}  
                         value={driver?.service_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -772,22 +772,22 @@ export function Driver() {
                   </div>
                 </div>
               </Tab>
-              <Tab eventKey="tab_2" title="Pièce d'identité">
+              <Tab eventKey="tab_2" title={translate("ID card")}>
                 <div className="row">
                   <div className="col-md-6">
                     <Form.Group className="form-group" controlId="formTypeP">
                       <Form.Label>
-                        <i className="fas fa-id-card"></i> Type de la pièce
+                        <i className="fas fa-id-card"></i> {translate("Type of document")}
                       </Form.Label>
 
                       <Form.Control
                         as="select"
                         name="piece_identite_conducteur"
-                        placeholder="Entrez le type de la pièce"
+                        placeholder={translate("Select License Type")}
                         value={driver?.piece_identite_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       >
-                        <option value="">Sélectionnez le type de permis</option>
+                        <option value="">{translate("Select License Type")}</option>
                         <option value="Biométrie">Biométrie</option>
                         <option value="Normal">Normal</option>
                       </Form.Control>
@@ -796,12 +796,12 @@ export function Driver() {
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formNumP">
                       <Form.Label>
-                        <i className="fas fa-id-card"></i> Numéro de la pièce
+                        <i className="fas fa-id-card"></i> {translate("Document number")}
                       </Form.Label>
                       <Form.Control
                         type="number"
                         name="numero_piece_identite_conducteur" 
-                        placeholder="Entrez le numéro de la pièce"
+                        placeholder={translate("Enter the document number")}
                         value={driver?.numero_piece_identite_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -813,25 +813,24 @@ export function Driver() {
                       controlId="formDateDelivrance"
                     >
                       <Form.Label>
-                        <i className="fas fa-calendar-day"></i> Date de délivrance
+                        <i className="fas fa-calendar-day"></i> {("Date of issue")}
                       </Form.Label>
                       <Form.Control
                         type="date"
                         name="date_delivrance_pi_conducteur"
-                        placeholder="Sélectionnez la date de délivrance"
+                        placeholder={("Select Issue Date")}
                         value={driver?.date_delivrance_pi_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formLieuD">
                       <Form.Label>
-                        <i className="fas fa-map-marker-alt"></i> Lieu de
-                        délivrance
+                        <i className="fas fa-map-marker-alt"></i> {translate("Place of issue")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="lieu_delivrance_pi_conducteur"
-                        placeholder="Entrez le lieu de délivrance"
+                        placeholder={translate("Enter the place of issue")}
                         value={driver?.lieu_delivrance_pi_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -839,21 +838,21 @@ export function Driver() {
                   </div>
                 </div>
               </Tab>
-              <Tab eventKey="tab_3" title="Permis de conduire">
+              <Tab eventKey="tab_3" title={translate("Driving License")}>
                 <div className="row">
                   <div className="col-md-6">
                     <Form.Group className="form-group" controlId="formTypePermis">
                       <Form.Label>
-                        <i className="fas fa-id-card"></i> Type de permis
+                        <i className="fas fa-id-card"></i> {translate("Type of license")}
                       </Form.Label>
                       <Form.Control
                         as="select"
                         name="premis_conducteur"
-                        placeholder="Type de permis"
+                        placeholder={translate("Select the type of permit")}
                         value={driver?.premis_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       >
-                        <option value="">Sélectionnez le type de permis</option>
+                        <option value="">{translate("Select the type of permit")}</option>
                         <option value="A1">A1</option>
                         <option value="A">A</option>
                         <option value="B">B</option>
@@ -870,25 +869,24 @@ export function Driver() {
 
                     <Form.Group className="form-group" controlId="formNumPermis">
                       <Form.Label>
-                        <i className="fas  fa-barcode"></i> Numéro de permis
+                        <i className="fas  fa-barcode"></i> {translate("Licence number")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="numero_permis_conducteur"
-                        placeholder="Entrez le numéro de permis"
+                        placeholder={translate("Enter the license number")}
                         value={driver?.numero_permis_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formLieuDP">
                       <Form.Label>
-                        <i className="fas fa-map-marker-alt"></i> Lieu de
-                        délivrance
+                        <i className="fas fa-map-marker-alt"></i> {translate("Place of issue")}
                       </Form.Label>
                       <Form.Control
                         type="text"
                         name="lieu_delivrance_permis_conducteur"
-                        placeholder="Entrez le lieu de délivrance"
+                        placeholder={translate("Enter the place of issue")}
                         value={driver?.lieu_delivrance_permis_conducteur || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -900,24 +898,24 @@ export function Driver() {
                       controlId="formDateDelivranceP"
                     >
                       <Form.Label>
-                        <i className="fas fa-calendar-day"></i> Date de délivrance
+                        <i className="fas fa-calendar-day"></i> {translate("Date of issue")}
                       </Form.Label>
                       <Form.Control
                         type="date"
                         name="date_delivrance_permis_conducteur"
-                        placeholder="Sélectionnez la date de délivrance"
+                        placeholder={translate("Select Issue Date")} 
                         value={driver?.date_delivrance_permis_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
                     </Form.Group>
                     <Form.Group className="form-group" controlId="formDateExp">
                       <Form.Label>
-                        <i className="fas fa-calendar-day"></i> Date d'expiration
+                        <i className="fas fa-calendar-day"></i> {translate("Expiration date")}
                       </Form.Label>
                       <Form.Control
                         type="date"
                         name="date_expir_permis_conducteur"
-                        placeholder="Sélectionnez la date d'expiration"
+                        placeholder={translate("Select Expiration Date")}
                         value={driver?.date_expir_permis_conducteur?.split("T")[0] || ""}
                         onChange={(e) => handleChange(e.target.name, e.target.value)}
                       />
@@ -955,7 +953,7 @@ export function Driver() {
 
           >
             {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-            {isEditing ? "Modifier" : "Ajouter"}
+            {isEditing ? translate("Edit") : translate("Add")}
           </Button>
         </div>
       </div>
