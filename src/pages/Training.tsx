@@ -308,7 +308,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     }
   
     return events.map(event => {
-      const endDate = new Date(event.end);
+      const endDate = new Date(event.start);
       endDate.setDate(endDate.getDate() + 1); // Add one day for display
       return {
         ...event,
