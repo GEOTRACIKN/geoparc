@@ -293,26 +293,27 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="id_conducteur">
-                        <Form.Label>{translate("Driver")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_conducteur}
-                            onChange={handleChange}
-                            disabled={!isEditable}
-                        >
-                            <option value="">{translate("Select Driver")}</option>
-                            {drivers.length === 0 ? (
-                                <option value="">{translate("No drivers available")}</option>
-                            ) : (
-                                drivers.map((driver) => (
-                                    <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                        {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
-                                    </option>
-                                ))
-                            )}
-                        </Form.Control>
-                    </Form.Group>
+                <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Control
+        as="select"
+        value={String(formData.id_conducteur)} // 🔥 Convertit en string pour éviter l'erreur
+        onChange={handleChange}
+        disabled={!isEditable}
+    >
+        <option value="">{translate("Select Driver")}</option>
+        {drivers.length === 0 ? (
+            <option value="">{translate("No drivers available")}</option>
+        ) : (
+            drivers.map((driver) => (
+                <option key={driver.id_conducteur} value={String(driver.id_conducteur)}> 
+                    {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
+                </option>
+            ))
+        )}
+    </Form.Control>
+</Form.Group>
+
 
                     <Form.Group controlId="date_start_training">
                         <Form.Label>{translate("Start Date")}</Form.Label>
