@@ -680,7 +680,7 @@ export function Dashboard() {
                 linkTo="/disponible-hs"
               ></FleetCounter>
             </div>
-            <div className="col-lg-2 col-md-2">
+            {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}
                 title={translate("Affectés")}
@@ -688,8 +688,8 @@ export function Dashboard() {
                 color={"bg-primary-light"}
                 linkTo="/affectes"
               ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
+            </div> */}
+            {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}
                 title={translate("Report")}
@@ -706,7 +706,7 @@ export function Dashboard() {
                 color={"bg-primary-light"}
                 linkTo="/affectes"
               ></FleetCounter>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -714,18 +714,7 @@ export function Dashboard() {
           <div className="container-fluid"></div>
         </>
 
-        <div className="col-lg-6">
-          <FleetSate
-            options={{
-              maintenanceCosts: 5000, // Coûts de Maintenance
-              missionCosts: 3000, // Coûts des Missions
-              fuelCosts: 2000, // Coûts de Carburant
-              legalCosts: 1500, // Coûts Juridiques
-              employeeCosts: 4000, // Coûts des Employés
-              hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
-            }}
-          />
-        </div>
+     
         <div className="col-lg-6">{/* <FleetCo2 /> */}</div>
         <div className="col-lg-12">
           <div className="card">
@@ -753,6 +742,18 @@ export function Dashboard() {
               ))}
             </div>
           </div>
+        </div>
+        <div className="col-lg-6">
+          <FleetSate
+            options={{
+              maintenanceCosts: 5000, // Coûts de Maintenance
+              missionCosts: 3000, // Coûts des Missions
+              fuelCosts: 2000, // Coûts de Carburant
+              legalCosts: 1500, // Coûts Juridiques
+              employeeCosts: 4000, // Coûts des Employés
+              hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
+            }}
+          />
         </div>
       </div>
     </>
