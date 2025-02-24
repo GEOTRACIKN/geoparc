@@ -579,6 +579,32 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                             </select>
                         </label>
                     </div>
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            variant="link"
+                            id="dropdown-basic"
+                            title="Display Columns"
+                        >
+                            <i className="las la-eye"></i>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {Object.keys(initialColumns).map((col, idx) => (
+                                <Dropdown.Item
+                                    key={idx}
+                                    as="button"
+                                    style={{ display: "flex", alignItems: "center" }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        checked={selectedColumns[col as keyof typeof initialColumns]}
+                                        onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
+                                    />
+                                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                   
                 </div>
                
