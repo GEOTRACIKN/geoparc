@@ -293,26 +293,33 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="id_conducteur">
-                        <Form.Label>{translate("Driver")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_conducteur}
-                            onChange={handleChange}
-                            disabled={!isEditable}
-                        >
-                            <option value="">{translate("Select Driver")}</option>
-                            {drivers.length === 0 ? (
-                                <option value="">{translate("No drivers available")}</option>
-                            ) : (
-                                drivers.map((driver) => (
-                                    <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                        {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
-                                    </option>
-                                ))
-                            )}
-                        </Form.Control>
-                    </Form.Group>
+                <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Control
+        as="select"
+        value={String(formData.id_conducteur)} // 🔥 Conversion en string pour éviter les erreurs
+        onChange={(e) =>
+            setFormData((prev) => ({
+                ...prev,
+                id_conducteur: e.target.value || "", // 🔥 Gère le cas où aucune option n'est sélectionnée
+            }))
+        }
+        disabled={!isEditable}
+    >
+        <option value="">{translate("Select Driver")}</option>
+        {drivers.length === 0 ? (
+            <option value="">{translate("No drivers available")}</option>
+        ) : (
+            drivers.map((driver) => (
+                <option key={driver.id_conducteur} value={String(driver.id_conducteur)}>
+                    {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
+                </option>
+            ))
+        )}
+    </Form.Control>
+</Form.Group>
+
+
 
                     <Form.Group controlId="date_start_training">
                         <Form.Label>{translate("Start Date")}</Form.Label>
@@ -345,15 +352,20 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
                 </Modal.Body>
                 <Modal.Footer>
-                    {isEditable ? (
-                        <Button type="submit">{translate("Save")}</Button>
-                        
-                    ) : (
-                        <Button variant="secondary" onClick={handleClose}>
-                            {translate("Close")}
-                        </Button>
-                    )}
-                </Modal.Footer>
+    {isEditable ? (
+        <>
+            <Button type="submit">{translate("Save")}</Button>
+            <Button variant="secondary" onClick={handleClose}>
+                {translate("Close")}
+            </Button>
+        </>
+    ) : (
+        <Button variant="secondary" onClick={handleClose}>
+            {translate("Close")}
+        </Button>
+    )}
+</Modal.Footer>
+
             </Form>
 
             <ModalDeleteTraining

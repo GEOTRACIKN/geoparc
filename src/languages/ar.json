@@ -706,5 +706,9 @@
 "Can't create driver": "لا يمكن إنشاء السائق",
 "Driver created successfully": "تم إنشاء السائق بنجاح",
 "ID card": "بطاقة الهوية",
-"Please fill in all required fields":"الرجاء ملء جميع المعلومات المطلوبة"
+"Please fill in all required fields":"الرجاء ملء جميع المعلومات المطلوبة",
+"Driving Test": "اختبار القيادة",
+"more": "آخرين",
+"By": "حسب"
+
 }

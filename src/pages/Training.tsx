@@ -308,7 +308,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     }
   
     return events.map(event => {
-      const endDate = new Date(event.end);
+      const endDate = new Date(event.start);
       endDate.setDate(endDate.getDate() + 1); // Add one day for display
       return {
         ...event,
@@ -442,11 +442,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
         {}
       );
-    const handleViewMore = (date: string) => {
+      const handleViewMore = (date: string) => {
         setExpandedDays((prevState) => ({
-          ...prevState,
-          [date]: !prevState[date],
-        }));
+            ...prevState,
+            [date]: !prevState[date],
+          }));
       };
     
       const renderEventList = (date: string) => {
@@ -554,7 +554,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                         <input
                             type="text"
                             //placeholder={` By ${typeSearch}`}
-                            placeholder={`by ${translate(typeSearch)}`}
+                            placeholder={`${translate("By")} ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -572,7 +572,6 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                 onChange={handleSelectChange}
                             >
                                 <option value="10">10</option>
-                                <option value="20">20</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                                 <option value="200">200</option>
@@ -580,6 +579,32 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                             </select>
                         </label>
                     </div>
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            variant="link"
+                            id="dropdown-basic"
+                            title="Display Columns"
+                        >
+                            <i className="las la-eye"></i>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {Object.keys(initialColumns).map((col, idx) => (
+                                <Dropdown.Item
+                                    key={idx}
+                                    as="button"
+                                    style={{ display: "flex", alignItems: "center" }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        checked={selectedColumns[col as keyof typeof initialColumns]}
+                                        onChange={() => handleColumnChange(col as keyof typeof initialColumns)}
+                                    />
+                                    <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                   
                 </div>
                
@@ -829,6 +854,8 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
       moreLinkClick={(info: any) => {
         calendarRef.current?.getApi().changeView("dayGridDay", info.date);
       }}
+      moreLinkContent={(args: { num: any; }) => `+ ${args.num} ${translate("more")}`}
+
             dayMaxEventRows={true}  
       dayMaxEvents={true}  
       

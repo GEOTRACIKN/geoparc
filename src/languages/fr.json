@@ -693,5 +693,8 @@
 "Driver updated successfully":"Conducteur mis à jour avec succès",
 "Can't create driver":"Impossible de créer le conducteur",
 "Driver created  successfully":"Conducteur créé avec succès",
-"Please fill in all required fields":"Veuillez remplir tous les champs obligatoires"
+"Please fill in all required fields":"Veuillez remplir tous les champs obligatoires",
+"Driving Test": "Examen de conduite",
+"more": "autres",
+"By": "Par"  
 }

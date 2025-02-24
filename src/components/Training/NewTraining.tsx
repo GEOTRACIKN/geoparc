@@ -86,6 +86,16 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+      setFormData({
+          id_conducteur: "",
+          date_start_training: "",
+          date_end_training: "",
+          type_training: "",
+      });
+      onHide(); // Fermer le modal après la réinitialisation
+  };
+  
 
 
     const validateForm = () => {
@@ -241,31 +251,32 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+      <Modal show={show} onHide={onHide} backdrop="static">
+
             <Modal.Header closeButton>
                 <Modal.Title>{translate("New")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="id_conducteur">
-                       <Form.Label>{translate("Driver")}</Form.Label>
-                       <Form.Control
-                           as="select"
-                           value={formData.id_conducteur}
-                           onChange={handleChange}
-                       >
-                           <option value="">{translate("Select Driver")}</option>
-                           {drivers.length === 0 ? (
-                               <option value="">{translate("No drivers available")}</option>
-                           ) : (
-                               drivers.map((driver) => (
-                                   <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                       {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
-                                   </option>
-                               ))
-                           )}
-                       </Form.Control>
-                   </Form.Group>
+                <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Select
+    options={drivers.map(driver => ({
+        value: driver.id_conducteur,
+        label: `${driver.prenom_conducteur} ${driver.nom_conducteur}`
+    }))}
+    placeholder={translate("Select Driver")}
+    isLoading={drivers.length === 0}
+    noOptionsMessage={() => translate("No drivers available")}
+    onChange={(selectedOption) => {
+        setFormData(prev => ({
+            ...prev,
+            id_conducteur: selectedOption ? String(selectedOption.value) : ""
+        }));
+    }}
+/>
+
+</Form.Group>
 
                   
                     {/* Purchase Date */}
