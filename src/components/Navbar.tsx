@@ -76,8 +76,10 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     translate('Vehicle insurance renewal'),
     translate('Next maintenance due'),
     translate('Training certificate expiration'),
-    translate('Training certificate expiration'),
-    translate('Fire extinguisher verification')
+    translate('Fire extinguisher verification'),
+    translate('Vehicle technical inspection'),
+    translate('Vehicle sticker verification'),
+    translate('Draining verification'),
   ];
 
 
