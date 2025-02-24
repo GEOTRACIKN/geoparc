@@ -71,7 +71,7 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>

@@ -71,8 +71,7 @@ const ModalDeleteFire: React.FC<ModalDeleteFireProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
-            <Modal.Header closeButton>
+        <Modal show={show} onHide={onHide} backdrop="static">            <Modal.Header closeButton>
                 <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>{translate("Are you sure you want to delete?")}</Modal.Body>

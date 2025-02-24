@@ -192,7 +192,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("New")}</Modal.Title>
             </Modal.Header>

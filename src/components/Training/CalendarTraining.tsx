@@ -352,15 +352,20 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
                 </Modal.Body>
                 <Modal.Footer>
-                    {isEditable ? (
-                        <Button type="submit">{translate("Save")}</Button>
-                        
-                    ) : (
-                        <Button variant="secondary" onClick={handleClose}>
-                            {translate("Close")}
-                        </Button>
-                    )}
-                </Modal.Footer>
+    {isEditable ? (
+        <>
+            <Button type="submit">{translate("Save")}</Button>
+            <Button variant="secondary" onClick={handleClose}>
+                {translate("Close")}
+            </Button>
+        </>
+    ) : (
+        <Button variant="secondary" onClick={handleClose}>
+            {translate("Close")}
+        </Button>
+    )}
+</Modal.Footer>
+
             </Form>
 
             <ModalDeleteTraining

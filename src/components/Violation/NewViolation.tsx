@@ -242,7 +242,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={onHide} responsive>
+    <Modal show={show} onHide={onHide} backdrop="static">
       <Modal.Header closeButton>
         <Modal.Title>{translate("Add Violation")}</Modal.Title>
       </Modal.Header>

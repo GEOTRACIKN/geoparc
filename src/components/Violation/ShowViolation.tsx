@@ -74,7 +74,7 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
     }, [show, fetchViolation]);
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>

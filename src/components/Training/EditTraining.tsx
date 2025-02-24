@@ -349,7 +349,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>

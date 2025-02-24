@@ -86,6 +86,16 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+      setFormData({
+          id_conducteur: "",
+          date_start_training: "",
+          date_end_training: "",
+          type_training: "",
+      });
+      onHide(); // Fermer le modal après la réinitialisation
+  };
+  
 
 
     const validateForm = () => {
@@ -241,7 +251,8 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+      <Modal show={show} onHide={onHide} backdrop="static">
+
             <Modal.Header closeButton>
                 <Modal.Title>{translate("New")}</Modal.Title>
             </Modal.Header>

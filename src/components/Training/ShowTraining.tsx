@@ -96,7 +96,7 @@ const ModalShowTraining: React.FC<ModalShowTrainingnProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
