@@ -356,25 +356,37 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     
-                    <Form.Group controlId="id_conducteur">
-                     <Form.Label>{translate("Driver")}</Form.Label>
-                     <Form.Control
-                         as="select"
-                         value={formData.id_conducteur}
-                         onChange={handleChange}
-                     >
-                         <option value="">{translate("Select Driver")}</option>
-                         {drivers.length === 0 ? (
-                             <option value="">{translate("No drivers available")}</option>
-                         ) : (
-                             drivers.map((driver) => (
-                                 <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                     {`${driver.nom_conducteur} ${driver.prenom_conducteur} `}
-                                 </option>
-                             ))
-                         )}
-                     </Form.Control>
-                 </Form.Group>
+                <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}</Form.Label>
+    <Select
+        options={drivers.map(driver => ({
+            value: driver.id_conducteur, // Numéro du conducteur
+            label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
+        })) as { value: number; label: string }[]} // 🔥 Correction du typage
+
+        placeholder={translate("Select Driver")}
+        isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+        noOptionsMessage={() => translate("No drivers available")}
+        isSearchable // Active la recherche
+
+        // 🔥 Correction de la sélection automatique avec conversion en string
+        value={drivers
+            .map(driver => ({
+                value: driver.id_conducteur,
+                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
+            }))
+            .find(option => String(option.value) === String(formData.id_conducteur)) || null
+        }
+
+        onChange={(selectedOption) => {
+            setFormData(prev => ({
+                ...prev,
+                id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+            }));
+        }}
+    />
+</Form.Group>
+
                    
 
                     <Form.Group controlId="date_start_training">
