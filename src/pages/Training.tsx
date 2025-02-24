@@ -442,11 +442,11 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
         {}
       );
-    const handleViewMore = (date: string) => {
+      const handleViewMore = (date: string) => {
         setExpandedDays((prevState) => ({
-          ...prevState,
-          [date]: !prevState[date],
-        }));
+            ...prevState,
+            [date]: !prevState[date],
+          }));
       };
     
       const renderEventList = (date: string) => {
@@ -854,6 +854,8 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
       moreLinkClick={(info: any) => {
         calendarRef.current?.getApi().changeView("dayGridDay", info.date);
       }}
+      moreLinkContent={(args: { num: any; }) => `+ ${args.num} ${translate("more")}`}
+
             dayMaxEventRows={true}  
       dayMaxEvents={true}  
       
