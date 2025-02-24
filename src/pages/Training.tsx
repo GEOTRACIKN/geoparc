@@ -554,7 +554,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                         <input
                             type="text"
                             //placeholder={` By ${typeSearch}`}
-                            placeholder={`by ${translate(typeSearch)}`}
+                            placeholder={`${translate("By")} ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
