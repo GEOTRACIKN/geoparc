@@ -178,13 +178,13 @@ const ModalShowDeadline: React.FC<ModalShowDeadlineProps> = ({
   return (
     <Modal show={show} onHide={onHide} responsive>
       <Modal.Header closeButton>
-        <Modal.Title>{translate("Show")}</Modal.Title>
+        <Modal.Title>{translate(formData.nom_type)}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
         <Form style={{
           color: "#000",
-          fontSize: "16px"
+          fontSize: "18px"
         }}>
           <Form.Group>
             <Form.Label>{translate("Deadline date")} :</Form.Label>
@@ -194,11 +194,6 @@ const ModalShowDeadline: React.FC<ModalShowDeadlineProps> = ({
           <Form.Group>
             <Form.Label>{translate("Creation date")} :</Form.Label>
             <p className="form-text">{formData.date_creation}</p>
-          </Form.Group>
-
-          <Form.Group>
-            <Form.Label>{translate("Type")} :</Form.Label>
-            <p className="form-text">{translate("formData.nom_type")}</p>
           </Form.Group>
 
           <Form.Group>
@@ -213,15 +208,15 @@ const ModalShowDeadline: React.FC<ModalShowDeadlineProps> = ({
 
           <Form.Group>
             <Form.Label>{translate("Deadline for")} :</Form.Label>
-            <p className="form-text">{formData.id_item} - {formData.item_name}</p>
+            <p className="form-text"> {formData.item_name}</p>
           </Form.Group>
 
-          <Form.Group>
+          {/* <Form.Group>
             <Form.Label>{translate("Conducteur")} :</Form.Label>
             <p className="form-text">
               {formData.nom_conducteur} {formData.prenom_conducteur} - {formData.immatriculation_vehicule}
             </p>
-          </Form.Group>
+          </Form.Group> */}
 
         </Form>
       </Modal.Body>
