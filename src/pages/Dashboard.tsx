@@ -57,6 +57,10 @@ interface SearchResult {
 interface ImmatriSuggestion {
   immatriculation_vehicule: string;
 }
+type VehicleState = {
+  etat_vehicule: string;
+  total: number;
+};
 
 
 export function Dashboard() {
@@ -65,7 +69,10 @@ export function Dashboard() {
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
-  const [totalReports, setTotalReports] = useState(0);
+ 
+  
+  const [vehicleStates, setVehicleStates] = useState<VehicleState[]>([]);
+    const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
   const [userName, setUserName] = useState(
     localStorage.getItem("Geopusername")
@@ -121,7 +128,23 @@ export function Dashboard() {
           id_user: userID,
           state: 1,
         });
+        // Fetch total number of groups
+// Fetch total number of vehicles by state
+const responseVehicleState = await fetch(
+  `${backendUrl}/api/etat/totalpage/${userID}`,
+  { mode: "cors" }
+);
+if (responseVehicleState.ok) {
+  const vehicleStateData = await responseVehicleState.json();
+  console.log("Vehicle states data before:", vehicleStateData); // Ajoute ce log ici
+  // Supposons que `vehicleStateData` soit un tableau contenant les états des véhicules
+  setVehicleStates(vehicleStateData);
+  console.log("Vehicle states:", vehicleStateData);
+} else {
+  console.error("Failed to fetch vehicle states");
+}
 
+        
         // Make the fetch request
         const responseNotifications = await fetch(
           `${backendUrl}/api/geop/notification/read`,
@@ -634,52 +657,43 @@ export function Dashboard() {
               ></FleetCounter>
             </div>
 
-            {/* Ajout des pavés supplémentaires */}
             <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={0}
-                title={translate("Hors Service")}
-                icon={"exclamation-circle"}
-                color={"bg-warning-light"}
-                linkTo="/hors-service"
-              ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={1}
-                title={translate("En panne")}
-                icon={"tools"}
-                color={"bg-danger-light"}
-                linkTo="/en-panne"
-              ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={3}
-                title={translate("En Réparation")}
-                icon={"wrench"}
-                color={"bg-info-light"}
-                linkTo="/en-reparation"
-              ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={6}
-                title={translate("Disponibles")}
-                icon={"check-circle"}
-                color={"bg-success-light"}
-                linkTo="/disponibles"
-              ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={0}
-                title={translate("Disponible-HS")}
-                icon={"ban"}
-                color={"bg-secondary-light"}
-                linkTo="/disponible-hs"
-              ></FleetCounter>
-            </div>
+  <FleetCounter
+    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "HS")?.total || 0}
+    title={translate("Out of Service")}
+    icon={"exclamation-circle"}
+    color={"bg-warning-light"}
+    linkTo="/vehicles"
+  />
+</div>
+<div className="col-lg-2 col-md-2">
+  <FleetCounter
+    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En panne")?.total || 0}
+    title={translate("Broken Down")}
+    icon={"tools"}
+    color={"bg-danger-light"}
+    linkTo="/vehicles"
+  />
+</div>
+<div className="col-lg-2 col-md-2">
+  <FleetCounter
+    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
+    title={translate("Under Repair")}
+    icon={"wrench"}
+    color={"bg-info-light"}
+    linkTo="/en-reparation"
+  />
+</div>
+<div className="col-lg-2 col-md-2">
+  <FleetCounter
+    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible")?.total || 0}
+    title={translate("Available")}
+    icon={"check-circle"}
+    color={"bg-success-light"}
+    linkTo="/disponibles"
+  />
+</div>
+
             {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}

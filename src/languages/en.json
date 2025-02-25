@@ -685,7 +685,11 @@
 "Please fill in all required fields":"Please fill in all required fields",
 "Driving Test": "Driving Test",
 "more": "more",
-"By": "By"  
+"By": "By",
+"Hors Service": "Out of Service",
+"En panne": "Broken Down",
+"En réparation": "Under Repair",
+"Disponible": "Available"  
 
 
 

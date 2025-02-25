@@ -696,5 +696,9 @@
 "Can't create driver": "No se puede crear el conductor",
 "Driver created successfully": "Conductor creado con éxito",
 "ID card":"tarjeta de identificación",
-"Please fill in all required fields":"Por favor, rellene todos los campos obligatorios"
+"Please fill in all required fields":"Por favor, rellene todos los campos obligatorios",
+"Out of Service": "Fuera de servicio",
+"Broken Down": "Averiado",
+"Under Repair": "En reparación",
+"Available": "Disponible"
 }

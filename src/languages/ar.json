@@ -709,6 +709,9 @@
 "Please fill in all required fields":"الرجاء ملء جميع المعلومات المطلوبة",
 "Driving Test": "اختبار القيادة",
 "more": "آخرين",
-"By": "حسب"
-
+"By": "حسب",
+"Out of Service": "خارج الخدمة",
+"Broken Down": "معطل",
+"Under Repair": "قيد الإصلاح",
+"Available": "متاح"
 }

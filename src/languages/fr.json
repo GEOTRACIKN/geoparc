@@ -696,5 +696,9 @@
 "Please fill in all required fields":"Veuillez remplir tous les champs obligatoires",
 "Driving Test": "Examen de conduite",
 "more": "autres",
-"By": "Par"  
+"By": "Par",
+"Out of Service": "Hors Service",
+"Broken Down": "En panne",
+"Under Repair": "En réparation",
+"Available": "Disponible"  
 }
