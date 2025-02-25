@@ -709,6 +709,26 @@
 "Please fill in all required fields":"الرجاء ملء جميع المعلومات المطلوبة",
 "Driving Test": "اختبار القيادة",
 "more": "آخرين",
-"By": "حسب"
-
+"By": "حسب",
+"The driving license of": "رخصة القيادة لـ",
+"will expire on": "ستنتهي في",
+"The insurance for": "التأمين لـ",
+"The next maintenance for vehicle": "الصيانة القادمة للمركبة",
+"is due by": "مستحقة بحلول",
+"The training certificate of": "شهادة التدريب لـ",
+"The fire extinguisher verification for vehicle": "فحص طفاية الحريق للمركبة",
+"The technical inspection for vehicle": "الفحص الفني للمركبة",
+"must be done before": "يجب إجراؤه قبل",
+"The vehicle sticker verification for": "التحقق من ملصق المركبة لـ",
+"should be done by": "يجب إجراؤه بحلول",
+"The draining verification for vehicle": "التحقق من تغيير الزيت للمركبة",
+"is scheduled for": "مجدول لـ",
+"The deadline for": "الموعد النهائي لـ",
+"is set for": "محدد لـ",
+"Driving license": "رخصة القيادة",
+"Vehicle insurance": "تأمين المركبة",
+"Extinguisher": "طفاية الحريق",
+"Technical control": "الفحص الفني",
+"Sticker": "الملصق",
+"Draining": "تغيير الزيت"
 }

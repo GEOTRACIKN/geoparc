@@ -685,8 +685,27 @@
 "Please fill in all required fields":"Please fill in all required fields",
 "Driving Test": "Driving Test",
 "more": "more",
-"By": "By"  
-
-
-
+"By": "By" ,
+"The driving license of": "The driving license of",
+"will expire on": "will expire on",
+"The insurance for": "The insurance for",
+"The next maintenance for vehicle": "The next maintenance for vehicle",
+"is due by": "is due by",
+"The training certificate of": "The training certificate of",
+"The fire extinguisher verification for vehicle": "The fire extinguisher verification for vehicle",
+"The technical inspection for vehicle": "The technical inspection for vehicle",
+"must be done before": "must be done before",
+"The vehicle sticker verification for": "The vehicle sticker verification for",
+"should be done by": "should be done by",
+"The draining verification for vehicle": "The draining verification for vehicle",
+"is scheduled for": "is scheduled for",
+"The deadline for": "The deadline for",
+"is set for": "is set for",
+"Driving license": "Driving license",
+"Vehicle insurance": "Vehicle insurance",
+"Maintenance": "Maintenance",
+"Extinguisher": "Extinguisher",
+"Technical control": "Technical control",
+"Sticker": "Sticker",
+"Draining": "Draining"
 }
