@@ -6,14 +6,14 @@ import { useTranslate } from "../hooks/LanguageProvider";
 import { formatToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
 
-
 interface NotificationsProps {
   id_notification: number;
   id_groupe_alarme: number;
   name_groupe_alarme: string;
   name_alarme: string;
   id_user: number;
-  type: number;
+  id_item: number;
+  id_type: number;
   message: string;
   severity: number;
   timestamp: string;
@@ -21,10 +21,13 @@ interface NotificationsProps {
   attached: number;
   date_start: string;
   immatriculation_vehicule: string;
+  training_prenom_conducteur: string;
+  feu_immatriculation_vehicule: string;
+  prenom_conducteur: string;
+  training_nom_conducteur: string;
+  nom_conducteur: string;
   id_alarm: number;
 }
-
-
 
 export function Notifications() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -91,14 +94,17 @@ export function Notifications() {
       setTotal(total);
 
       // Récupération des données d'alarmes
-      const alarmsResponse = await fetch(`${backendUrl}/api/geop/notification/search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: bodyData,
-        mode: "cors",
-      });
+      const alarmsResponse = await fetch(
+        `${backendUrl}/api/geop/notification/search`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: bodyData,
+          mode: "cors",
+        }
+      );
 
       const data = await alarmsResponse.json();
       setPageCount(Math.ceil(total / limitValue));
@@ -111,11 +117,9 @@ export function Notifications() {
     }
   };
 
-
   const refreshAlarms = () => {
     getNotifications(limit, currentPage, search, type, colum, sort);
   };
-
 
   const getNotificationsLimitValue = async (
     limitValue: number,
@@ -181,14 +185,7 @@ export function Notifications() {
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
-     await getNotifications(
-      limit,
-      currentPage,
-      search,
-      type,
-      colum,
-      sort
-    );
+    await getNotifications(limit, currentPage, search, type, colum, sort);
     // setAlarms(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -208,7 +205,7 @@ export function Notifications() {
       type,
       colum,
       sort
-    ); 
+    );
     setAlarms(commentsFormServer);
     window.scrollTo(0, 0);
   };
@@ -227,9 +224,6 @@ export function Notifications() {
     date_start: true,
     date_end: true,
   });
-
-
-
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -261,18 +255,15 @@ export function Notifications() {
         setType(5);
         break;
       case translate("Date de fin"):
-        setType(6)
+        setType(6);
         break;
       default:
-       // console.log("Unknown selection");
+        // console.log("Unknown selection");
         break;
     }
 
-
-
-
     setTypeSearch(selectedValue);
-   // console.log("Selected value:", selectedValue);
+    // console.log("Selected value:", selectedValue);
   };
 
   const handleAdvancedSearch = async (event: any) => {
@@ -284,8 +275,99 @@ export function Notifications() {
   const handleSortingColum = (currentColumn: string) => {
     setSortColum(currentColumn);
     sort == "ASC" ? setSort("DESC") : setSort("ASC");
-    setCurrentPage(1)
+    setCurrentPage(1);
     getNotifications(limit, 1, search, type, colum, sort);
+  };
+
+  const generateDescription = (alarme: NotificationsProps) => {
+    const highlight = (value: any) => (
+      <span style={{color:"#3b82f6"}} className="text-blue-500 font-semibold">{value}</span>
+    );
+
+    switch (alarme.id_type) {
+      case 1: // Driving license
+        return (
+          <>
+            {translate("The driving license of")}{" "}
+            {highlight(alarme.nom_conducteur)}{" "}
+            {highlight(alarme.prenom_conducteur)} {translate("will expire on")}{" "}
+            {highlight(alarme.timestamp.split("T")[0].split("T")[0])}
+          </>
+        );
+
+      case 2: // Vehicle insurance
+        return (
+          <>
+            {translate("The insurance for")} {highlight(alarme.id_item)} 
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 3: // Maintenance
+        return (
+          <>
+            {translate("The next maintenance for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 4: // Training
+        return (
+          <>
+            {translate("The training certificate of")}{" "}
+            {highlight(alarme.training_nom_conducteur)}{" "}
+            {highlight(alarme.training_prenom_conducteur)}{" "}
+            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 5: // Fire extinguisher verification
+        return (
+          <>
+            {translate("The fire extinguisher verification for vehicle")}{" "}
+            {highlight(alarme.feu_immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 6: // Technical control
+        return (
+          <>
+            {translate("The technical inspection for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("must be done before")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 7: // Sticker
+        return (
+          <>
+            {translate("The vehicle sticker verification for")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("should be done by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 8: // Draining
+        return (
+          <>
+            {translate("The draining verification for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("is scheduled for")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      default:
+        return (
+          <>
+            {translate("The deadline for")} {highlight(alarme.id_item)} (
+            {highlight(alarme.immatriculation_vehicule)}){" "}
+            {translate("is set for")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+    }
   };
 
   return (
@@ -313,9 +395,7 @@ export function Notifications() {
             {translate("Notifications")} ({total})
           </h4>
         </div>
-        <div className="col-md-6 col-sm-12 text-right">
-
-        </div>
+        <div className="col-md-6 col-sm-12 text-right"></div>
       </div>
       <div className="row">
         <div
@@ -413,7 +493,9 @@ export function Notifications() {
                   checked={selectedColumns.name_alarme}
                   onChange={() => handleColumnChange("name_alarme")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Alarms")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Alarms")}
+                </span>
               </Dropdown.Item>
               <Dropdown.Item
                 as="button"
@@ -425,7 +507,9 @@ export function Notifications() {
                   checked={selectedColumns.message}
                   onChange={() => handleColumnChange("message")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Détails")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Détails")}
+                </span>
               </Dropdown.Item>
               <Dropdown.Item
                 as="button"
@@ -452,7 +536,9 @@ export function Notifications() {
                   checked={selectedColumns.date_start}
                   onChange={() => handleColumnChange("date_start")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Creation date")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Creation date")}
+                </span>
               </Dropdown.Item>
 
               <Dropdown.Item
@@ -465,14 +551,15 @@ export function Notifications() {
                   checked={selectedColumns.date_end}
                   onChange={() => handleColumnChange("date_end")}
                 />
-                <span style={{ marginLeft: "10px" }}>{translate("Date end")}</span>
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Date end")}
+                </span>
               </Dropdown.Item>
 
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
-              >
-              </Dropdown.Item>
+              ></Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -512,7 +599,8 @@ export function Notifications() {
                 </th>
               )} */}
               {selectedColumns.message && (
-                <th style={{minWidth: "250px"}}
+                <th
+                  style={{ minWidth: "250px" }}
                   className="sorting"
                   onClick={() => handleSortingColum("message")}
                 >
@@ -556,7 +644,8 @@ export function Notifications() {
                       color={"#123abc"}
                       loading={loading}
                       size={20}
-                    /></p>
+                    />
+                  </p>
                 </td>
               </tr>
             ) : list_Alarms.length > 0 ? (
@@ -567,17 +656,23 @@ export function Notifications() {
                       <input type="checkbox" className="form-check-input" />
                     </div>
                   </td>
-                  {selectedColumns.id_notification && <td>{alarme.id_notification}</td>}
+                  {selectedColumns.id_notification && (
+                    <td>{alarme.id_notification}</td>
+                  )}
                   {/* {selectedColumns.name_groupe_alarme && <td>{alarme.name_groupe_alarme}</td>}
                   {selectedColumns.name_alarme && <td>{alarme.name_alarme}</td>} */}
-                  {selectedColumns.message && <td>{alarme.message}</td>}
+                  {selectedColumns.message && (
+                    <td>{generateDescription(alarme)}</td>
+                  )}
                   {/* {selectedColumns.attached && (<td>{alarme.immatriculation_vehicule}</td>)} */}
-                  {selectedColumns.date_start && (<td>{formatToTimestamp(alarme.timestamp)}</td>)}
-                  {/* {selectedColumns.date_end && (<td>{formatToTimestamp(alarme.timestamp)}</td>)} */}
+                  {selectedColumns.date_start && (
+                    <td>{formatToTimestamp(alarme.timestamp.split("T")[0])}</td>
+                  )}
+                  {/* {selectedColumns.date_end && (<td>{formatToTimestamp(alarme.timestamp.split("T")[0])}</td>)} */}
                   <td>
                     <div className="d-flex align-items-center list-action">
                       <Link
-                          to={`/deadline/${alarme.id_alarm}/0`}
+                        to={`/deadline/${alarme.id_alarm}/0`}
                         className="badge badge-success mr-2"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -588,7 +683,6 @@ export function Notifications() {
                           style={{ fontSize: "1.2em" }}
                         ></i>
                       </Link>
-
                     </div>
                   </td>
                 </tr>
@@ -629,7 +723,6 @@ export function Notifications() {
             activeClassName={"active"}
           />
         </div>
-      
       </div>
     </>
   );
