@@ -91,7 +91,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
             !formData.type_pharmacy ||
             !formData.id_vehicule
         ) {
-            toast.error("Please fill out all fields.", {
+            toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

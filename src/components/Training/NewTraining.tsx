@@ -106,19 +106,19 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             !formData.date_end_training ||
             !formData.type_training
         ) {
-            toast.error("Please fill out all fields.", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "light",
-                transition: Bounce,
-            });
-            return false;
-        }
-    
+          toast.error(translate("Please fill out all fields."), {
+            position: "bottom-right",
+            autoClose: 2400,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Bounce,
+        });
+        return false;
+        
+      }
         // Vérifier que la date de début est antérieure à la date de fin
         const startDate = new Date(formData.date_start_training); // Convertir en objet Date
         const endDate = new Date(formData.date_end_training); // Convertir en objet Date
