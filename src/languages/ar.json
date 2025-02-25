@@ -733,5 +733,10 @@
 "Draining": "تغيير الزيت",
 "pending": "قيد الانتظار",
 "completed": "مكتمل",
-"canceled": "ملغى"
+"canceled": "ملغى",
+"Out of Service": "خارج الخدمة",
+"Broken Down": "معطل",
+"Under Repair": "قيد الإصلاح",
+"Available": "متاح",
+"Please fill out all fields": "يرجى ملء جميع الحقول"
 }

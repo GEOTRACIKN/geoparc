@@ -721,5 +721,10 @@
 "Draining": "Vidange",
 "pending": "en attente",
 "completed": "terminée",
-"canceled": "annulée"
+"canceled": "annulée",
+"Out of Service": "Hors Service",
+"Broken Down": "En panne",
+"Under Repair": "En réparation",
+"Available": "Disponible",
+"Please fill out all fields": "Veuillez remplir tous les champs"  
 }

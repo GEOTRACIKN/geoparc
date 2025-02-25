@@ -206,7 +206,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             !formData.type_fire ||
             !formData.id_vehicule
         ) {
-            toast.error("Please fill out all fields.", {
+           toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -265,7 +265,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Fire updated successfully!", {
+            toast.success(translate("Fire updated successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -283,7 +283,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating fire:", error);
-            toast.error("Error updating fire. Please try again.", {
+            toast.error(translate("Error updating fire. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
