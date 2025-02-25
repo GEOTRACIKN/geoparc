@@ -717,5 +717,8 @@
 "Extinguisher": "Extintor",
 "Technical control": "Inspección técnica",
 "Sticker": "Pegatina del vehículo",
-"Draining": "Cambio de aceite"
+"Draining": "Cambio de aceite",
+"pending": "pendiente",
+"completed": "completado",
+"canceled": "cancelado"
 }

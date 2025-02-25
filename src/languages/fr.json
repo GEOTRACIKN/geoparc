@@ -718,5 +718,8 @@
 "Extinguisher": "Extincteur",
 "Technical control": "Contrôle technique",
 "Sticker": "Vignette",
-"Draining": "Vidange"
+"Draining": "Vidange",
+"pending": "en attente",
+"completed": "terminée",
+"canceled": "annulée"
 }

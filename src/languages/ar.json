@@ -730,5 +730,8 @@
 "Extinguisher": "طفاية الحريق",
 "Technical control": "الفحص الفني",
 "Sticker": "الملصق",
-"Draining": "تغيير الزيت"
+"Draining": "تغيير الزيت",
+"pending": "قيد الانتظار",
+"completed": "مكتمل",
+"canceled": "ملغى"
 }

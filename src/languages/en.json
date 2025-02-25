@@ -707,5 +707,8 @@
 "Extinguisher": "Extinguisher",
 "Technical control": "Technical control",
 "Sticker": "Sticker",
-"Draining": "Draining"
+"Draining": "Draining",
+"pending":"pending",
+"completed": "completed",
+"canceled":"canceled"
 }

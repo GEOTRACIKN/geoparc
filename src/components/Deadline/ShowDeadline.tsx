@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
-import moment from "moment"; 
+import moment from "moment";
 
 interface ModalShowDeadlineProps {
   show: boolean;
@@ -96,47 +96,84 @@ const ModalShowDeadline: React.FC<ModalShowDeadlineProps> = ({
     }
   }, [show, id_deadline]);
 
-// Génération automatique de la description avec traduction
-const generatedDescription = (() => {
-  switch (parseInt(formData.id_type)) {
-    case 1: // Driving license
-      return translate("The driving license of") + ` ${formData.nom_conducteur} ${formData.prenom_conducteur} ` +
-             translate("will expire on") + ` ${formData.date_deadline}`;
-  
-    case 2: // Vehicle insurance
-      return translate("The insurance for") + ` ${formData.id_item} (${formData.item_name}) ` +
-             translate("will expire on") + ` ${formData.date_deadline}`;
-  
-    case 3: // Maintenance
-      return translate("The next maintenance for vehicle") + ` ${formData.immatriculation_vehicule} ` +
-             translate("is due by") + ` ${formData.date_deadline}`;
-  
-    case 4: // Training
-      return translate("The training certificate of") + ` ${formData.training_nom_conducteur} ${formData.training_prenom_conducteur} ` +
-             translate("will expire on") + ` ${formData.date_deadline}`;
-  
-    case 5: // Fire extinguisher verification
-      return translate("The fire extinguisher verification for vehicle") + ` ${formData.feu_immatriculation_vehicule} ` +
-             translate("is due by") + ` ${formData.date_deadline}`;
-  
-    case 6: // Technical control
-      return translate("The technical inspection for vehicle") + ` ${formData.immatriculation_vehicule} ` +
-             translate("must be done before") + ` ${formData.date_deadline}`;
-  
-    case 7: // Sticker
-      return translate("The vehicle sticker verification for") + ` ${formData.immatriculation_vehicule} ` +
-             translate("should be done by") + ` ${formData.date_deadline}`;
-  
-    case 8: // Draining
-      return translate("The draining verification for vehicle") + ` ${formData.immatriculation_vehicule} ` +
-             translate("is scheduled for") + ` ${formData.date_deadline}`;
-  
-    default:
-      return translate("The deadline for") + ` ${formData.id_item} (${formData.item_name}) ` +
-             translate("is set for") + ` ${formData.date_deadline}`;
-  }
-  
-})();
+  // Génération automatique de la description avec traduction
+  const generatedDescription = (() => {
+    const highlight = (value: any) => <span className="text-blue-500 font-semibold">{value}</span>;
+
+    switch (parseInt(formData.id_type)) {
+      case 1: // Driving license
+        return (
+          <>
+            {translate("The driving license of")} {highlight(formData.nom_conducteur)} {highlight(formData.prenom_conducteur)}{" "}
+            {translate("will expire on")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 2: // Vehicle insurance
+        return (
+          <>
+            {translate("The insurance for")} {highlight(formData.id_item)} ({highlight(formData.item_name)}){" "}
+            {translate("will expire on")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 3: // Maintenance
+        return (
+          <>
+            {translate("The next maintenance for vehicle")} {highlight(formData.immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 4: // Training
+        return (
+          <>
+            {translate("The training certificate of")} {highlight(formData.training_nom_conducteur)}{" "}
+            {highlight(formData.training_prenom_conducteur)} {translate("will expire on")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 5: // Fire extinguisher verification
+        return (
+          <>
+            {translate("The fire extinguisher verification for vehicle")} {highlight(formData.feu_immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 6: // Technical control
+        return (
+          <>
+            {translate("The technical inspection for vehicle")} {highlight(formData.immatriculation_vehicule)}{" "}
+            {translate("must be done before")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 7: // Sticker
+        return (
+          <>
+            {translate("The vehicle sticker verification for")} {highlight(formData.immatriculation_vehicule)}{" "}
+            {translate("should be done by")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      case 8: // Draining
+        return (
+          <>
+            {translate("The draining verification for vehicle")} {highlight(formData.immatriculation_vehicule)}{" "}
+            {translate("is scheduled for")} {highlight(formData.date_deadline)}
+          </>
+        );
+
+      default:
+        return (
+          <>
+            {translate("The deadline for")} {highlight(formData.id_item)} ({highlight(formData.item_name)}){" "}
+            {translate("is set for")} {highlight(formData.date_deadline)}
+          </>
+        );
+    }
+  })();
 
   return (
     <Modal show={show} onHide={onHide} responsive>
@@ -145,7 +182,10 @@ const generatedDescription = (() => {
       </Modal.Header>
 
       <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
-        <Form>
+        <Form style={{
+          color: "#000",
+          fontSize: "16px"
+        }}>
           <Form.Group>
             <Form.Label>{translate("Deadline date")} :</Form.Label>
             <p className="form-text">{formData.date_deadline}</p>
@@ -158,17 +198,17 @@ const generatedDescription = (() => {
 
           <Form.Group>
             <Form.Label>{translate("Type")} :</Form.Label>
-            <p className="form-text">{formData.nom_type}</p>
+            <p className="form-text">{translate("formData.nom_type")}</p>
           </Form.Group>
 
           <Form.Group>
             <Form.Label>{translate("Description")} :</Form.Label>
-            <p className="form-text">{generatedDescription}</p>
+            <p className="form-text">{<>{generatedDescription}</>}</p>
           </Form.Group>
 
           <Form.Group>
             <Form.Label>{translate("Status")} :</Form.Label>
-            <p className="form-text">{formData.status}</p>
+            <p className="form-text">{translate(formData.status)}</p>
           </Form.Group>
 
           <Form.Group>
