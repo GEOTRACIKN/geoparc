@@ -3,6 +3,8 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
+
 
 // Définir les types pour les props
 interface ModalNewPharmacyProps {
@@ -13,12 +15,11 @@ interface ModalNewPharmacyProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
     show,
@@ -37,6 +38,8 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
     const { translate } = useTranslate();
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     // Récupérer les véhicules selon l'ID utilisateur
     useEffect(() => {
@@ -81,14 +84,26 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_pharmacy: "",
+            product_pharmacy: "",
+            purch_date_pharmacy: "",
+            exp_date_pharmacy: "",
+            cost_pharmacy: "",
+            type_pharmacy: "",
+            id_vehicule: "", // Store vehicle ID
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
 
     const validateForm = () => {
         if (
             !formData.product_pharmacy ||
-            !formData.purch_date_pharmacy ||
+            
             !formData.exp_date_pharmacy ||
-            !formData.cost_pharmacy ||
-            !formData.type_pharmacy ||
+           
             !formData.id_vehicule
         ) {
             toast.error(translate("Please fill out all fields"), {
@@ -149,7 +164,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
             const result = await response.json();
 
-            toast.success("Pharmacy added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -200,13 +215,43 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 <Modal.Body>
                     {/* Product */}
                     <Form.Group controlId="product_pharmacy">
-                        <Form.Label>{translate("Product")}</Form.Label>
+                        <Form.Label>{translate("Product")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.product_pharmacy}
                             onChange={handleChange}
                         />
                     </Form.Group>
+                    <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
 
                     {/* Purchase Date */}
                     <Form.Group controlId="purch_date_pharmacy">
@@ -220,7 +265,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
                     {/* Expiry Date */}
                     <Form.Group controlId="exp_date_pharmacy">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_pharmacy}
@@ -248,29 +293,10 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                         />
                     </Form.Group>
 
-                    {/* Vehicle */}
-                    <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.length === 0 ? (
-                                <option value="">{translate("No vehicles available")}</option>
-                            ) : (
-                                vehicles.map((vehicle) => (
-                                    <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                        {vehicle.immatriculation_vehicule}
-                                    </option>
-                                ))
-                            )}
-                        </Form.Control>
-                    </Form.Group>
+                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

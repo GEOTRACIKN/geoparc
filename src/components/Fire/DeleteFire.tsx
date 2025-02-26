@@ -12,7 +12,6 @@ interface ModalDeleteFireProps {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalDeleteFire: React.FC<ModalDeleteFireProps> = ({
     show,
@@ -22,6 +21,8 @@ const ModalDeleteFire: React.FC<ModalDeleteFireProps> = ({
 }) => {
     // Move the useTranslate hook inside the component
     const { translate } = useTranslate();
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const handleDelete = async () => {
         try {

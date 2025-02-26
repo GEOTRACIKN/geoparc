@@ -18,13 +18,11 @@ interface EditFireModalProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
-
 const EditFireModal: React.FC<EditFireModalProps> = ({
     show,
     onHide,
@@ -41,9 +39,12 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         type_fire: "",
         id_vehicule: "",
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
+
    
 
     // Charger les données de la pharmacie existante
@@ -129,12 +130,14 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     
     useEffect(() => {
         const fetchVehicles = async () => {
-            try {
-                if (!geopuserID) {
-                    console.warn("No user ID provided");
-                    return;
-                }
+            if (!geopuserID) {
+                console.warn("No user ID provided");
+                return;
+            }
     
+            console.log("Fetching vehicles for user ID:", geopuserID); // Ajout du log pour voir si l'ID est correct
+    
+            try {
                 const response = await fetch(
                     `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
@@ -144,7 +147,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 }
     
                 const data = await response.json();
-                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+                console.log("API response for vehicles:", data); // Debug: voir la structure de data
     
                 setVehicles(data.vehicles || []);
             } catch (error) {
@@ -163,8 +166,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         };
     
         fetchVehicles();
-    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
-
+    }, [geopuserID, backendUrl]); // Déclenchement à chaque changement de `geopuserID`
     
     
 
@@ -196,13 +198,27 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     
       };
 
+      const handleClose = () => {
+        setFormData({
+            id_fire: "",
+            ref_fire: "",
+            volume_fire: "",
+            purch_date_fire: "",
+            exp_date_fire: "",
+            cost_fire: "",
+            type_fire: "",
+            id_vehicule: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
+      
+
     const validateForm = () => {
         if (
-            !formData.volume_fire ||
-            !formData.ref_fire ||
-            !formData.purch_date_fire ||
+            
             !formData.exp_date_fire ||
-            !formData.cost_fire ||
+          
             !formData.type_fire ||
             !formData.id_vehicule
         ) {
@@ -265,8 +281,8 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
             const result = await response.json();
 
-            toast.success(translate("Fire updated successfully!"), {
-                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {
+                                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -303,49 +319,9 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                     <Form.Group controlId="ref_fire">
-                        <Form.Label>{translate("Reference")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.ref_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="volume_fire">
-                        <Form.Label>{translate("Volume")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={formData.volume_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                   
-                    <Form.Group controlId="purch_date_fire">
-                        <Form.Label>{translate("Purchase Date")}</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={formData.purch_date_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="exp_date_fire">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={formData.exp_date_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="cost_fire">
-                        <Form.Label>{translate("Cost")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={formData.cost_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="type_fire">
-                        <Form.Label>{translate("Type")}</Form.Label>
+                      {/* Type */}
+                      <Form.Group controlId="type_fire">
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
                         <Select
                         options={fireOptions}
                         onChange={handleFireTypeChange}
@@ -356,24 +332,87 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                         />
 
                     </Form.Group>
+
                     <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
+
+                     {/* Purchase Date */}
+                     <Form.Group controlId="purch_date_fire">
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
+                            type="date"
+                            value={formData.purch_date_fire}
                             onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle) => (
-                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                    {vehicle.immatriculation_vehicule}
-                                </option>
-                            ))}
-                        </Form.Control>
+                        />
+                    </Form.Group>
+
+                    {/* Expiry Date */}
+                    <Form.Group controlId="exp_date_fire">
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.exp_date_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.ref_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    {/* Volume */}
+                    <Form.Group controlId="volume_fire">
+                        <Form.Label>{translate("Volume")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.volume_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+
+                    {/* Cost */}
+                    <Form.Group controlId="cost_fire">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.cost_fire}
+                            onChange={handleChange}
+                        />
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">
