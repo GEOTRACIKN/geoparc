@@ -22,7 +22,6 @@ type Vehicle = {
   immatriculation_vehicule: string;
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
@@ -31,6 +30,8 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 }) => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const geopuserID = localStorage.getItem("GeopUserID");
+
 
 
   const [formData, setFormData] = useState<{

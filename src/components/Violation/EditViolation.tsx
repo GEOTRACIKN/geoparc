@@ -29,7 +29,6 @@ interface Vehicle {
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     show,
@@ -47,6 +46,8 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
         description: "",
         customType: "",
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
