@@ -38,45 +38,53 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
     const { translate } = useTranslate();
       const [drivers, setDrivers] = useState<Driver[]>([]);
+      const id_user = localStorage.getItem("GeopUserID");
 
-        useEffect(() => {
-          if (show) {
+
+      useEffect(() => {
+        console.log("🔄 useEffect triggered!");
+        console.log("✅ show:", show, "🆔 geopuserID:", id_user);
+    
+        if (show && id_user) { // Vérifie que id_user est bien défini
             const fetchDrivers = async () => {
-              try {
-                const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
-        
-                if (!response.ok) {
-                  throw new Error("Failed to fetch drivers");
+                try {
+                    console.log("🚀 Fetching drivers for id_user:", id_user);
+                    const response = await fetch(`${backendUrl}/api/geop/drivers/${id_user}`);
+    
+                    if (!response.ok) {
+                        throw new Error(`❌ Failed to fetch drivers: ${response.status}`);
+                    }
+    
+                    const data = await response.json();
+                    console.log("📦 Drivers data received from API:", data);
+    
+                    const drivers = Array.isArray(data.vehicles)
+                        ? data.vehicles
+                            .filter(
+                                (driver: any) =>
+                                    driver.nom_conducteur?.trim() !== "" &&
+                                    driver.prenom_conducteur?.trim() !== ""
+                            )
+                            .map((driver: any) => ({
+                                id_conducteur: driver.id_conducteur,
+                                nom_conducteur: driver.nom_conducteur,
+                                prenom_conducteur: driver.prenom_conducteur,
+                            }))
+                        : [];
+    
+                    console.log("✅ Filtered drivers:", drivers);
+                    setDrivers(drivers);
+                } catch (error) {
+                    console.error("❌ Error fetching drivers:", error);
+                    setDrivers([]);
                 }
-        
-                const data = await response.json();
-                console.log("Drivers data received from API:", data);
-        
-                const drivers = Array.isArray(data.vehicles)
-                  ? data.vehicles
-                      .filter(
-                        (driver: any) =>
-                          driver.nom_conducteur?.trim() !== "" &&
-                          driver.prenom_conducteur?.trim() !== ""
-                      )
-                      .map((driver: any) => ({
-                        id_conducteur: driver.id_conducteur,
-                        nom_conducteur: driver.nom_conducteur,
-                        prenom_conducteur: driver.prenom_conducteur,
-                      }))
-                  : [];
-        
-                setDrivers(drivers);
-              } catch (error) {
-                console.error("Error fetching drivers:", error);
-                setDrivers([]);
-              }
             };
-        
+    
             fetchDrivers();
-          }
-        }, [show, backendUrl, geopuserID]);
-
+        } else {
+            console.log("⚠️ Conditions non remplies: soit `show` est faux, soit `id_user` est undefined.");
+        }
+    }, [show, backendUrl, id_user]);
     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -106,7 +114,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             !formData.date_end_training ||
             !formData.type_training
         ) {
-          toast.error(translate("Please fill out all fields."), {
+          toast.error(translate("Please fill out all fields"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -211,7 +219,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -259,7 +267,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                 <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
     <Select
     options={drivers.map(driver => ({
         value: driver.id_conducteur,
@@ -281,7 +289,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
                   
                     {/* Purchase Date */}
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
@@ -302,7 +310,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
                     {/* Type */}
                     <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
                         <Select
               options={trainingOptions}
               onChange={handletrainingTypeChange}
@@ -317,7 +325,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

@@ -11,8 +11,6 @@ interface ModalDeleteViolationProps {
     onSuccess?: () => void;
 }
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalDeleteViolation: React.FC<ModalDeleteViolationProps> = ({
     show,
@@ -23,6 +21,10 @@ const ModalDeleteViolation: React.FC<ModalDeleteViolationProps> = ({
     
 // Move the useTranslate hook inside the component
     const { translate } = useTranslate();
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const geopuserID = localStorage.getItem("GeopUserID");
+
+
 
     const handleDelete = async () => {
         try {

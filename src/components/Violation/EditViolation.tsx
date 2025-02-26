@@ -23,12 +23,12 @@ type Driver = {
 };
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
     show,
@@ -44,8 +44,9 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
         date_violation: "",
         cost: 0,
         description: "",
-        customType: "",
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -226,7 +227,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
       };
     
       const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, customType: e.target.value });
+        setFormData({ ...formData});
         console.log(formData);  // Affiche les données dans la console
       };
     
@@ -237,6 +238,19 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             ...prevState,
             [id]: value,
         }));
+    };
+
+    const handleClose = () => {
+        setFormData({
+            id_violation: "",
+            id_conducteur: "",
+            type_violation: "",
+            id_vehicule: "",
+            date_violation: "",
+            cost: 0,
+            description: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
     };
 
     const validateForm = () => {
@@ -270,15 +284,9 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             isValid = false;
         }
     
-        if (Number(formData.cost) < 0 || isNaN(Number(formData.cost))) {
-            toast.error("Le coût doit être un nombre positif !");
-            isValid = false;
-        }
+       
     
-        if (!formData.description) {
-            toast.error("La description est requise !");
-            isValid = false;
-        }
+      
     
         return isValid;
     };
@@ -310,7 +318,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
 
             const result = await response.json();
 
-            toast.success("Violation updated successfully!", {
+            toast.success(translate("Updated successfully!"), {        
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -351,7 +359,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
           style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
         >
            <Form.Group controlId="type_violation">
-            <Form.Label>{translate("Violation type")}</Form.Label>
+            <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
             <Select
               options={violationOptions}
               onChange={handleViolationTypeChange}
@@ -362,60 +370,70 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
               isClearable
             />
           </Form.Group>
-          {formData.type_violation === "other" && (
-            <Form.Group controlId="customType">
-              <Form.Label>{translate("Custom Violation Type")}</Form.Label>
-              <Form.Control
-                type="text"
-                name="customType"
-                value={formData.customType}
-                onChange={handleCustomTypeChange}
-                placeholder="Enter custom violation type"
-              />
-            </Form.Group>
-          )}
-       <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
-    <Form.Control
-        as="select"
-        value={formData.id_conducteur}
-        onChange={handleChange}
-    >
-        <option value="">{translate("Select Driver")}</option>
-        {drivers.length === 0 ? (
-            <option value="">{translate("No drivers available")}</option>
-        ) : (
-            drivers.map((driver) => (
-                <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                    {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
-                </option>
-            ))
-        )}
-    </Form.Control>
+         
+          <Form.Group controlId="id_conducteur">
+            <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+            <Select
+                options={drivers.map(driver => ({
+                    value: driver.id_conducteur, // Numéro du conducteur
+                    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
+                })) as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                placeholder={translate("Select Driver")}
+                isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                noOptionsMessage={() => translate("No drivers available")}
+                isSearchable // Active la recherche
+
+                // 🔥 Correction de la sélection automatique avec conversion en string
+                value={drivers
+                    .map(driver => ({
+                        value: driver.id_conducteur,
+                        label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
+                    }))
+                    .find(option => String(option.value) === String(formData.id_conducteur)) || null
+                }
+
+                onChange={(selectedOption) => {
+                    setFormData(prev => ({
+                        ...prev,
+                        id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                    }));
+                }}
+            />
+        </Form.Group>
+        <Form.Group controlId="id_vehicule">
+    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+    <Select
+        options={vehicles.map(vehicle => ({
+                                value: vehicle.id_vehicule, // ID du véhicule
+                                label: vehicle.immatriculation_vehicule // Immatriculation
+                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+        placeholder={translate("Select Vehicle")}
+        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+        noOptionsMessage={() => translate("No vehicles available")}
+        isSearchable // Active la recherche
+
+        // 🔥 Correction de la sélection automatique avec conversion en string
+        value={vehicles
+            .map(vehicle => ({
+                value: vehicle.id_vehicule,
+                label: vehicle.immatriculation_vehicule
+            }))
+            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+        }
+
+        onChange={(selectedOption) => {
+            setFormData(prev => ({
+                ...prev,
+                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+            }));
+        }}
+    />
 </Form.Group>
 
-        <Form.Group controlId="id_vehicule">
-                               <Form.Label>{translate("Vehicle")}</Form.Label>
-                               <Form.Control
-                                   as="select"
-                                   value={formData.id_vehicule}
-                                   onChange={handleChange}
-                               >
-                                   <option value="">{translate("Select Vehicle")}</option>
-                                   {vehicles.length === 0 ? (
-                                       <option value="">{translate("No vehicles available")}</option>
-                                   ) : (
-                                       vehicles.map((vehicle) => (
-                                           <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                               {vehicle.immatriculation_vehicule}
-                                           </option>
-                                       ))
-                                   )}
-                               </Form.Control>
-                           </Form.Group>
-
           <Form.Group controlId="date">
-            <Form.Label>{translate("Date Violation")}</Form.Label>
+            <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
             <Form.Control
               type="datetime-local"
               name="date"
@@ -425,16 +443,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             />
           </Form.Group>
 
-          <Form.Group controlId="cost">
-            <Form.Label>{translate("Cost")}</Form.Label>
-            <Form.Control
-              type="text"
-              name="cost"
-              value={formData.cost}
-              onChange={handleInputChange}
-              placeholder="Enter Cost here"
-            />
-          </Form.Group>
           <Form.Group controlId="description">
             <Form.Label>{translate("Description")}</Form.Label>
             <Form.Control
@@ -448,7 +456,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
           </Form.Group>
         </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

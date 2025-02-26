@@ -356,32 +356,6 @@ export function Fire() {
                                     {translate("ID")}
                                 </th>
                             )}
-                             {selectedColumns.Reference && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("ref_fire")}
-                                >
-                                    {translate("Reference")}
-                                </th>
-                            )}
-                            
-                             {selectedColumns.Volume && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("volume_fire")}
-                                >
-                                    {translate("Volume")}
-                                </th>
-                            )}
-                            
-                             {selectedColumns.Cost && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("cost_fire")}
-                                >
-                                    {translate("Cost")}
-                                </th>
-                            )} 
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -414,6 +388,33 @@ export function Fire() {
                                     {translate("Expiration Date")}
                                 </th>
                             )}
+                             {selectedColumns.Reference && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("ref_fire")}
+                                >
+                                    {translate("Reference")}
+                                </th>
+                            )}
+                            
+                             {selectedColumns.Volume && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("volume_fire")}
+                                >
+                                    {translate("Volume")}
+                                </th>
+                            )}
+                            
+                             {selectedColumns.Cost && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("cost_fire")}
+                                >
+                                    {translate("Cost")}
+                                </th>
+                            )} 
+                            
                             
                             <th>{translate("Action")}</th>
                         </tr>
@@ -447,19 +448,7 @@ export function Fire() {
                                             {selectedColumns.ID && (
                                                 <td>{Fire.id_fire}</td>
                                             )}
-                                             {selectedColumns.Reference && (
-                                                <td>{Fire.ref_fire}</td>
-                                            )}
-                                         
-                                              {selectedColumns.Volume && (
-                                                <td>{Fire.volume_fire}</td>
-                                            )}
-
-                                         
-                                            {selectedColumns.Cost && (
-                                                <td>{Fire.cost_fire}</td>
-                                            )}
-                                            {selectedColumns.Type && (
+                                              {selectedColumns.Type && (
                                                 <td>{mapFireType(Fire.type_fire)}</td>
                                             )}
                                                {selectedColumns.Vehicle && (
@@ -473,6 +462,19 @@ export function Fire() {
                                              {selectedColumns["Expiration Date"] && (
                                                 <td>{Fire.exp_date_fire}</td>
                                             )}
+                                             {selectedColumns.Reference && (
+                                                <td>{Fire.ref_fire}</td>
+                                            )}
+                                         
+                                              {selectedColumns.Volume && (
+                                                <td>{Fire.volume_fire}</td>
+                                            )}
+
+                                         
+                                            {selectedColumns.Cost && (
+                                                <td>{Fire.cost_fire}</td>
+                                            )}
+                                          
                                             
                                           
                                           <td className="text-center">

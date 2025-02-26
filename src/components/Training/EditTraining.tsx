@@ -20,7 +20,6 @@ interface Driver {
     nom_conducteur: string;
     prenom_conducteur: string;
 }
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
@@ -40,45 +39,47 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
     const { translate } = useTranslate();
     const [drivers, setDrivers] = useState<Driver[]>([]);
+    const geopuserID = localStorage.getItem("GeopUserID");
 
-       useEffect(() => {
-            if (show) {
-              const fetchDrivers = async () => {
+
+    useEffect(() => {
+        console.log("useEffect triggered - show:", show, "geopuserID:", geopuserID);
+    
+        if (show && geopuserID) { // Vérifie si geopuserID est défini avant d'exécuter la requête
+            const fetchDrivers = async () => {
                 try {
-                  const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
-          
-                  if (!response.ok) {
-                    throw new Error("Failed to fetch drivers");
-                  }
-          
-                  const data = await response.json();
-                  console.log("Drivers data received from API:", data);
-          
-                  const drivers = Array.isArray(data.vehicles)
-                    ? data.vehicles
-                        .filter(
-                          (driver: any) =>
-                            driver.nom_conducteur?.trim() !== "" &&
-                            driver.prenom_conducteur?.trim() !== ""
-                        )
-                        .map((driver: any) => ({
-                          id_conducteur: driver.id_conducteur,
-                          nom_conducteur: driver.nom_conducteur,
-                          prenom_conducteur: driver.prenom_conducteur,
-                        }))
-                    : [];
-          
-                  setDrivers(drivers);
+                    console.log("Fetching drivers for geopuserID:", geopuserID);
+                    const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+    
+                    if (!response.ok) throw new Error("Failed to fetch drivers");
+    
+                    const data = await response.json();
+                    console.log("Drivers data received from API:", data);
+    
+                    const drivers = Array.isArray(data.vehicles)
+                        ? data.vehicles
+                            .filter((driver: any) =>
+                                driver.nom_conducteur?.trim() !== "" && driver.prenom_conducteur?.trim() !== ""
+                            )
+                            .map((driver: any) => ({
+                                id_conducteur: driver.id_conducteur,
+                                nom_conducteur: driver.nom_conducteur,
+                                prenom_conducteur: driver.prenom_conducteur,
+                            }))
+                        : [];
+    
+                    console.log("Filtered drivers:", drivers);
+                    setDrivers(drivers);
                 } catch (error) {
-                  console.error("Error fetching drivers:", error);
-                  setDrivers([]);
+                    console.error("Error fetching drivers:", error);
+                    setDrivers([]);
                 }
-              };
-          
-              fetchDrivers();
-            }
-          }, [show, backendUrl, geopuserID]);
-   
+            };
+    
+            setTimeout(fetchDrivers, 500); // Ajoute un délai pour laisser le temps aux données de se charger
+        }
+    }, [show, backendUrl, geopuserID]);
+    
     useEffect(() => {
         // Vérifie si l'id_training est valide avant de faire l'appel API
         if (!id_training) {
@@ -155,13 +156,15 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     }, [id_training, backendUrl]);
 
     useEffect(() => {
-        if (show) {
+        console.log("Valeur de geopuserID:", geopuserID); // Vérifier ce qui est stocké
+      
+        if (show && geopuserID) { // Vérification supplémentaire
           const fetchDrivers = async () => {
             try {
               const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
       
               if (!response.ok) {
-                throw new Error("Failed to fetch drivers");
+                throw new Error(`Failed to fetch drivers: ${response.status}`);
               }
       
               const data = await response.json();
@@ -191,6 +194,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
           fetchDrivers();
         }
       }, [show, backendUrl, geopuserID]);
+      
        useEffect(() => {
               if (formData.date_start_training) {
                 const startDate = new Date(formData.date_start_training);
@@ -231,6 +235,17 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_training:"",
+            id_conducteur: "",
+            date_start_training: "",
+            date_end_training: "",
+            type_training: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+    
 
     const validateForm = () => {
         // Vérifier si tous les champs sont remplis
@@ -317,8 +332,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training updated successfully!", {
-                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -357,7 +371,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                 <Modal.Body>
                     
                 <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
     <Select
         options={drivers.map(driver => ({
             value: driver.id_conducteur, // Numéro du conducteur
@@ -390,7 +404,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                    
 
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
@@ -409,7 +423,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                     </Form.Group>
                     
                     <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
                         <Select
               options={trainingOptions}
               onChange={handletrainingTypeChange}
@@ -423,7 +437,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">
