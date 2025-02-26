@@ -166,6 +166,17 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             [id]: value,
         }));
     };
+        const handleReset = () => {
+        setFormData({
+        id_training: "",
+        id_conducteur: "",
+        date_start_training: "",
+        date_end_training: "",
+        type_training: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
 
     const validateForm = () => {
         if (
@@ -355,12 +366,12 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
     {isEditable ? (
         <>
             <Button type="submit">{translate("Save")}</Button>
-            <Button variant="secondary" onClick={handleClose}>
+            <Button variant="secondary" onClick={handleReset}>
                 {translate("Close")}
             </Button>
         </>
     ) : (
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={handleReset}>
             {translate("Close")}
         </Button>
     )}

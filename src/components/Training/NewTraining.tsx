@@ -106,7 +106,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             !formData.date_end_training ||
             !formData.type_training
         ) {
-          toast.error(translate("Please fill out all fields."), {
+          toast.error(translate("Please fill out all fields"), {
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -317,7 +317,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

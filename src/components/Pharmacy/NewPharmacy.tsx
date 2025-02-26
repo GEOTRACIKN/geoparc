@@ -81,6 +81,19 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_pharmacy: "",
+            product_pharmacy: "",
+            purch_date_pharmacy: "",
+            exp_date_pharmacy: "",
+            cost_pharmacy: "",
+            type_pharmacy: "",
+            id_vehicule: "", // Store vehicle ID
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
 
     const validateForm = () => {
         if (
@@ -270,7 +283,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

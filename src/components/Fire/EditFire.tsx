@@ -196,6 +196,22 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     
       };
 
+      const handleClose = () => {
+        setFormData({
+            id_fire: "",
+            ref_fire: "",
+            volume_fire: "",
+            purch_date_fire: "",
+            exp_date_fire: "",
+            cost_fire: "",
+            type_fire: "",
+            id_vehicule: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
+      
+
     const validateForm = () => {
         if (
             !formData.volume_fire ||
@@ -373,7 +389,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

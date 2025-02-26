@@ -231,6 +231,17 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_training:"",
+            id_conducteur: "",
+            date_start_training: "",
+            date_end_training: "",
+            type_training: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+    
 
     const validateForm = () => {
         // Vérifier si tous les champs sont remplis
@@ -423,7 +434,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">
