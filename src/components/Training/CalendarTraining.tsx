@@ -6,6 +6,7 @@ import { Bounce, toast } from "react-toastify";
 import axios from 'axios';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ModalDeleteTraining from "./DeleteTraining";  // Import your delete modal component
+import Select from "react-select";
 
 interface CalendarTrainingModalProps {
     show: boolean;
@@ -306,29 +307,36 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                 <Modal.Body>
                 <Form.Group controlId="id_conducteur">
     <Form.Label>{translate("Driver")}</Form.Label>
-    <Form.Control
-        as="select"
-        value={String(formData.id_conducteur)} // 🔥 Conversion en string pour éviter les erreurs
-        onChange={(e) =>
+    <Select
+        options={drivers.map((driver) => ({
+            value: driver.id_conducteur,
+            label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+        }))}
+
+        placeholder={translate("Select Driver")}
+        isLoading={drivers.length === 0} // Loader si les données ne sont pas chargées
+        noOptionsMessage={() => translate("No drivers available")}
+        isSearchable // 🔥 Active la recherche
+
+        value={drivers
+            .map((driver) => ({
+                value: driver.id_conducteur,
+                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+            }))
+            .find((option) => String(option.value) === String(formData.id_conducteur)) || null
+        }
+
+        onChange={(selectedOption) => {
             setFormData((prev) => ({
                 ...prev,
-                id_conducteur: e.target.value || "", // 🔥 Gère le cas où aucune option n'est sélectionnée
-            }))
-        }
-        disabled={!isEditable}
-    >
-        <option value="">{translate("Select Driver")}</option>
-        {drivers.length === 0 ? (
-            <option value="">{translate("No drivers available")}</option>
-        ) : (
-            drivers.map((driver) => (
-                <option key={driver.id_conducteur} value={String(driver.id_conducteur)}>
-                    {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
-                </option>
-            ))
-        )}
-    </Form.Control>
+                id_conducteur: selectedOption ? String(selectedOption.value) : "",
+            }));
+        }}
+
+        isDisabled={!isEditable} // Désactivation si non éditable
+    />
 </Form.Group>
+
 
 
 
@@ -351,16 +359,31 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Training Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={isEditable ? formData.type_training : mapTrainingType(formData.type_training)}
-                            onChange={handleChange}
-                            disabled={!isEditable}
-                        />
-                    </Form.Group>
-
+                        <Form.Group controlId="type_training">
+                            <Form.Label>{translate("Training Type")}</Form.Label>
+                            {isEditable ? (
+                                <Select
+                                options={trainingOptions}
+                                // Ici, on cherche l'option dont la valeur correspond à formData.type_training
+                                value={trainingOptions.find(option => option.value === formData.type_training) || null}
+                                onChange={(selectedOption) =>
+                                    setFormData(prev => ({
+                                    ...prev,
+                                    type_training: selectedOption ? selectedOption.value : ""
+                                    }))
+                                }
+                                placeholder={translate("Select Training Type")}
+                                isSearchable
+                                />
+                            ) : (
+                                // En mode lecture, on affiche le label complet grâce à mapTrainingType
+                                <Form.Control 
+                                type="text" 
+                                value={mapTrainingType(formData.type_training)} 
+                                readOnly 
+                                />
+                            )}
+                            </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
     {isEditable ? (
