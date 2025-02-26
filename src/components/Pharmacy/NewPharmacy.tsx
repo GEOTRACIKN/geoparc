@@ -164,7 +164,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
             const result = await response.json();
 
-            toast.success("Pharmacy added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

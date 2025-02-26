@@ -281,8 +281,8 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
             const result = await response.json();
 
-            toast.success(translate("Fire updated successfully!"), {
-                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {
+                                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,

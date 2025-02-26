@@ -263,7 +263,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Pharmacy updated successfully!", {
+            toast.success(translate("Updated successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

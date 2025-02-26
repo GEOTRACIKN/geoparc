@@ -318,7 +318,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
 
             const result = await response.json();
 
-            toast.success("Violation updated successfully!", {
+            toast.success(translate("Updated successfully!"), {        
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

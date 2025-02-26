@@ -88,7 +88,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
             console.log(result);
 
             // Afficher une notification de succès
-            toast.success("Intervention added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

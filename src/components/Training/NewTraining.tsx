@@ -219,7 +219,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

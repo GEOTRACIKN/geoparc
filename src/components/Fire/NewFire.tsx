@@ -186,7 +186,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
 
             const result = await response.json();
 
-            toast.success("Fire added successfully!", {
+            toast.success(translate("Added successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

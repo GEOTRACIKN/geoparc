@@ -332,8 +332,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training updated successfully!", {
-                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,

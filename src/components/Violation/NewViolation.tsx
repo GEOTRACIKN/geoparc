@@ -198,7 +198,8 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       })
       .then((data) => {
         if (data.message === 'violation ajouté avec succès') {
-          toast.success("Violation added successfully!", {
+          toast.success(translate("Added successfully!"), 
+          {            
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
