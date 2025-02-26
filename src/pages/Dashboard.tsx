@@ -226,7 +226,7 @@ export function Dashboard() {
             { id: "5", value: counts["5"], max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
             { id: "6", value: counts["6"], max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "DrainingDetail" },
             { id: "7", value: counts["7"], max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailSticker" },
-            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailEntretienDate" },
+            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailDraining" },
             // { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
             // { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
             // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
