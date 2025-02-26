@@ -19,7 +19,6 @@ interface Vehicle {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewFire: React.FC<ModalNewFireProps> = ({
     show,
@@ -36,6 +35,8 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
         type_fire: "",
         id_vehicule: "", // Store vehicle ID
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
     const { translate } = useTranslate();
@@ -123,11 +124,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
 
     const validateForm = () => {
         if (
-            !formData.volume_fire ||
-            !formData.ref_fire ||
-            !formData.purch_date_fire ||
             !formData.exp_date_fire ||
-            !formData.cost_fire ||
             !formData.type_fire ||
             !formData.id_vehicule
         ) {

@@ -23,7 +23,6 @@ interface Vehicle {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const EditFireModal: React.FC<EditFireModalProps> = ({
     show,
@@ -41,9 +40,12 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         type_fire: "",
         id_vehicule: "",
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
+
    
 
     // Charger les données de la pharmacie existante
@@ -215,11 +217,9 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
     const validateForm = () => {
         if (
-            !formData.volume_fire ||
-            !formData.ref_fire ||
-            !formData.purch_date_fire ||
+            
             !formData.exp_date_fire ||
-            !formData.cost_fire ||
+          
             !formData.type_fire ||
             !formData.id_vehicule
         ) {

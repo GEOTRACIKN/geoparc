@@ -20,7 +20,6 @@ interface Vehicle {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     show,
@@ -39,6 +38,8 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     });
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const geopuserID = localStorage.getItem("GeopUserID");
+
     const { translate } = useTranslate();
     const formatDate = (date: string) => {
         const parsedDate = new Date(date);

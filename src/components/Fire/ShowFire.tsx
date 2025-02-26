@@ -70,7 +70,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                     id_fire: data.id_fire,
                     volume_fire: data.volume_fire,
                     ref_fire: data.ref_fire,
-                    purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
+                    purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : '',
                     exp_date_fire: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     cost_fire: data.cost_fire,
                     type_fire: mapFireType(data.type_fire),

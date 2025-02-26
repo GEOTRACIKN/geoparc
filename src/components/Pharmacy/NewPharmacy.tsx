@@ -18,7 +18,6 @@ interface Vehicle {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
     show,
@@ -37,6 +36,8 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
     const { translate } = useTranslate();
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     // Récupérer les véhicules selon l'ID utilisateur
     useEffect(() => {
