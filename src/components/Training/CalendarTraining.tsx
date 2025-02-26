@@ -306,7 +306,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                 <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
     <Select
         options={drivers.map((driver) => ({
             value: driver.id_conducteur,
@@ -341,7 +341,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
 
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
@@ -360,7 +360,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                     </Form.Group>
 
                         <Form.Group controlId="type_training">
-                            <Form.Label>{translate("Training Type")}</Form.Label>
+                            <Form.Label>{translate("Training Type")}{translate(" *")}</Form.Label>
                             {isEditable ? (
                                 <Select
                                 options={trainingOptions}

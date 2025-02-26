@@ -121,7 +121,17 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       fetchDrivers();
     }
   }, [show, backendUrl, geopuserID]);
-  
+  const handleClose = () => {
+    setFormData({
+      id_conducteur: "",
+    type: "",
+    id_vehicule: "",
+    date: "",
+    cost: null, // Null est maintenant accepté
+    description: "",
+    });
+    onHide(); // Fermer le modal après la réinitialisation
+};
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prevState) => ({
@@ -182,7 +192,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       .then((response) => {
         if (!response.ok) {
           // Si la réponse HTTP n'est pas ok, on déclenche une erreur
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(``);
         }
         return response.json();
       })
@@ -222,7 +232,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         }
       })
       .catch((error) => {
-        toast.error("Error adding violation: " + error.message, {
+        toast.error("Please fill out all fields" + error.message, {
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -233,7 +243,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           theme: "light",
           transition: Bounce,
         });
-        console.error("Error adding violation:", error);
+        console.error("Error adding violation", error);
       });
   };
 
@@ -251,90 +261,130 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         <Modal.Body
           style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
         >
-          <Form.Group controlId="type">
-            <Form.Label>{translate("Violation type")}</Form.Label>
-            <Select
-              options={violationOptions}
-              onChange={handleViolationTypeChange}
-              name="type"
-              value={violationOptions.find(
-                (option) => option.value === formData.type
-              )}
-              isClearable
-            />
-          </Form.Group>
-          
-       
-          <Form.Group controlId="id_conducteur">
-            <Form.Label>{translate("Driver")}</Form.Label>
-            <Select
-                options={drivers.map(driver => ({
-                    value: driver.id_conducteur, // Numéro du conducteur
-                    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
-                })) as { value: number; label: string }[]} // 🔥 Correction du typage
-
-                placeholder={translate("Select Driver")}
-                isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
-                noOptionsMessage={() => translate("No drivers available")}
-                isSearchable // Active la recherche
-
-                // 🔥 Correction de la sélection automatique avec conversion en string
-                value={drivers
-                    .map(driver => ({
-                        value: driver.id_conducteur,
-                        label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
-                    }))
-                    .find(option => String(option.value) === String(formData.id_conducteur)) || null
-                }
-
-                onChange={(selectedOption) => {
-                    setFormData(prev => ({
-                        ...prev,
-                        id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
-                    }));
-                }}
-            />
-        </Form.Group>
-        <Form.Group controlId="id_vehicule">
-    <Form.Label>{translate("Vehicle")}</Form.Label>
-    <Select
-        options={vehicles.map(vehicle => ({
-                                value: vehicle.id_vehicule, // ID du véhicule
-                                label: vehicle.immatriculation_vehicule // Immatriculation
-                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
-
-        placeholder={translate("Select Vehicle")}
-        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
-        noOptionsMessage={() => translate("No vehicles available")}
-        isSearchable // Active la recherche
-
-        // 🔥 Correction de la sélection automatique avec conversion en string
-        value={vehicles
-            .map(vehicle => ({
-                value: vehicle.id_vehicule,
-                label: vehicle.immatriculation_vehicule
-            }))
-            .find(option => String(option.value) === String(formData.id_vehicule)) || null
-        }
-
-        onChange={(selectedOption) => {
-            setFormData(prev => ({
-                ...prev,
-                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
-            }));
-        }}
-    />
+         {/* Violation Type */}
+<Form.Group controlId="type">
+  <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
+  <Select
+    options={violationOptions}
+    onChange={handleViolationTypeChange}
+    name="type"
+    value={
+      violationOptions.find((option) => option.value === formData.type) || null
+    }
+    isClearable
+    isSearchable
+    styles={{
+      control: (provided) => ({
+        ...provided,
+        borderColor: formData.type === "" ? "red" : provided.borderColor,
+        "&:hover": {
+          borderColor: formData.type === "" ? "red" : provided.borderColor,
+        },
+      }),
+    }}
+  />
 </Form.Group>
-          <Form.Group controlId="date">
-            <Form.Label>{translate("Date Violation")}</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              placeholder="Enter Date and Time here"
-            />
-          </Form.Group>
+
+{/* Driver */}
+<Form.Group controlId="id_conducteur">
+  <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+  <Select
+    options={drivers.map((driver) => ({
+      value: driver.id_conducteur,
+      label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+    }))}
+    placeholder={translate("Select Driver")}
+    isLoading={drivers.length === 0}
+    noOptionsMessage={() => translate("No drivers available")}
+    isSearchable
+    value={
+      drivers
+        .map((driver) => ({
+          value: driver.id_conducteur,
+          label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+        }))
+        .find(
+          (option) =>
+            String(option.value) === String(formData.id_conducteur)
+        ) || null
+    }
+    onChange={(selectedOption) => {
+      setFormData((prev) => ({
+        ...prev,
+        id_conducteur: selectedOption ? String(selectedOption.value) : "",
+      }));
+    }}
+    styles={{
+      control: (provided) => ({
+        ...provided,
+        borderColor:
+          formData.id_conducteur === "" ? "red" : provided.borderColor,
+        "&:hover": {
+          borderColor:
+            formData.id_conducteur === "" ? "red" : provided.borderColor,
+        },
+      }),
+    }}
+  />
+</Form.Group>
+
+{/* Vehicle */}
+<Form.Group controlId="id_vehicule">
+  <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+  <Select
+    options={vehicles.map((vehicle) => ({
+      value: vehicle.id_vehicule,
+      label: vehicle.immatriculation_vehicule,
+    }))}
+    placeholder={translate("Select Vehicle")}
+    isLoading={vehicles.length === 0}
+    noOptionsMessage={() => translate("No vehicles available")}
+    isSearchable
+    value={
+      vehicles
+        .map((vehicle) => ({
+          value: vehicle.id_vehicule,
+          label: vehicle.immatriculation_vehicule,
+        }))
+        .find(
+          (option) =>
+            String(option.value) === String(formData.id_vehicule)
+        ) || null
+    }
+    onChange={(selectedOption) => {
+      setFormData((prev) => ({
+        ...prev,
+        id_vehicule: selectedOption ? String(selectedOption.value) : "",
+      }));
+    }}
+    styles={{
+      control: (provided) => ({
+        ...provided,
+        borderColor:
+          formData.id_vehicule === "" ? "red" : provided.borderColor,
+        "&:hover": {
+          borderColor:
+            formData.id_vehicule === "" ? "red" : provided.borderColor,
+        },
+      }),
+    }}
+  />
+</Form.Group>
+
+{/* Date Violation */}
+<Form.Group controlId="date">
+  <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
+  <Form.Control
+    type="datetime-local"
+    name="date"
+    value={formData.date}
+    onChange={handleInputChange}
+    placeholder="Enter Date and Time here"
+    style={{
+      borderColor: formData.date === "" ? "red" : undefined,
+    }}
+  />
+</Form.Group>
 
         
           <Form.Group controlId="description">
@@ -350,7 +400,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
+          <Button variant="secondary" onClick={handleClose}>
             {translate("Close")}
           </Button>
           <Button variant="primary" type="submit">

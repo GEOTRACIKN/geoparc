@@ -372,7 +372,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                 <Modal.Body>
                     
                 <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
+    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
     <Select
         options={drivers.map(driver => ({
             value: driver.id_conducteur, // Numéro du conducteur
@@ -405,7 +405,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                    
 
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
@@ -424,7 +424,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                     </Form.Group>
                     
                     <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
                         <Select
               options={trainingOptions}
               onChange={handletrainingTypeChange}

@@ -215,7 +215,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                 <Modal.Body>
                     {/* Product */}
                     <Form.Group controlId="product_pharmacy">
-                        <Form.Label>{translate("Product")}</Form.Label>
+                        <Form.Label>{translate("Product")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.product_pharmacy}
@@ -223,7 +223,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                         />
                     </Form.Group>
                     <Form.Group controlId="id_vehicule">
-                    <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
                     <Select
                         options={vehicles.map(vehicle => ({
                                                 value: vehicle.id_vehicule, // ID du véhicule
@@ -265,7 +265,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
 
                     {/* Expiry Date */}
                     <Form.Group controlId="exp_date_pharmacy">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_pharmacy}

@@ -321,7 +321,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 <Modal.Body>
                       {/* Type */}
                       <Form.Group controlId="type_fire">
-                        <Form.Label>{translate("Type")}</Form.Label>
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
                         <Select
                         options={fireOptions}
                         onChange={handleFireTypeChange}
@@ -334,7 +334,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="id_vehicule">
-                    <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
                     <Select
                         options={vehicles.map(vehicle => ({
                                                 value: vehicle.id_vehicule, // ID du véhicule
@@ -376,7 +376,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
                     {/* Expiry Date */}
                     <Form.Group controlId="exp_date_fire">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_fire}

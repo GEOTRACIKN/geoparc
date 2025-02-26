@@ -44,7 +44,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
         date_violation: "",
         cost: 0,
         description: "",
-        customType: "",
     });
     const geopuserID = localStorage.getItem("GeopUserID");
 
@@ -228,7 +227,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
       };
     
       const handleCustomTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, customType: e.target.value });
+        setFormData({ ...formData});
         console.log(formData);  // Affiche les données dans la console
       };
     
@@ -239,6 +238,19 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             ...prevState,
             [id]: value,
         }));
+    };
+
+    const handleClose = () => {
+        setFormData({
+            id_violation: "",
+            id_conducteur: "",
+            type_violation: "",
+            id_vehicule: "",
+            date_violation: "",
+            cost: 0,
+            description: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
     };
 
     const validateForm = () => {
@@ -347,7 +359,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
           style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
         >
            <Form.Group controlId="type_violation">
-            <Form.Label>{translate("Violation type")}</Form.Label>
+            <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
             <Select
               options={violationOptions}
               onChange={handleViolationTypeChange}
@@ -360,7 +372,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
           </Form.Group>
          
           <Form.Group controlId="id_conducteur">
-            <Form.Label>{translate("Driver")}</Form.Label>
+            <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
             <Select
                 options={drivers.map(driver => ({
                     value: driver.id_conducteur, // Numéro du conducteur
@@ -390,7 +402,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             />
         </Form.Group>
         <Form.Group controlId="id_vehicule">
-    <Form.Label>{translate("Vehicle")}</Form.Label>
+    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
     <Select
         options={vehicles.map(vehicle => ({
                                 value: vehicle.id_vehicule, // ID du véhicule
@@ -421,7 +433,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
 </Form.Group>
 
           <Form.Group controlId="date">
-            <Form.Label>{translate("Date Violation")}</Form.Label>
+            <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
             <Form.Control
               type="datetime-local"
               name="date"
@@ -431,16 +443,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             />
           </Form.Group>
 
-          <Form.Group controlId="cost">
-            <Form.Label>{translate("Cost")}</Form.Label>
-            <Form.Control
-              type="text"
-              name="cost"
-              value={formData.cost}
-              onChange={handleInputChange}
-              placeholder="Enter Cost here"
-            />
-          </Form.Group>
           <Form.Group controlId="description">
             <Form.Label>{translate("Description")}</Form.Label>
             <Form.Control
@@ -454,7 +456,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
           </Form.Group>
         </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">
