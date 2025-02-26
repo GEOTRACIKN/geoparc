@@ -99,10 +99,9 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
     const validateForm = () => {
         if (
             !formData.product_pharmacy ||
-            !formData.purch_date_pharmacy ||
+            
             !formData.exp_date_pharmacy ||
-            !formData.cost_pharmacy ||
-            !formData.type_pharmacy ||
+           
             !formData.id_vehicule
         ) {
             toast.error(translate("Please fill out all fields"), {
