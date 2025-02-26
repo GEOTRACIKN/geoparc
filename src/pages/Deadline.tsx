@@ -242,7 +242,7 @@ export function Deadline() {
       // Formatter les données pour FullCalendar
       const formattedDeadlines = data.map((deadline: any) => ({
         id: deadline.id_deadline || "Sans ID",
-        title: deadline.description || "Sans titre",
+        title: generatePlainTextDescription(deadline) || "Sans titre",
         start: deadline.date_deadline
           ? moment(deadline.date_deadline).format("YYYY-MM-DD")
           : null,
@@ -263,6 +263,31 @@ export function Deadline() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  
+  
+  const generatePlainTextDescription = (deadline: any) => {
+    switch (deadline.id_type) {
+      case 1:
+        return `The driving license of ${deadline.nom_conducteur} ${deadline.prenom_conducteur} will expire on ${deadline.date_deadline}`;
+      case 2:
+        return `The insurance for ${deadline.id_item} (${deadline.immatriculation_vehicule}) will expire on ${deadline.date_deadline}`;
+      case 3:
+        return `The next maintenance for vehicle ${deadline.immatriculation_vehicule} is due by ${deadline.date_deadline}`;
+      case 4:
+        return `The training certificate of ${deadline.training_nom_conducteur} ${deadline.training_prenom_conducteur} will expire on ${deadline.date_deadline}`;
+      case 5:
+        return `The fire extinguisher verification for vehicle ${deadline.feu_immatriculation_vehicule} is due by ${deadline.date_deadline}`;
+      case 6:
+        return `The technical inspection for vehicle ${deadline.immatriculation_vehicule} must be done before ${deadline.date_deadline}`;
+      case 7:
+        return `The vehicle sticker verification for ${deadline.immatriculation_vehicule} should be done by ${deadline.date_deadline}`;
+      case 8:
+        return `The draining verification for vehicle ${deadline.immatriculation_vehicule} is scheduled for ${deadline.date_deadline}`;
+      default:
+        return `The deadline for ${deadline.id_item} (${deadline.immatriculation_vehicule}) is set for ${deadline.date_deadline}`;
     }
   };
 
@@ -752,6 +777,7 @@ export function Deadline() {
             eventClick={(info: { event: { id: number } }) =>
               handleCalendarDeadlineModal(info.event.id)
             }
+            
             dayCellContent={renderDayCellContent}
             dayRender={(info: any) => {
               const date = info.dateStr;

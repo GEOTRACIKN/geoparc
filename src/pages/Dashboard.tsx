@@ -69,10 +69,12 @@ export function Dashboard() {
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
- 
-  
+  const [totalTrainings, setTotalTrainings] = useState(0);
+  const [totalFires, setTotalFires] = useState(0);
+
+
   const [vehicleStates, setVehicleStates] = useState<VehicleState[]>([]);
-    const [totalReports, setTotalReports] = useState(0);
+  const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
   const [userName, setUserName] = useState(
     localStorage.getItem("Geopusername")
@@ -128,23 +130,49 @@ export function Dashboard() {
           id_user: userID,
           state: 1,
         });
-        // Fetch total number of groups
-// Fetch total number of vehicles by state
-const responseVehicleState = await fetch(
-  `${backendUrl}/api/etat/totalpage/${userID}`,
-  { mode: "cors" }
-);
-if (responseVehicleState.ok) {
-  const vehicleStateData = await responseVehicleState.json();
-  console.log("Vehicle states data before:", vehicleStateData); // Ajoute ce log ici
-  // Supposons que `vehicleStateData` soit un tableau contenant les états des véhicules
-  setVehicleStates(vehicleStateData);
-  console.log("Vehicle states:", vehicleStateData);
-} else {
-  console.error("Failed to fetch vehicle states");
-}
 
-        
+        const responseVehicleState = await fetch(
+          `${backendUrl}/api/etat/totalpage/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseVehicleState.ok) {
+          const vehicleStateData = await responseVehicleState.json();
+          console.log("Vehicle states data before:", vehicleStateData);
+          setVehicleStates(vehicleStateData);
+          console.log("Vehicle states:", vehicleStateData);
+        } else {
+          console.error("Failed to fetch vehicle states");
+        }
+
+        // Fetch total number of training
+        const responseTraining = await fetch(
+          `${backendUrl}/api/geop/training/count/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseTraining.ok) {
+          const totalTrainingsData = await responseTraining.json();
+          const totalTrainingsCount = totalTrainingsData;
+          setTotalTrainings(totalTrainingsCount);
+        } else {
+          console.error("Failed to fetch total number of Vehicles");
+        }
+
+        // Fetch total number of training
+        const responseFire = await fetch(
+          `${backendUrl}/api/geop/fire/count/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseFire.ok) {
+          const totalFiresData = await responseFire.json();
+          const totalFiresCount = totalFiresData;
+          console.log(totalFiresCount);
+          
+          setTotalFires(totalFiresCount);
+        } else {
+          console.error("Failed to fetch total number of Vehicles");
+        }
+
+
         // Make the fetch request
         const responseNotifications = await fetch(
           `${backendUrl}/api/geop/notification/read`,
@@ -178,23 +206,23 @@ if (responseVehicleState.ok) {
           };
 
 
-          // Boucle pour compter les notifications par type
-          totalNotificationsData.forEach((notif: { type: string }) => {
-            if (counts[notif.type] !== undefined) {
-              counts[notif.type]++;
+
+          totalNotificationsData.forEach((notif: { id_type: string }) => {
+            if (counts[notif.id_type] !== undefined) {
+              counts[notif.id_type]++;
             }
           });
 
           // Mettre à jour les états avec les nouveaux comptes
           setAlertData([
-            { id: "1", value: counts["1"], max: 10, color: "#e66d05", label: "Permis de conduire", modalId: "detailPermis" },
-            { id: "2", value: counts["2"], max: 10, color: "#3c8dbc", label: "Assurance véhicule", modalId: "detailASS" },
-            { id: "3", value: counts["3"], max: 10, color: "#f56954", label: "Contrôle technique", modalId: "detailCnrlTech" },
-            { id: "4", value: counts["4"], max: 10, color: "#00a65a", label: "Formation", modalId: "detailFormation" },
-            { id: "5", value: counts["5"], max: 10, color: "#3c8dbc", label: "Extincteur", modalId: "detailExt" },
-            { id: "6", value: counts["6"], max: 10, color: "#00a65a", label: "Vidange", modalId: "detailVidange" },
-            { id: "7", value: counts["7"], max: 10, color: "purple", label: "Entretiens par Km", modalId: "detailEntretienKlm" },
-            // { id: "8", value: counts["8"], max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
+            { id: "1", value: counts["1"], max: totalVehicles, color: "#e66d05", label: translate("Driving license"), modalId: "detailPermis" },
+            { id: "2", value: counts["2"], max: totalDrivers, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailASS" },
+            { id: "3", value: counts["3"], max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailCnrlTech" },
+            { id: "4", value: counts["4"], max: totalTrainings, color: "#00a65a", label: translate("Training"), modalId: "detailFormation" },
+            { id: "5", value: counts["5"], max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
+            { id: "6", value: counts["6"], max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "detailVidange" },
+            { id: "7", value: counts["7"], max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailEntretienKlm" },
+            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailEntretienDate" },
             // { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
             // { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
             // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
@@ -247,14 +275,14 @@ if (responseVehicleState.ok) {
 
 
   const [alertData, setAlertData] = useState([
-    { id: "1", value: 0, max: totalDrivers, color: "#e66d05", label: "Permis de conduire", modalId: "detailPermis" },
-    { id: "2", value: 0, max: totalVehicles, color: "#3c8dbc", label: "Assurance véhicule", modalId: "detailASS" },
-    { id: "3", value: 0, max: 10, color: "#f56954", label: "Contrôle technique", modalId: "detailCnrlTech" },
-    { id: "4", value: 0, max: 10, color: "#00a65a", label: "Formation", modalId: "detailFormation" },
-    { id: "5", value: 0, max: 10, color: "#3c8dbc", label: "Extincteur", modalId: "detailExt" },
-    { id: "6", value: 0, max: 10, color: "#00a65a", label: "Vidange", modalId: "detailVidange" },
-    { id: "7", value: 0, max: 10, color: "purple", label: "Entretiens planifiés par kilométrage", modalId: "detailEntretienKlm" },
-    // { id: "8", value: 0, max: 10, color: "#d5d546", label: "Entretiens planifiés par date", modalId: "detailEntretienDate" },
+    { id: "1", value: 0, max: totalDrivers, color: "#e66d05", label: translate("Driving license"), modalId: "detailPermis" },
+    { id: "2", value: 0, max: totalVehicles, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailASS" },
+    { id: "3", value: 0, max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailCnrlTech" },
+    { id: "4", value: 0, max: totalTrainings, color: "#00a65a", label: translate("Training"), modalId: "detailFormation" },
+    { id: "5", value: 0, max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
+    { id: "6", value: 0, max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "detailVidange" },
+    { id: "7", value: 0, max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailEntretienKlm" },
+    { id: "8", value: 0, max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailEntretienDate" },
     // { id: "9", value: 0, max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
     // { id: "10", value: 0, max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
     // { id: "11", value: 0, max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
@@ -658,41 +686,41 @@ if (responseVehicleState.ok) {
             </div>
 
             <div className="col-lg-2 col-md-2">
-  <FleetCounter
-    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "HS")?.total || 0}
-    title={translate("Out of Service")}
-    icon={"exclamation-circle"}
-    color={"bg-warning-light"}
-    linkTo="/vehicles"
-  />
-</div>
-<div className="col-lg-2 col-md-2">
-  <FleetCounter
-    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En panne")?.total || 0}
-    title={translate("Broken Down")}
-    icon={"tools"}
-    color={"bg-danger-light"}
-    linkTo="/vehicles"
-  />
-</div>
-<div className="col-lg-2 col-md-2">
-  <FleetCounter
-    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
-    title={translate("Under Repair")}
-    icon={"wrench"}
-    color={"bg-info-light"}
-    linkTo="/en-reparation"
-  />
-</div>
-<div className="col-lg-2 col-md-2">
-  <FleetCounter
-    numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible")?.total || 0}
-    title={translate("Available")}
-    icon={"check-circle"}
-    color={"bg-success-light"}
-    linkTo="/disponibles"
-  />
-</div>
+              <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "HS")?.total || 0}
+                title={translate("Out of Service")}
+                icon={"exclamation-circle"}
+                color={"bg-warning-light"}
+                linkTo="/vehicles"
+              />
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En panne")?.total || 0}
+                title={translate("Broken Down")}
+                icon={"tools"}
+                color={"bg-danger-light"}
+                linkTo="/vehicles"
+              />
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
+                title={translate("Under Repair")}
+                icon={"wrench"}
+                color={"bg-info-light"}
+                linkTo="/en-reparation"
+              />
+            </div>
+            <div className="col-lg-2 col-md-2">
+              <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible")?.total || 0}
+                title={translate("Available")}
+                icon={"check-circle"}
+                color={"bg-success-light"}
+                linkTo="/disponibles"
+              />
+            </div>
 
             {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
@@ -728,7 +756,7 @@ if (responseVehicleState.ok) {
           <div className="container-fluid"></div>
         </>
 
-     
+
         <div className="col-lg-6">{/* <FleetCo2 /> */}</div>
         <div className="col-lg-12">
           <div className="card">
@@ -750,8 +778,8 @@ if (responseVehicleState.ok) {
                     color={alert.color}
                     label={alert.label}
                     modalId={alert.modalId}
-                    height={120} 
-                    id={alert.id}                  />
+                    height={120}
+                    id={alert.id} />
                 </div>
               ))}
             </div>
