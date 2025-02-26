@@ -155,13 +155,15 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     }, [id_training, backendUrl]);
 
     useEffect(() => {
-        if (show) {
+        console.log("Valeur de geopuserID:", geopuserID); // Vérifier ce qui est stocké
+      
+        if (show && geopuserID) { // Vérification supplémentaire
           const fetchDrivers = async () => {
             try {
               const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
       
               if (!response.ok) {
-                throw new Error("Failed to fetch drivers");
+                throw new Error(`Failed to fetch drivers: ${response.status}`);
               }
       
               const data = await response.json();
@@ -191,6 +193,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
           fetchDrivers();
         }
       }, [show, backendUrl, geopuserID]);
+      
        useEffect(() => {
               if (formData.date_start_training) {
                 const startDate = new Date(formData.date_start_training);

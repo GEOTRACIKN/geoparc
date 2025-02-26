@@ -47,13 +47,13 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                 const response = await fetch(
                     `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
-        
+    
                 if (!response.ok) {
                     throw new Error("Failed to fetch vehicles");
                 }
-        
+    
                 const data = await response.json();
-                console.log("Fetched vehicles:", data); // Ensure the correct structure
+                console.log("Fetched vehicles:", data); // Vérifie la structure de la réponse
                 setVehicles(data.vehicles || []);
             } catch (error) {
                 console.error("Error fetching vehicles:", error);
@@ -69,13 +69,11 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
                 });
             }
         };
-        
-
+    
         if (geopuserID) {
             fetchVehicles();
         }
-    }, []);
-  
+    }, [geopuserID]); // Ajoute `geopuserID` comme dépendance
     
      
 

@@ -39,45 +39,44 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
     const { translate } = useTranslate();
       const [drivers, setDrivers] = useState<Driver[]>([]);
 
-        useEffect(() => {
-          if (show) {
-            const fetchDrivers = async () => {
-              try {
-                const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
-        
-                if (!response.ok) {
-                  throw new Error("Failed to fetch drivers");
-                }
-        
-                const data = await response.json();
-                console.log("Drivers data received from API:", data);
-        
-                const drivers = Array.isArray(data.vehicles)
-                  ? data.vehicles
-                      .filter(
-                        (driver: any) =>
-                          driver.nom_conducteur?.trim() !== "" &&
-                          driver.prenom_conducteur?.trim() !== ""
-                      )
-                      .map((driver: any) => ({
-                        id_conducteur: driver.id_conducteur,
-                        nom_conducteur: driver.nom_conducteur,
-                        prenom_conducteur: driver.prenom_conducteur,
-                      }))
-                  : [];
-        
-                setDrivers(drivers);
-              } catch (error) {
-                console.error("Error fetching drivers:", error);
-                setDrivers([]);
+      useEffect(() => {
+        if (show && geopuserID) { // Vérifie que geopuserID est bien défini
+          const fetchDrivers = async () => {
+            try {
+              const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+      
+              if (!response.ok) {
+                throw new Error(`Failed to fetch drivers: ${response.status}`);
               }
-            };
-        
-            fetchDrivers();
-          }
-        }, [show, backendUrl, geopuserID]);
-
-    
+      
+              const data = await response.json();
+              console.log("Drivers data received from API:", data);
+      
+              const drivers = Array.isArray(data.vehicles)
+                ? data.vehicles
+                    .filter(
+                      (driver: any) =>
+                        driver.nom_conducteur?.trim() !== "" &&
+                        driver.prenom_conducteur?.trim() !== ""
+                    )
+                    .map((driver: any) => ({
+                      id_conducteur: driver.id_conducteur,
+                      nom_conducteur: driver.nom_conducteur,
+                      prenom_conducteur: driver.prenom_conducteur,
+                    }))
+                : [];
+      
+              setDrivers(drivers);
+            } catch (error) {
+              console.error("Error fetching drivers:", error);
+              setDrivers([]);
+            }
+          };
+      
+          fetchDrivers();
+        }
+      }, [show, backendUrl, geopuserID]);
+      
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;

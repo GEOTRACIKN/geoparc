@@ -129,12 +129,14 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     
     useEffect(() => {
         const fetchVehicles = async () => {
-            try {
-                if (!geopuserID) {
-                    console.warn("No user ID provided");
-                    return;
-                }
+            if (!geopuserID) {
+                console.warn("No user ID provided");
+                return;
+            }
     
+            console.log("Fetching vehicles for user ID:", geopuserID); // Ajout du log pour voir si l'ID est correct
+    
+            try {
                 const response = await fetch(
                     `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
@@ -144,7 +146,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 }
     
                 const data = await response.json();
-                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+                console.log("API response for vehicles:", data); // Debug: voir la structure de data
     
                 setVehicles(data.vehicles || []);
             } catch (error) {
@@ -163,8 +165,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         };
     
         fetchVehicles();
-    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
-
+    }, [geopuserID, backendUrl]); // Déclenchement à chaque changement de `geopuserID`
     
     
 
