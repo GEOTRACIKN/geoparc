@@ -5,6 +5,7 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
 import dayjs from "dayjs"; 
+import Select from "react-select";
 
 interface EditPharmacyModalProps {
     show: boolean;
@@ -15,7 +16,7 @@ interface EditPharmacyModalProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
@@ -307,6 +308,36 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                             value={formData.product_pharmacy}
                             onChange={handleChange}
                         />
+                        <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
                     </Form.Group>
                     <Form.Group controlId="purch_date_pharmacy">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
@@ -340,21 +371,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle) => (
-                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                    {vehicle.immatriculation_vehicule}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

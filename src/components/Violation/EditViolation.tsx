@@ -23,9 +23,10 @@ type Driver = {
 };
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
+
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const geopuserID = localStorage.getItem("GeopUserID");
@@ -270,15 +271,9 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             isValid = false;
         }
     
-        if (Number(formData.cost) < 0 || isNaN(Number(formData.cost))) {
-            toast.error("Le coût doit être un nombre positif !");
-            isValid = false;
-        }
+       
     
-        if (!formData.description) {
-            toast.error("La description est requise !");
-            isValid = false;
-        }
+      
     
         return isValid;
     };
@@ -362,57 +357,67 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
               isClearable
             />
           </Form.Group>
-          {formData.type_violation === "other" && (
-            <Form.Group controlId="customType">
-              <Form.Label>{translate("Custom Violation Type")}</Form.Label>
-              <Form.Control
-                type="text"
-                name="customType"
-                value={formData.customType}
-                onChange={handleCustomTypeChange}
-                placeholder="Enter custom violation type"
-              />
-            </Form.Group>
-          )}
-       <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
-    <Form.Control
-        as="select"
-        value={formData.id_conducteur}
-        onChange={handleChange}
-    >
-        <option value="">{translate("Select Driver")}</option>
-        {drivers.length === 0 ? (
-            <option value="">{translate("No drivers available")}</option>
-        ) : (
-            drivers.map((driver) => (
-                <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                    {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
-                </option>
-            ))
-        )}
-    </Form.Control>
-</Form.Group>
+         
+          <Form.Group controlId="id_conducteur">
+            <Form.Label>{translate("Driver")}</Form.Label>
+            <Select
+                options={drivers.map(driver => ({
+                    value: driver.id_conducteur, // Numéro du conducteur
+                    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
+                })) as { value: number; label: string }[]} // 🔥 Correction du typage
 
+                placeholder={translate("Select Driver")}
+                isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                noOptionsMessage={() => translate("No drivers available")}
+                isSearchable // Active la recherche
+
+                // 🔥 Correction de la sélection automatique avec conversion en string
+                value={drivers
+                    .map(driver => ({
+                        value: driver.id_conducteur,
+                        label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
+                    }))
+                    .find(option => String(option.value) === String(formData.id_conducteur)) || null
+                }
+
+                onChange={(selectedOption) => {
+                    setFormData(prev => ({
+                        ...prev,
+                        id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                    }));
+                }}
+            />
+        </Form.Group>
         <Form.Group controlId="id_vehicule">
-                               <Form.Label>{translate("Vehicle")}</Form.Label>
-                               <Form.Control
-                                   as="select"
-                                   value={formData.id_vehicule}
-                                   onChange={handleChange}
-                               >
-                                   <option value="">{translate("Select Vehicle")}</option>
-                                   {vehicles.length === 0 ? (
-                                       <option value="">{translate("No vehicles available")}</option>
-                                   ) : (
-                                       vehicles.map((vehicle) => (
-                                           <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                               {vehicle.immatriculation_vehicule}
-                                           </option>
-                                       ))
-                                   )}
-                               </Form.Control>
-                           </Form.Group>
+    <Form.Label>{translate("Vehicle")}</Form.Label>
+    <Select
+        options={vehicles.map(vehicle => ({
+                                value: vehicle.id_vehicule, // ID du véhicule
+                                label: vehicle.immatriculation_vehicule // Immatriculation
+                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+        placeholder={translate("Select Vehicle")}
+        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+        noOptionsMessage={() => translate("No vehicles available")}
+        isSearchable // Active la recherche
+
+        // 🔥 Correction de la sélection automatique avec conversion en string
+        value={vehicles
+            .map(vehicle => ({
+                value: vehicle.id_vehicule,
+                label: vehicle.immatriculation_vehicule
+            }))
+            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+        }
+
+        onChange={(selectedOption) => {
+            setFormData(prev => ({
+                ...prev,
+                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+            }));
+        }}
+    />
+</Form.Group>
 
           <Form.Group controlId="date">
             <Form.Label>{translate("Date Violation")}</Form.Label>

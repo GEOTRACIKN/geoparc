@@ -18,12 +18,11 @@ interface EditFireModalProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
 const EditFireModal: React.FC<EditFireModalProps> = ({
     show,
     onHide,
@@ -320,48 +319,8 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                     <Form.Group controlId="ref_fire">
-                        <Form.Label>{translate("Reference")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.ref_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="volume_fire">
-                        <Form.Label>{translate("Volume")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={formData.volume_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                   
-                    <Form.Group controlId="purch_date_fire">
-                        <Form.Label>{translate("Purchase Date")}</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={formData.purch_date_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="exp_date_fire">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={formData.exp_date_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="cost_fire">
-                        <Form.Label>{translate("Cost")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={formData.cost_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="type_fire">
+                      {/* Type */}
+                      <Form.Group controlId="type_fire">
                         <Form.Label>{translate("Type")}</Form.Label>
                         <Select
                         options={fireOptions}
@@ -373,20 +332,83 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                         />
 
                     </Form.Group>
+
                     <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Form.Label>{translate("Vehicle")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
+
+                     {/* Purchase Date */}
+                     <Form.Group controlId="purch_date_fire">
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
+                            type="date"
+                            value={formData.purch_date_fire}
                             onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle) => (
-                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                    {vehicle.immatriculation_vehicule}
-                                </option>
-                            ))}
-                        </Form.Control>
+                        />
+                    </Form.Group>
+
+                    {/* Expiry Date */}
+                    <Form.Group controlId="exp_date_fire">
+                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={formData.exp_date_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.ref_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    {/* Volume */}
+                    <Form.Group controlId="volume_fire">
+                        <Form.Label>{translate("Volume")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.volume_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+
+                    {/* Cost */}
+                    <Form.Group controlId="cost_fire">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.cost_fire}
+                            onChange={handleChange}
+                        />
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
