@@ -273,15 +273,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     }
     isClearable
     isSearchable
-    styles={{
-      control: (provided) => ({
-        ...provided,
-        borderColor: formData.type === "" ? "red" : provided.borderColor,
-        "&:hover": {
-          borderColor: formData.type === "" ? "red" : provided.borderColor,
-        },
-      }),
-    }}
+  
   />
 </Form.Group>
 
@@ -314,17 +306,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         id_conducteur: selectedOption ? String(selectedOption.value) : "",
       }));
     }}
-    styles={{
-      control: (provided) => ({
-        ...provided,
-        borderColor:
-          formData.id_conducteur === "" ? "red" : provided.borderColor,
-        "&:hover": {
-          borderColor:
-            formData.id_conducteur === "" ? "red" : provided.borderColor,
-        },
-      }),
-    }}
+   
   />
 </Form.Group>
 
@@ -357,17 +339,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         id_vehicule: selectedOption ? String(selectedOption.value) : "",
       }));
     }}
-    styles={{
-      control: (provided) => ({
-        ...provided,
-        borderColor:
-          formData.id_vehicule === "" ? "red" : provided.borderColor,
-        "&:hover": {
-          borderColor:
-            formData.id_vehicule === "" ? "red" : provided.borderColor,
-        },
-      }),
-    }}
+    
   />
 </Form.Group>
 
@@ -380,9 +352,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     value={formData.date}
     onChange={handleInputChange}
     placeholder="Enter Date and Time here"
-    style={{
-      borderColor: formData.date === "" ? "red" : undefined,
-    }}
+    
   />
 </Form.Group>
 
