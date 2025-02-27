@@ -44,6 +44,80 @@ interface VehiculeListInterface {
   affectation?: string;
   username_user: string;
   id_user: string;
+  category_vehicule?: string;
+  propriete_vehicule?: string;
+  id_marque?: number;
+  date_aquisition_vehicule?: Date;
+  type_carburant_vehicule?: string;
+  annee_vehicule?: string;
+  date_circulation_vehicule?: Date;
+  num_chassis_vehicule?: string;
+  nbre_place_vehicule?: number;
+  puissance_vehicule?: string;
+  kilometrage_vehicule?: string;
+  commentaire_vehicule?: string;
+  companie_assurance_vehicule?: string;
+  type_assurance_vehicule?: string;
+  date_debut_assurance_vehicule?: string;
+  date_expir_assurance_vehicule?: string;
+  cout_assurance_vehicule?: string;
+  delai_assurance_vehicule?: string;
+  reference_assurance_vehicule?: string;
+  note_assurance_vehicule?: string;
+  etat_ctr_tech_vehicule?: string;
+  date_debut_ctr_tech_vehicule?: string;
+  date_fin_ctr_tech_vehicule?: string;
+  station_ctr_vehicule?: string;
+  cout_ctr_tech_vehicule?: string;
+  note_ctr_tech_vehicule?: string;
+  date_vignette_vehicule?: string;
+  cout_vignette_vehicule?: string;
+  id_gps?: number;
+  longueur_vehicule?: string;
+  largeur_vehicule?: string;
+  hauteur_vehicule?: string;
+  poid_vehicule?: string;
+  nbre_porte_vehicule?: number;
+  icon_vehicule?: string;
+  detail_vehicule?: string;
+  num_porte_vehicule?: string;
+  ptac_vehicule?: string;
+  kilometrage_reel_vehicule?: string;
+  image_vehicule?: string;
+  consomatio_gasoil_reel_vehicule?: string;
+  latitude_vehicule?: string;
+  longitude_vehicule?: string;
+  date_heure_position_vehicule?: string;
+  id_sousParc_vehicule?: number;
+  num_vignette_vehicule?: string;
+  famille_vehicule?: string;
+  gamme_vehicule?: string;
+  id_groupe?: number;
+  fuel_level_vehicule?: string;
+  co2_vehicule?: string;
+  capacite_res_vehicule?: string;
+  prochain_vidange_vehicule?: string;
+  info_vehicule?: number;
+  draft?: number;
+  inService_vehicule?: string;
+  date_creation_vehicule?: string;
+  date_modification_vehicule?: string;
+  date_suppression_vehicule?: string;
+  PSN?: string;
+  LAST_IB_CODE?: string;
+  fuel_type?: string;
+  maximum_allowed_total?: string;
+  consommation_moyenne_vehicule?: string;
+  id_parc?: number;
+  nom_user?: string;
+  prenom_user?: string;
+  nom_conducteur?: string;
+  nom_parc?: string;
+  date_dernier_vidange?: string;
+  dernier_vidange_vehicule?: number;
+  kilometrage_prochain_entretien?: number;
+  nom_marque?: string;
+  reference_ctr_tech_vehicule?: string;
 }
 
 
@@ -320,24 +394,115 @@ export function Vehicles() {
     translate("Trailer"),
   ];
 
-
   const downloadVehicleExcel = () => {
+    const selectedData = vehicles
+      .filter((vehicle) => selectedVehicles.includes(vehicle.id_vehicule.toString()))
+      .map((vehicle) => [
+        vehicle.id_vehicule,
+        vehicle.immatriculation_vehicule,
+        vehicle.category_vehicule || "",
+        vehicle.vehicule_type,
+        vehicle.etat_vehicule,
+        vehicle.kilometrage_vehicule || "",
+        vehicle.driver_first_name ? vehicle.driver_first_name + " " + (vehicle.driver_last_name || "") : "",
+        vehicle.nom_marque || "",
+        vehicle.modele_vehicule,
+        vehicle.type_carburant_vehicule || "",
 
-    const selectedData = vehicles.filter((vehicle) =>
-      selectedVehicles.includes(vehicle.id_vehicule.toString())
-    ).map((vehicle) => [
-      vehicle.id_vehicule,
-      vehicle.modele_vehicule,
-      vehicle.immatriculation_vehicule,
-      vehicle.etat_vehicule,
-      vehicle.affectation,
-      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
-      vehicle.username_user,
-    ]);
+        vehicle.PSN || "",
+        vehicle.annee_vehicule || "",
+        vehicle.nbre_porte_vehicule || "",
+        vehicle.puissance_vehicule || "",
+        vehicle.longueur_vehicule || "",
+        vehicle.hauteur_vehicule || "",
+        vehicle.co2_vehicule || "",
+        vehicle.date_circulation_vehicule || "",
+        vehicle.num_chassis_vehicule || "",
+        vehicle.nbre_place_vehicule || "",
+        vehicle.ptac_vehicule || "",
+        vehicle.largeur_vehicule || "",
+        vehicle.poid_vehicule || "",
+
+        vehicle.companie_assurance_vehicule || "",
+        vehicle.type_assurance_vehicule || "",
+        vehicle.date_debut_assurance_vehicule || "",
+        vehicle.date_expir_assurance_vehicule || "",
+        vehicle.cout_assurance_vehicule || "",
+        vehicle.delai_assurance_vehicule || "",
+
+        vehicle.etat_ctr_tech_vehicule || "",
+        vehicle.reference_ctr_tech_vehicule || "",
+        vehicle.date_debut_ctr_tech_vehicule || "",
+        vehicle.date_fin_ctr_tech_vehicule || "",
+        vehicle.cout_ctr_tech_vehicule || "",
+
+        vehicle.num_vignette_vehicule || "",
+        vehicle.date_vignette_vehicule || "",
+        vehicle.cout_vignette_vehicule || "",
+
+        vehicle.dernier_vidange_vehicule || "",
+        vehicle.prochain_vidange_vehicule || "",
+        vehicle.date_dernier_vidange || "",
+        vehicle.kilometrage_prochain_entretien || "",
+      ]);
+  
+    const vehicleHeadersExcel = [
+     
+      translate("Vehicle ID"),
+      translate("License Plate"),
+      translate("Category"),
+      translate("Type"),
+      translate("Condition"),
+      translate("KM"),
+      translate("Driver Full Name"),
+      translate("Modele"),
+      translate("Brand"),
+      translate("Fuel Type"),
+
+      translate("PSN"),
+      translate("Year"),
+      translate("Door Number"),
+      translate("Power"),
+      translate("Length"),
+      translate("Height"),
+      translate("CO2 Emissions"),
+      translate("First Registration Date"),
+      translate("Chassis Number"),
+      translate("Number of Seats"),
+      translate("Gross Vehicle Weight (PTAC)"),
+      translate("Width"),
+      translate("Weight"),
+
+      translate("Insurance Company"),
+      translate("Insurance Type"),
+      translate("Insurance Start Date"),
+      translate("Insurance Expiry Date"),
+      translate("Insurance Cost"),
+      translate("Insurance Duration"),
 
 
-    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+      translate("Technical Inspection Status"),
+      translate("Technical Inspection Reference"),
+      translate("Technical Inspection Start Date"),
+      translate("Technical Inspection End Date"),
+      translate("Technical Inspection Cost"),
+
+      translate("Vignette Number"),
+      translate("Vignette Date"),
+      translate("Vignette Cost"),
+      
+      translate("Last Oil Change (km)"),
+      translate("Next Oil Change (km)"),
+      translate("Last Oil Change Date"),
+      translate("Next Maintenance Mileage"),
+      
+    
+    ];
+  
+    generateExcelFile(translate("Vehicle List"), vehicleHeadersExcel, selectedData);
   };
+  
+  
 
   const downloadVehiclePDF = () => {
 
