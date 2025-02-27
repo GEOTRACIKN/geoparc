@@ -68,7 +68,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 console.log("Données reçues : ", JSON.stringify(data, null, 2));
     
                 if (!data || !data.id_fire) {
-                    toast.error("Fire data not found.");
                     return;
                 }
     
@@ -120,7 +119,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching fire data.");
             }
         };
     
@@ -240,16 +238,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         );
 
         if (!selectedVehicle) {
-            toast.error("Please select a valid vehicle.", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "light",
-                transition: Bounce,
-            });
+           
             return false;
         }
 
@@ -282,7 +271,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             const result = await response.json();
 
             toast.success(translate("Updated successfully!"), {
-                                position: "bottom-right",
+                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -299,7 +288,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating fire:", error);
-            toast.error(translate("Error updating fire. Please try again"), {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

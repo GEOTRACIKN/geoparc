@@ -715,7 +715,12 @@
 "En panne": "Broken Down",
 "En réparation": "Under Repair",
 "Disponible": "Available",
-"Please fill out all fields": "Please fill out all fields"
+"Please fill out all fields": "Please fill out all fields",
+"Error updating. Please try again.": "Error updating. Please try again.",
+"Updated successfully!": "Updated successfully!",
+"Error adding. Please try again.": "Error adding. Please try again.",
+"Added successfully!": "Added successfully!",
+"Start date must be earlier than end date": "Start date must be earlier than end date"
 
 
 

@@ -728,7 +728,10 @@
 "Available": "Disponible",
 "Please fill out all fields": "Veuillez remplir tous les champs" ,
 "Added successfully!": "Ajouté avec succès !",
-"Updated successfully!": "Ajouté avec succès !"
+"Updated successfully!": "Ajouté avec succès !",
+"Error updating. Please try again": "Erreur lors de la mise à jour. Veuillez réessayer",
+"Error adding. Please try again": "Erreur lors de l'ajout. Veuillez réessayer",
+"Start date must be earlier than end date": "La date de début doit être antérieure à la date de fin"
 
 
 }

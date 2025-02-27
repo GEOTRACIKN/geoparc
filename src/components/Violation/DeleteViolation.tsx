@@ -42,7 +42,7 @@ const ModalDeleteViolation: React.FC<ModalDeleteViolationProps> = ({
             const result = await response.json();
             console.log(result);
 
-            toast.success(translate("Violation deleted successfully!"), {
+            toast.success(translate("Deleted successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -60,7 +60,7 @@ const ModalDeleteViolation: React.FC<ModalDeleteViolationProps> = ({
             onHide();
         } catch (error) {
             console.error(error);
-            toast.error(translate("Error deleting violation. Please try again."), {
+            toast.error(translate("Error deleting. Please try again."), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

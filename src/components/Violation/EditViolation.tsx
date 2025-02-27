@@ -110,7 +110,6 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching violation data.");
             }
         };
     
@@ -336,7 +335,7 @@ const ModalEditViolation: React.FC<ModalEditViolationProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating violation:", error);
-            toast.error("Error updating violation. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

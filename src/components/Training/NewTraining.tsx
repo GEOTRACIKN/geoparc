@@ -132,7 +132,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
         const endDate = new Date(formData.date_end_training); // Convertir en objet Date
     
         if (startDate > endDate) {
-            toast.error("Start date must be earlier than end date.", {
+            toast.error(translate("Start date must be earlier than end date"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -245,7 +245,7 @@ const ModalNewTraining: React.FC<ModalNewTrainingProps> = ({
             onHide();
         } catch (error) {
             console.error("Error adding training:", error);
-            toast.error("Error adding training. Please try again.", {
+            toast.error(translate("Error adding. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

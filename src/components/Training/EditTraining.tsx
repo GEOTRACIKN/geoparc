@@ -148,7 +148,6 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching training data.");
             }
         };
     
@@ -332,7 +331,8 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success(translate("Updated successfully!"), {                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {                
+                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -349,7 +349,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating training:", error);
-            toast.error("Error updating training. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -371,38 +371,36 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                 <Modal.Body>
                     
                 <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
-    <Select
-        options={drivers.map(driver => ({
-            value: driver.id_conducteur, // Numéro du conducteur
-            label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
-        })) as { value: number; label: string }[]} // 🔥 Correction du typage
+                        <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+                        <Select
+                            options={drivers.map(driver => ({
+                                value: driver.id_conducteur, // Numéro du conducteur
+                                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
+                            })) as { value: number; label: string }[]} // 🔥 Correction du typage
 
-        placeholder={translate("Select Driver")}
-        isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
-        noOptionsMessage={() => translate("No drivers available")}
-        isSearchable // Active la recherche
+                            placeholder={translate("Select Driver")}
+                            isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                            noOptionsMessage={() => translate("No drivers available")}
+                            isSearchable // Active la recherche
 
-        // 🔥 Correction de la sélection automatique avec conversion en string
-        value={drivers
-            .map(driver => ({
-                value: driver.id_conducteur,
-                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
-            }))
-            .find(option => String(option.value) === String(formData.id_conducteur)) || null
-        }
+                            // 🔥 Correction de la sélection automatique avec conversion en string
+                            value={drivers
+                                .map(driver => ({
+                                    value: driver.id_conducteur,
+                                    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
+                                }))
+                                .find(option => String(option.value) === String(formData.id_conducteur)) || null
+                            }
 
-        onChange={(selectedOption) => {
-            setFormData(prev => ({
-                ...prev,
-                id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
-            }));
-        }}
-    />
-</Form.Group>
-
+                            onChange={(selectedOption) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                                }));
+                            }}
+                        />
+                    </Form.Group>
                    
-
                     <Form.Group controlId="date_start_training">
                         <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control

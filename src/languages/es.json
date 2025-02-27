@@ -725,5 +725,10 @@
 "Broken Down": "Averiado",
 "Under Repair": "En reparación",
 "Available": "Disponible",
-"Please fill out all fields": "Por favor, complete todos los campos"
+"Please fill out all fields": "Por favor, complete todos los campos",
+"Error updating. Please try again.": "Error al actualizar. Por favor, inténtelo de nuevo.",
+"Updated successfully!": "¡Actualizado con éxito!",
+"Error adding. Please try again.": "Error al agregar. Por favor, inténtelo de nuevo.",
+"Added successfully!": "¡Agregado con éxito!",
+"Start date must be earlier than end date": "La fecha de inicio debe ser anterior a la fecha de fin"
 }
