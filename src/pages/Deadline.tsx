@@ -32,7 +32,19 @@ interface DeadlineInterface {
   description: string;
   nom_type: string;
   id_item: string;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+  immatriculation_vehicule: string;
+  training_id_conducteur: number;
+  training_nom_conducteur: string;
+  training_prenom_conducteur: string;
+  feu_id_vehicule: string;
+  feu_immatriculation_vehicule: number;
+  item_name: string;
 }
+
+
+
 
 export function Deadline() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -230,7 +242,7 @@ export function Deadline() {
       // Formatter les données pour FullCalendar
       const formattedDeadlines = data.map((deadline: any) => ({
         id: deadline.id_deadline || "Sans ID",
-        title: deadline.description || "Sans titre",
+        title: generatePlainTextDescription(deadline) || "Sans titre",
         start: deadline.date_deadline
           ? moment(deadline.date_deadline).format("YYYY-MM-DD")
           : null,
@@ -254,15 +266,45 @@ export function Deadline() {
     }
   };
 
+  
+  
+  const generatePlainTextDescription = (deadline: any) => {
+    switch (deadline.id_type) {
+      case 1:
+        return `The driving license of ${deadline.nom_conducteur} ${deadline.prenom_conducteur} will expire on ${deadline.date_deadline}`;
+      case 2:
+        return `The insurance for ${deadline.id_item} (${deadline.immatriculation_vehicule}) will expire on ${deadline.date_deadline}`;
+      case 3:
+        return `The next maintenance for vehicle ${deadline.immatriculation_vehicule} is due by ${deadline.date_deadline}`;
+      case 4:
+        return `The training certificate of ${deadline.training_nom_conducteur} ${deadline.training_prenom_conducteur} will expire on ${deadline.date_deadline}`;
+      case 5:
+        return `The fire extinguisher verification for vehicle ${deadline.feu_immatriculation_vehicule} is due by ${deadline.date_deadline}`;
+      case 6:
+        return `The technical inspection for vehicle ${deadline.immatriculation_vehicule} must be done before ${deadline.date_deadline}`;
+      case 7:
+        return `The vehicle sticker verification for ${deadline.immatriculation_vehicule} should be done by ${deadline.date_deadline}`;
+      case 8:
+        return `The draining verification for vehicle ${deadline.immatriculation_vehicule} is scheduled for ${deadline.date_deadline}`;
+      default:
+        return `The deadline for ${deadline.id_item} (${deadline.immatriculation_vehicule}) is set for ${deadline.date_deadline}`;
+    }
+  };
+
   const getColorByType = (type: string) => {
     const colors: Record<string, string> = {
-      "1": "#FF5733", // Rouge vif
-      "2": "#1E7D22", // Vert foncé 🍃
-      "3": "#3357FF", // Bleu classique
-      "4": "#FFC300", // Jaune
-      "5": "#8E44AD", // Violet
+      "1": "#FF5733", // Bright Red
+      "2": "#1E7D22", // Dark Green 🍃
+      "3": "#3357FF", // Classic Blue
+      "4": "#FFC300", // Yellow
+      "5": "#8E44AD", // Purple
+      "6": "#E67E22", // Orange
+      "7": "#2C3E50", // Midnight Blue
+      "8": "#D35400", // Terracotta
+      "9": "#16A085", // Emerald Green
     };
-    return colors[type] || "#808080"; // Gris par défaut
+
+    return colors[type] || "#808080"; // Default color
   };
 
 
@@ -280,12 +322,12 @@ export function Deadline() {
 
   useEffect(() => {
 
-  if(id_alarm){ getDeadlines(limit, currentPage, id_alarm, type, column, sort);}
-  else{ getDeadlines(limit, currentPage, search, type, column, sort);}
-  if(typeId && typeId!=0){ getDeadlines(limit, currentPage, search, typeId, column, sort);}
+    if (id_alarm) { getDeadlines(limit, currentPage, id_alarm, type, column, sort); }
+    else { getDeadlines(limit, currentPage, search, type, column, sort); }
+    if (typeId && typeId != 0) { getDeadlines(limit, currentPage, search, typeId, column, sort); }
 
 
-   // getCalendarDeadlines();
+    // getCalendarDeadlines();
   }, []);
 
   const handleTypeSearch = (event: any) => {
@@ -592,10 +634,33 @@ export function Deadline() {
                     </td>
 
                     {selectedColumns.id_deadline && (<td>{Deadline.id_deadline}</td>)}
-                    {selectedColumns.nom_type && <td> {Deadline.nom_type} </td>}
+                    {selectedColumns.nom_type && <td> {translate(Deadline.nom_type)} </td>}
                     {selectedColumns.date_creation && (<td>{toTimestamp(Deadline.date_creation)}</td>)}
                     {selectedColumns.date_deadline && (<td>{toTimestamp(Deadline.date_deadline)}</td>)}
-                    {selectedColumns.id_item && (<td>{Deadline.id_item}</td>)}
+                    {selectedColumns.id_item && (<td>
+                      {(() => {
+                        switch (Deadline.id_type) {
+                          case 1: // Driving license (Conducteur)
+                            return `${Deadline.prenom_conducteur} ${Deadline.nom_conducteur}`;
+                          case 2: // Vehicle insurance
+                          return Deadline.immatriculation_vehicule;
+                          case 3: // Maintenance
+                            return Deadline.immatriculation_vehicule;
+                          case 4: // Training
+                            return `${Deadline.training_prenom_conducteur} ${Deadline.training_nom_conducteur}`;
+                          case 5: // Fire extinguisher
+                            return Deadline.feu_immatriculation_vehicule;
+                          case 6: // Technical control
+                            return Deadline.immatriculation_vehicule;
+                          case 7: // Sticker
+                            return Deadline.immatriculation_vehicule;
+                          case 8: // Draining
+                            return Deadline.immatriculation_vehicule; // Ces types sont liés aux véhicules
+                          default:
+                            return Deadline.item_name || "N/A"; // Affichage par défaut
+                        }
+                      })()}
+                    </td>)}
 
                     <td className="text-center">
                       <div className="d-flex justify-content-center align-items-center list-action">
@@ -712,6 +777,7 @@ export function Deadline() {
             eventClick={(info: { event: { id: number } }) =>
               handleCalendarDeadlineModal(info.event.id)
             }
+            
             dayCellContent={renderDayCellContent}
             dayRender={(info: any) => {
               const date = info.dateStr;

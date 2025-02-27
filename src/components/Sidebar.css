@@ -2532,4 +2532,13 @@ body.light-theme .form {
   width: 100% !important;
 }
 
+.text-blue-500 {
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+.text-red-500 {
+  color: #ef4444;
+  font-weight: bold;
+}
 
