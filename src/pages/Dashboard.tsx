@@ -709,7 +709,7 @@ export function Dashboard() {
                 title={translate("Under Repair")}
                 icon={"wrench"}
                 color={"bg-info-light"}
-                linkTo="/en-reparation"
+                linkTo="/vehicles"
               />
             </div>
             <div className="col-lg-2 col-md-2">
@@ -718,7 +718,7 @@ export function Dashboard() {
                 title={translate("Available")}
                 icon={"check-circle"}
                 color={"bg-success-light"}
-                linkTo="/disponibles"
+                linkTo="/vehicles"
               />
             </div>
 
