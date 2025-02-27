@@ -525,7 +525,7 @@
 "Receptionist Name":"اسم موظف الاستقبال",
 "Service":"خدمة",
 "Speed":"سرعة ",
-"overspeed" : "تجاوز السرعة",
+"Over Speed" : "تجاوز السرعة",
 "Insufficient Break" : "استراحة غير كافية",
 "Night Driving" : "القيادة الليلية",
 "Overtime Driving" : "القيادة في وقت إضافي",
