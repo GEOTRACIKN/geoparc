@@ -406,7 +406,7 @@ export function Vehicles() {
         vehicle.kilometrage_vehicule || "",
         vehicle.driver_first_name ? vehicle.driver_first_name + " " + (vehicle.driver_last_name || "") : "",
         vehicle.nom_marque || "",
-        vehicle.modele_vehicule,
+        vehicle.modele_vehicule || "",
         vehicle.type_carburant_vehicule || "",
 
         vehicle.PSN || "",

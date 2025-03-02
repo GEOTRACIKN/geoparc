@@ -681,7 +681,7 @@ export function Dashboard() {
                 title={translate("Users")}
                 icon={"users-cog"}
                 color={"bg-success-user"}
-                linkTo="/users" // Add the link here
+                linkTo="/" // Add the link here
               ></FleetCounter>
             </div>
 
