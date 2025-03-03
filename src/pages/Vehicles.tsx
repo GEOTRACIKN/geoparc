@@ -144,6 +144,7 @@ export function Vehicles() {
   const [IdVehicle, setIdDVehicle] = useState<number>(0);
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
   
 
   const handleClickLink = (navigateTo: string) => {
@@ -187,35 +188,36 @@ export function Vehicles() {
     search: string,
     type: number,
     column: string,
-    sort: string
-  ) => {
+    sort: string,
+    etat?: string 
+   ) => {
     try {
       setLoading(true);
+      const params = {
+        id_user: userID,
+        page: page,
+        limit: limit,
+        column: searchColum[column],
+        sort: sort,
+        search: search,
+        type: type,
+        etat: etat // Ajoutez le paramètre d'état
+      };
+  
       const [countData, vehicleData] = await Promise.all([
         fetch(`${backendUrl}/vehicles/count`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            id_user: parseInt(userID ?? "0") || 0,
-            search: search,
-          }),
+          body: JSON.stringify(params)
         }).then((res) => res.json()),
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            id_user: userID,
-            page: page,
-            limit: limit,
-            column: searchColum[column],
-            sort: sort,
-            search: search,
-            type: type,
-          }),
+          body: JSON.stringify(params)
         }).then((res) => res.json()),
       ]);
 
@@ -235,12 +237,21 @@ export function Vehicles() {
   };
 
   const refreshVehiculeData = async () => {
-    getVehicles(limit, currentPage, search, type, column, sort);
+    await getVehicles(
+      limit, 
+      currentPage, 
+      search, 
+      type, 
+      column, 
+      sort, 
+      selectedStates.join(',') // Envoi des états sélectionnés
+    );
   };
+  
 
   useLayoutEffect(() => {
     refreshVehiculeData();
-  }, [userID, limit, limit, search, type, column, sort]);
+  }, [userID, limit, limit, search, type, column, sort, selectedStates]);
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -480,7 +491,6 @@ export function Vehicles() {
       translate("Insurance Cost"),
       translate("Insurance Duration"),
 
-
       translate("Technical Inspection Status"),
       translate("Technical Inspection Reference"),
       translate("Technical Inspection Start Date"),
@@ -496,14 +506,10 @@ export function Vehicles() {
       translate("Last Oil Change Date"),
       translate("Next Maintenance Mileage"),
       
-    
     ];
   
     generateExcelFile(translate("Vehicle List"), vehicleHeadersExcel, selectedData);
   };
-  
-  
-
   const downloadVehiclePDF = () => {
 
     const selectedData = vehicles.filter((vehicle) =>
@@ -621,7 +627,50 @@ export function Vehicles() {
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
+
                   </Dropdown>
+            <div className="col-sm-12 col-md-6">
+              <div className="input-group">
+                <Dropdown className="mr-2">
+                  <Dropdown.Toggle variant="secondary" id="dropdown-states">
+                    <i className="las la-filter"></i> {translate("State")}
+                    {selectedStates.length > 0 && ` (${selectedStates.length})`}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {[
+                      { value: "Disponible", label: translate("Disponible") },
+                      { value: "HS", label: translate("HS") },
+                      { value: "En Réparation", label: translate("En Réparation") },
+                      { value: "En Panne", label: translate("En Panne") }
+                    ].map((state) => (
+                      <Dropdown.Item 
+                        key={state.value} 
+                        as="label"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <div className="form-check d-flex align-items-center">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={selectedStates.includes(state.value)}
+                            onChange={(e) => {
+                              const newStates = e.target.checked
+                                ? [...selectedStates, state.value]
+                                : selectedStates.filter(v => v !== state.value);
+                              setSelectedStates(newStates);
+                              setCurrentPage(1);
+                            }}
+                          />
+                          <span className="ml-2">{state.label}</span>
+                        </div>
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+
+    {/* Gardez le reste de vos éléments de filtre existants ici */}
+  </div>
+</div>
                   <input
                     type="text"
                     placeholder={` ${translate("Search by")} ${translate(
