@@ -10,6 +10,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { BarLoader } from "react-spinners";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 
 import {
   engineStat,
@@ -71,6 +72,8 @@ export function Dashboard() {
   const [totalVehicles, setTotalVehicles] = useState(0);
   const [totalTrainings, setTotalTrainings] = useState(0);
   const [totalFires, setTotalFires] = useState(0);
+  const navigate = useNavigate();
+
 
 
   const [vehicleStates, setVehicleStates] = useState<VehicleState[]>([]);
@@ -630,6 +633,9 @@ export function Dashboard() {
 
     getMarkers();
   }, []);
+  const handleClick = (etat: string) => {
+    navigate(`/vehicles?etat=${etat}`);
+  }
 
   // Fonction pour calculer la différence en heures entre deux timestamps
   function calculateHoursDifference(
@@ -641,6 +647,10 @@ export function Dashboard() {
     return diffInMilliseconds / (1000 * 60 * 60);
   }
   const currentDate = new Date().toLocaleDateString();
+  const handleStateClick = (etat: string) => {
+    window.location.href = `/vehicles?etat_vehicule=${encodeURIComponent(etat)}`;
+  };
+  
 
 
   return (
@@ -685,7 +695,7 @@ export function Dashboard() {
               ></FleetCounter>
             </div>
 
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("HS")} style={{ cursor: "pointer" }}>              
               <FleetCounter
                 numberOfItem={vehicleStates.find(state => state.etat_vehicule === "HS")?.total || 0}
                 title={translate("Out of Service")}
@@ -694,7 +704,7 @@ export function Dashboard() {
                 linkTo="/vehicles"
               />
             </div>
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("En panne")} style={{ cursor: "pointer" }}>              
               <FleetCounter
                 numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En panne")?.total || 0}
                 title={translate("Broken Down")}
@@ -703,16 +713,16 @@ export function Dashboard() {
                 linkTo="/vehicles"
               />
             </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("En Réparation")} style={{ cursor: "pointer" }}>
+                <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En Réparation")?.total || 0}
                 title={translate("Under Repair")}
                 icon={"wrench"}
                 color={"bg-info-light"}
                 linkTo="/vehicles"
               />
             </div>
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Disponible")} style={{ cursor: "pointer" }}>
               <FleetCounter
                 numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible")?.total || 0}
                 title={translate("Available")}

@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect, useLayoutEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Table,
   Modal,
@@ -123,10 +124,10 @@ interface VehiculeListInterface {
 
 export function Vehicles() {
   const { translate } = useTranslate();
-
   const [type, setType] = useState(1);
   const [typeSearch, setTypeSearch] = useState(translate("Immatriculation"));
   const [search, setSearch] = useState("");
+  const [pageCount, setPageCount] = useState(0); // Nombre total de pages
   const [column, setSortColumn] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const userID = localStorage.getItem("GeopUserID");
@@ -134,7 +135,6 @@ export function Vehicles() {
   const [total, setTotal] = useState<number>(0);
   const [vehicles, setVehicles] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
-  const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const navigate = useNavigate();
@@ -145,8 +145,12 @@ export function Vehicles() {
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const etat = queryParams.get("etat_vehicule") || ""; // Récupère le paramètre `etat`  
+  // State pour stocker les véhicules filtrés
   
-
+  console.log("État extrait de l'URL :", etat); // Vérifiez la valeur dans la console
   const handleClickLink = (navigateTo: string) => {
     if (navigateTo) {
       navigate(navigateTo);
@@ -189,53 +193,94 @@ export function Vehicles() {
     type: number,
     column: string,
     sort: string,
-    etat?: string 
-   ) => {
+    etat?: string
+  ) => {
     try {
       setLoading(true);
-      const params = {
-        id_user: userID,
-        page: page,
-        limit: limit,
-        column: searchColum[column],
-        sort: sort,
-        search: search,
-        type: type,
-        etat: etat // Ajoutez le paramètre d'état
-      };
   
       const [countData, vehicleData] = await Promise.all([
         fetch(`${backendUrl}/vehicles/count`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(params)
-        }).then((res) => res.json()),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_user: parseInt(userID ?? "0") || 0,
+            search: search,
+            etat: etat, // Ajout du filtre état
+          }),
+        }).then(res => res.json()),
+  
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(params)
-        }).then((res) => res.json()),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_user: userID,
+            page: page,
+            limit: limit,
+            column: searchColum[column],
+            sort: sort,
+            search: search,
+            type: type,
+            etat: etat, // Ajout du filtre état
+          }),
+        }).then(res => res.json()),
       ]);
-
-      const total = countData[0].total;
-      setTotal(total);
-
-      const calculatedPageCount = Math.ceil(total / limit);
+  
+      // Mise à jour CRITIQUE de la pagination
+      const newTotal = countData[0].total;
+      setTotal(newTotal);
+  
+      // Filtrer les véhicules côté frontend
+      const filteredVehicles = etat
+        ? vehicleData.filter((vehicle: { etat_vehicule: string; }) => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+        : vehicleData;
+  
+      // Calcul du nombre de pages
+      const calculatedPageCount = etat
+        ? Math.ceil(filteredVehicles.length / limit) // Pagination basée sur les véhicules filtrés
+        : Math.ceil(newTotal / limit); // Pagination basée sur le nombre total de véhicules
+  
       setPageCount(calculatedPageCount);
-      setVehicles(vehicleData);
-
-      return vehicleData;
+  
+      // Réinitialisation de la page si nécessaire
+      if (page > calculatedPageCount) {
+        setCurrentPage(1);
+      }
+  
+      setVehicles(filteredVehicles); // Utiliser les véhicules filtrés pour l'affichage
+  
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false); // Set loading to false on data fetch completion
+      setLoading(false);
     }
   };
+  console.log("Valeur de etat récupérée depuis l'URL :", etat); // Vérifie la valeur
+ 
 
+  const filteredVehicles = etat
+  ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+  : vehicles;
+
+console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+
+
+//const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
+console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+
+
+const handleStateChange = (state: string) => {
+  const newStates = selectedStates.includes(state)
+    ? selectedStates.filter(s => s !== state)
+    : [...selectedStates, state];
+  setSelectedStates(newStates);
+  setCurrentPage(1); // Réinitialiser la page actuelle à 1
+};
+  // Dans le gestionnaire de changement d'état
+  const handleStateFilter = (selectedStates: string[]) => {
+    setSelectedStates(selectedStates);
+    setCurrentPage(1); // Réinitialisation à la première page
+    getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
+  };
   const refreshVehiculeData = async () => {
     await getVehicles(
       limit, 
@@ -247,7 +292,14 @@ export function Vehicles() {
       selectedStates.join(',') // Envoi des états sélectionnés
     );
   };
-  
+
+  useEffect(() => {
+    const calculatedPageCount = etat
+      ? Math.ceil(filteredVehicles.length / limit)
+      : Math.ceil(total / limit);
+    setPageCount(calculatedPageCount);
+  }, [etat, filteredVehicles, total, limit]);
+
 
   useLayoutEffect(() => {
     refreshVehiculeData();
@@ -333,9 +385,10 @@ export function Vehicles() {
       column,
       sort
     ); // Ajouter await ici
-    setVehicles(commentsFormServer);
+    //setVehicles(commentsFormServer);
     window.scrollTo(0, 0);
   };
+  
 
   const handleResetSearch = async () => {
     setSearch("");
@@ -364,9 +417,6 @@ export function Vehicles() {
     }
   };
 
-
-
-
   const handleVehiclesSelect = (DriverID: string) => {
     let updatedSetSelectedVehicles: string[] = [];
 
@@ -392,7 +442,6 @@ export function Vehicles() {
 
     console.log(updatedSetSelectedVehicles);
   };
-
 
   const vehicleHeaders = [
     translate("ID"),
@@ -546,6 +595,7 @@ export function Vehicles() {
   const closeDetailModal = () => {
     setModalStatusDetail(null);
   };
+  const totalVehiclesToDisplay = etat ? filteredVehicles.length : total;
 
 
 
@@ -562,8 +612,9 @@ export function Vehicles() {
           >
             <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
-              {translate("Vehicles")} {total}
+              {translate("Total Vehicles")} {totalVehiclesToDisplay}            
             </h4>
+           
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
@@ -629,7 +680,7 @@ export function Vehicles() {
                     </Dropdown.Menu>
 
                   </Dropdown>
-            <div className="col-sm-12 col-md-6">
+         {/*  <div className="col-sm-12 col-md-6">
               <div className="input-group">
                 <Dropdown className="mr-2">
                   <Dropdown.Toggle variant="secondary" id="dropdown-states">
@@ -667,10 +718,10 @@ export function Vehicles() {
                     ))}
                   </Dropdown.Menu>
                 </Dropdown>
+                
 
-    {/* Gardez le reste de vos éléments de filtre existants ici */}
   </div>
-</div>
+</div>*/}
                   <input
                     type="text"
                     placeholder={` ${translate("Search by")} ${translate(
@@ -888,8 +939,8 @@ export function Vehicles() {
                     </p>
                   </td>
                 </tr>
-              ) : vehicles.length > 0 ? (
-                vehicles.map((item) => (
+              ) : filteredVehicles.length > 0 ? (
+                 filteredVehicles.map((item) => (
                   <tr key={item.id_vehicule}>
                     <td>
                       <div className="form-check form-check-inline">
