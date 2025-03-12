@@ -147,7 +147,6 @@ export function Vehicles() {
 const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); // Véhicules de la page actuelle
   
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
-  
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const etat = queryParams.get("etat_vehicule") || ""; // Récupère le paramètre `etat`  
@@ -208,7 +207,7 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
           body: JSON.stringify({
             id_user: parseInt(userID ?? "0") || 0,
             search: search,
-            etat: etat, // Filtre côté backend
+            etat: etat, // Ajout du filtre état
           }),
         }).then(res => res.json()),
 
@@ -217,13 +216,13 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id_user: userID,
-            page: page, // Page actuelle
-            limit: limit, // Nombre d'éléments par page
+            page: 1, // Toujours récupérer la première page (tous les véhicules)
+            limit: 1000, // Récupérer tous les véhicules en une seule requête
             column: searchColum[column],
             sort: sort,
             search: search,
             type: type,
-            etat: etat, // Filtre côté backend
+            etat: etat, // Ajout du filtre état
           }),
         }).then(res => res.json()),
       ]);
@@ -232,8 +231,13 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
       const newTotal = countData[0].total;
       setTotal(newTotal);
 
+      // Filtrer les véhicules côté frontend
+      const filteredVehicles = etat
+        ? vehicleData.filter((vehicle: VehiculeListInterface) => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+        : vehicleData;
+
       // Calculer le nombre total de pages
-      const calculatedPageCount = Math.ceil(newTotal / limit);
+      const calculatedPageCount = Math.ceil(filteredVehicles.length / limit);
       setPageCount(calculatedPageCount);
 
       // Réinitialiser la page actuelle si nécessaire
@@ -241,8 +245,8 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
         setCurrentPage(1);
       }
 
-      // Stocker les véhicules paginés et filtrés
-      setVehicles(vehicleData);
+      // Stocker tous les véhicules filtrés
+      setVehicles(filteredVehicles);
 
     } catch (error) {
       console.error(error);
@@ -260,13 +264,24 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
 
 console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
+const startIndex = (currentPage - 1) * limit;
+const endIndex = startIndex + limit;
+//const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
+console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
 
+const handleStateChange = (state: string) => {
+  const newStates = selectedStates.includes(state)
+    ? selectedStates.filter(s => s !== state)
+    : [...selectedStates, state];
+  setSelectedStates(newStates);
+  setCurrentPage(1); // Réinitialiser la page actuelle à 1
+};
   // Dans le gestionnaire de changement d'état
   const handleStateFilter = (selectedStates: string[]) => {
     setSelectedStates(selectedStates);
     setCurrentPage(1); // Réinitialisation à la première page
-    //getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
+    getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
   };
   const refreshVehiculeData = async () => {
     await getVehicles(
@@ -279,29 +294,22 @@ console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Véri
       selectedStates.join(',') // Envoi des états sélectionnés
     );
   };
+
   useEffect(() => {
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
-    const newPaginatedVehicles = filteredVehicles.slice(startIndex, endIndex);
+    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
     setPaginatedVehicles(newPaginatedVehicles);
-  }, [currentPage, filteredVehicles, limit]);
-
-  // Calculer le nombre total de pages
-  useEffect(() => {
-    const calculatedPageCount = Math.ceil(filteredVehicles.length / limit);
-    setPageCount(calculatedPageCount);
-  }, [filteredVehicles, limit]);
-
-  // Gérer le changement de page
-  const handlePageClick = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected + 1);
-  };
-
-  // Charger les véhicules au montage du composant
+  }, [currentPage, vehicles, limit]);
   useEffect(() => {
     getVehicles(limit, currentPage, search, type, column, sort, etat);
   }, [currentPage, etat]);
-  
+
+
+  useLayoutEffect(() => {
+    refreshVehiculeData();
+  }, [userID, limit, limit, search, type, column, sort, selectedStates]);
+
   /*const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getVehicles(limit, currentPage, search, type, column, sort);
@@ -440,7 +448,24 @@ console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Véri
     console.log(updatedSetSelectedVehicles);
   };
   
-  
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
+    setPaginatedVehicles(newPaginatedVehicles);
+  }, [currentPage, vehicles, limit]);
+
+  // Gérer le changement de page
+  const handlePageClick = (selectedPage: { selected: number; }) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+
+  // Charger les véhicules au montage du composant
+  useEffect(() => {
+    getVehicles(limit, currentPage, search, type, column, sort, etat);
+  }, [currentPage, etat]);
+
+ 
 
   const vehicleHeaders = [
     translate("ID"),
@@ -585,8 +610,6 @@ console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Véri
       });
     }
   };
- 
-
 
 
   const closeModal = () => {
@@ -1003,25 +1026,25 @@ console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Véri
             </div>
             <div className="col-md-6 d-flex justify-content-end">
             <ReactPaginate
-        previousLabel={translate("previous")}
-        nextLabel={translate("next")}
-        breakLabel={"..."}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={3}
-        onPageChange={handlePageClick}
-        containerClassName={"pagination justify-content-end"}
-        pageClassName={"page-item"}
-        pageLinkClassName={"page-link"}
-        previousClassName={"page-item"}
-        previousLinkClassName={"page-link"}
-        nextClassName={"page-item"}
-        nextLinkClassName={"page-link"}
-        breakClassName={"page-item"}
-        breakLinkClassName={"page-link"}
-        activeClassName={"active"}
-        forcePage={currentPage - 1}
-      />
+  previousLabel={translate("previous")}
+  nextLabel={translate("next")}
+  breakLabel={"..."}
+  pageCount={pageCount} // Nombre total de pages
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={3}
+  onPageChange={handlePageClick} // Gérer le changement de page
+  containerClassName={"pagination justify-content-end"}
+  pageClassName={"page-item"}
+  pageLinkClassName={"page-link"}
+  previousClassName={"page-item"}
+  previousLinkClassName={"page-link"}
+  nextClassName={"page-item"}
+  nextLinkClassName={"page-link"}
+  breakClassName={"page-item"}
+  breakLinkClassName={"page-link"}
+  activeClassName={"active"}
+  forcePage={currentPage - 1} // Forcer la page active
+/>
             </div>
           </div>
         </div>
