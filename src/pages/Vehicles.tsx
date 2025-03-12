@@ -306,9 +306,10 @@ const handleStateChange = (state: string) => {
   }, [currentPage, etat]);
 
 
-  useLayoutEffect(() => {
+  /*useLayoutEffect(() => {
     refreshVehiculeData();
   }, [userID, limit, limit, search, type, column, sort, selectedStates]);
+  */
 
   /*const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
