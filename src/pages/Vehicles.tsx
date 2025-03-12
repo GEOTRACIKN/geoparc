@@ -144,7 +144,10 @@ export function Vehicles() {
   const [IdVehicle, setIdDVehicle] = useState<number>(0);
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); // Véhicules de la page actuelle
+  
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const etat = queryParams.get("etat_vehicule") || ""; // Récupère le paramètre `etat`  
@@ -197,7 +200,7 @@ export function Vehicles() {
   ) => {
     try {
       setLoading(true);
-  
+
       const [countData, vehicleData] = await Promise.all([
         fetch(`${backendUrl}/vehicles/count`, {
           method: "POST",
@@ -205,49 +208,42 @@ export function Vehicles() {
           body: JSON.stringify({
             id_user: parseInt(userID ?? "0") || 0,
             search: search,
-            etat: etat, // Ajout du filtre état
+            etat: etat, // Filtre côté backend
           }),
         }).then(res => res.json()),
-  
+
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id_user: userID,
-            page: page,
-            limit: limit,
+            page: page, // Page actuelle
+            limit: limit, // Nombre d'éléments par page
             column: searchColum[column],
             sort: sort,
             search: search,
             type: type,
-            etat: etat, // Ajout du filtre état
+            etat: etat, // Filtre côté backend
           }),
         }).then(res => res.json()),
       ]);
-  
+
       // Mise à jour CRITIQUE de la pagination
       const newTotal = countData[0].total;
       setTotal(newTotal);
-  
-      // Filtrer les véhicules côté frontend
-      const filteredVehicles = etat
-        ? vehicleData.filter((vehicle: { etat_vehicule: string; }) => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
-        : vehicleData;
-  
-      // Calcul du nombre de pages
-      const calculatedPageCount = etat
-        ? Math.ceil(filteredVehicles.length / limit) // Pagination basée sur les véhicules filtrés
-        : Math.ceil(newTotal / limit); // Pagination basée sur le nombre total de véhicules
-  
+
+      // Calculer le nombre total de pages
+      const calculatedPageCount = Math.ceil(newTotal / limit);
       setPageCount(calculatedPageCount);
-  
-      // Réinitialisation de la page si nécessaire
+
+      // Réinitialiser la page actuelle si nécessaire
       if (page > calculatedPageCount) {
         setCurrentPage(1);
       }
-  
-      setVehicles(filteredVehicles); // Utiliser les véhicules filtrés pour l'affichage
-  
+
+      // Stocker les véhicules paginés et filtrés
+      setVehicles(vehicleData);
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -255,7 +251,8 @@ export function Vehicles() {
     }
   };
   console.log("Valeur de etat récupérée depuis l'URL :", etat); // Vérifie la valeur
- 
+
+
 
   const filteredVehicles = etat
   ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
@@ -264,22 +261,12 @@ export function Vehicles() {
 console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
 
-//const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
-console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
-
-const handleStateChange = (state: string) => {
-  const newStates = selectedStates.includes(state)
-    ? selectedStates.filter(s => s !== state)
-    : [...selectedStates, state];
-  setSelectedStates(newStates);
-  setCurrentPage(1); // Réinitialiser la page actuelle à 1
-};
   // Dans le gestionnaire de changement d'état
   const handleStateFilter = (selectedStates: string[]) => {
     setSelectedStates(selectedStates);
     setCurrentPage(1); // Réinitialisation à la première page
-    getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
+    //getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
   };
   const refreshVehiculeData = async () => {
     await getVehicles(
@@ -292,25 +279,35 @@ const handleStateChange = (state: string) => {
       selectedStates.join(',') // Envoi des états sélectionnés
     );
   };
-
   useEffect(() => {
-    const calculatedPageCount = etat
-      ? Math.ceil(filteredVehicles.length / limit)
-      : Math.ceil(total / limit);
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const newPaginatedVehicles = filteredVehicles.slice(startIndex, endIndex);
+    setPaginatedVehicles(newPaginatedVehicles);
+  }, [currentPage, filteredVehicles, limit]);
+
+  // Calculer le nombre total de pages
+  useEffect(() => {
+    const calculatedPageCount = Math.ceil(filteredVehicles.length / limit);
     setPageCount(calculatedPageCount);
-  }, [etat, filteredVehicles, total, limit]);
+  }, [filteredVehicles, limit]);
 
+  // Gérer le changement de page
+  const handlePageClick = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
 
-  useLayoutEffect(() => {
-    refreshVehiculeData();
-  }, [userID, limit, limit, search, type, column, sort, selectedStates]);
-
-  const handlePageClick = async (data: any) => {
+  // Charger les véhicules au montage du composant
+  useEffect(() => {
+    getVehicles(limit, currentPage, search, type, column, sort, etat);
+  }, [currentPage, etat]);
+  
+  /*const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getVehicles(limit, currentPage, search, type, column, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
-  };
+  };*/
 
 
   const menuItems = [
@@ -442,6 +439,8 @@ const handleStateChange = (state: string) => {
 
     console.log(updatedSetSelectedVehicles);
   };
+  
+  
 
   const vehicleHeaders = [
     translate("ID"),
@@ -586,6 +585,8 @@ const handleStateChange = (state: string) => {
       });
     }
   };
+ 
+
 
 
   const closeModal = () => {
@@ -939,8 +940,8 @@ const handleStateChange = (state: string) => {
                     </p>
                   </td>
                 </tr>
-              ) : filteredVehicles.length > 0 ? (
-                 filteredVehicles.map((item) => (
+              ) : paginatedVehicles.length > 0 ? (
+                paginatedVehicles.map((item) => (
                   <tr key={item.id_vehicule}>
                     <td>
                       <div className="form-check form-check-inline">
@@ -1001,26 +1002,26 @@ const handleStateChange = (state: string) => {
               </span>
             </div>
             <div className="col-md-6 d-flex justify-content-end">
-              <ReactPaginate
-                previousLabel={translate("previous")}
-                nextLabel={translate("next")}
-                breakLabel={"..."}
-                pageCount={pageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                containerClassName={"pagination justify-content-end"}
-                pageClassName={"page-item"}
-                pageLinkClassName={"page-link"}
-                previousClassName={"page-item"}
-                previousLinkClassName={"page-link"}
-                nextClassName={"page-item"}
-                nextLinkClassName={"page-link"}
-                breakClassName={"page-item"}
-                breakLinkClassName={"page-link"}
-                activeClassName={"active"}
-                forcePage={currentPage - 1}
-              />
+            <ReactPaginate
+        previousLabel={translate("previous")}
+        nextLabel={translate("next")}
+        breakLabel={"..."}
+        pageCount={pageCount}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={3}
+        onPageChange={handlePageClick}
+        containerClassName={"pagination justify-content-end"}
+        pageClassName={"page-item"}
+        pageLinkClassName={"page-link"}
+        previousClassName={"page-item"}
+        previousLinkClassName={"page-link"}
+        nextClassName={"page-item"}
+        nextLinkClassName={"page-link"}
+        breakClassName={"page-item"}
+        breakLinkClassName={"page-link"}
+        activeClassName={"active"}
+        forcePage={currentPage - 1}
+      />
             </div>
           </div>
         </div>
