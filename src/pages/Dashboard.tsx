@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import FleetCounter from "../components/Dashboard/fleetCounter";
 import FleetSate from "../components/Dashboard/fleetSate";
+import StateVehicule from "../components/Dashboard/stateVehicule"
 import StatsComponent from "../components/Dashboard/StatsComponent";
 
 import { useTranslate } from "../hooks/LanguageProvider";
@@ -806,6 +807,11 @@ export function Dashboard() {
               hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
             }}
           />
+        </div>
+        <div className="col-lg-6">
+        <StateVehicule 
+  vehicleStates={vehicleStates}
+/>
         </div>
       </div>
     </>
