@@ -40,7 +40,7 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
             const result = await response.json();
             console.log(result);
 
-            toast.success(translate("Pharmacy deleted successfully!"), {
+            toast.success(translate("Deleted successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -58,7 +58,7 @@ const ModalDeletePharmacy: React.FC<ModalDeletePharmacyProps> = ({
             onHide();
         } catch (error) {
             console.error(error);
-            toast.error(translate("Error deleting pharmacy. Please try again."), {
+            toast.error(translate("Error deleting. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

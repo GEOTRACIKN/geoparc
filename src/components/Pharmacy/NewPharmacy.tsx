@@ -125,16 +125,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
         );
     
         if (!selectedVehicle) {
-            toast.error("Please select a valid vehicle.", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "light",
-                transition: Bounce,
-            });
+           
             return false;
         }
     
@@ -193,7 +184,7 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
             onHide();
         } catch (error) {
             console.error("Error adding pharmacy:", error);
-            toast.error("Error adding pharmacy. Please try again.", {
+            toast.error(translate("Error adding. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

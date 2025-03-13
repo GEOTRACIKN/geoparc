@@ -50,7 +50,7 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
                 
                 setFormData({
                     id_conducteur: data.id_conducteur,
-                    date_violation: date_violation.isValid() ? date_violation.format('DD/MM/YYYY') : 'Invalid Date',
+                    date_violation: date_violation.isValid() ? date_violation.format('DD/MM/YYYY') : '',
                     type_violation: data.type_violation,
                     immatriculation_vehicule: data.immatriculation_vehicule,
                     cost: data.cost,

@@ -216,7 +216,7 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
             onHide();
         } catch (error) {
             console.error("Error adding fire:", error);
-            toast.error("Error adding fire. Please try again.", {
+            toast.error(translate("Error adding. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

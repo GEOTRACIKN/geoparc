@@ -119,7 +119,6 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                 }));
             } catch (error: unknown) {
                 console.error("Error fetching training data:", error);
-                toast.error("Error fetching training data.");
             }
         };
 
@@ -244,7 +243,8 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success(translate("Updated successfully!"), {                position: "bottom-right",
+            toast.success(translate("Updated successfully!"), {                
+                position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -261,7 +261,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating training:", error);
-            toast.error("Error updating training. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

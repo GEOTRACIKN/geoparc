@@ -127,7 +127,6 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching pharmacy data.");
             }
         };
     
@@ -281,7 +280,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating pharmacy:", error);
-            toast.error("Error updating pharmacy. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,

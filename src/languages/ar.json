@@ -525,7 +525,7 @@
 "Receptionist Name":"اسم موظف الاستقبال",
 "Service":"خدمة",
 "Speed":"سرعة ",
-"overspeed" : "تجاوز السرعة",
+"Over Speed" : "تجاوز السرعة",
 "Insufficient Break" : "استراحة غير كافية",
 "Night Driving" : "القيادة الليلية",
 "Overtime Driving" : "القيادة في وقت إضافي",
@@ -739,7 +739,11 @@
 "Under Repair": "قيد الإصلاح",
 "Available": "متاح",
 "Please fill out all fields": "يرجى ملء جميع الحقول",
+
+"Error updating. Please try again.": "حدث خطأ أثناء التحديث. يرجى المحاولة مرة أخرى.",
+"Updated successfully!": "تم التحديث بنجاح!",
+"Error adding. Please try again.": "حدث خطأ أثناء الإضافة. يرجى المحاولة مرة أخرى.",
 "Added successfully!": "تمت الإضافة بنجاح!",
-"Updated successfully!": "تم التحديث بنجاح!"
+"Start date must be earlier than end date": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء"
 
 }

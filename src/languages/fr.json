@@ -519,11 +519,11 @@
 "Receptionist Name":"Nom du réceptionniste",
 "Service":"Service",
 "Speed":"Vitesse",
-"overspeed" : "survitesse",
-"Insufficient Break" : "pause insuffisante",
-"Night Driving" : "conduite de nuit",
-"Overtime Driving" : "conduite en heures supplémentaires",
-"Other" : "autre",
+"Over Speed" : "Survitesse",
+"Insufficient Break" : "Pause insuffisante",
+"Night Driving" : "Conduite de nuit",
+"Overtime Driving" : "Conduite en heures supplémentaires",
+"Other" : "Autre",
 "Add Violation" : "Ajouter une infraction",
 "Violation type" : "Type d'infraction",
 "Date Violation" : "Date de l'infraction",
@@ -728,7 +728,10 @@
 "Available": "Disponible",
 "Please fill out all fields": "Veuillez remplir tous les champs" ,
 "Added successfully!": "Ajouté avec succès !",
-"Updated successfully!": "Ajouté avec succès !"
+"Updated successfully!": "Ajouté avec succès !",
+"Error updating. Please try again": "Erreur lors de la mise à jour. Veuillez réessayer",
+"Error adding. Please try again": "Erreur lors de l'ajout. Veuillez réessayer",
+"Start date must be earlier than end date": "La date de début doit être antérieure à la date de fin"
 
 
 }

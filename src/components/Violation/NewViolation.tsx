@@ -219,7 +219,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
         } else {
           // Si la réponse ne contient pas le message de succès attendu
-          toast.error("Failed to add violation. Please try again.", {
+            toast.error(translate("Error adding. Please try again"), {  
             position: "bottom-right",
             autoClose: 3000,
             hideProgressBar: false,
@@ -253,134 +253,134 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     console.log(formData);  // Affiche les données dans la console
   };
 
-  return (
-    <Modal show={show} onHide={onHide} backdrop="static">
-      <Modal.Header closeButton>
-        <Modal.Title>{translate("Add Violation")}</Modal.Title>
-      </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body
-          style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
-        >
-         {/* Violation Type */}
-<Form.Group controlId="type">
-  <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
-  <Select
-    options={violationOptions}
-    onChange={handleViolationTypeChange}
-    name="type"
-    value={
-      violationOptions.find((option) => option.value === formData.type) || null
-    }
-    isClearable
-    isSearchable
-  
-  />
-</Form.Group>
+      return (
+        <Modal show={show} onHide={onHide} backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>{translate("Add Violation")}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSubmit}>
+            <Modal.Body
+              style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
+            >
+            {/* Violation Type */}
+    <Form.Group controlId="type">
+      <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
+      <Select
+        options={violationOptions}
+        onChange={handleViolationTypeChange}
+        name="type"
+        value={
+          violationOptions.find((option) => option.value === formData.type) || null
+        }
+        isClearable
+        isSearchable
+      
+      />
+    </Form.Group>
 
-{/* Driver */}
-<Form.Group controlId="id_conducteur">
-  <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
-  <Select
-    options={drivers.map((driver) => ({
-      value: driver.id_conducteur,
-      label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
-    }))}
-    placeholder={translate("Select Driver")}
-    isLoading={drivers.length === 0}
-    noOptionsMessage={() => translate("No drivers available")}
-    isSearchable
-    value={
-      drivers
-        .map((driver) => ({
+    {/* Driver */}
+    <Form.Group controlId="id_conducteur">
+      <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+      <Select
+        options={drivers.map((driver) => ({
           value: driver.id_conducteur,
           label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
-        }))
-        .find(
-          (option) =>
-            String(option.value) === String(formData.id_conducteur)
-        ) || null
-    }
-    onChange={(selectedOption) => {
-      setFormData((prev) => ({
-        ...prev,
-        id_conducteur: selectedOption ? String(selectedOption.value) : "",
-      }));
-    }}
-   
-  />
-</Form.Group>
+        }))}
+        placeholder={translate("Select Driver")}
+        isLoading={drivers.length === 0}
+        noOptionsMessage={() => translate("No drivers available")}
+        isSearchable
+        value={
+          drivers
+            .map((driver) => ({
+              value: driver.id_conducteur,
+              label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+            }))
+            .find(
+              (option) =>
+                String(option.value) === String(formData.id_conducteur)
+            ) || null
+        }
+        onChange={(selectedOption) => {
+          setFormData((prev) => ({
+            ...prev,
+            id_conducteur: selectedOption ? String(selectedOption.value) : "",
+          }));
+        }}
+      
+      />
+    </Form.Group>
 
-{/* Vehicle */}
-<Form.Group controlId="id_vehicule">
-  <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
-  <Select
-    options={vehicles.map((vehicle) => ({
-      value: vehicle.id_vehicule,
-      label: vehicle.immatriculation_vehicule,
-    }))}
-    placeholder={translate("Select Vehicle")}
-    isLoading={vehicles.length === 0}
-    noOptionsMessage={() => translate("No vehicles available")}
-    isSearchable
-    value={
-      vehicles
-        .map((vehicle) => ({
+    {/* Vehicle */}
+    <Form.Group controlId="id_vehicule">
+      <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+      <Select
+        options={vehicles.map((vehicle) => ({
           value: vehicle.id_vehicule,
           label: vehicle.immatriculation_vehicule,
-        }))
-        .find(
-          (option) =>
-            String(option.value) === String(formData.id_vehicule)
-        ) || null
-    }
-    onChange={(selectedOption) => {
-      setFormData((prev) => ({
-        ...prev,
-        id_vehicule: selectedOption ? String(selectedOption.value) : "",
-      }));
-    }}
-    
-  />
-</Form.Group>
-
-{/* Date Violation */}
-<Form.Group controlId="date">
-  <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
-  <Form.Control
-    type="datetime-local"
-    name="date"
-    value={formData.date}
-    onChange={handleInputChange}
-    placeholder="Enter Date and Time here"
-    
-  />
-</Form.Group>
-
+        }))}
+        placeholder={translate("Select Vehicle")}
+        isLoading={vehicles.length === 0}
+        noOptionsMessage={() => translate("No vehicles available")}
+        isSearchable
+        value={
+          vehicles
+            .map((vehicle) => ({
+              value: vehicle.id_vehicule,
+              label: vehicle.immatriculation_vehicule,
+            }))
+            .find(
+              (option) =>
+                String(option.value) === String(formData.id_vehicule)
+            ) || null
+        }
+        onChange={(selectedOption) => {
+          setFormData((prev) => ({
+            ...prev,
+            id_vehicule: selectedOption ? String(selectedOption.value) : "",
+          }));
+        }}
         
-          <Form.Group controlId="description">
-            <Form.Label>{translate("Description")}</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="description"
-              rows={4}
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Enter description here"
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            {translate("Close")}
-          </Button>
-          <Button variant="primary" type="submit">
-            {translate("Add")}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
-  );
-};
+      />
+    </Form.Group>
+
+    {/* Date Violation */}
+    <Form.Group controlId="date">
+      <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
+      <Form.Control
+        type="datetime-local"
+        name="date"
+        value={formData.date}
+        onChange={handleInputChange}
+        placeholder="Enter Date and Time here"
+        
+      />
+    </Form.Group>
+
+            
+              <Form.Group controlId="description">
+                <Form.Label>{translate("Description")}</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  name="description"
+                  rows={4}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter description here"
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                {translate("Close")}
+              </Button>
+              <Button variant="primary" type="submit">
+                {translate("Add")}
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      );
+    };
 
 export default ModalNewVilation;
