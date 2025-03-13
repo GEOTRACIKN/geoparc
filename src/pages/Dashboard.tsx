@@ -715,7 +715,7 @@ export function Dashboard() {
             </div>
             <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("En Réparation")} style={{ cursor: "pointer" }}>
                 <FleetCounter
-                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En Réparation")?.total || 0}
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
                 title={translate("Under Repair")}
                 icon={"wrench"}
                 color={"bg-info-light"}
