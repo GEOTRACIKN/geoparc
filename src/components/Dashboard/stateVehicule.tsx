@@ -81,7 +81,7 @@ const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
       <div style={{ padding: "20px" }}>
         <h6 className="box-title">
           <i className="las la-car-side" style={{ fontSize: "24px" }}></i> 
-          État du parc automobile
+           État du parc automobile
         </h6>
       </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />

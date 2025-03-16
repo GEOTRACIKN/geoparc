@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import FleetCounter from "../components/Dashboard/fleetCounter";
 import FleetSate from "../components/Dashboard/fleetSate";
-import StateVehicule from "../components/Dashboard/stateVehicule"
+import StateVehicule from "../components/Dashboard/stateVehicule";
+import StateTraining from "../components/Dashboard/stateTraining";
+
 import StatsComponent from "../components/Dashboard/StatsComponent";
 
 import { useTranslate } from "../hooks/LanguageProvider";
@@ -59,6 +61,11 @@ interface SearchResult {
 interface ImmatriSuggestion {
   immatriculation_vehicule: string;
 }
+type TrainingState = {
+  id_training: number;
+  date_end_training: string;
+}
+
 type VehicleState = {
   etat_vehicule: string;
   total: number;
@@ -97,6 +104,7 @@ export function Dashboard() {
   const [totalTechnicalInspection, setTotalTechnicalInspection] = useState(0);
   const [totalTraining, setTotalTraining] = useState(0);
   const [totalFireExtinguisher, setTotalFireExtinguisher] = useState(0);
+  const [trainings, setTrainings] = useState<TrainingState[]>([]);
 
 
   useEffect(() => {
@@ -164,6 +172,8 @@ export function Dashboard() {
         } else {
           console.error("Failed to fetch total number of Vehicles");
         }
+
+        
 
         // Fetch total number of training
         const responseFire = await fetch(
@@ -243,6 +253,16 @@ export function Dashboard() {
           console.error("Failed to fetch total number of Vehicles");
           setNotifications([]);
         }
+
+        const responseTrainings = await fetch(
+          `${backendUrl}/api/geop/training/all/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseTrainings.ok) {
+          const trainingsData = await responseTrainings.json();
+          setTrainings(trainingsData);
+        }
+  
 
         // Fetch total number of users
         const responseUsers = await fetch(
@@ -815,6 +835,11 @@ export function Dashboard() {
         <div className="col-lg-6">
         <StateVehicule 
   vehicleStates={vehicleStates}
+/>
+        </div>
+        <div className="col-lg-6">
+        <StateTraining 
+  trainings={trainings}
 />
         </div>
       </div>
