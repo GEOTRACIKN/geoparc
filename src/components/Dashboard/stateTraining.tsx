@@ -1,10 +1,11 @@
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
+import { useTranslate } from '../../hooks/LanguageProvider';
+
 
 interface Training {
   date_end_training: string;
-  // Ajouter d'autres propriétés au besoin
 }
 
 interface Props {
@@ -24,6 +25,8 @@ const StateTraining: React.FC<Props> = ({ trainings }) => {
     const today = moment().startOf('day');
     return endDate.isSameOrAfter(today);
   };
+    const { translate } = useTranslate();
+  
 
   // Calcul des statistiques
   const validCount = trainings.filter(t => isTrainingValid(t)).length;
@@ -83,7 +86,7 @@ const StateTraining: React.FC<Props> = ({ trainings }) => {
       <div style={{ padding: "20px" }}>
         <h6 className="box-title">
           <i className="las la-certificate" style={{ fontSize: "24px" }}></i> 
-          État des formations
+          {translate("Training status")}
         </h6>
       </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />

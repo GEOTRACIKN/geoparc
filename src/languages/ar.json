@@ -744,6 +744,6 @@
 "Updated successfully!": "تم التحديث بنجاح!",
 "Error adding. Please try again.": "حدث خطأ أثناء الإضافة. يرجى المحاولة مرة أخرى.",
 "Added successfully!": "تمت الإضافة بنجاح!",
-"Start date must be earlier than end date": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء"
-
+"Start date must be earlier than end date": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء",
+  "Training status": "حالة التدريبات"
 }

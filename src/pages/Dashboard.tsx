@@ -62,7 +62,6 @@ interface ImmatriSuggestion {
   immatriculation_vehicule: string;
 }
 type TrainingState = {
-  id_training: number;
   date_end_training: string;
 }
 
@@ -82,8 +81,6 @@ export function Dashboard() {
   const [totalFires, setTotalFires] = useState(0);
   const navigate = useNavigate();
 
-
-
   const [vehicleStates, setVehicleStates] = useState<VehicleState[]>([]);
   const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
@@ -98,14 +95,12 @@ export function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-
   const [totalDrivingLicense, setTotalDrivingLicense] = useState(0);
   const [totalVehicleInsurance, setTotalVehicleInsurance] = useState(0);
   const [totalTechnicalInspection, setTotalTechnicalInspection] = useState(0);
   const [totalTraining, setTotalTraining] = useState(0);
   const [totalFireExtinguisher, setTotalFireExtinguisher] = useState(0);
   const [trainings, setTrainings] = useState<TrainingState[]>([]);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -820,18 +815,19 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="col-lg-6">
-          <FleetSate
-            options={{
-              maintenanceCosts: 5000, // Coûts de Maintenance
-              missionCosts: 3000, // Coûts des Missions
-              fuelCosts: 2000, // Coûts de Carburant
-              legalCosts: 1500, // Coûts Juridiques
-              employeeCosts: 4000, // Coûts des Employés
-              hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
-            }}
-          />
-        </div>
+          {/* <div className="col-lg-6">
+        <FleetSate
+          options={{
+            maintenanceCosts: 5000, // Coûts de Maintenance
+            missionCosts: 3000, // Coûts des Missions
+            fuelCosts: 2000, // Coûts de Carburant
+            legalCosts: 1500, // Coûts Juridiques
+            employeeCosts: 4000, // Coûts des Employés
+            hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
+          }}
+        />
+      </div> */}
+
         <div className="col-lg-6">
         <StateVehicule 
   vehicleStates={vehicleStates}

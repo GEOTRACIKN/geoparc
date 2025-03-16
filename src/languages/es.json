@@ -730,5 +730,6 @@
 "Updated successfully!": "¡Actualizado con éxito!",
 "Error adding. Please try again.": "Error al agregar. Por favor, inténtelo de nuevo.",
 "Added successfully!": "¡Agregado con éxito!",
-"Start date must be earlier than end date": "La fecha de inicio debe ser anterior a la fecha de fin"
+"Start date must be earlier than end date": "La fecha de inicio debe ser anterior a la fecha de fin",
+"Training status": "Estado de las formaciones"
 }
