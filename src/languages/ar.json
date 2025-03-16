@@ -745,5 +745,15 @@
 "Error adding. Please try again.": "حدث خطأ أثناء الإضافة. يرجى المحاولة مرة أخرى.",
 "Added successfully!": "تمت الإضافة بنجاح!",
 "Start date must be earlier than end date": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء",
-  "Training status": "حالة التدريبات"
+"Training status": "حالة التدريبات",
+"Valid": "صالح",
+"Invalid": "غير صالح",
+"Valid trainings": "تدريبات صالحة",
+"Expired trainings": "تدريبات منتهية الصلاحية",
+"Out of service": "خارج الخدمة",
+"Broken down": "معطل",
+"Under repair": "قيد الإصلاح",
+"Vehicle states": "حالة المركبات",
+"Fleet status": "حالة أسطول المركبات"
+ 
 }

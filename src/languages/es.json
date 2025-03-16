@@ -731,5 +731,14 @@
 "Error adding. Please try again.": "Error al agregar. Por favor, inténtelo de nuevo.",
 "Added successfully!": "¡Agregado con éxito!",
 "Start date must be earlier than end date": "La fecha de inicio debe ser anterior a la fecha de fin",
-"Training status": "Estado de las formaciones"
+"Training status": "Estado de las formaciones",
+"Valid": "Válido",
+"Invalid": "Inválido",
+"Valid trainings": "Formaciones válidas",
+"Expired trainings": "Formaciones caducadas",
+"Out of service": "Fuera de servicio",
+"Broken down": "Averiado",
+"Under repair": "En reparación",
+"Vehicle states": "Estados de los vehículos",
+"Fleet status": "Estado de la flota"
 }

@@ -732,7 +732,16 @@
 "Error updating. Please try again": "Erreur lors de la mise à jour. Veuillez réessayer",
 "Error adding. Please try again": "Erreur lors de l'ajout. Veuillez réessayer",
 "Start date must be earlier than end date": "La date de début doit être antérieure à la date de fin",
-"Training status": "État des formations"
+"Training status": "État des formations",
+"Valid": "Valide",
+"Invalid": "Invalide",
+"Valid trainings": "Formations valides",
+"Expired trainings": "Formations expirées",
+"Out of service": "Hors service",
+"Broken down": "En panne",
+"Under repair": "En réparation",
+"Vehicle states": "États des véhicules",
+"Fleet status": "État du parc automobile"
 
 
 }

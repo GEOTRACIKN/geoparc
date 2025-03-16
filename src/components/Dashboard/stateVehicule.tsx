@@ -2,6 +2,7 @@ import React from 'react';
 import Highcharts from 'highcharts';
 import variablePie from 'highcharts/modules/variable-pie';
 import HighchartsReact from 'highcharts-react-official';
+import { useTranslate } from '../../hooks/LanguageProvider';
 
 variablePie(Highcharts);
 
@@ -15,20 +16,21 @@ interface Props {
 }
 
 const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
+  const { translate } = useTranslate(); // Récupération de la fonction translate
+
   // Couleurs correspondantes aux états
   const stateColors = {
     "HS": "#FFC107",
     "En panne": "#DC3545",
     "En réparation": "#17A2B8",
     "Disponible": "#28A745"
-  } as const; // Ajout de 'as const' pour le typage littéral
-
+  } as const;
 
   // Formatage des données pour Highcharts
   const chartData = vehicleStates.map(state => ({
     y: state.total,
-    name: state.etat_vehicule,
-    color: stateColors[state.etat_vehicule as keyof typeof stateColors], // Assertion de type ici        
+    name: translateState(state.etat_vehicule),
+    color: stateColors[state.etat_vehicule as keyof typeof stateColors],      
     label: translateState(state.etat_vehicule)
   }));
 
@@ -59,19 +61,19 @@ const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
       itemStyle: { fontSize: '12px' }
     },
     series: [{
-      name: 'États des véhicules',
+      name: translate("Vehicle states"), // Traduction du titre
       colorByPoint: true,
       data: chartData
     }]
   };
 
-  // Fonction de traduction simplifiée
+  // Fonction de traduction avec translate
   function translateState(state: string) {
     const translations: { [key: string]: string } = {
-      "HS": "Hors service",
-      "En panne": "En panne",
-      "En réparation": "En réparation",
-      "Disponible": "Disponible"
+      "HS": translate("Out of service"),
+      "En panne": translate("Broken down"),
+      "En réparation": translate("Under repair"),
+      "Disponible": translate("Available")
     };
     return translations[state] || state;
   }
@@ -81,7 +83,7 @@ const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
       <div style={{ padding: "20px" }}>
         <h6 className="box-title">
           <i className="las la-car-side" style={{ fontSize: "24px" }}></i> 
-           État du parc automobile
+          {translate("Fleet status")} {/* Traduction du titre */}
         </h6>
       </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />

@@ -36,16 +36,16 @@ const StateTraining: React.FC<Props> = ({ trainings }) => {
   const chartData = [
     { 
       y: validCount, 
-      name: "Valide", 
+      name: translate("Valid"), 
       color: stateColors.Valide, 
-      label: "Formations valides" 
-    },
+      label: translate("Valid trainings")
+        },
     { 
       y: invalidCount, 
-      name: "Invalide", 
+      name: translate("Invalid"), 
       color: stateColors.Invalide, 
-      label: "Formations expirées" 
-    }
+      label: translate("Expired trainings")   
+     }
   ];
 
   const chartOptions = {

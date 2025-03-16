@@ -721,8 +721,17 @@
 "Error adding. Please try again.": "Error adding. Please try again.",
 "Added successfully!": "Added successfully!",
 "Start date must be earlier than end date": "Start date must be earlier than end date",
-"Training status": "Training status"
-
+"Training status": "Training status",
+"Valid": "Valid",
+"Invalid": "Invalid",
+"Valid trainings": "Valid trainings",
+"Expired trainings": "Expired trainings",
+"Vehicle states": "Vehicle states",
+"Fleet status": "Fleet status",
+"Out of service": "Out of service",
+"Broken down": "Broken down",
+"Under repair": "Under repair",
+"Available": "Available"
 
 
 }
