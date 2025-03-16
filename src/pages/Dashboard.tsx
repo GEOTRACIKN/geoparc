@@ -124,6 +124,7 @@ export function Dashboard() {
         if (responseVehicles.ok) {
           const totalVehiclesData = await responseVehicles.json();
           const totalVehiclesCount = totalVehiclesData[0].total;
+          console.log("totalVehiclesCount: "+totalVehiclesCount);
           setTotalVehicles(totalVehiclesCount);
         } else {
           console.error("Failed to fetch total number of Vehicles");
@@ -156,7 +157,10 @@ export function Dashboard() {
         if (responseTraining.ok) {
           const totalTrainingsData = await responseTraining.json();
           const totalTrainingsCount = totalTrainingsData;
+
+          console.log("totalTrainingsCount: "+totalTrainingsCount);
           setTotalTrainings(totalTrainingsCount);
+          console.log("totalTrainingsCount: "+totalTrainingsCount);
         } else {
           console.error("Failed to fetch total number of Vehicles");
         }
@@ -169,7 +173,7 @@ export function Dashboard() {
         if (responseFire.ok) {
           const totalFiresData = await responseFire.json();
           const totalFiresCount = totalFiresData;
-          console.log(totalFiresCount);
+          console.log("totalFiresCount: "+totalFiresCount);
           
           setTotalFires(totalFiresCount);
         } else {
@@ -217,16 +221,16 @@ export function Dashboard() {
             }
           });
 
-          // Mettre à jour les états avec les nouveaux comptes
+          // Update the statuses with the new accounts
           setAlertData([
-            { id: "1", value: counts["1"], max: totalVehicles, color: "#e66d05", label: translate("Driving license"), modalId: "detailPermis" },
-            { id: "2", value: counts["2"], max: totalDrivers, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailASS" },
-            { id: "3", value: counts["3"], max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailCnrlTech" },
+            { id: "1", value: counts["1"], max: totalVehicles, color: "#e66d05", label: translate("Driving license"), modalId: "detailLicense" },
+            { id: "2", value: counts["2"], max: totalDrivers, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailInsurance" },
+            { id: "3", value: counts["3"], max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailMaintenance" },
             { id: "4", value: counts["4"], max: totalTrainings, color: "#00a65a", label: translate("Training"), modalId: "detailFormation" },
             { id: "5", value: counts["5"], max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
-            { id: "6", value: counts["6"], max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "detailVidange" },
-            { id: "7", value: counts["7"], max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailEntretienKlm" },
-            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailEntretienDate" },
+            { id: "6", value: counts["6"], max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "DrainingDetail" },
+            { id: "7", value: counts["7"], max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailSticker" },
+            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailDraining" },
             // { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
             // { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
             // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
