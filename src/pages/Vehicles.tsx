@@ -882,7 +882,7 @@ const handleStateChange = (state: string) => {
                   </div>
                 </th>
 
-                {selectedColumns.id_vehicule && (
+                {selectedColumns.id_vehicule && userID=="1" && (
                   <th
                     className="sorting"
                     onClick={() => handleSortingColum("id_vehicule")}
@@ -980,7 +980,7 @@ const handleStateChange = (state: string) => {
                       </div>
                     </td>
 
-                    {selectedColumns.id_vehicule && <td>{item.id_vehicule}</td>}
+                    {selectedColumns.id_vehicule && userID=="1" && <td>{item.id_vehicule}</td>}
                     {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
                     {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
                     {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}

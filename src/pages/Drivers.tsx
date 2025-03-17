@@ -691,10 +691,10 @@ export function Drivers() {
                 </div>
               </th>
 
-              {selectedColumns.id_conducteur && <th className="sorting" onClick={() => handleSortingcolumn("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
+              {selectedColumns.id_conducteur && id_user=="1" && <th className="sorting" onClick={() => handleSortingcolumn("id_conducteur")}>{translate("Id")}</th>}
               {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("nom_conducteur")}>{translate("Last and first name")}</th>)}
               {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
+              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
               {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
               {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
               {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
@@ -731,10 +731,10 @@ export function Drivers() {
                           <label htmlFor={`checkbox-${driver.id_conducteur}`} className="mb-0"></label>
                         </div>
                       </td>
-                      {selectedColumns.id_conducteur && <td>{driver.id_conducteur}</td>}
-                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
+                      {selectedColumns.id_conducteur && id_user=="1" && <td>{driver.id_conducteur}</td>}
                       {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
                       {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
+                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
                       {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}

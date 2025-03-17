@@ -602,7 +602,7 @@ export function Deadline() {
                   </div>
                 </th>
 
-                {selectedColumns.id_deadline && (<th className="sorting " onClick={() => handleSortingColumn("id_deadline")} > {translate("ID")} </th>)}
+                {selectedColumns.id_deadline && id_user=="1" && (<th className="sorting " onClick={() => handleSortingColumn("id_deadline")} > {translate("ID")} </th>)}
                 {selectedColumns.nom_type && (<th className="sorting " onClick={() => handleSortingColumn("nom_type")} > {translate("Type")} </th>)}
                 {selectedColumns.date_creation && (<th className="sorting " onClick={() => handleSortingColumn("date_creation")}> {translate("Creation date")}</th>)}
                 {selectedColumns.date_deadline && (<th className="sorting " onClick={() => handleSortingColumn("date_deadline")}> {translate("Deadline date")}</th>)}
@@ -633,7 +633,7 @@ export function Deadline() {
                       </div>
                     </td>
 
-                    {selectedColumns.id_deadline && (<td>{Deadline.id_deadline}</td>)}
+                    {selectedColumns.id_deadline && id_user=="1" && (<td>{Deadline.id_deadline}</td>)}
                     {selectedColumns.nom_type && <td> {translate(Deadline.nom_type)} </td>}
                     {selectedColumns.date_creation && (<td>{toTimestamp(Deadline.date_creation)}</td>)}
                     {selectedColumns.date_deadline && (<td>{toTimestamp(Deadline.date_deadline)}</td>)}

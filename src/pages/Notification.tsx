@@ -211,7 +211,7 @@ export function Notifications() {
   };
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_notification: true,
+    id_notification: id_user=="1" ? true : false,
     id_groupe_alarme: true,
     name_groupe_alarme: true,
     name_alarme: true,
@@ -574,7 +574,7 @@ export function Notifications() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_notification && (
+              {selectedColumns.id_notification && id_user=="1" && (
                 <th
                   className="sorting"
                   onClick={() => handleSortingColum("id_notification")}
@@ -656,7 +656,7 @@ export function Notifications() {
                       <input type="checkbox" className="form-check-input" />
                     </div>
                   </td>
-                  {selectedColumns.id_notification && (
+                  {selectedColumns.id_notification && id_user=="1" && (
                     <td>{alarme.id_notification}</td>
                   )}
                   {/* {selectedColumns.name_groupe_alarme && <td>{alarme.name_groupe_alarme}</td>}
