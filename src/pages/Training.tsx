@@ -148,7 +148,7 @@ const customLocale = {
       
     // Define the calendar events (empty for now)
     const initialColumns = {
-        ID: true,
+        //ID: false,
         Name: true,
         Type: true,
        "Start Date": true, 
@@ -366,7 +366,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
     };
      //**** Partie Excel ****
       const TrainingHeaders = [
-        translate("IDTraining"),
+        //translate("IDTraining"),
         translate("Driver"),
         translate("Type Training"),
         translate("Start Date"),
@@ -544,7 +544,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                 ></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
-                                <Dropdown.Item>{translate("ID")}</Dropdown.Item>
+                                {/*<Dropdown.Item>{translate("ID")}</Dropdown.Item> */}
                                 <Dropdown.Item>{translate("Name")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Start Date")}</Dropdown.Item>
@@ -630,7 +630,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                 </div>
                             </th>
                         
-                            {selectedColumns.ID && (
+                            {selectedColumns.ID && id_user == "1" && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("id_training")}
@@ -708,7 +708,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                                         </div>
                                     </td>
                                     
-                                            {selectedColumns.ID && (
+                                            {selectedColumns.ID && id_user == "1"  && (
                                                 <td>{Training.id_training}</td>
                                             )}
                                                             

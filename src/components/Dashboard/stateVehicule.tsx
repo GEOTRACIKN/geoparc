@@ -20,10 +20,7 @@ const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
 
   // Couleurs correspondantes aux états
   const stateColors = {
-    "HS": "#FFC107",
-    "En panne": "#DC3545",
-    "En réparation": "#17A2B8",
-    "Disponible": "#28A745"
+    
   } as const;
 
   // Formatage des données pour Highcharts
@@ -83,7 +80,7 @@ const StateVehicule: React.FC<Props> = ({ vehicleStates }) => {
       <div style={{ padding: "20px" }}>
         <h6 className="box-title">
           <i className="las la-car-side" style={{ fontSize: "24px" }}></i> 
-          {translate("Fleet status")} {/* Traduction du titre */}
+          <b>{translate(" Fleet status")}</b>
         </h6>
       </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />

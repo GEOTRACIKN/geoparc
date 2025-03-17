@@ -86,7 +86,7 @@ const StateTraining: React.FC<Props> = ({ trainings }) => {
       <div style={{ padding: "20px" }}>
         <h6 className="box-title">
           <i className="las la-certificate" style={{ fontSize: "24px" }}></i> 
-          {translate("Training status")}
+          <b>{translate("Training status")}</b>
         </h6>
       </div>
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />

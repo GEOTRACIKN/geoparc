@@ -39,7 +39,7 @@ export function Pharmacy() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        ID: true,
+        //ID: true,
         Product: true,
         Type: true,
         Vehicle: true,
@@ -281,7 +281,7 @@ export function Pharmacy() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
+                            {selectedColumns.ID && id_user == "1" &&  (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("id_pharmacy")}
@@ -366,7 +366,7 @@ export function Pharmacy() {
                                         </div>
                                     </td>
                                     
-                                            {selectedColumns.ID && (
+                                            {selectedColumns.ID && id_user == "1" && (
                                                 <td>{Pharmacy.id_pharmacy}</td>
                                             )}
                                           
