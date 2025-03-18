@@ -82,8 +82,8 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
 
   const notificationType = [
-    translate('License expiration'),
-    translate('Vehicle insurance renewal'),
+    translate('Driving license'),
+    translate('Vehicle insurance'),
     translate('Next maintenance due'),
     translate('Training certificate expiration'),
     translate('Fire extinguisher verification'),
@@ -661,7 +661,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                     </div>
                                     <div className="media-body ml-3">
                                       <div className="d-flex align-items-center justify-content-between">
-                                        <h6 className="mb-0">{notificationType[Number(notification.id_type)]}</h6>
+                                        <h6 className="mb-0">{notificationType[Number(notification.id_type-1)]}</h6>
                                         <small className="">
                                           <b>{new Date(notification.timestamp).toLocaleTimeString()}</b>
                                         </small>
