@@ -115,13 +115,13 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="cost">
+                   { /*<Form.Group controlId="cost">
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
                             value={formData.cost}
                             readOnly
                         />
-                    </Form.Group>
+                    </Form.Group>*/}
 
                     <Form.Group controlId="description">
                         <Form.Label>{translate("Description")}</Form.Label>
