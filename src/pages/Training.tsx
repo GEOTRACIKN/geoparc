@@ -127,6 +127,7 @@ const customLocale = {
     };
     return colors[type] || "#808080"; // Gris par défaut
   };
+  
 
 
 
@@ -817,49 +818,46 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 
       </div>
       <FullCalendar
-      ref={calendarRef}
-      key={adjustedEvents.length}
-      plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-      locale={customLocale} // Use the custom locale object
-      contentHeight={600}
-      initialView="dayGridMonth"
-      events={adjustedEvents}
-      eventClick={(info: { event: { id: number } }) =>
-        handleCalendarTrainingModal(info.event.id)
-      }
-      dayCellContent={renderDayCellContent}
-      dayRender={(info: any) => {
-        const date = info.dateStr;
-        return <div className="day-cell">{renderEventList(date)}</div>;
-      }}
-      eventContent={(arg: any) => (
-        <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
-            
-          <b>{arg.timeText}</b>
-          <span>{mapTrainingType(arg.event.title)}</span>
-        </div>
-      )}
-      
-      customButtons={{
-        backToMonth: {
-          text: translate("Back"),
-          click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
-        },
-      }}
-      headerToolbar={{
-        left: "prev,next today backToMonth",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
-      }}
-      moreLinkClick={(info: any) => {
-        calendarRef.current?.getApi().changeView("dayGridDay", info.date);
-      }}
-      moreLinkContent={(args: { num: any; }) => `+ ${args.num} ${translate("more")}`}
+  ref={calendarRef}
+  key={adjustedEvents.length}
+  plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+  locale={customLocale}
+  contentHeight={600}
+  initialView="dayGridMonth"
+  events={adjustedEvents}
+  eventClick={(info: { event: { id: number } }) =>
+    handleCalendarTrainingModal(info.event.id)
+  }
+  dayCellContent={renderDayCellContent}
+  eventContent={(arg: any) => (
+    <div title={`Type: ${arg.event.extendedProps.type}\nStart Date: ${arg.event.start}\nEnd Date: ${arg.event.end}`}>
+      <b>{arg.timeText}</b>
+      <span>{mapTrainingType(arg.event.title)}</span>
+    </div>
+  )}
+  dateClick={(arg: { dateStr: any; }) => {
+    console.log("Date cliquée :", arg.dateStr); // tu peux aussi passer cette date à ton modal
+    handleShowNewTrainingModal();
+  }}
+  customButtons={{
+    backToMonth: {
+      text: translate("Back"),
+      click: () => calendarRef.current?.getApi().changeView("dayGridMonth"),
+    },
+  }}
+  headerToolbar={{
+    left: "prev,next today backToMonth",
+    center: "title",
+    right: "dayGridMonth,timeGridWeek,timeGridDay,listYear",
+  }}
+  moreLinkClick={(info: any) => {
+    calendarRef.current?.getApi().changeView("dayGridDay", info.date);
+  }}
+  moreLinkContent={(args: { num: any }) => `+ ${args.num} ${translate("more")}`}
+  dayMaxEventRows={true}
+  dayMaxEvents={true}
+/>
 
-            dayMaxEventRows={true}  
-      dayMaxEvents={true}  
-      
-    />
 
               </div>        
              )}
