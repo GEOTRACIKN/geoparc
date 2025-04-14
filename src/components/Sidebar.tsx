@@ -278,7 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       id: 41,
       label: "GMAO",
       icon: "las la-cogs",
-      permissionId: 8, // ID de permission à ajuster
+      permissionId: 41, // ID de permission à ajuster
       subItems: [
         {
           id: 41,
