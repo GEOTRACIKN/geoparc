@@ -271,6 +271,17 @@ const ModalNewPharmacy: React.FC<ModalNewPharmacyProps> = ({
                             type="number"
                             value={formData.cost_pharmacy}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
 

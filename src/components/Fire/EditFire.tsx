@@ -387,6 +387,17 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                             type="number"
                             value={formData.volume_fire}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
 
@@ -397,6 +408,17 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                             type="number"
                             value={formData.cost_fire}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                 </Modal.Body>

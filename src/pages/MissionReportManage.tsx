@@ -430,6 +430,18 @@ const createMission = async (mission: MissionReportInterface) => {
                     placeholder="Enter expenses"
                     value={mission?.frais_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
+                    onKeyDown={(e) => {
+                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    min="0"
+                  
                     required
                 />
                 </Form.Group>
@@ -517,6 +529,17 @@ const createMission = async (mission: MissionReportInterface) => {
                     placeholder="Enter amortization period"
                     value={mission?.amort_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
+                    onKeyDown={(e) => {
+                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    min="0"
                     required
                   />
                 </Form.Group>
@@ -589,6 +612,17 @@ const createMission = async (mission: MissionReportInterface) => {
                     placeholder="Enter vehicle KM"
                     value={mission?.km_dep_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
+                    onKeyDown={(e) => {
+                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    min="0"
                     required
                 />
                 </Form.Group>
@@ -602,6 +636,17 @@ const createMission = async (mission: MissionReportInterface) => {
                     placeholder="Enter number of nights"
                     value={mission?.nuit_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
+                    onKeyDown={(e) => {
+                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    min="0"
                     required
                   />
               </Form.Group>
@@ -617,6 +662,17 @@ const createMission = async (mission: MissionReportInterface) => {
                 placeholder="Enter immobilization days"
                 value={mission?.immob_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
                 required
               />
             </Form.Group>
@@ -630,6 +686,17 @@ const createMission = async (mission: MissionReportInterface) => {
                 placeholder="Enter duration in days"
                 value={mission?.durr_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
                 required
               />
             </Form.Group>
@@ -644,6 +711,17 @@ const createMission = async (mission: MissionReportInterface) => {
                 placeholder="Enter return mileage"
                 value={mission?.km_ret_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
                 required
               />
             </Form.Group>
@@ -658,6 +736,17 @@ const createMission = async (mission: MissionReportInterface) => {
                 placeholder="Enter distance"
                 value={mission?.dist_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
                 required
               />
             </Form.Group>
