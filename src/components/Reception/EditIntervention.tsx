@@ -4,6 +4,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
 
 interface ModalEditInterventionProps {
     show: boolean;
@@ -12,8 +16,11 @@ interface ModalEditInterventionProps {
     onSuccess?: () => void;
 
 }
+interface Vehicle {
+    id_vehicule: number;
+    immatriculation_vehicule: string;
+}
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     show,
@@ -24,7 +31,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     const [formData, setFormData] = useState({
         date: "",
         priority: "",
-        vehicle: "",
+        id_vehicule: "",
         km: "",
         subject: "",
         client: "",
@@ -34,6 +41,8 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
     });
 
     const { translate } = useTranslate();
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    
 
     const serviceMapping: { [key: number]: string } = {
         1: "Garage",
@@ -42,6 +51,46 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
         4: "Changement de Pneu",
         5: "Changement de Pièce",
     };
+     useEffect(() => {
+            const fetchVehicles = async () => {
+                if (!geopuserID) {
+                    console.warn("No user ID provided");
+                    return;
+                }
+        
+                console.log("Fetching vehicles for user ID:", geopuserID); // Ajout du log pour voir si l'ID est correct
+        
+                try {
+                    const response = await fetch(
+                        `${backendUrl}/api/geop/vehicule/${geopuserID}`
+                    );
+        
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch vehicles. Status: ${response.status}`);
+                    }
+        
+                    const data = await response.json();
+                    console.log("API response for vehicles:", data); // Debug: voir la structure de data
+        
+                    setVehicles(data.vehicles || []);
+                } catch (error) {
+                    console.error("Error fetching vehicles:", error);
+                    toast.error("Error fetching vehicles.", {
+                        position: "bottom-right",
+                        autoClose: 2400,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "light",
+                        transition: Bounce,
+                    });
+                }
+            };
+        
+            fetchVehicles();
+        }, [geopuserID, backendUrl]); // Déclenchement à chaque changement de `geopuserID`
+        
 
     // Fetch data from API and set form data
     const fetchIntervention = async () => {
@@ -57,7 +106,7 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                 setFormData({
                     date: formatDateToTimestamp(intervention.date_intervention), 
                     priority: intervention.priority,
-                    vehicle: intervention.vehicule,
+                    id_vehicule: intervention.id_vehicule,
                     km: intervention.km,
                     subject: intervention.subject,
                     client: intervention.client,
@@ -170,16 +219,37 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
                         </Form.Control>
                     </Form.Group>
 
-                    <Form.Group controlId="vehicle">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder={translate("Enter vehicle")}
-                            value={formData.vehicle}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
 
+                    <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
                     <Form.Group controlId="km">
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control

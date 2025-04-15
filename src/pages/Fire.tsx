@@ -11,6 +11,7 @@ import ModalEditFire from "../components/Fire/EditFire";
 import ModalDeleteFire from "../components/Fire/DeleteFire";
 
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface Fire {
     id_fire: number;
@@ -27,7 +28,6 @@ interface Fire {
 
 
 export function Fire() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_fire, setFire] = useState<Fire[]>([]);
