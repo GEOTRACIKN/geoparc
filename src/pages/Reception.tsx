@@ -15,7 +15,7 @@ interface Intervention {
     date_intervention: string;
     priority: string;
     statut: string;
-    vehicule: string;
+    immatriculation_vehicule: string;
     km: number;
     subject: string;
     client: string;
@@ -51,7 +51,7 @@ export function Reception() {
         Date: true,
         priority: true,
         statut: true,
-        vehicule: true,
+        id_vehicule: true,
         km: true,
         client: true,
     };
@@ -312,10 +312,10 @@ export function Reception() {
                             )}
 
 
-                            {selectedColumns.vehicule && (
+                            {selectedColumns.id_vehicule && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
@@ -395,9 +395,9 @@ export function Reception() {
                                     )}
 
 
-                                    {selectedColumns.vehicule && (
+                                    {selectedColumns.id_vehicule && (
                                         <td>
-                                            {Intervention.vehicule}
+                                            {Intervention.immatriculation_vehicule}
                                         </td>
                                     )}
                                     {selectedColumns.km && (

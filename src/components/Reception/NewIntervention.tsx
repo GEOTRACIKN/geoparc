@@ -6,6 +6,7 @@ import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
 
+const geopuserID = localStorage.getItem("GeopUserID");
 
 interface ModalNewInterventionnProps {
     show: boolean;
@@ -19,7 +20,6 @@ interface Vehicle {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 
 const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
