@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
+import Select from "react-select";
+
 
 interface ModalNewInterventionnProps {
     show: boolean;
     onHide: () => void;
     onSuccess?: () => void;
+}
+
+interface Vehicle {
+    id_vehicule: number;
+    immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -24,7 +31,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         date: "",
         priority: "",
         statut: "Demande",
-        vehicle: "",
+        id_vehicule: "",
         km: "",
         subject: "",
         client: "",
@@ -34,6 +41,8 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
     });
 
     const { translate } = useTranslate();
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
+    
 
     const serviceOptions: { [key: string]: number } = {
         "Garage": 1,
@@ -42,6 +51,40 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         "Changement De Pneu": 4,
         "Changement de Pièce": 5,
     };
+     useEffect(() => {
+            const fetchVehicles = async () => {
+                try {
+                    const response = await fetch(
+                        `${backendUrl}/api/geop/vehicule/${geopuserID}`
+                    );
+        
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch vehicles");
+                    }
+        
+                    const data = await response.json();
+                    console.log("Fetched vehicles:", data); // Vérifie la structure de la réponse
+                    setVehicles(data.vehicles || []);
+                } catch (error) {
+                    console.error("Error fetching vehicles:", error);
+                    toast.error("Error fetching vehicles.", {
+                        position: "bottom-right",
+                        autoClose: 2400,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "light",
+                        transition: Bounce,
+                    });
+                }
+            };
+        
+            if (geopuserID) {
+                fetchVehicles();
+            }
+        }, [geopuserID]); // Ajoute `geopuserID` comme dépendance
+        
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -106,7 +149,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 date: "",
                 priority: "",
                 statut: "",
-                vehicle: "",
+                id_vehicule: "",
                 km: "",
                 subject: "",
                 client: "",
@@ -173,15 +216,36 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                         </Form.Control>
                     </Form.Group>
 
-                    <Form.Group controlId="vehicle">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Entrez le véhicule"
-                            value={formData.vehicle}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                    <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
 
                     <Form.Group controlId="km">
                         <Form.Label>{translate("Km")}</Form.Label>
