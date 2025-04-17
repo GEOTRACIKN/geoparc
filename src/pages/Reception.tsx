@@ -297,7 +297,7 @@ export function Reception() {
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("ID")}
+                                    onClick={() => handleSortingColumn("id_intervention")}
                                 >
                                     {translate("ID")}
                                 </th>
@@ -305,7 +305,7 @@ export function Reception() {
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Date")}
+                                    onClick={() => handleSortingColumn("date_intervention")}
                                 >
                                     {translate("Date")}
                                 </th>
