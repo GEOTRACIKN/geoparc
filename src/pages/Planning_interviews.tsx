@@ -44,8 +44,8 @@ export function InterviewSchedule() {
     const initialColumns = {
         IDPlanning: true,
         Planningdate: true,
-        vehicle: true,
-        km: true,
+        Vehicle: true,
+        Km: true,
         TypeInterview: true,
         Interviewdate: true
     };
@@ -359,16 +359,16 @@ export function InterviewSchedule() {
                             {selectedColumns.Planningdate && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Planningdate")}
+                                    onClick={() => handleSortingColumn("date_planification")}
                                 >
                                     {translate("Planning date")}
                                 </th>
                             )}
 
-                            {selectedColumns.vehicle && (
+                            {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicle")}
+                                    onClick={() => handleSortingColumn("vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
@@ -384,7 +384,7 @@ export function InterviewSchedule() {
                             {selectedColumns.Interviewdate && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("InterviewDate")}
+                                    onClick={() => handleSortingColumn("date_entretien")}
                                 >
                                     {translate("Interview date")}
                                 </th>
@@ -393,7 +393,7 @@ export function InterviewSchedule() {
                             {selectedColumns.TypeInterview && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("TypeInterview")}
+                                    onClick={() => handleSortingColumn("type_entretien")}
                                 >
                                     {translate("Type of interview")}
                                 </th>
@@ -438,7 +438,7 @@ export function InterviewSchedule() {
                                         </td>
                                     )}
 
-                                    {selectedColumns.vehicle && (
+                                    {selectedColumns.Vehicle && (
                                         <td>
                                             {Schedule.vehicule}
                                         </td>
