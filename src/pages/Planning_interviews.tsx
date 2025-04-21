@@ -12,7 +12,7 @@ import { Bounce, toast } from "react-toastify";
 interface Schedule {
     id_planning: number;
     date_planification: string;
-    vehicule: string;
+    immatriculation_vehicule: string;
     km: number;
     service: number;
     type_entretien: string,
@@ -42,12 +42,12 @@ export function InterviewSchedule() {
 
 
     const initialColumns = {
-        IDPlanning: true,
-        Planningdate: true,
+        ID: true,
+        "Planning date": true,
         Vehicle: true,
         Km: true,
-        TypeInterview: true,
-        Interviewdate: true
+        "Type": true,
+        "Interview date": true
     };
 
     // Load selected columns from localStorage or use initial state
@@ -275,7 +275,7 @@ export function InterviewSchedule() {
                                 <Dropdown.Item>{translate("ID Intervention")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicule")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Km")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type of interview")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -347,7 +347,7 @@ export function InterviewSchedule() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.IDPlanning && (
+                            {selectedColumns.ID && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("id_planning")}
@@ -356,7 +356,7 @@ export function InterviewSchedule() {
                                 </th>
                             )}
 
-                            {selectedColumns.Planningdate && (
+                            {selectedColumns["Planning date"] && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("date_planification")}
@@ -368,7 +368,7 @@ export function InterviewSchedule() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
@@ -381,7 +381,7 @@ export function InterviewSchedule() {
                                     {translate("KM")}
                                 </th>
                             )}
-                            {selectedColumns.Interviewdate && (
+                            {selectedColumns["Interview date"] && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("date_entretien")}
@@ -390,7 +390,7 @@ export function InterviewSchedule() {
                                 </th>
                             )}
 
-                            {selectedColumns.TypeInterview && (
+                            {selectedColumns.Type && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("type_entretien")}
@@ -427,12 +427,12 @@ export function InterviewSchedule() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.IDPlanning && (
+                                    {selectedColumns.ID && (
                                         <td>
                                             {Schedule.id_planning}
                                         </td>
                                     )}
-                                    {selectedColumns.Planningdate && (
+                                    {selectedColumns["Planning date"] && (
                                         <td>
                                             {formatDateToTimestamp(Schedule.date_planification)}
                                         </td>
@@ -440,7 +440,7 @@ export function InterviewSchedule() {
 
                                     {selectedColumns.Vehicle && (
                                         <td>
-                                            {Schedule.vehicule}
+                                            {Schedule.immatriculation_vehicule}
                                         </td>
                                     )}
                                     {selectedColumns.km && (
@@ -448,7 +448,7 @@ export function InterviewSchedule() {
                                             {Schedule.km}
                                         </td>
                                     )}
-                                    {selectedColumns.Interviewdate && (
+                                    {selectedColumns["Interview date"] && (
                                         <td>
                                             {Schedule.date_entretien ? (
                                                 formatDateToTimestamp(Schedule.date_entretien)
@@ -458,7 +458,7 @@ export function InterviewSchedule() {
                                         </td>
                                     )}
 
-                                    {selectedColumns.TypeInterview && (
+                                    {selectedColumns.Type && (
                                         <td>
                                             {Schedule.type_entretien ? (
                                                 Schedule.type_entretien

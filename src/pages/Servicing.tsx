@@ -13,8 +13,7 @@ interface Servicing {
     id_servicing: number;
     invoice_no_servicing: number;
     type_servicing: number;
-    id_vehicule: number;
-    type_vehicule: string;
+    immatriculation_vehicule: string;
     date_servicing: string;
     place_servicing: string;
     cost_servicing: number;
@@ -354,12 +353,12 @@ export function Servicing() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("type_vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                             {selectedColumns.Km && (
+                             {selectedColumns.KM && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("km_servicing")}
@@ -445,7 +444,7 @@ export function Servicing() {
 
                                             )}
                                              {selectedColumns.Vehicle && (
-                                                <td>{Servicing.type_vehicule}</td>
+                                                <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
                                              {selectedColumns.Km && (
                                                 <td>{Servicing.km_servicing}</td>
