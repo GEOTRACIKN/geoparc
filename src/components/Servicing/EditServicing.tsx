@@ -27,7 +27,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     const [formData, setFormData] = useState({
         invoice_no_servicing: "",
         type_servicing: 0,
-        type_vehicule: "",
+        immatriculation_vehicule: "",
         date_servicing: "",
         place_servicing: "",
         cost_servicing: "",
@@ -68,7 +68,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                 setFormData({
                     invoice_no_servicing: servicing.invoice_no_servicing || "",
                     type_servicing: servicing.type_servicing ? servicing.type_servicing.toString() : "",
-                    type_vehicule: servicing.type_vehicule || "",
+                    immatriculation_vehicule: servicing.immatriculation_vehicule || "",
                     date_servicing: servicing.date_servicing ? formatDateToTimestamp(servicing.date_servicing) : "",
                     place_servicing: servicing.place_servicing || "",
                     cost_servicing: servicing.cost_servicing || "",
@@ -177,13 +177,13 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
                     
 
-<Form.Group controlId="type_vehicule">
+<Form.Group controlId="immatriculation_vehicule">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}
                             //placeholder="Entrez le véhicule"
-                            value={formData.type_vehicule}
+                            value={formData.immatriculation_vehicule}
                             onChange={handleChange}
                         />
                     </Form.Group>

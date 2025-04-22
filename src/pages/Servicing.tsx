@@ -22,14 +22,14 @@ interface Servicing {
     next_oil_change_servicing: number;
     
 }
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const id_user = localStorage.getItem("GeopUserID");
 
 
 export function Servicing() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
-    const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
