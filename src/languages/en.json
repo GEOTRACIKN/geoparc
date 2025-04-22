@@ -731,7 +731,9 @@
 "Out of service": "Out of service",
 "Broken down": "Broken down",
 "Under repair": "Under repair",
-"Available": "Available"
+"Available": "Available",
+"Available-OS": "Available-OS",
+"Assigned": "Assigned"
 
 
 }

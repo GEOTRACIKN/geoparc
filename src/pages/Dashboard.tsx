@@ -752,6 +752,27 @@ export function Dashboard() {
               />
             </div>
 
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Affecté")} style={{ cursor: "pointer" }}>
+            <FleetCounter
+              numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Affecté")?.total || 0}
+              title={translate("Assigned")}
+              icon={"truck"}
+              color={"bg-success-light"}
+              linkTo="/vehicles"
+            />
+          </div>
+
+          <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Disponible-Hs")} style={{ cursor: "pointer" }}>
+            <FleetCounter
+              numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible-Hs")?.total || 0}
+              title={translate("Available-OS")}
+              icon={"cogs"}
+              color={"bg-success-user"}
+              linkTo="/vehicles"
+            />
+          </div>
+
+
             {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}

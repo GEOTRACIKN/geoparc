@@ -740,5 +740,7 @@
 "Broken down": "Averiado",
 "Under repair": "En reparación",
 "Vehicle states": "Estados de los vehículos",
-" Fleet status": " Estado de la flota"
+" Fleet status": " Estado de la flota",
+"Available-OS": "Disponible defectuoso",
+"Assigned": "Asignado"
 }
