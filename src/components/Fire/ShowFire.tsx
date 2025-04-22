@@ -20,7 +20,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     const [formData, setFormData] = useState({
         id_fire: "",
         volume_fire: "",
-        location_fire: "",
+        ref_fire: "",
 
         purch_date_fire: "",
         exp_date_fire: "",
@@ -30,6 +30,19 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     });
 
     const { translate } = useTranslate();
+    const fireOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+    const mapFireType = (type: string) => {
+        const found = fireOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
 
     // Fetch data from API and set form data
     const fetchFire = async () => {
@@ -56,11 +69,11 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                 setFormData({
                     id_fire: data.id_fire,
                     volume_fire: data.volume_fire,
-                    location_fire: data.location_fire,
-                    purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
+                    ref_fire: data.ref_fire,
+                    purch_date_fire: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : '',
                     exp_date_fire: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     cost_fire: data.cost_fire,
-                    type_fire: data.type_fire,
+                    type_fire: mapFireType(data.type_fire),
                     immatriculation_vehicule: data.immatriculation_vehicule
                 });
             } else {
@@ -89,7 +102,7 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide} backdrop="static" responsive>
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
@@ -106,10 +119,10 @@ const ModalShowFire: React.FC<ModalShowFirenProps> = ({
                     </Form.Group>
 
 
-                    <Form.Group controlId="location_fire">
-                        <Form.Label>{translate("Location")}</Form.Label>
+                    <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
                         <Form.Control
-                            value={formData.location_fire}
+                            value={formData.ref_fire}
                             readOnly
                         />
                     </Form.Group>

@@ -130,13 +130,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 5,
-          label: "Add Vehicle",
-          icon: "las la-check-double",
-          to: "/vehicle",
-          permissionId: 37,
-        },
-        {
-          id: 5,
           label: "Vehicle checks",
           icon: "las la-check-double",
           to: "/vehicles-checks",
@@ -232,18 +225,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
+      id:51,
+      label: "Deadline",
+      icon: "lar la-life-ring",
+      to: "/deadline",
+      permissionId:51, 
+    },
+    {
       id: 40,
       label: "HSE",
       icon: "las la-shield-alt",
       permissionId: 40, // ID de permission à ajuster
       subItems: [
-        {
-          id: 40,
-          label: "HSE dashboard",
-          icon: "fas fa-shield-alt",
-          to: "/hse-dashboard",
-          permissionId: 40,
-        },
+        // {
+        //   id: 40,
+        //   label: "HSE dashboard",
+        //   icon: "fas fa-shield-alt",
+        //   to: "/hse-dashboard",
+        //   permissionId: 40,
+        // },
         {
           id: 40,
           label: "Warnings",
@@ -253,14 +253,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 20,
-          label: "Violation",
+          label: "Violations",
           icon: "las la-ban",
           to: "/violation",
           permissionId: 40,
         },
         {
           id: 21,
-          label: "Management of fire extinguishers",
+          label: "Fire extinguisher management",
           icon: "las la-fire-extinguisher",
           to: "/fire-ext",
           permissionId: 40,
@@ -278,7 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       id: 41,
       label: "GMAO",
       icon: "las la-cogs",
-      permissionId: 8, // ID de permission à ajuster
+      permissionId: 41, // ID de permission à ajuster
       subItems: [
         {
           id: 41,
@@ -345,6 +345,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           permissionId: 42,
         },
       ],
+    },
+    {
+      id: 52,
+      label: "Notifications",
+      icon: "las la-bell",
+      to: "/notifications",
+      permissionId: 52, 
     },
     {
       id: 33,

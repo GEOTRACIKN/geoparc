@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect, useLayoutEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Table,
   Modal,
@@ -44,15 +45,89 @@ interface VehiculeListInterface {
   affectation?: string;
   username_user: string;
   id_user: string;
+  category_vehicule?: string;
+  propriete_vehicule?: string;
+  id_marque?: number;
+  date_aquisition_vehicule?: Date;
+  type_carburant_vehicule?: string;
+  annee_vehicule?: string;
+  date_circulation_vehicule?: Date;
+  num_chassis_vehicule?: string;
+  nbre_place_vehicule?: number;
+  puissance_vehicule?: string;
+  kilometrage_vehicule?: string;
+  commentaire_vehicule?: string;
+  companie_assurance_vehicule?: string;
+  type_assurance_vehicule?: string;
+  date_debut_assurance_vehicule?: string;
+  date_expir_assurance_vehicule?: string;
+  cout_assurance_vehicule?: string;
+  delai_assurance_vehicule?: string;
+  reference_assurance_vehicule?: string;
+  note_assurance_vehicule?: string;
+  etat_ctr_tech_vehicule?: string;
+  date_debut_ctr_tech_vehicule?: string;
+  date_fin_ctr_tech_vehicule?: string;
+  station_ctr_vehicule?: string;
+  cout_ctr_tech_vehicule?: string;
+  note_ctr_tech_vehicule?: string;
+  date_vignette_vehicule?: string;
+  cout_vignette_vehicule?: string;
+  id_gps?: number;
+  longueur_vehicule?: string;
+  largeur_vehicule?: string;
+  hauteur_vehicule?: string;
+  poid_vehicule?: string;
+  nbre_porte_vehicule?: number;
+  icon_vehicule?: string;
+  detail_vehicule?: string;
+  num_porte_vehicule?: string;
+  ptac_vehicule?: string;
+  kilometrage_reel_vehicule?: string;
+  image_vehicule?: string;
+  consomatio_gasoil_reel_vehicule?: string;
+  latitude_vehicule?: string;
+  longitude_vehicule?: string;
+  date_heure_position_vehicule?: string;
+  id_sousParc_vehicule?: number;
+  num_vignette_vehicule?: string;
+  famille_vehicule?: string;
+  gamme_vehicule?: string;
+  id_groupe?: number;
+  fuel_level_vehicule?: string;
+  co2_vehicule?: string;
+  capacite_res_vehicule?: string;
+  prochain_vidange_vehicule?: string;
+  info_vehicule?: number;
+  draft?: number;
+  inService_vehicule?: string;
+  date_creation_vehicule?: string;
+  date_modification_vehicule?: string;
+  date_suppression_vehicule?: string;
+  PSN?: string;
+  LAST_IB_CODE?: string;
+  fuel_type?: string;
+  maximum_allowed_total?: string;
+  consommation_moyenne_vehicule?: string;
+  id_parc?: number;
+  nom_user?: string;
+  prenom_user?: string;
+  nom_conducteur?: string;
+  nom_parc?: string;
+  date_dernier_vidange?: string;
+  dernier_vidange_vehicule?: number;
+  kilometrage_prochain_entretien?: number;
+  nom_marque?: string;
+  reference_ctr_tech_vehicule?: string;
 }
 
 
 export function Vehicles() {
   const { translate } = useTranslate();
-
   const [type, setType] = useState(1);
   const [typeSearch, setTypeSearch] = useState(translate("Immatriculation"));
   const [search, setSearch] = useState("");
+  const [pageCount, setPageCount] = useState(0); // Nombre total de pages
   const [column, setSortColumn] = useState("id_conducteur");
   const [sort, setSort] = useState("ASC");
   const userID = localStorage.getItem("GeopUserID");
@@ -60,7 +135,6 @@ export function Vehicles() {
   const [total, setTotal] = useState<number>(0);
   const [vehicles, setVehicles] = useState<VehiculeListInterface[]>([]);
   const [limit, setLimit] = useState(10);
-  const [pageCount, setPageCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const navigate = useNavigate();
@@ -70,8 +144,15 @@ export function Vehicles() {
   const [IdVehicle, setIdDVehicle] = useState<number>(0);
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
+const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); // Véhicules de la page actuelle
   
-
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const etat = queryParams.get("etat_vehicule") || ""; // Récupère le paramètre `etat`  
+  // State pour stocker les véhicules filtrés
+  
+  console.log("État extrait de l'URL :", etat); // Vérifiez la valeur dans la console
   const handleClickLink = (navigateTo: string) => {
     if (navigateTo) {
       navigate(navigateTo);
@@ -87,7 +168,7 @@ export function Vehicles() {
 
   const searchColum: { [key: string]: number } = {
     id_vehicule: 0,
-    immatriculation_vehicule: 1,
+    immatriculation_vehicule: 1, 
     vehicule_type: 2,
     // nom_conducteur: 3,
     username_user: 4,
@@ -100,8 +181,6 @@ export function Vehicles() {
        setTitleStatus('Delete vehicle');
        setIdUser(userID ? Number(userID) : 0);
        setIdDVehicle(id_vehicle);
-
-    
       // After successful deletion, update the vehicle list
       //  await updateVehicleList();
     } catch (error) {
@@ -115,67 +194,129 @@ export function Vehicles() {
     search: string,
     type: number,
     column: string,
-    sort: string
+    sort: string,
+    etat?: string
   ) => {
     try {
       setLoading(true);
+
       const [countData, vehicleData] = await Promise.all([
         fetch(`${backendUrl}/vehicles/count`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id_user: parseInt(userID ?? "0") || 0,
             search: search,
+            etat: etat, // Ajout du filtre état
           }),
-        }).then((res) => res.json()),
+        }).then(res => res.json()),
+
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id_user: userID,
-            page: page,
-            limit: limit,
+            page: 1, // Toujours récupérer la première page (tous les véhicules)
+            limit: 1000, // Récupérer tous les véhicules en une seule requête
             column: searchColum[column],
             sort: sort,
             search: search,
             type: type,
+            etat: etat, // Ajout du filtre état
           }),
-        }).then((res) => res.json()),
+        }).then(res => res.json()),
       ]);
 
-      const total = countData[0].total;
-      setTotal(total);
+      // Mise à jour CRITIQUE de la pagination
+      const newTotal = countData[0].total;
+      setTotal(newTotal);
 
-      const calculatedPageCount = Math.ceil(total / limit);
+      // Filtrer les véhicules côté frontend
+      const filteredVehicles = etat
+        ? vehicleData.filter((vehicle: VehiculeListInterface) => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+        : vehicleData;
+
+      // Calculer le nombre total de pages
+      const calculatedPageCount = Math.ceil(filteredVehicles.length / limit);
       setPageCount(calculatedPageCount);
-      setVehicles(vehicleData);
 
-      return vehicleData;
+      // Réinitialiser la page actuelle si nécessaire
+      if (page > calculatedPageCount) {
+        setCurrentPage(1);
+      }
+
+      // Stocker tous les véhicules filtrés
+      setVehicles(filteredVehicles);
+
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false); // Set loading to false on data fetch completion
+      setLoading(false);
     }
   };
+  console.log("Valeur de etat récupérée depuis l'URL :", etat); // Vérifie la valeur
 
+
+
+  const filteredVehicles = etat
+  ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+  : vehicles;
+
+console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+
+const startIndex = (currentPage - 1) * limit;
+const endIndex = startIndex + limit;
+//const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
+console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+
+
+const handleStateChange = (state: string) => {
+  const newStates = selectedStates.includes(state)
+    ? selectedStates.filter(s => s !== state)
+    : [...selectedStates, state];
+  setSelectedStates(newStates);
+  setCurrentPage(1); // Réinitialiser la page actuelle à 1
+};
+  // Dans le gestionnaire de changement d'état
+  const handleStateFilter = (selectedStates: string[]) => {
+    setSelectedStates(selectedStates);
+    setCurrentPage(1); // Réinitialisation à la première page
+    getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
+  };
   const refreshVehiculeData = async () => {
-    getVehicles(limit, currentPage, search, type, column, sort);
+    await getVehicles(
+      limit, 
+      currentPage, 
+      search, 
+      type, 
+      column, 
+      sort, 
+      selectedStates.join(',') // Envoi des états sélectionnés
+    );
   };
 
-  useLayoutEffect(() => {
-    refreshVehiculeData();
-  }, [userID, limit, limit, search, type, column, sort]);
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
+    setPaginatedVehicles(newPaginatedVehicles);
+  }, [currentPage, vehicles, limit]);
+  useEffect(() => {
+    getVehicles(limit, currentPage, search, type, column, sort, etat);
+  }, [currentPage, etat]);
 
-  const handlePageClick = async (data: any) => {
+
+  /*useLayoutEffect(() => {
+    refreshVehiculeData();
+  }, [userID, limit, limit, search, type, column, sort, selectedStates]);
+  */
+
+  /*const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getVehicles(limit, currentPage, search, type, column, sort);
     // setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
-  };
+  };*/
 
 
   const menuItems = [
@@ -250,9 +391,10 @@ export function Vehicles() {
       column,
       sort
     ); // Ajouter await ici
-    setVehicles(commentsFormServer);
+    //setVehicles(commentsFormServer);
     window.scrollTo(0, 0);
   };
+  
 
   const handleResetSearch = async () => {
     setSearch("");
@@ -281,9 +423,6 @@ export function Vehicles() {
     }
   };
 
-
-
-
   const handleVehiclesSelect = (DriverID: string) => {
     let updatedSetSelectedVehicles: string[] = [];
 
@@ -309,7 +448,25 @@ export function Vehicles() {
 
     console.log(updatedSetSelectedVehicles);
   };
+  
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
+    setPaginatedVehicles(newPaginatedVehicles);
+  }, [currentPage, vehicles, limit]);
 
+  // Gérer le changement de page
+  const handlePageClick = (selectedPage: { selected: number; }) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+
+  // Charger les véhicules au montage du composant
+  useEffect(() => {
+    getVehicles(limit, currentPage, search, type, column, sort, etat);
+  }, [currentPage, etat]);
+
+ 
 
   const vehicleHeaders = [
     translate("ID"),
@@ -322,25 +479,111 @@ export function Vehicles() {
     translate("Trailer"),
   ];
 
-
   const downloadVehicleExcel = () => {
+    const selectedData = vehicles
+      .filter((vehicle) => selectedVehicles.includes(vehicle.id_vehicule.toString()))
+      .map((vehicle) => [
+        vehicle.id_vehicule,
+        vehicle.immatriculation_vehicule,
+        vehicle.category_vehicule || "",
+        vehicle.vehicule_type,
+        vehicle.etat_vehicule,
+        vehicle.kilometrage_vehicule || "",
+        vehicle.driver_first_name ? vehicle.driver_first_name + " " + (vehicle.driver_last_name || "") : "",
+        vehicle.nom_marque || "",
+        vehicle.modele_vehicule || "",
+        vehicle.type_carburant_vehicule || "",
 
-    const selectedData = vehicles.filter((vehicle) =>
-      selectedVehicles.includes(vehicle.id_vehicule.toString())
-    ).map((vehicle) => [
-      vehicle.id_vehicule,
-      vehicle.modele_vehicule,
-      vehicle.immatriculation_vehicule,
-      vehicle.etat_vehicule,
-      vehicle.affectation,
-      vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
-      vehicle.username_user,
-    ]);
+        vehicle.PSN || "",
+        vehicle.annee_vehicule || "",
+        vehicle.nbre_porte_vehicule || "",
+        vehicle.puissance_vehicule || "",
+        vehicle.longueur_vehicule || "",
+        vehicle.hauteur_vehicule || "",
+        vehicle.co2_vehicule || "",
+        vehicle.date_circulation_vehicule || "",
+        vehicle.num_chassis_vehicule || "",
+        vehicle.nbre_place_vehicule || "",
+        vehicle.ptac_vehicule || "",
+        vehicle.largeur_vehicule || "",
+        vehicle.poid_vehicule || "",
 
+        vehicle.companie_assurance_vehicule || "",
+        vehicle.type_assurance_vehicule || "",
+        vehicle.date_debut_assurance_vehicule || "",
+        vehicle.date_expir_assurance_vehicule || "",
+        vehicle.cout_assurance_vehicule || "",
+        vehicle.delai_assurance_vehicule || "",
 
-    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
+        vehicle.etat_ctr_tech_vehicule || "",
+        vehicle.reference_ctr_tech_vehicule || "",
+        vehicle.date_debut_ctr_tech_vehicule || "",
+        vehicle.date_fin_ctr_tech_vehicule || "",
+        vehicle.cout_ctr_tech_vehicule || "",
+
+        vehicle.num_vignette_vehicule || "",
+        vehicle.date_vignette_vehicule || "",
+        vehicle.cout_vignette_vehicule || "",
+
+        vehicle.dernier_vidange_vehicule || "",
+        vehicle.prochain_vidange_vehicule || "",
+        vehicle.date_dernier_vidange || "",
+        vehicle.kilometrage_prochain_entretien || "",
+      ]);
+  
+    const vehicleHeadersExcel = [
+     
+      translate("Vehicle ID"),
+      translate("License Plate"),
+      translate("Category"),
+      translate("Type"),
+      translate("Condition"),
+      translate("KM"),
+      translate("Driver Full Name"),
+      translate("Modele"),
+      translate("Brand"),
+      translate("Fuel Type"),
+
+      translate("PSN"),
+      translate("Year"),
+      translate("Door Number"),
+      translate("Power"),
+      translate("Length"),
+      translate("Height"),
+      translate("CO2 Emissions"),
+      translate("First Registration Date"),
+      translate("Chassis Number"),
+      translate("Number of Seats"),
+      translate("Gross Vehicle Weight (PTAC)"),
+      translate("Width"),
+      translate("Weight"),
+
+      translate("Insurance Company"),
+      translate("Insurance Type"),
+      translate("Insurance Start Date"),
+      translate("Insurance Expiry Date"),
+      translate("Insurance Cost"),
+      translate("Insurance Duration"),
+
+      translate("Technical Inspection Status"),
+      translate("Technical Inspection Reference"),
+      translate("Technical Inspection Start Date"),
+      translate("Technical Inspection End Date"),
+      translate("Technical Inspection Cost"),
+
+      translate("Vignette Number"),
+      translate("Vignette Date"),
+      translate("Vignette Cost"),
+      
+      translate("Last Oil Change (km)"),
+      translate("Next Oil Change (km)"),
+      translate("Last Oil Change Date"),
+      translate("Next Maintenance Mileage"),
+      
+    ];
+  
+    generateExcelFile(translate("Vehicle List"), vehicleHeadersExcel, selectedData);
   };
-
   const downloadVehiclePDF = () => {
 
     const selectedData = vehicles.filter((vehicle) =>
@@ -377,6 +620,7 @@ export function Vehicles() {
   const closeDetailModal = () => {
     setModalStatusDetail(null);
   };
+  const totalVehiclesToDisplay = etat ? filteredVehicles.length : total;
 
 
 
@@ -393,8 +637,9 @@ export function Vehicles() {
           >
             <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
-              {translate("Vehicles")} {total}
+              {translate("Total Vehicles")} {totalVehiclesToDisplay}            
             </h4>
+           
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
@@ -458,7 +703,50 @@ export function Vehicles() {
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
+
                   </Dropdown>
+         {/*  <div className="col-sm-12 col-md-6">
+              <div className="input-group">
+                <Dropdown className="mr-2">
+                  <Dropdown.Toggle variant="secondary" id="dropdown-states">
+                    <i className="las la-filter"></i> {translate("State")}
+                    {selectedStates.length > 0 && ` (${selectedStates.length})`}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {[
+                      { value: "Disponible", label: translate("Disponible") },
+                      { value: "HS", label: translate("HS") },
+                      { value: "En Réparation", label: translate("En Réparation") },
+                      { value: "En Panne", label: translate("En Panne") }
+                    ].map((state) => (
+                      <Dropdown.Item 
+                        key={state.value} 
+                        as="label"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <div className="form-check d-flex align-items-center">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={selectedStates.includes(state.value)}
+                            onChange={(e) => {
+                              const newStates = e.target.checked
+                                ? [...selectedStates, state.value]
+                                : selectedStates.filter(v => v !== state.value);
+                              setSelectedStates(newStates);
+                              setCurrentPage(1);
+                            }}
+                          />
+                          <span className="ml-2">{state.label}</span>
+                        </div>
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+                
+
+  </div>
+</div>*/}
                   <input
                     type="text"
                     placeholder={` ${translate("Search by")} ${translate(
@@ -594,7 +882,7 @@ export function Vehicles() {
                   </div>
                 </th>
 
-                {selectedColumns.id_vehicule && (
+                {selectedColumns.id_vehicule && userID=="1" && (
                   <th
                     className="sorting"
                     onClick={() => handleSortingColum("id_vehicule")}
@@ -628,14 +916,14 @@ export function Vehicles() {
                     {translate("State")}
                   </th>
                 )}
-                {selectedColumns.assignment && (
+                {/* {selectedColumns.assignment && (
                   <th
                     className="assignment"
                     onClick={() => handleSortingColum("assignment")}
                   >
                     {translate("Assignment")}
                   </th>
-                )}
+                )} */}
                 {selectedColumns.nom_conducteur && (
                   <th
                     className="sorting"
@@ -652,14 +940,14 @@ export function Vehicles() {
                     {translate("User")}
                   </th>
                 )}
-                {selectedColumns.trailer && (
+                {/* {selectedColumns.trailer && (
                   <th
                     className="sorting"
                     onClick={() => handleSortingColum("trailer")}
                   >
                     {translate("Trailer")}
                   </th>
-                )}
+                )} */}
                 {<th>{translate("Action")}</th>}
               </tr>
             </thead>
@@ -676,8 +964,8 @@ export function Vehicles() {
                     </p>
                   </td>
                 </tr>
-              ) : vehicles.length > 0 ? (
-                vehicles.map((item) => (
+              ) : paginatedVehicles.length > 0 ? (
+                paginatedVehicles.map((item) => (
                   <tr key={item.id_vehicule}>
                     <td>
                       <div className="form-check form-check-inline">
@@ -692,14 +980,14 @@ export function Vehicles() {
                       </div>
                     </td>
 
-                    {selectedColumns.id_vehicule && <td>{item.id_vehicule}</td>}
+                    {selectedColumns.id_vehicule && userID=="1" && <td>{item.id_vehicule}</td>}
                     {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
                     {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
                     {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}
-                    {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)}
+                    {/* {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)} */}
                     {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
                     {selectedColumns.username_user && (<td className="text-center">{item.username_user}</td>)}
-                    {selectedColumns.trailer && (<td className="text-center">{/* {item.trailer} */}</td>)}
+                    {/* {selectedColumns.trailer && (<td className="text-center">{}</td>)} */}
                     <td>
                       <div className="d-flex align-items-center list-action">
                         <NavLink
@@ -738,26 +1026,26 @@ export function Vehicles() {
               </span>
             </div>
             <div className="col-md-6 d-flex justify-content-end">
-              <ReactPaginate
-                previousLabel={translate("previous")}
-                nextLabel={translate("next")}
-                breakLabel={"..."}
-                pageCount={pageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                containerClassName={"pagination justify-content-end"}
-                pageClassName={"page-item"}
-                pageLinkClassName={"page-link"}
-                previousClassName={"page-item"}
-                previousLinkClassName={"page-link"}
-                nextClassName={"page-item"}
-                nextLinkClassName={"page-link"}
-                breakClassName={"page-item"}
-                breakLinkClassName={"page-link"}
-                activeClassName={"active"}
-                forcePage={currentPage - 1}
-              />
+            <ReactPaginate
+  previousLabel={translate("previous")}
+  nextLabel={translate("next")}
+  breakLabel={"..."}
+  pageCount={pageCount} // Nombre total de pages
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={3}
+  onPageChange={handlePageClick} // Gérer le changement de page
+  containerClassName={"pagination justify-content-end"}
+  pageClassName={"page-item"}
+  pageLinkClassName={"page-link"}
+  previousClassName={"page-item"}
+  previousLinkClassName={"page-link"}
+  nextClassName={"page-item"}
+  nextLinkClassName={"page-link"}
+  breakClassName={"page-item"}
+  breakLinkClassName={"page-link"}
+  activeClassName={"active"}
+  forcePage={currentPage - 1} // Forcer la page active
+/>
             </div>
           </div>
         </div>

@@ -22,7 +22,6 @@ type Vehicle = {
   immatriculation_vehicule: string;
 };
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
   show,
@@ -31,14 +30,23 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 }) => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const geopuserID = localStorage.getItem("GeopUserID");
 
 
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState<{
+    id_conducteur: string ;
+    type: string | null;
+    id_vehicule: string;
+    date: string;
+    cost: number | null; // Accepte maintenant null
+    description: string ;
+  }>({
     id_conducteur: "",
     type: "",
     id_vehicule: "",
     date: "",
-    cost: 0,
+    cost: null, // Null est maintenant accepté
     description: "",
   });
 
@@ -113,7 +121,17 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       fetchDrivers();
     }
   }, [show, backendUrl, geopuserID]);
-  
+  const handleClose = () => {
+    setFormData({
+      id_conducteur: "",
+    type: "",
+    id_vehicule: "",
+    date: "",
+    cost: null, // Null est maintenant accepté
+    description: "",
+    });
+    onHide(); // Fermer le modal après la réinitialisation
+};
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prevState) => ({
@@ -148,7 +166,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     type: "",
     id_vehicule: "",
     date: "",
-    cost: 0,
+    cost: null, 
     description: "",
   };
 
@@ -174,13 +192,14 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
       .then((response) => {
         if (!response.ok) {
           // Si la réponse HTTP n'est pas ok, on déclenche une erreur
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(``);
         }
         return response.json();
       })
       .then((data) => {
         if (data.message === 'violation ajouté avec succès') {
-          toast.success("Violation added successfully!", {
+          toast.success(translate("Added successfully!"), 
+          {            
             position: "bottom-right",
             autoClose: 2400,
             hideProgressBar: false,
@@ -200,7 +219,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
 
         } else {
           // Si la réponse ne contient pas le message de succès attendu
-          toast.error("Failed to add violation. Please try again.", {
+            toast.error(translate("Error adding. Please try again"), {  
             position: "bottom-right",
             autoClose: 3000,
             hideProgressBar: false,
@@ -214,7 +233,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
         }
       })
       .catch((error) => {
-        toast.error("Error adding violation: " + error.message, {
+        toast.error("Please fill out all fields" + error.message, {
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -225,7 +244,7 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
           theme: "light",
           transition: Bounce,
         });
-        console.error("Error adding violation:", error);
+        console.error("Error adding violation", error);
       });
   };
 
@@ -234,113 +253,134 @@ const ModalNewVilation: React.FC<ModalNewViolationProps> = ({
     console.log(formData);  // Affiche les données dans la console
   };
 
-  return (
-    <Modal show={show} onHide={onHide} responsive>
-      <Modal.Header closeButton>
-        <Modal.Title>{translate("Add Violation")}</Modal.Title>
-      </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body
-          style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
-        >
-          <Form.Group controlId="type">
-            <Form.Label>{translate("Violation type")}</Form.Label>
-            <Select
-              options={violationOptions}
-              onChange={handleViolationTypeChange}
-              name="type"
-              value={violationOptions.find(
-                (option) => option.value === formData.type
-              )}
-              isClearable
-            />
-          </Form.Group>
-          
-       
-       <Form.Group controlId="id_conducteur">
-    <Form.Label>{translate("Driver")}</Form.Label>
-    <Form.Control
-        as="select"
-        value={formData.id_conducteur}
-        onChange={handleChange}
-    >
-        <option value="">{translate("Select Driver")}</option>
-        {drivers.length === 0 ? (
-            <option value="">{translate("No drivers available")}</option>
-        ) : (
-            drivers.map((driver) => (
-                <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                    {`${driver.prenom_conducteur} ${driver.nom_conducteur}`}
-                </option>
-            ))
-        )}
-    </Form.Control>
-</Form.Group>
+      return (
+        <Modal show={show} onHide={onHide} backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>{translate("Add Violation")}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSubmit}>
+            <Modal.Body
+              style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
+            >
+            {/* Violation Type */}
+    <Form.Group controlId="type">
+      <Form.Label>{translate("Violation type")}{translate(" *")}</Form.Label>
+      <Select
+        options={violationOptions}
+        onChange={handleViolationTypeChange}
+        name="type"
+        value={
+          violationOptions.find((option) => option.value === formData.type) || null
+        }
+        isClearable
+        isSearchable
+      
+      />
+    </Form.Group>
 
-        <Form.Group controlId="id_vehicule">
-                               <Form.Label>{translate("Vehicle")}</Form.Label>
-                               <Form.Control
-                                   as="select"
-                                   value={formData.id_vehicule}
-                                   onChange={handleChange}
-                               >
-                                   <option value="">{translate("Select Vehicle")}</option>
-                                   {vehicles.length === 0 ? (
-                                       <option value="">{translate("No vehicles available")}</option>
-                                   ) : (
-                                       vehicles.map((vehicle) => (
-                                           <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                               {vehicle.immatriculation_vehicule}
-                                           </option>
-                                       ))
-                                   )}
-                               </Form.Control>
-                           </Form.Group>
+    {/* Driver */}
+    <Form.Group controlId="id_conducteur">
+      <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+      <Select
+        options={drivers.map((driver) => ({
+          value: driver.id_conducteur,
+          label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+        }))}
+        placeholder={translate("Select Driver")}
+        isLoading={drivers.length === 0}
+        noOptionsMessage={() => translate("No drivers available")}
+        isSearchable
+        value={
+          drivers
+            .map((driver) => ({
+              value: driver.id_conducteur,
+              label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+            }))
+            .find(
+              (option) =>
+                String(option.value) === String(formData.id_conducteur)
+            ) || null
+        }
+        onChange={(selectedOption) => {
+          setFormData((prev) => ({
+            ...prev,
+            id_conducteur: selectedOption ? String(selectedOption.value) : "",
+          }));
+        }}
+      
+      />
+    </Form.Group>
 
-          <Form.Group controlId="date">
-            <Form.Label>{translate("Date Violation")}</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              placeholder="Enter Date and Time here"
-            />
-          </Form.Group>
+    {/* Vehicle */}
+    <Form.Group controlId="id_vehicule">
+      <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+      <Select
+        options={vehicles.map((vehicle) => ({
+          value: vehicle.id_vehicule,
+          label: vehicle.immatriculation_vehicule,
+        }))}
+        placeholder={translate("Select Vehicle")}
+        isLoading={vehicles.length === 0}
+        noOptionsMessage={() => translate("No vehicles available")}
+        isSearchable
+        value={
+          vehicles
+            .map((vehicle) => ({
+              value: vehicle.id_vehicule,
+              label: vehicle.immatriculation_vehicule,
+            }))
+            .find(
+              (option) =>
+                String(option.value) === String(formData.id_vehicule)
+            ) || null
+        }
+        onChange={(selectedOption) => {
+          setFormData((prev) => ({
+            ...prev,
+            id_vehicule: selectedOption ? String(selectedOption.value) : "",
+          }));
+        }}
+        
+      />
+    </Form.Group>
 
-          <Form.Group controlId="cost">
-            <Form.Label>{translate("Cost")}</Form.Label>
-            <Form.Control
-              type="text"
-              name="cost"
-              value={formData.cost}
-              onChange={handleInputChange}
-              placeholder="Enter Cost here"
-            />
-          </Form.Group>
-          <Form.Group controlId="description">
-            <Form.Label>{translate("Description")}</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="description"
-              rows={4}
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Enter description here"
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            {translate("Close")}
-          </Button>
-          <Button variant="primary" type="submit">
-            {translate("Add")}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
-  );
-};
+    {/* Date Violation */}
+    <Form.Group controlId="date">
+      <Form.Label>{translate("Date Violation")}{translate(" *")}</Form.Label>
+      <Form.Control
+        type="datetime-local"
+        name="date"
+        value={formData.date}
+        onChange={handleInputChange}
+        placeholder="Enter Date and Time here"
+        
+      />
+    </Form.Group>
+
+            
+              <Form.Group controlId="description">
+                <Form.Label>{translate("Description")}</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  name="description"
+                  rows={4}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter description here"
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                {translate("Close")}
+              </Button>
+              <Button variant="primary" type="submit">
+                {translate("Add")}
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      );
+    };
 
 export default ModalNewVilation;

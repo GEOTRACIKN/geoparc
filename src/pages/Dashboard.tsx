@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import FleetCounter from "../components/Dashboard/fleetCounter";
 import FleetSate from "../components/Dashboard/fleetSate";
+import StateVehicule from "../components/Dashboard/stateVehicule";
+import StateTraining from "../components/Dashboard/stateTraining";
+
 import StatsComponent from "../components/Dashboard/StatsComponent";
 
 import { useTranslate } from "../hooks/LanguageProvider";
@@ -9,8 +12,8 @@ import { Table } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { BarLoader } from "react-spinners";
-import Select from 'react-select';
-
+import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 
 import {
   engineStat,
@@ -34,44 +37,70 @@ interface VehicleData {
   // Ajoutez d'autres propriétés si nécessaire
 }
 
+interface SearchResult {
+  psn_dispositif: string;
+  prenom_user: string;
+  nom_conducteur: string;
+  prenom_conducteur: string;
+  nom_user: string;
+  nom_groupe: string;
+  immatriculation_vehicule: string;
+  SOG: number;
+  LAT: number;
+  LON: number;
+  GPSDIST: number;
+  ENGINESTAT: number;
+  category_vehicule: string;
+  vehicule_type: string;
+  TIMESTAMP: string;
+  Adresse: string; // Add the address field
+}
+
+
+
+interface ImmatriSuggestion {
+  immatriculation_vehicule: string;
+}
+type TrainingState = {
+  date_end_training: string;
+}
+
+type VehicleState = {
+  etat_vehicule: string;
+  total: number;
+};
+
+
 export function Dashboard() {
   const { translate } = useTranslate();
   const userID = localStorage.getItem("GeopUserID");
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalVehicles, setTotalVehicles] = useState(0);
+  const [totalTrainings, setTotalTrainings] = useState(0);
+  const [totalFires, setTotalFires] = useState(0);
+  const navigate = useNavigate();
+
+  const [vehicleStates, setVehicleStates] = useState<VehicleState[]>([]);
   const [totalReports, setTotalReports] = useState(0);
   const [dashData, setDashData] = useState<VehicleData[]>([]);
-  const [userName, setUserName] = useState(localStorage.getItem("Geopusername"));
+  const [userName, setUserName] = useState(
+    localStorage.getItem("Geopusername")
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [immatriculationSuggestions, setImmatriculationSuggestions] = useState<ImmatriSuggestion[]>([]);
   const [selectedPsn, setSelectedPsn] = useState<string | null>(null); // État pour stocker le PSN sélectionné
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  interface SearchResult {
-    psn_dispositif: string;
-    prenom_user: string;
-    nom_conducteur: string;
-    prenom_conducteur: string;
-    nom_user: string;
-    nom_groupe: string;
-    immatriculation_vehicule: string;
-    SOG: number;
-    LAT: number;
-    LON: number;
-    GPSDIST: number;
-    ENGINESTAT: number;
-    category_vehicule: string;
-    vehicule_type: string;
-    TIMESTAMP: string;
-    Adresse: string; // Add the address field
-  }
-
-  interface ImmatriSuggestion {
-    immatriculation_vehicule: string;
-  }
+  const [totalDrivingLicense, setTotalDrivingLicense] = useState(0);
+  const [totalVehicleInsurance, setTotalVehicleInsurance] = useState(0);
+  const [totalTechnicalInspection, setTotalTechnicalInspection] = useState(0);
+  const [totalTraining, setTotalTraining] = useState(0);
+  const [totalFireExtinguisher, setTotalFireExtinguisher] = useState(0);
+  const [trainings, setTrainings] = useState<TrainingState[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,23 +127,137 @@ export function Dashboard() {
         if (responseVehicles.ok) {
           const totalVehiclesData = await responseVehicles.json();
           const totalVehiclesCount = totalVehiclesData[0].total;
+          console.log("totalVehiclesCount: "+totalVehiclesCount);
           setTotalVehicles(totalVehiclesCount);
         } else {
           console.error("Failed to fetch total number of Vehicles");
         }
 
-        // Fetch total number of repport
-        const responseReports = await fetch(
-          `${backendUrl}/api/rapport/totalpage/${userID}`,
+        // Prepare the request body
+        const bodyData = JSON.stringify({
+          id_user: userID,
+          state: 1,
+        });
+
+        const responseVehicleState = await fetch(
+          `${backendUrl}/api/etat/totalpage/${userID}`,
           { mode: "cors" }
         );
-        if (responseVehicles.ok) {
-          const totalReportsData = await responseReports.json();
-          const totalReportsCount = totalReportsData[0].total;
-          setTotalReports(totalReportsCount);
+        if (responseVehicleState.ok) {
+          const vehicleStateData = await responseVehicleState.json();
+          console.log("Vehicle states data before:", vehicleStateData);
+          setVehicleStates(vehicleStateData);
+          console.log("Vehicle states:", vehicleStateData);
+        } else {
+          console.error("Failed to fetch vehicle states");
+        }
+
+        // Fetch total number of training
+        const responseTraining = await fetch(
+          `${backendUrl}/api/geop/training/count/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseTraining.ok) {
+          const totalTrainingsData = await responseTraining.json();
+          const totalTrainingsCount = totalTrainingsData;
+
+          console.log("totalTrainingsCount: "+totalTrainingsCount);
+          setTotalTrainings(totalTrainingsCount);
+          console.log("totalTrainingsCount: "+totalTrainingsCount);
         } else {
           console.error("Failed to fetch total number of Vehicles");
         }
+
+        
+
+        // Fetch total number of training
+        const responseFire = await fetch(
+          `${backendUrl}/api/geop/fire/count/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseFire.ok) {
+          const totalFiresData = await responseFire.json();
+          const totalFiresCount = totalFiresData;
+          console.log("totalFiresCount: "+totalFiresCount);
+          
+          setTotalFires(totalFiresCount);
+        } else {
+          console.error("Failed to fetch total number of Vehicles");
+        }
+
+
+        // Make the fetch request
+        const responseNotifications = await fetch(
+          `${backendUrl}/api/geop/notification/read`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: bodyData,
+            mode: "cors",
+          }
+        );
+        if (responseVehicles.ok) {
+          const totalNotificationsData = await responseNotifications.json();
+
+          setNotifications(totalNotificationsData);
+
+          const counts: Record<string, number> = {
+            "1": 0, // Permis de conduire
+            "2": 0, // Assurance véhicule
+            "3": 0, // Contrôle technique
+            "4": 0, // Formation
+            "5": 0, // Extincteur
+            "6": 0, // Vidange
+            "7": 0, // Entretiens planifiés par kilométrage
+            "8": 0, // Entretiens planifiés par date
+            "9": 0, // Stock de pièces
+            "10": 0, // Permis de circuler
+            "11": 0, // Agrément sanitaire
+            "12": 0, // Récépissé
+          };
+
+
+
+          totalNotificationsData.forEach((notif: { id_type: string }) => {
+            if (counts[notif.id_type] !== undefined) {
+              counts[notif.id_type]++;
+            }
+          });
+
+          // Update the statuses with the new accounts
+          setAlertData([
+            { id: "1", value: counts["1"], max: totalVehicles, color: "#e66d05", label: translate("Driving license"), modalId: "detailLicense" },
+            { id: "2", value: counts["2"], max: totalDrivers, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailInsurance" },
+            { id: "3", value: counts["3"], max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailMaintenance" },
+            { id: "4", value: counts["4"], max: totalTrainings, color: "#00a65a", label: translate("Training"), modalId: "detailFormation" },
+            { id: "5", value: counts["5"], max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
+            { id: "6", value: counts["6"], max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "DrainingDetail" },
+            { id: "7", value: counts["7"], max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailSticker" },
+            { id: "8", value: counts["8"], max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailDraining" },
+            // { id: "9", value: counts["9"], max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
+            // { id: "10", value: counts["10"], max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
+            // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
+            // { id: "12", value: counts["12"], max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
+          ]);
+          console.log(setTotalDrivingLicense)
+
+
+        } else {
+          console.error("Failed to fetch total number of Vehicles");
+          setNotifications([]);
+        }
+
+        const responseTrainings = await fetch(
+          `${backendUrl}/api/geop/training/all/${userID}`,
+          { mode: "cors" }
+        );
+        if (responseTrainings.ok) {
+          const trainingsData = await responseTrainings.json();
+          setTrainings(trainingsData);
+        }
+  
 
         // Fetch total number of users
         const responseUsers = await fetch(
@@ -151,6 +294,23 @@ export function Dashboard() {
 
     fetchData();
   }, [userID]);
+
+
+
+  const [alertData, setAlertData] = useState([
+    { id: "1", value: 0, max: totalDrivers, color: "#e66d05", label: translate("Driving license"), modalId: "detailPermis" },
+    { id: "2", value: 0, max: totalVehicles, color: "#3c8dbc", label: translate("Vehicle insurance"), modalId: "detailASS" },
+    { id: "3", value: 0, max: totalVehicles, color: "#f56954", label: translate("Maintenance"), modalId: "detailCnrlTech" },
+    { id: "4", value: 0, max: totalTrainings, color: "#00a65a", label: translate("Training"), modalId: "detailFormation" },
+    { id: "5", value: 0, max: totalFires, color: "#3c8dbc", label: translate("Extinguisher"), modalId: "detailExt" },
+    { id: "6", value: 0, max: totalVehicles, color: "#00a65a", label: translate("Technical control"), modalId: "detailVidange" },
+    { id: "7", value: 0, max: totalVehicles, color: "purple", label: translate("Sticker"), modalId: "detailEntretienKlm" },
+    { id: "8", value: 0, max: totalVehicles, color: "#d5d546", label: translate("Draining"), modalId: "detailEntretienDate" },
+    // { id: "9", value: 0, max: 10, color: "#e60505", label: "Stock", modalId: "stockpiece" },
+    // { id: "10", value: 0, max: 10, color: "#9896f1", label: "Permis circulé", modalId: "detailPermis" },
+    // { id: "11", value: 0, max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
+    // { id: "12", value: 0, max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
+  ]);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -394,12 +554,15 @@ export function Dashboard() {
       ...vehicleData,
     }));
   };
-  const handleImmatriculationSelect = (selectedOption: { value: string; label: string } | null) => {
+  const handleImmatriculationSelect = (
+    selectedOption: { value: string; label: string } | null
+  ) => {
     if (selectedOption) {
       const selectedImmatriculation = selectedOption.value;
       // Recherchez l'objet correspondant dans dashData pour obtenir le PSN
       const correspondingPsn = dashData.find(
-        (vehicle) => vehicle.immatriculation_vehicule === selectedImmatriculation
+        (vehicle) =>
+          vehicle.immatriculation_vehicule === selectedImmatriculation
       )?.psn_dispositif;
       setSelectedPsn(correspondingPsn || null);
     } else {
@@ -490,7 +653,9 @@ export function Dashboard() {
 
     getMarkers();
   }, []);
-
+  const handleClick = (etat: string) => {
+    navigate(`/vehicles?etat=${etat}`);
+  }
 
   // Fonction pour calculer la différence en heures entre deux timestamps
   function calculateHoursDifference(
@@ -502,21 +667,12 @@ export function Dashboard() {
     return diffInMilliseconds / (1000 * 60 * 60);
   }
   const currentDate = new Date().toLocaleDateString();
+  const handleStateClick = (etat: string) => {
+    window.location.href = `/vehicles?etat_vehicule=${encodeURIComponent(etat)}`;
+  };
+  
 
 
-  const alertData = [
-    { id: 'assurances', value: 5, max: 10, color: '#3c8dbc', label: 'Assurances', modalId: 'detailASS' },
-    { id: 'controle-technique', value: 5, max: 10, color: '#f56954', label: 'Contrôle technique', modalId: 'detailCnrlTech' },
-    { id: 'vidange', value: 7, max: 10, color: '#00a65a', label: 'Vidange', modalId: 'detailVidange' },
-    { id: 'entretien-klm', value: 10, max: 10, color: 'purple', label: 'Entretiens planifiés par kilométrage', modalId: 'detailEntretienKlm' },
-    { id: 'entretien-date', value: 10, max: 10, color: '#d5d546', label: 'Entretiens planifiés par date', modalId: 'detailEntretienDate' },
-    { id: 'permis', value: 2, max: 10, color: '#e66d05', label: 'Permis de conduire', modalId: 'detailPermis' },
-    { id: 'stock', value: 6, max: 10, color: '#e60505', label: 'Stock', modalId: 'stockpiece' },
-    { id: 'extincteur', value: 4, max: 10, color: '#3c8dbc', label: 'Extincteur', modalId: 'detailExt' },
-    { id: 'Permis circulé', value: 4, max: 10, color: '#9896f1', label: 'Permis circulé', modalId: 'detailPermis' },
-    { id: 'Agrément Sanitaire', value: 4, max: 10, color: '#264e70', label: 'Agrément Sanitaire', modalId: 'detaiAgrement' },
-    { id: 'Récépissé', value: 4, max: 10, color: '#edb1f1', label: 'Récépissé', modalId: 'detailRecepisse' }
-  ];
   return (
     <>
       <div className="row">
@@ -542,11 +698,11 @@ export function Dashboard() {
             </div>
             <div className="col-lg-2 col-md-2">
               <FleetCounter
-                numberOfItem={totalReports}
+                numberOfItem={notifications.length}
                 title={translate("Alert")}
                 icon={"chart-bar"}
                 color={"bg-success-light"}
-                linkTo="/reports" // Add the link here
+                linkTo="/notifications" // Add the link here
               ></FleetCounter>
             </div>
             <div className="col-lg-2 col-md-2">
@@ -555,57 +711,69 @@ export function Dashboard() {
                 title={translate("Users")}
                 icon={"users-cog"}
                 color={"bg-success-user"}
-                linkTo="/users" // Add the link here
+                linkTo="/" // Add the link here
               ></FleetCounter>
             </div>
 
-            {/* Ajout des pavés supplémentaires */}
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("HS")} style={{ cursor: "pointer" }}>              
               <FleetCounter
-                numberOfItem={0}
-                title={translate("Hors Service")}
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "HS")?.total || 0}
+                title={translate("Out of Service")}
                 icon={"exclamation-circle"}
                 color={"bg-warning-light"}
-                linkTo="/hors-service"
-              ></FleetCounter>
+                linkTo="/vehicles"
+              />
             </div>
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("En panne")} style={{ cursor: "pointer" }}>              
               <FleetCounter
-                numberOfItem={1}
-                title={translate("En panne")}
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En panne")?.total || 0}
+                title={translate("Broken Down")}
                 icon={"tools"}
                 color={"bg-danger-light"}
-                linkTo="/en-panne"
-              ></FleetCounter>
+                linkTo="/vehicles"
+              />
             </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={3}
-                title={translate("En Réparation")}
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("En Réparation")} style={{ cursor: "pointer" }}>
+                <FleetCounter
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "En réparation")?.total || 0}
+                title={translate("Under Repair")}
                 icon={"wrench"}
                 color={"bg-info-light"}
-                linkTo="/en-reparation"
-              ></FleetCounter>
+                linkTo="/vehicles"
+              />
             </div>
-            <div className="col-lg-2 col-md-2">
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Disponible")} style={{ cursor: "pointer" }}>
               <FleetCounter
-                numberOfItem={6}
-                title={translate("Disponibles")}
+                numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible")?.total || 0}
+                title={translate("Available")}
                 icon={"check-circle"}
                 color={"bg-success-light"}
-                linkTo="/disponibles"
-              ></FleetCounter>
+                linkTo="/vehicles"
+              />
             </div>
-            <div className="col-lg-2 col-md-2">
-              <FleetCounter
-                numberOfItem={0}
-                title={translate("Disponible-HS")}
-                icon={"ban"}
-                color={"bg-secondary-light"}
-                linkTo="/disponible-hs"
-              ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
+
+            <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Affecté")} style={{ cursor: "pointer" }}>
+            <FleetCounter
+              numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Affecté")?.total || 0}
+              title={translate("Assigned")}
+              icon={"truck"}
+              color={"bg-success-light"}
+              linkTo="/vehicles"
+            />
+          </div>
+
+          <div className="col-lg-2 col-md-2" onClick={() => handleStateClick("Disponible-Hs")} style={{ cursor: "pointer" }}>
+            <FleetCounter
+              numberOfItem={vehicleStates.find(state => state.etat_vehicule === "Disponible-Hs")?.total || 0}
+              title={translate("Available-OS")}
+              icon={"cogs"}
+              color={"bg-success-user"}
+              linkTo="/vehicles"
+            />
+          </div>
+
+
+            {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}
                 title={translate("Affectés")}
@@ -613,8 +781,8 @@ export function Dashboard() {
                 color={"bg-primary-light"}
                 linkTo="/affectes"
               ></FleetCounter>
-            </div>
-            <div className="col-lg-2 col-md-2">
+            </div> */}
+            {/* <div className="col-lg-2 col-md-2">
               <FleetCounter
                 numberOfItem={0}
                 title={translate("Report")}
@@ -631,35 +799,25 @@ export function Dashboard() {
                 color={"bg-primary-light"}
                 linkTo="/affectes"
               ></FleetCounter>
-            </div>
+            </div> */}
           </div>
         </div>
 
         <>
-          <div className="container-fluid">
-          </div>
+          <div className="container-fluid"></div>
         </>
 
-        <div className="col-lg-6" >
-          <FleetSate
-            options={{
-              maintenanceCosts: 5000,  // Coûts de Maintenance
-              missionCosts: 3000,      // Coûts des Missions
-              fuelCosts: 2000,         // Coûts de Carburant
-              legalCosts: 1500,        // Coûts Juridiques
-              employeeCosts: 4000,     // Coûts des Employés
-              hseCosts: 1000,          // Coûts HSE (Hygiène, Sécurité, Environnement)
-            }}
-          />
-        </div>
-        <div className="col-lg-6">
-          {/* <FleetCo2 /> */}
-        </div>
-        <div className="col-lg-12" >
+
+        <div className="col-lg-6">{/* <FleetCo2 /> */}</div>
+        <div className="col-lg-12">
           <div className="card">
-            <div className="" style={{padding:"20px"}}>
+            <div className="" style={{ padding: "20px" }}>
               <h6 className="box-title">
-              <i className="las la-bell" style={{fontSize: "24px"}}></i>  Alertes <span className="badge bg-red">{alertData.reduce((acc, alert) => acc + alert.value, 0)}</span>
+                <i className="las la-bell" style={{ fontSize: "24px" }}></i>{" "}
+                Alertes{" "}
+                <span className="badge bg-red">
+                  {alertData.reduce((acc, alert) => acc + alert.value, 0)}
+                </span>
               </h6>
             </div>
             <div className="row">
@@ -671,12 +829,35 @@ export function Dashboard() {
                     color={alert.color}
                     label={alert.label}
                     modalId={alert.modalId}
-                    height={120}                 
-                  />
+                    height={120}
+                    id={alert.id} />
                 </div>
               ))}
             </div>
           </div>
+        </div>
+          {/* <div className="col-lg-6">
+        <FleetSate
+          options={{
+            maintenanceCosts: 5000, // Coûts de Maintenance
+            missionCosts: 3000, // Coûts des Missions
+            fuelCosts: 2000, // Coûts de Carburant
+            legalCosts: 1500, // Coûts Juridiques
+            employeeCosts: 4000, // Coûts des Employés
+            hseCosts: 1000, // Coûts HSE (Hygiène, Sécurité, Environnement)
+          }}
+        />
+      </div> */}
+
+        <div className="col-lg-6">
+        <StateVehicule 
+  vehicleStates={vehicleStates}
+/>
+        </div>
+        <div className="col-lg-6">
+        <StateTraining 
+  trainings={trainings}
+/>
         </div>
       </div>
     </>

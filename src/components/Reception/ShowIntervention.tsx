@@ -4,27 +4,30 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { formatDateToTimestamp } from "../../utilities/functions";
 
-interface ModalShowInterventionnProps {
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const geopuserID = localStorage.getItem("GeopUserID");
+
+interface ModalViewInterventionProps {
     show: boolean;
     onHide: () => void;
     id_intervention: number | null;
-
 }
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+interface Vehicle {
+    id_vehicule: number;
+    immatriculation_vehicule: string;
+}
 
-
-const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
+const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
     show,
     onHide,
     id_intervention,
-
 }) => {
     const [formData, setFormData] = useState({
         date: "",
         priority: "",
-        vehicle: "",
-        mileage: "",
+        id_vehicule: "",
+        km: "",
         subject: "",
         client: "",
         clientPhone: "",
@@ -33,7 +36,8 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
     });
 
     const { translate } = useTranslate();
-
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    
     const serviceMapping: { [key: number]: string } = {
         1: "Garage",
         2: "Planification d'entretien",
@@ -42,168 +46,160 @@ const ModalShowIntervention: React.FC<ModalShowInterventionnProps> = ({
         5: "Changement de Pièce",
     };
 
-    // Fetch data from API and set form data
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            if (!geopuserID) return;
+            
+            try {
+                const response = await fetch(
+                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
+                );
+                const data = await response.json();
+                setVehicles(data.vehicles || []);
+            } catch (error) {
+                console.error("Error fetching vehicles:", error);
+            }
+        };
+        fetchVehicles();
+    }, []);
+
     const fetchIntervention = async () => {
         try {
             const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
-            console.log('Request URL:', url);
-    
             const response = await fetch(url);
-    
-            // Vérifiez le statut de la réponse
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
             const data = await response.json();
-    
-            console.log('Data:', data);
-            console.log('Data length:', data.length);
-    
+            
             if (data.length > 0) {
                 const intervention = data[0];
                 setFormData({
-                    date: formatDateToTimestamp(intervention.date_intervention), 
+                    date: formatDateToTimestamp(intervention.date_intervention),
                     priority: intervention.priority,
-                    vehicle: intervention.vehicule,
-                    mileage: intervention.km,
+                    id_vehicule: intervention.id_vehicule,
+                    km: intervention.km,
                     subject: intervention.subject,
                     client: intervention.client,
                     clientPhone: intervention.phone_client,
                     receptionistName: intervention.receptionist_name,
                     service: intervention.service.toString(),
                 });
-            } else {
-                console.warn('No intervention data found for the provided ID.');
             }
         } catch (error) {
-            console.error('Erreur lors de la récupération des données:', error);
+            console.error('Error fetching intervention:', error);
         }
     };
-    
 
     useEffect(() => {
-        if (show) {
-            fetchIntervention();
-        }
+        if (show) fetchIntervention();
     }, [show]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [id]: value,
-        }));
-    };
+    // Trouver l'immatriculation du véhicule
+    const vehicleLabel = vehicles.find(v => v.id_vehicule === Number(formData.id_vehicule))?.immatriculation_vehicule || "";
 
     return (
         <Modal show={show} onHide={onHide} responsive>
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Show Request")}</Modal.Title>
+                <Modal.Title>{translate("Intervention Details")}</Modal.Title>
             </Modal.Header>
             <Form>
-                <Modal.Body
-                    style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
-                >
-                    <Form.Group controlId="date">
+                <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
+                    {/* Date */}
+                    <Form.Group controlId="date" >
                         <Form.Label>{translate("Request Date")}</Form.Label>
                         <Form.Control
-                            type="datetime-local"
                             value={formData.date}
-                            readOnly // Rend le champ non modifiable
+                            readOnly
+                            
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="priority">
+                    {/* Priorité */}
+                    <Form.Group controlId="priority" >
                         <Form.Label>{translate("Priority")}</Form.Label>
-                        <Form.Control as="select" value={formData.priority} disabled >
-                            <option value="">{translate("Select Priority")}</option>
-                            <option value="Normal">{translate("Normal")}</option>
-                            <option value="Urgent">{translate("Urgent")}</option>
-                        </Form.Control>
+                        <Form.Control 
+                            value={translate(formData.priority)}
+                            readOnly
+                            
+                        />
                     </Form.Group>
 
-                    <Form.Group controlId="vehicle">
+                    {/* Véhicule */}
+                    <Form.Group controlId="vehicle" >
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder={translate("Enter vehicle")}
-                            value={formData.vehicle}
-                            readOnly               
-                                 />
+                            value={vehicleLabel}
+                            readOnly
+                            
+                        />
                     </Form.Group>
 
-                    <Form.Group controlId="mileage">
+                    {/* Kilométrage */}
+                    <Form.Group controlId="km" >
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
-                            type="number"
-                            placeholder={translate("Enter mileage")}
-                            value={formData.mileage}
-                            readOnly  
-                                                  />
+                            value={formData.km}
+                            readOnly
+                            
+                        />
                     </Form.Group>
 
-                    <Form.Group controlId="subject">
+                    {/* Sujet */}
+                    <Form.Group controlId="subject" >
                         <Form.Label>{translate("Subject")}</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder={translate("Enter subject")}
                             value={formData.subject}
                             readOnly
+                            
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="client">
+                    {/* Client */}
+                    <Form.Group controlId="client" >
                         <Form.Label>{translate("Client")}</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder={translate("Enter client name")}
                             value={formData.client}
                             readOnly
+                            
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="clientPhone">
+                    {/* Téléphone client */}
+                    <Form.Group controlId="clientPhone" >
                         <Form.Label>{translate("Client Phone")}</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder={translate("Enter client phone")}
                             value={formData.clientPhone}
                             readOnly
+                            
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="receptionistName">
+                    {/* Réceptionniste */}
+                    <Form.Group controlId="receptionistName" >
                         <Form.Label>{translate("Receptionist's Name")}</Form.Label>
                         <Form.Control
-                            type="text"
-                            placeholder={translate("Enter receptionist's name")}
                             value={formData.receptionistName}
                             readOnly
+                            
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="service">
+                    {/* Service */}
+                    <Form.Group controlId="service" >
                         <Form.Label>{translate("Service")}</Form.Label>
-                        <Form.Control as="select" value={formData.service} disabled>
-                            <option value="">{translate("Select Service")}</option>
-                            {Object.entries(serviceMapping).map(([key, label]) => (
-                                <option key={key} value={key}>
-                                    {label}
-                                </option>
-                            ))}
-                        </Form.Control>
+                        <Form.Control
+                            value={serviceMapping[Number(formData.service)]}
+                            readOnly
+                            
+                        />
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
-                  
                 </Modal.Footer>
             </Form>
         </Modal>
     );
 };
 
-export default ModalShowIntervention;
+export default ModalViewIntervention;

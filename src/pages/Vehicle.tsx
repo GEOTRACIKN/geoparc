@@ -6,6 +6,7 @@ import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import FieldInput from "../components/Vehicle/FieldInput";
 import SelectGroup from "../components/Vehicle/SelectGroup";
+import FieldDateInput from "../components/Vehicle/FieldDateInput";
 
 export interface VehicleInterface {
   id_vehicule?: number | null;
@@ -546,52 +547,53 @@ export function Vehicle() {
     { value: 152, label: "Nash" },
     { value: 153, label: "Nissan" },
     { value: 154, label: "Noble" },
-    { value: 155, label: "Packard" },
-    { value: 156, label: "Pagani" },
-    { value: 157, label: "Panhard" },
-    { value: 158, label: "Peugeot" },
-    { value: 159, label: "Pininfarina" },
-    { value: 160, label: "Plymouth" },
-    { value: 161, label: "Polaris" },
-    { value: 162, label: "Pontiac" },
-    { value: 163, label: "Porsche" },
-    { value: 164, label: "Qoros" },
-    { value: 165, label: "Ram" },
-    { value: 166, label: "Renault" },
-    { value: 167, label: "Riley" },
-    { value: 168, label: "Rolls-Royce" },
-    { value: 169, label: "Rover" },
-    { value: 170, label: "Saab" },
-    { value: 171, label: "Saleen" },
-    { value: 172, label: "Saturn" },
-    { value: 173, label: "Scion" },
-    { value: 174, label: "Shelby" },
-    { value: 175, label: "Simca" },
-    { value: 176, label: "Smart" },
-    { value: 177, label: "Spyker" },
-    { value: 178, label: "Ssangyong" },
-    { value: 179, label: "Studebaker" },
-    { value: 180, label: "Subaru" },
-    { value: 181, label: "Sunbeam" },
-    { value: 182, label: "Suzuki" },
-    { value: 183, label: "Talbot" },
-    { value: 184, label: "Tesla" },
-    { value: 185, label: "Toyota" },
-    { value: 186, label: "Trabant" },
-    { value: 187, label: "Trident" },
-    { value: 188, label: "Triumph" },
-    { value: 189, label: "TVR" },
-    { value: 190, label: "Vauxhall" },
-    { value: 191, label: "Volkswagen" },
-    { value: 192, label: "Volvo" },
-    { value: 193, label: "Westfield" },
-    { value: 194, label: "Wiesmann" },
-    { value: 195, label: "Willys Overland" },
-    { value: 196, label: "Yamaha" },
-    { value: 197, label: "Zagato" },
-    { value: 198, label: "Zastava" },
-    { value: 199, label: "Zaz" },
-    { value: 200, label: "Zest" },
+    { value: 155, label: "Opel" },
+    { value: 156, label: "Packard" },
+    { value: 157, label: "Pagani" },
+    { value: 158, label: "Panhard" },
+    { value: 159, label: "Peugeot" },
+    { value: 160, label: "Pininfarina" },
+    { value: 161, label: "Plymouth" },
+    { value: 162, label: "Polaris" },
+    { value: 163, label: "Pontiac" },
+    { value: 164, label: "Porsche" },
+    { value: 165, label: "Qoros" },
+    { value: 166, label: "Ram" },
+    { value: 167, label: "Renault" },
+    { value: 168, label: "Riley" },
+    { value: 169, label: "Rolls-Royce" },
+    { value: 170, label: "Rover" },
+    { value: 171, label: "Saab" },
+    { value: 172, label: "Saleen" },
+    { value: 173, label: "Saturn" },
+    { value: 174, label: "Scion" },
+    { value: 175, label: "Shelby" },
+    { value: 176, label: "Simca" },
+    { value: 177, label: "Smart" },
+    { value: 178, label: "Spyker" },
+    { value: 179, label: "Ssangyong" },
+    { value: 180, label: "Studebaker" },
+    { value: 181, label: "Subaru" },
+    { value: 182, label: "Sunbeam" },
+    { value: 183, label: "Suzuki" },
+    { value: 184, label: "Talbot" },
+    { value: 185, label: "Tesla" },
+    { value: 186, label: "Toyota" },
+    { value: 187, label: "Trabant" },
+    { value: 188, label: "Trident" },
+    { value: 189, label: "Triumph" },
+    { value: 190, label: "TVR" },
+    { value: 191, label: "Vauxhall" },
+    { value: 192, label: "Volkswagen" },
+    { value: 193, label: "Volvo" },
+    { value: 194, label: "Westfield" },
+    { value: 195, label: "Wiesmann" },
+    { value: 196, label: "Willys Overland" },
+    { value: 197, label: "Yamaha" },
+    { value: 198, label: "Zagato" },
+    { value: 199, label: "Zastava" },
+    { value: 200, label: "Zaz" },
+    { value: 201, label: "Zest" }
   ];
 
 
@@ -667,7 +669,6 @@ export function Vehicle() {
     { id: "date_vignette_vehicule", label: "Date vignette", type: "date", placeholder: "", tooltip: "Date vignette", icon: "fas fa-calendar", required: false },
     { id: "cout_vignette_vehicule", label: "Coût", type: "number", placeholder: "Coût", tooltip: "Coût", icon: "fas fa-money-bill", required: false },
   ];
-
 
 
   const fieldsTab6: Field[] = [
@@ -1294,6 +1295,12 @@ export function Vehicle() {
                               }}
                               onChange={field.onChange}
                             />
+                          ) : field.type === "date" ? (
+                            <FieldDateInput
+                              field={field}
+                              value={vehicleItem ? vehicleItem[field.id as keyof VehicleInterface] : ""}
+                              onChange={handleChange}
+                            />
                           ) : (
                             <FieldInput
                               field={field}
@@ -1301,6 +1308,7 @@ export function Vehicle() {
                               onChange={handleChange}
                             />
                           )}
+
                         </div>
                       ))}
                   </Row>

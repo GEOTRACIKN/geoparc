@@ -13,8 +13,7 @@ interface Servicing {
     id_servicing: number;
     invoice_no_servicing: number;
     type_servicing: number;
-    id_vehicule: number;
-    type_vehicule: string;
+    immatriculation_vehicule: string;
     date_servicing: string;
     place_servicing: string;
     cost_servicing: number;
@@ -23,14 +22,14 @@ interface Servicing {
     next_oil_change_servicing: number;
     
 }
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const id_user = localStorage.getItem("GeopUserID");
 
 
 export function Servicing() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
-    const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -354,12 +353,12 @@ export function Servicing() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("type_vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                             {selectedColumns.Km && (
+                             {selectedColumns.KM && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("km_servicing")}
@@ -445,7 +444,7 @@ export function Servicing() {
 
                                             )}
                                              {selectedColumns.Vehicle && (
-                                                <td>{Servicing.type_vehicule}</td>
+                                                <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
                                              {selectedColumns.Km && (
                                                 <td>{Servicing.km_servicing}</td>

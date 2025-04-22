@@ -20866,16 +20866,18 @@ button.close-btn-res,div.sidebar-toggle {
 }
 
 .notification-icon>span {
-    height: 13px;
-    width: 13px;
+    height: 18px;
+    width: 18px;
     border-radius: 50%;
     line-height: 15px;
     font-size: 8px;
     text-align: center;
     position: absolute;
-    top: -5px;
+    top: 4px;
     left: auto;
-    right: -8px
+    right: -8px;
+    font-weight: bold;
+    font-size: 11px
 }
 
 .todo-date {
@@ -24762,7 +24764,10 @@ r
     padding-bottom: 0;
 }
 
-
+.w-100 {
+    width: 100% !important;
+  }
+  
 
 @media only screen and (min-width: 768px) {
    

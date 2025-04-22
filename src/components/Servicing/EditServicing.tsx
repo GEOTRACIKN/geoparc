@@ -27,7 +27,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
     const [formData, setFormData] = useState({
         invoice_no_servicing: "",
         type_servicing: 0,
-        type_vehicule: "",
+        immatriculation_vehicule: "",
         date_servicing: "",
         place_servicing: "",
         cost_servicing: "",
@@ -68,7 +68,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                 setFormData({
                     invoice_no_servicing: servicing.invoice_no_servicing || "",
                     type_servicing: servicing.type_servicing ? servicing.type_servicing.toString() : "",
-                    type_vehicule: servicing.type_vehicule || "",
+                    immatriculation_vehicule: servicing.immatriculation_vehicule || "",
                     date_servicing: servicing.date_servicing ? formatDateToTimestamp(servicing.date_servicing) : "",
                     place_servicing: servicing.place_servicing || "",
                     cost_servicing: servicing.cost_servicing || "",
@@ -177,13 +177,13 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
 
                     
 
-<Form.Group controlId="type_vehicule">
+<Form.Group controlId="immatriculation_vehicule">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}
                             //placeholder="Entrez le véhicule"
-                            value={formData.type_vehicule}
+                            value={formData.immatriculation_vehicule}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -206,6 +206,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez le kilométrage"
                             value={formData.km_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
 
@@ -217,6 +228,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez le véhicule"
                             value={formData.invoice_no_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
 
@@ -251,6 +273,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez le nom du client"
                             value={formData.place_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
 
@@ -261,6 +294,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez le c"
                             value={formData.cost_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                     <Form.Group controlId="depreciation_servicing">
@@ -270,6 +314,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez la periode de depreciation_servicing (jour)"
                             value={formData.depreciation_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                    
@@ -281,6 +336,17 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Enter next oil change"
                             value={formData.next_oil_change_servicing}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                     

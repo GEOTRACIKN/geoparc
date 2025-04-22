@@ -21,16 +21,26 @@ interface NavbarProps {
 }
 
 interface Notification {
-  id_notification: number,
-  id_groupe_alarme: number,
-  id_user: number,
-  id_vehicule: number,
-  id_conducteur: number,
-  type: string,
-  message: string,
-  severity: number,
-  timestamp: string,
-  state: number,
+  id_notification: number;
+  id_groupe_alarme: number;
+  name_groupe_alarme: string;
+  name_alarme: string;
+  id_user: number;
+  id_item: number;
+  id_type: number;
+  message: string;
+  severity: number;
+  timestamp: string;
+  state: number;
+  attached: number;
+  date_start: string;
+  immatriculation_vehicule: string;
+  training_prenom_conducteur: string;
+  feu_immatriculation_vehicule: string;
+  prenom_conducteur: string;
+  training_nom_conducteur: string;
+  nom_conducteur: string;
+  id_alarm: number;
 }
 
 interface Permission {
@@ -62,6 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
+
   const strLang = {
     en: translate('English'),
     fr: translate('French'),
@@ -69,8 +80,24 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     es: translate('Espagnol'),
   };
 
+
+  const notificationType = [
+    translate('Driving license'),
+    translate('Vehicle insurance'),
+    translate('Next maintenance due'),
+    translate('Training certificate expiration'),
+    translate('Fire extinguisher verification'),
+    translate('Vehicle technical inspection'),
+    translate('Vehicle sticker verification'),
+    translate('Draining verification'),
+  ];
+
+
+
+
+
   const { isDarkMode, toggleTheme } = useTheme();
-   // Utilisation du hook
+  // Utilisation du hook
   const handleLogout = () => {
     localStorage.removeItem("authToken"); // Remove the token from localStorage
     localStorage.removeItem("userID"); // Remove the token from localStorage
@@ -104,7 +131,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
       inactivityTimeout = setTimeout(() => {
         // Auto logout after 15 minutes of inactivity
         handleLogout();
-      }, 900000); // 15 minutes in milliseconds
+      }, 14400000); // 15 minutes in milliseconds
     };
 
     const handleStorageChange = (event: StorageEvent) => {
@@ -170,7 +197,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
       // Make the fetch request
       const response = await fetch(
-        `${backendUrl}/api/notification/read`,
+        `${backendUrl}/api/geop/notification/read`,
         {
           method: "POST",
           headers: {
@@ -191,6 +218,19 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
       // Set the notifications state
       setNotifications(alarmResponse);
+
+      // toast.success("Nouvelles échéances détecté....", {
+      //        position: "bottom-right",
+      //        autoClose: 2400,
+      //        hideProgressBar: false,
+      //        closeOnClick: true,
+      //        pauseOnHover: true,
+      //        draggable: true,
+      //        progress: undefined,
+      //        theme: "light",
+      //        transition: Bounce,
+      //      });
+
     } catch (error) {
 
       console.error("Error fetching alarms:", error);
@@ -339,6 +379,98 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     );
   };
 
+
+  const generateDescription = (alarme: Notification) => {
+    const highlight = (value: any) => (
+      <span style={{ color: "#3b82f6" }} className="text-blue-500 font-semibold">{value}</span>
+    );
+
+    switch (alarme.id_type) {
+      case 1: // Driving license
+        return (
+          <>
+            {translate("The driving license of")}{" "}
+            {highlight(alarme.nom_conducteur)}{" "}
+            {highlight(alarme.prenom_conducteur)} {translate("will expire on")}{" "}
+            {highlight(alarme.timestamp.split("T")[0].split("T")[0])}
+          </>
+        );
+
+      case 2: // Vehicle insurance
+        return (
+          <>
+            {translate("The insurance for")} {highlight(alarme.id_item)}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 3: // Maintenance
+        return (
+          <>
+            {translate("The next maintenance for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 4: // Training
+        return (
+          <>
+            {translate("The training certificate of")}{" "}
+            {highlight(alarme.training_nom_conducteur)}{" "}
+            {highlight(alarme.training_prenom_conducteur)}{" "}
+            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 5: // Fire extinguisher verification
+        return (
+          <>
+            {translate("The fire extinguisher verification for vehicle")}{" "}
+            {highlight(alarme.feu_immatriculation_vehicule)}{" "}
+            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 6: // Technical control
+        return (
+          <>
+            {translate("The technical inspection for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("must be done before")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 7: // Sticker
+        return (
+          <>
+            {translate("The vehicle sticker verification for")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("should be done by")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      case 8: // Draining
+        return (
+          <>
+            {translate("The draining verification for vehicle")}{" "}
+            {highlight(alarme.immatriculation_vehicule)}{" "}
+            {translate("is scheduled for")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+
+      default:
+        return (
+          <>
+            {translate("The deadline for")} {highlight(alarme.id_item)} (
+            {highlight(alarme.immatriculation_vehicule)}){" "}
+            {translate("is set for")} {highlight(alarme.timestamp.split("T")[0])}
+          </>
+        );
+    }
+  };
+
   return (
     <div className={`iq-top-navbar  ${changNavbar ? "navbar-push" : "navbar-pool"}`} >
       <div className="iq-navbar-custom">
@@ -352,13 +484,13 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             > </i>
 
             <Nav.Link to="/" className={`header-logo`} as={NavLink}>
-              <Image 
-              className="img-fluid rounded-normal light-logo" 
-              style={{ height: "22px", width: "136px", paddingLeft: 15 }}
-              src={isDarkMode ? "asset/images/logo_dark.png" : "asset/images/logo.png"}
-              alt="Logo" />
-            
-           
+              <Image
+                className="img-fluid rounded-normal light-logo"
+                style={{ height: "22px", width: "136px", paddingLeft: 15 }}
+                src={isDarkMode ? "asset/images/logo_dark.png" : "asset/images/logo.png"}
+                alt="Logo" />
+
+
             </Nav.Link>
 
 
@@ -411,8 +543,8 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             </button>
             <div className={`navbar-collapse collapse ${showMenu}`} id="navbarSupportedContent">
               <ul className="navbar-nav ml-auto navbar-list align-items-center">
-               
-              { checkPermission(27) && ( <li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
+
+                {checkPermission(27) && (<li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
                   {userID === "1" && (
                     <a href={`https://geoparc.geotrackin.com?apikey=${APIkey}`} className="gp">
                       <i className="las la-sign-in-alt" style={{ fontSize: "29px" }}></i>
@@ -489,29 +621,56 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                         <Card.Body className="p-0">
                           <div className="custom-title p-3">
                             <div className="d-flex align-items-center justify-content-between">
-                              <h5 className="mb-0">Notifications</h5>
+                              <h5 className="mb-0">{translate("Notifications")}</h5>
                               <Badge className="badge-card">{notifications && notifications.length}</Badge>
                             </div>
                           </div>
                           <div className="px-3 pt-0 pb-0 sub-card">
                             {notifications && notifications.length > 0 ? (
                               notifications.slice(0, 7).map((notification) => (
-                                <a href="#" className="iq-sub-card" key={notification.id_notification}>
+                                <Link
+                                  to={`/deadline/${notification.id_alarm}/0`}
+                                  className="iq-sub-card"
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                  title="View alarm"
+                                  key={notification.id_notification}
+                                  onClick={() => {
+                                    fetch(`${backendUrl}/api/geop/notification/update`, {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                      body: JSON.stringify({ id_notification: notification.id_notification}), // 1 = non lues
+                                    })
+                                      .then((response) => response.json())
+                                      .then((data) => {
+                                     if(userID)   getAlarms(userID, 1);
+                                        console.log("Notifications mises à jour :", data);
+                                      })
+                                      .catch((error) => {
+                                        console.error("Erreur lors de la mise à jour :", error);
+                                      });
+                                  
+                                    setTimeout(() => setDropdownOpenNotification(false), 100);
+                                  }}
+                                >
                                   <div className="media align-items-center custom-card py-3 border-bottom" style={{ paddingBottom: "0.5rem !important" }}>
                                     <div>
                                       <img className="avatar-30 rounded-small" src="../asset/images/icon-report/3.png" alt="01" />
                                     </div>
                                     <div className="media-body ml-3">
                                       <div className="d-flex align-items-center justify-content-between">
-                                        <h6 className="mb-0">{notification.type}</h6>
+                                        <h6 className="mb-0">{notificationType[Number(notification.id_type-1)]}</h6>
                                         <small className="">
                                           <b>{new Date(notification.timestamp).toLocaleTimeString()}</b>
                                         </small>
                                       </div>
-                                      <small className="mb-0">{notification.message}</small>
+                                      <small className="mb-0">{generateDescription(notification)}</small>
                                     </div>
                                   </div>
-                                </a>
+
+                                </Link>
                               ))
                             ) : (
                               <p className="text-center p-2">{translate("No notifications available.")}</p>
