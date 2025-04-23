@@ -32,6 +32,10 @@ export function Servicing() {
 
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
+        // Ajouter temporairement au début de votre composant
+useEffect(() => {
+    localStorage.removeItem("selectedColumns"); // À retirer après utilisation
+}, []);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -44,6 +48,7 @@ export function Servicing() {
 
     
     
+
     const [selectedServicingId, setSelectedServicingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -53,14 +58,14 @@ export function Servicing() {
    ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
-        InvoiceNo: true,
-        Service: true,
+        InvoiceNo: false,
+        Service: false,
         Vehicle: true,
         Date: true,
-        Place: true,
-        Cost: true,
+        Place: false,
+        Cost: false,
         //Depreciation: true,
-        KM: false,
+        KM: true,
         //NextOilChange: true,
     
     };
@@ -82,9 +87,33 @@ export function Servicing() {
     };
 
     // Load selected columns from localStorage or use initial state
-    const loadSelectedColumns = () => {
+    /*const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+    };*/
+
+    const loadSelectedColumns = () => {
+        const savedColumns = localStorage.getItem("selectedColumns");
+        
+        if (savedColumns) {
+            const parsedColumns = JSON.parse(savedColumns);
+            
+            // Vérifier la structure des colonnes
+            const isValid = [
+                parsedColumns.ID !== undefined,
+                parsedColumns.Vehicle !== undefined,
+                parsedColumns.KM !== undefined
+            ].every(Boolean);
+    
+            if (!isValid) {
+                localStorage.removeItem("selectedColumns");
+                return initialColumns;
+            }
+            
+            return parsedColumns;
+        }
+        
+        return initialColumns;
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
