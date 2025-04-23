@@ -58,16 +58,14 @@ useEffect(() => {
    ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
+        Date: true,
+        Vehicle: true,
+        KM: true,
         InvoiceNo: false,
         Service: false,
-        Vehicle: true,
-        Date: true,
-        Place: false,
         Cost: false,
-        //Depreciation: true,
-        KM: true,
-        //NextOilChange: true,
-    
+        Place: false,
+        //Depreciation: true
     };
     
     const serviceMapping: { [key: number]: string } = {
