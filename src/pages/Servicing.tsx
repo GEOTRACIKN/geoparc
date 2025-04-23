@@ -54,13 +54,13 @@ export function Servicing() {
     const initialColumns = {
         ID: true,
         InvoiceNo: true,
-        Type: true,
+        Service: true,
         Vehicle: true,
         Date: true,
         Place: true,
         Cost: true,
         //Depreciation: true,
-        KM: true,
+        KM: false,
         //NextOilChange: true,
     
     };
@@ -446,7 +446,7 @@ export function Servicing() {
                                 </th>
                             )}
                             
-                            {selectedColumns.Type && (
+                            {selectedColumns.Service && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("type_servicing")}
@@ -517,13 +517,13 @@ export function Servicing() {
                                              {selectedColumns.Vehicle && (
                                                 <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
-                                             {selectedColumns.Km && (
+                                             {selectedColumns.KM && (
                                                 <td>{Servicing.km_servicing}</td>
                                             )}
                                               {selectedColumns.InvoiceNo && (
                                                 <td>{Servicing.invoice_no_servicing}</td>
                                             )}
-                                            {selectedColumns.Type && (
+                                            {selectedColumns.Service && (
                                                 <td>
                                                     {serviceMapping[Servicing.type_servicing]}
                                                 </td>
