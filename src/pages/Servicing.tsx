@@ -20,7 +20,7 @@ interface Servicing {
     place_servicing: string;
     cost_servicing: number;
     depreciation_servicing: number;
-    km_servicing: number;
+    kilometrage_reel_vehicule: number;
     next_oil_change_servicing: number;
     
 }
@@ -459,7 +459,7 @@ useEffect(() => {
                              {selectedColumns.KM && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("km_servicing")}
+                                    onClick={() => handleSortingColumn("kilometrage_reel_vehicule")}
                                 >
                                     {translate("KM")}
                                 </th>
@@ -545,7 +545,7 @@ useEffect(() => {
                                                 <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
                                              {selectedColumns.KM && (
-                                                <td>{Servicing.km_servicing}</td>
+                                                <td>{Servicing.kilometrage_reel_vehicule}</td>
                                             )}
                                               {selectedColumns.InvoiceNo && (
                                                 <td>{Servicing.invoice_no_servicing}</td>

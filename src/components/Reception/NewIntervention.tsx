@@ -32,7 +32,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         priority: "",
         statut: "Demande",
         id_vehicule: "",
-        km: "",
+        kilometrage_reel_vehicule: "",
         subject: "",
         client: "",
         clientPhone: "",
@@ -150,7 +150,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 priority: "",
                 statut: "",
                 id_vehicule: "",
-                km: "",
+                kilometrage_reel_vehicule: "",
                 subject: "",
                 client: "",
                 clientPhone: "",
@@ -247,12 +247,12 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                     />
                 </Form.Group>
 
-                    <Form.Group controlId="km">
+                    <Form.Group controlId="kilometrage_reel_vehicule">
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
                             placeholder="Entrez le kilométrage"
-                            value={formData.km}
+                            value={formData.kilometrage_reel_vehicule}
                             onChange={handleChange}
                             onKeyDown={(e) => {
                                 // Autorise seulement les touches numériques, suppr, backspace, tab, fleches

@@ -13,7 +13,7 @@ interface Schedule {
     id_planning: number;
     date_planification: string;
     immatriculation_vehicule: string;
-    km: number;
+    kilometrage_reel_vehicule: number;
     service: number;
     type_entretien: string,
     date_entretien: string,
@@ -373,10 +373,10 @@ export function InterviewSchedule() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.km && (
+                            {selectedColumns.kilometrage_reel_vehicule && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("km")}
+                                    onClick={() => handleSortingColumn("kilometrage_reel_vehicule")}
                                 >
                                     {translate("KM")}
                                 </th>
@@ -443,9 +443,9 @@ export function InterviewSchedule() {
                                             {Schedule.immatriculation_vehicule}
                                         </td>
                                     )}
-                                    {selectedColumns.km && (
+                                    {selectedColumns.kilometrage_reel_vehicule && (
                                         <td>
-                                            {Schedule.km}
+                                            {Schedule.kilometrage_reel_vehicule}
                                         </td>
                                     )}
                                     {selectedColumns["Interview date"] && (
