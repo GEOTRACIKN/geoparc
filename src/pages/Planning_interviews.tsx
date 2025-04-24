@@ -8,7 +8,6 @@ import { PropagateLoader } from "react-spinners";
 import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";
 import { Bounce, toast } from "react-toastify";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
 
 
 
@@ -24,6 +23,8 @@ interface Schedule {
 
 
 export function InterviewSchedule() {
+
+    const id_user = localStorage.getItem("GeopUserID");
 
     const { translate } = useTranslate();
     const [list_Schedule, setSchedule] = useState<Schedule[]>([]);

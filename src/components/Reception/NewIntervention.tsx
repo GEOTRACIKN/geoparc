@@ -6,7 +6,6 @@ import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
 
-const geopuserID = localStorage.getItem("GeopUserID");
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface ModalNewInterventionnProps {
@@ -39,6 +38,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         receptionistName: "",
         service: 0,
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
 
     const { translate } = useTranslate();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
@@ -277,7 +277,6 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                 <Form.Group controlId="km">
                     <Form.Label>{translate("Km")}</Form.Label>
                     <Form.Control
-                        type="number"
                         value={formData.km}
                         readOnly
                     />

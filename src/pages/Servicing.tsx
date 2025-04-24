@@ -9,7 +9,6 @@ import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
 import { Bounce, toast } from "react-toastify";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
 
 
 interface Servicing {
@@ -29,6 +28,8 @@ interface Servicing {
 
 
 export function Servicing() {
+
+    const id_user = localStorage.getItem("GeopUserID");
 
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
