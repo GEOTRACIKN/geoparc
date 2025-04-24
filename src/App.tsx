@@ -23,9 +23,6 @@ import { Permissions } from "./pages/Permissions";
 import { Drivers } from "./pages/Drivers";
 import { Contrat } from "./pages/Contrat";
 import { Training } from "./pages/Training";
-
-
-
 import { Warnings } from "./pages/Warnings";
 import { Violation} from "./pages/Violation";
 import { Fuel_consumption } from "./pages/Fuel_consumption";
@@ -36,6 +33,8 @@ import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
 import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
 import { Servicing } from "./pages/Servicing";
+import { Pneu } from "./pages/Pneu";
+
 
 
 import { InterviewSchedule } from "./pages/Planning_interviews";
@@ -161,10 +160,11 @@ function App() {
           <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
           <Route path="/fire-ext" element={<DashboardLayout>{<Fire/>}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
+          <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
-          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
           <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />

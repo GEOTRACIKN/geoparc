@@ -308,6 +308,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           to: "/servicing",
           permissionId: 41,
         },
+        {
+          id: 27,
+          label: "Pneu",
+          icon: "",
+          to: "/pneu",
+          permissionId: 41,
+        },
       ],
     },
     {
