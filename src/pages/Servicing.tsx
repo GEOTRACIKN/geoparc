@@ -8,7 +8,8 @@ import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
 import { Bounce, toast } from "react-toastify";
-
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const id_user = localStorage.getItem("GeopUserID");
 
 
 interface Servicing {
@@ -24,8 +25,7 @@ interface Servicing {
     next_oil_change_servicing: number;
     
 }
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
+
 
 
 export function Servicing() {
