@@ -32,7 +32,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
         place_servicing: "",
         cost_servicing: "",
         depreciation_servicing: "",
-        kilometrage_reel_vehicule: "",
+        km_servicing: "",
         next_oil_change_servicing: "",
     });
 
@@ -73,7 +73,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     place_servicing: servicing.place_servicing || "",
                     cost_servicing: servicing.cost_servicing || "",
                     depreciation_servicing: servicing.depreciation_servicing || "",
-                    kilometrage_reel_vehicule: servicing.kilometrage_reel_vehicule || "",
+                    km_servicing: servicing.km_servicing || "",
                     next_oil_change_servicing: servicing.next_oil_change_servicing || "",
                 });
             } else {
@@ -114,7 +114,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     type_servicing: formData.type_servicing || null,
                     cost_servicing: formData.cost_servicing || null,
                     depreciation_servicing: formData.depreciation_servicing || null,
-                    kilometrage_reel_vehicule: formData.kilometrage_reel_vehicule || null,
+                    km_servicing: formData.km_servicing || null,
                     next_oil_change_servicing: formData.next_oil_change_servicing || null,
                 }),
             });
@@ -198,13 +198,13 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                     </Form.Group>
 
                     
-                    <Form.Group controlId="kilometrage_reel_vehicule">
+                    <Form.Group controlId="km_servicing">
                         <Form.Label>{translate("KM")}</Form.Label>
                         <Form.Control
                             type="number"
                             readOnly={!isEditable}
                             //placeholder="Entrez le kilométrage"
-                            value={formData.kilometrage_reel_vehicule}
+                            value={formData.km_servicing}
                             onChange={handleChange}
                             onKeyDown={(e) => {
                                 // Autorise seulement les touches numériques, suppr, backspace, tab, fleches

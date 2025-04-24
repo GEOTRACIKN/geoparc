@@ -21,7 +21,7 @@ const ModalEditPlanninginterviews: React.FC<
     const [formData, setFormData] = useState({
         date_planification: "",
         vehicle: "",
-        kilometrage_reel_vehicule: "",
+        km: "",
         date_entretien: "",
         type_entretien: "",
     });
@@ -42,7 +42,7 @@ const ModalEditPlanninginterviews: React.FC<
                         planninginterview.date_planification
                     ),
                     vehicle: planninginterview.vehicule,
-                    kilometrage_reel_vehicule: planninginterview.kilometrage_reel_vehicule,
+                    km: planninginterview.km,
                     date_entretien: formatDateToTimestamp(planninginterview.date_entretien),
                     type_entretien: planninginterview.type_entretien,
                 });
@@ -190,12 +190,12 @@ const ModalEditPlanninginterviews: React.FC<
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="kilometrage_reel_vehicule">
+                    <Form.Group controlId="km">
                         <Form.Label>{translate("Km")}</Form.Label>
                         <Form.Control
                             type="number"
-                            placeholder={translate("Enter kilometrage_reel_vehicule")}
-                            value={formData.kilometrage_reel_vehicule}
+                            placeholder={translate("Enter km")}
+                            value={formData.km}
                             onChange={handleChange}
                             readOnly
                         />

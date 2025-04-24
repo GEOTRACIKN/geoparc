@@ -16,7 +16,7 @@ interface Schedule {
     id_planning: number;
     date_planification: string;
     immatriculation_vehicule: string;
-    kilometrage_reel_vehicule: number;
+    km: number;
     service: number;
     type_entretien: string,
     date_entretien: string,
@@ -374,17 +374,17 @@ export function InterviewSchedule() {
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.kilometrage_reel_vehicule && (
+                            {selectedColumns.km && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("kilometrage_reel_vehicule")}
+                                    onClick={() => handleSortingColumn("km")}
                                 >
                                     {translate("KM")}
                                 </th>
                             )}
                             {selectedColumns["Interview date"] && (
                                 <th
-                                    className="sorting "
+                                   className="sorting "
                                     onClick={() => handleSortingColumn("date_entretien")}
                                 >
                                     {translate("Interview date")}
@@ -444,9 +444,9 @@ export function InterviewSchedule() {
                                             {Schedule.immatriculation_vehicule}
                                         </td>
                                     )}
-                                    {selectedColumns.kilometrage_reel_vehicule && (
+                                    {selectedColumns.km && (
                                         <td>
-                                            {Schedule.kilometrage_reel_vehicule}
+                                            {Schedule.km}
                                         </td>
                                     )}
                                     {selectedColumns["Interview date"] && (
