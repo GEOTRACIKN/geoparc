@@ -187,7 +187,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Brand")}{translate(" *")}</Form.Label>
+                        <Form.Label>{translate("Modele")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.modele_pneu}
@@ -196,7 +196,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
                     </Form.Group>
 
                     <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Select
                             options={vehicles.map(vehicle => ({
                                 value: vehicle.id_vehicule,
@@ -230,11 +230,44 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
+                    <Form.Group controlId="modele_pneu">
+                        <Form.Label>{translate("Pneu a installer/desinstaller")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.modele_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="modele_pneu">
+                        <Form.Label>{translate("Position")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.modele_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="modele_pneu">
+                        <Form.Label>{translate("Technicien")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.modele_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="modele_pneu">
+                        <Form.Label>{translate("Durée")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.modele_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+
 
                     <Form.Group controlId="cout_pneu">
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
-                            type="number"
+                            type="text"
                             value={formData.cout_pneu}
                             onChange={handleChange}
                             onKeyDown={(e) => {

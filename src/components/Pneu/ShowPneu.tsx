@@ -20,9 +20,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_pneu: "",
-        product_pneu: "",
+        modele_pneu: "",
         date_achat_pneu: "",
-        cost_pneu: "",
+        cout_pneu: "",
         type_pneu: "",
         immatriculation_vehicule: "",
     });
@@ -49,9 +49,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
 
                 setFormData({
                     id_pneu: data.id_pneu,
-                    product_pneu: data.product_pneu,
+                    modele_pneu: data.modele_pneu,
                     date_achat_pneu: formatDateToTimestamp(data.date_achat_pneu),
-                    cost_pneu: data.cost_pneu,
+                    cout_pneu: data.cout_pneu,
                     type_pneu: data.type_pneu,
                     immatriculation_vehicule: data.immatriculation_vehicule
                 });
@@ -76,9 +76,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
             </Modal.Header>
             <Form>
                 <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
-                    <Form.Group controlId="product_pneu">
+                    <Form.Group controlId="modele_pneu">
                         <Form.Label>{translate("Product")}</Form.Label>
-                        <Form.Control value={formData.product_pneu} readOnly />
+                        <Form.Control value={formData.modele_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="date_achat_pneu">
@@ -88,9 +88,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
 
                     
 
-                    <Form.Group controlId="cost_pneu">
+                    <Form.Group controlId="cout_pneu">
                         <Form.Label>{translate("Cost")}</Form.Label>
-                        <Form.Control value={formData.cost_pneu} readOnly />
+                        <Form.Control value={formData.cout_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="type_pneu">
