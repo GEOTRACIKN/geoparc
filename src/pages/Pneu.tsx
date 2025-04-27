@@ -14,7 +14,6 @@ interface Pneu {
     id_pneu: number;
     produit_pneu: string;
     date_achat_pneu: string;
-    date_expiration_pneu: string;
     cout_pneu: string;
     type_pneu: string;
     immatriculation_vehicule: string;
@@ -43,7 +42,6 @@ export function Pneu() {
         Type: true,
         Vehicle: true,
         "Purchase Date": true,
-        "Expiration Date": true,
         Cost: true,
     };
 
@@ -143,9 +141,7 @@ export function Pneu() {
             case translate("Type"):
                 setType(2);
                 break;
-            case translate("Expiration Date"):
-                setType(3);
-                break;
+           
             case translate("Cost"):
                 setType(4);
                 break;
@@ -203,7 +199,6 @@ export function Pneu() {
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Expiration Date")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -289,11 +284,7 @@ export function Pneu() {
                                     {translate("Purchase Date")}
                                 </th>
                             )}
-                            {selectedColumns["Expiration Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_expiration_pneu")}>
-                                    {translate("Expiration Date")}
-                                </th>
-                            )}
+                        
                             {selectedColumns.Cost && (
                                 <th className="sorting" onClick={() => handleSortingColumn("cout_pneu")}>
                                     {translate("Cost")}
@@ -315,8 +306,8 @@ export function Pneu() {
                                 </td>
                             </tr>
                         ) : Array.isArray(list_pneu) && list_pneu.length !== 0 ? (
-                            list_pneu.map((pneu, index) => (
-                                <tr key={pneu.id_pneu}>
+                            list_pneu.map((Pneu, index) => (
+                                <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
                                             <input
@@ -325,36 +316,53 @@ export function Pneu() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.ID && <td>{pneu.id_pneu}</td>}
-                                    {selectedColumns.Product && <td>{pneu.produit_pneu}</td>}
-                                    {selectedColumns.Vehicle && <td>{pneu.immatriculation_vehicule}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(pneu.date_achat_pneu)}</td>}
-                                    {selectedColumns["Expiration Date"] && <td>{formatDateToTimestamp(pneu.date_expiration_pneu)}</td>}
-                                    {selectedColumns.Cost && <td>{pneu.cout_pneu}</td>}
-                                    {selectedColumns.Type && <td>{pneu.type_pneu}</td>}
-                                    <td className="text-right">
-                                        <Button
-                                            variant="warning"
-                                            size="sm"
-                                            onClick={() => handleEditPneuModal(pneu.id_pneu)}
-                                        >
-                                            {translate("Edit")}
-                                        </Button>
-                                        <Button
-                                            variant="info"
-                                            size="sm"
-                                            onClick={() => handleShowShowPneuModal(pneu.id_pneu)}
-                                        >
-                                            {translate("View")}
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={() => handleDeletePneuModal(pneu.id_pneu)}
-                                        >
-                                            {translate("Delete")}
-                                        </Button>
-                                    </td>
+                                    {selectedColumns.ID && 
+                                    <td>{Pneu.id_pneu}
+                                    </td>}
+                                    {selectedColumns.Product && <td>{Pneu.produit_pneu}</td>}
+                                    {selectedColumns.Vehicle && <td>{Pneu.immatriculation_vehicule}</td>}
+                                    {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(Pneu.date_achat_pneu)}</td>}
+                                    {selectedColumns.Cost && <td>{Pneu.cout_pneu}</td>}
+                                    {selectedColumns.Type && <td>{Pneu.type_pneu}</td>}
+                                    <td className="text-center">
+                                            <div className="d-flex justify-content-center align-items-center list-action">
+                                                {/* View Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-primary mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Détail"
+                                                    onClick={() => handleShowShowPneuModal(Pneu.id_pneu)}
+                                                >
+                                                    <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+
+                                                {/* Edit Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge badge-success mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Edit"
+                                                    onClick={() => handleEditPneuModal(Pneu.id_pneu)}
+                                                >
+                                                    <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+
+                                                {/* Delete Button */}
+                                                <Link
+                                                    to={``}
+                                                    className="badge bg-danger mr-2"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Delete"
+                                                    onClick={() => handleDeletePneuModal(Pneu.id_pneu)}
+                                                >
+                                                    <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                                                </Link>
+                                            </div>
+                                        </td>
                                 </tr>
                             ))
                         ): (

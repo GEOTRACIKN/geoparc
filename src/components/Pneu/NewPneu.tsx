@@ -25,7 +25,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_pneu: "",
-        reference_pneu: "",
+        modele_pneu: "",
         date_achat_pneu: "",
         cout_pneu: "",
         type_pneu: "",
@@ -80,7 +80,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
     const handleClose = () => {
         setFormData({
          id_pneu: "",
-        reference_pneu: "",
+        modele_pneu: "",
         date_achat_pneu: "",
         cout_pneu: "",
         type_pneu: "",
@@ -91,7 +91,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 
     const validateForm = () => {
         if (
-            //!formData.reference_pneu ||
+            //!formData.modele_pneu ||
             //!formData.date_expiration_pneu ||
             !formData.id_vehicule
         ) {
@@ -127,7 +127,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
         }
 
         try {
-            const response = await fetch(`${backendUrl}/api/geop/addnewtire/${geopuserID}`, {
+            const response = await fetch(`${backendUrl}/api/geop/addnewpneu/${geopuserID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -152,7 +152,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 
             setFormData({
                 id_pneu: "",
-                reference_pneu: "",
+                modele_pneu: "",
                 date_achat_pneu: "",
                 cout_pneu: "",
                 type_pneu: "",
@@ -186,11 +186,11 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="reference_pneu">
+                    <Form.Group controlId="modele_pneu">
                         <Form.Label>{translate("Brand")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="text"
-                            value={formData.reference_pneu}
+                            value={formData.modele_pneu}
                             onChange={handleChange}
                         />
                     </Form.Group>

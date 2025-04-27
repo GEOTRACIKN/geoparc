@@ -29,7 +29,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_pneu: "",
-        reference_pneu: "",
+        modele_pneu: "",
         date_achat_pneu: "",
         cout_pneu: "",
         type_pneu: "",
@@ -130,7 +130,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({
     const handleClose = () => {
         setFormData({
             id_pneu: "",
-            reference_pneu: "",
+            modele_pneu: "",
             date_achat_pneu: "",
             cout_pneu: "",
             type_pneu: "",
@@ -141,7 +141,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({
 
     const validateForm = () => {
         if (
-            !formData.reference_pneu ||
+            !formData.modele_pneu ||
             !formData.id_vehicule
         ) {
             toast.error(translate("Veuillez remplir tous les champs"), {
@@ -241,11 +241,11 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="reference_pneu">
+                    <Form.Group controlId="modele_pneu">
                         <Form.Label>{translate("Référence")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="text"
-                            value={formData.reference_pneu}
+                            value={formData.modele_pneu}
                             onChange={handleChange}
                         />
                     </Form.Group>
