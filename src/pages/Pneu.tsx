@@ -12,7 +12,7 @@ import ModalDeletePneu from "../components/Pneu/DeletePneu";
 
 interface Pneu {
     id_pneu: number;
-    modele_pneu: string;
+    num_facture_pneu: string;
     date_achat_pneu: string;
     cout_pneu: string;
     type_pneu: string;
@@ -270,7 +270,7 @@ export function Pneu() {
                                 </th>
                             )}
                             {selectedColumns.Product && (
-                                <th className="sorting" onClick={() => handleSortingColumn("modele_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("num_facture_pneu")}>
                                     {translate("Product")}
                                 </th>
                             )}
@@ -295,7 +295,7 @@ export function Pneu() {
                                     {translate("Type")}
                                 </th>
                             )}
-                            <th className="text-right">{translate("Actions")}</th>
+                            <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -319,7 +319,7 @@ export function Pneu() {
                                     {selectedColumns.ID && 
                                     <td>{Pneu.id_pneu}
                                     </td>}
-                                    {selectedColumns.Product && <td>{Pneu.modele_pneu}</td>}
+                                    {selectedColumns.Product && <td>{Pneu.num_facture_pneu}</td>}
                                     {selectedColumns.Vehicle && <td>{Pneu.immatriculation_vehicule}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(Pneu.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{Pneu.cout_pneu}</td>}

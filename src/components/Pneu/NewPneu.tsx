@@ -25,10 +25,16 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_pneu: "",
-        modele_pneu: "",
+        num_facture_pneu: "",
+        km_pneu:"",
         date_achat_pneu: "",
+        etat_pneu:"",
+        position_pneu:"",
         cout_pneu: "",
         type_pneu: "",
+        fournisseur_pneu:"",
+        temps_amort:"",
+
         id_vehicule: "",
     });
 
@@ -80,10 +86,15 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
     const handleClose = () => {
         setFormData({
          id_pneu: "",
-        modele_pneu: "",
+        num_facture_pneu: "",
+        km_pneu:"",
         date_achat_pneu: "",
+        etat_pneu:"",
+        position_pneu:"",
         cout_pneu: "",
         type_pneu: "",
+        fournisseur_pneu:"",
+        temps_amort:"",
         id_vehicule: "",
         });
         onHide();
@@ -91,7 +102,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 
     const validateForm = () => {
         if (
-            //!formData.modele_pneu ||
+            //!formData.num_facture_pneu ||
             //!formData.date_expiration_pneu ||
             !formData.id_vehicule
         ) {
@@ -152,10 +163,16 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
 
             setFormData({
                 id_pneu: "",
-                modele_pneu: "",
+                num_facture_pneu: "",
+                km_pneu:"",
                 date_achat_pneu: "",
+                etat_pneu:"",
+                position_pneu:"",
                 cout_pneu: "",
                 type_pneu: "",
+                fournisseur_pneu:"",
+                temps_amort:"",
+
                 id_vehicule: "",
             });
 
@@ -179,6 +196,12 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
         }
     };
 
+    const getVehicleKm = async (id_vehicule: string | number) => {
+        const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+        if (!res.ok) throw new Error("Erreur récupération km");
+        return await res.json();
+    };
+
     return (
         <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
@@ -186,83 +209,132 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Modele")}</Form.Label>
+                    <Form.Group controlId="num_facture_pneu">
+                        <Form.Label>{translate("N° Facture")}</Form.Label>
                         <Form.Control
                             type="text"
-                            value={formData.modele_pneu}
+                            value={formData.num_facture_pneu}
                             onChange={handleChange}
                         />
                     </Form.Group>
 
                     <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Select
-                            options={vehicles.map(vehicle => ({
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
                                 value: vehicle.id_vehicule,
                                 label: vehicle.immatriculation_vehicule
-                            })) as { value: number; label: string }[]}
-                            placeholder={translate("Select Vehicle")}
-                            isLoading={vehicles.length === 0}
-                            noOptionsMessage={() => translate("No vehicles available")}
-                            isSearchable
-                            value={vehicles
-                                .map(vehicle => ({
-                                    value: vehicle.id_vehicule,
-                                    label: vehicle.immatriculation_vehicule
-                                }))
-                                .find(option => String(option.value) === String(formData.id_vehicule)) || null
-                            }
-                            onChange={(selectedOption) => {
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={async (selectedOption) => {
+                            const id = selectedOption ? String(selectedOption.value) : "";
+                        
+                            if (id) {
+                                try {
+                                    const data = await getVehicleKm(id);
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        id_vehicule: id,
+                                        km_pneu: data.kilometrage_vehicule || "",
+                                    }));
+                                } catch (error) {
+                                    console.error("Erreur lors de la récupération du km:", error);
+                                    toast.error("Erreur récupération kilométrage", {
+                                        position: "bottom-right",
+                                        autoClose: 2400,
+                                        transition: Bounce,
+                                    });
+                                }
+                            } else {
                                 setFormData(prev => ({
                                     ...prev,
-                                    id_vehicule: selectedOption ? String(selectedOption.value) : ""
+                                    id_vehicule: "",
+                                    km_pneu: "",
                                 }));
-                            }}
+                            }
+                        }}                        
+                    />
+
+                </Form.Group>
+                <Form.Group controlId="km_pneu">
+                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.km_pneu}
+                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
 
                     <Form.Group controlId="date_achat_pneu">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control
-                            type="date"
-                            value={formData.date_achat_pneu}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Pneu a installer/desinstaller")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.modele_pneu}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Position")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.modele_pneu}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Technicien")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.modele_pneu}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="modele_pneu">
-                        <Form.Label>{translate("Durée")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.modele_pneu}
+                            type="datetime-local"
+                            value={
+                                formData.date_achat_pneu
+                                    ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16)
+                                    : ""
+                                }
                             onChange={handleChange}
                         />
                     </Form.Group>
 
+                     <Form.Group controlId="etat_pneu">
+                     <Form.Label>{translate("Pneu à installer/désinstaller")}</Form.Label>
+                                                        <Form.Control
+                                                            as="select"
+                                                            value={formData.etat_pneu}
+                                                            onChange={handleChange}
+                                                        >
+                                                            <option value="installer">{translate("Installer")}</option>
+                                                            <option value="desinstaller">{translate("Désinstaller")}</option>
+                                                        </Form.Control>
+                                                    </Form.Group>                                                        
+                    <Form.Group controlId="position_pneu">
+                        <Form.Label>{translate("Position")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.position_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="fournisseur_pneu">
+                        <Form.Label>{translate("Fournisseur")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.fournisseur_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="temps_amort">
+                        <Form.Label>{translate("Durée")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.temps_amort}
+                            onChange={handleChange}
+                            onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            min="0"
+                        />
+                    </Form.Group>
 
                     <Form.Group controlId="cout_pneu">
                         <Form.Label>{translate("Cost")}</Form.Label>
@@ -280,14 +352,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="type_pneu">
-                        <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_pneu}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
+                   
                 </Modal.Body>
 
                 <Modal.Footer>
