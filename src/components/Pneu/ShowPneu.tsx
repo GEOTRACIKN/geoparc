@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
-import moment from 'moment'; // Importation de moment.js
-import { formatDateToTimestamp } from "../../utilities/functions";
+import moment from 'moment';
 
 interface ModalShowPneuProps {
     show: boolean;
@@ -13,22 +12,18 @@ interface ModalShowPneuProps {
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
-    show,
-    onHide,
-    id_pneu,
-}) => {
+const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) => {
     const [formData, setFormData] = useState({
         id_pneu: "",
         num_facture_pneu: "",
-        km_pneu:"",
+        km_pneu: "",
         date_achat_pneu: "",
-        etat_pneu:"",
-        position_pneu:"",
+        etat_pneu: "",
+        position_pneu: "",
         cout_pneu: "",
         type_pneu: "",
-        fournisseur_pneu:"",
-        temps_amort:"",
+        fournisseur_pneu: "",
+        temps_amort: "",
         immatriculation_vehicule: "",
     });
 
@@ -46,24 +41,21 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
             }
 
             const data = await response.json();
-
             console.log('API response for pneu:', data);
 
             if (data && data.id_pneu) {
-               
-
                 setFormData({
                     id_pneu: data.id_pneu,
-                num_facture_pneu: data.num_facture_pneu,
-                date_achat_pneu: data.date_achat_pneu,
-                km_pneu: data.km_pneu,
-                cout_pneu: data.cout_pneu,
-                type_pneu: data.type_pneu,
-                immatriculation_vehicule: data.immatriculation_vehicule,
-                etat_pneu: data.etat_pneu || "", // added etat_pneu
-                position_pneu: data.position_pneu || "", // added position_pneu
-                fournisseur_pneu: data.fournisseur_pneu || "", // added fournisseur_pneu
-                temps_amort: data.temps_amort || "" // added temps_amort
+                    num_facture_pneu: data.num_facture_pneu,
+                    date_achat_pneu: data.date_achat_pneu,
+                    km_pneu: data.km_pneu,
+                    cout_pneu: data.cout_pneu,
+                    type_pneu: data.type_pneu,
+                    immatriculation_vehicule: data.immatriculation_vehicule,
+                    etat_pneu: data.etat_pneu || "",
+                    position_pneu: data.position_pneu || "",
+                    fournisseur_pneu: data.fournisseur_pneu || "",
+                    temps_amort: data.temps_amort || ""
                 });
             } else {
                 console.warn('No pneu data found for the provided ID.');
@@ -79,105 +71,66 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({
         }
     }, [show]);
 
-    
-
     return (
-        <Modal show={show} onHide={onHide} backdrop="static" responsive>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
             <Form>
-                <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
+                <Modal.Body>
+                    
                     <Form.Group controlId="num_facture_pneu">
                         <Form.Label>{translate("N° Facture")}</Form.Label>
                         <Form.Control value={formData.num_facture_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="date_achat_pneu">
-                    <Form.Label>{translate("Purchase Date")}</Form.Label>
-                    <Form.Control
-                        value={
-                        formData.date_achat_pneu
-                            ? moment(formData.date_achat_pneu).format('YYYY-MM-DD HH:mm')
-                            : ""
-                        }
-                        readOnly
-                    />
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Control
+                            value={
+                                formData.date_achat_pneu
+                                    ? moment(formData.date_achat_pneu).format('YYYY-MM-DD HH:mm')
+                                    : ""
+                            }
+                            readOnly
+                        />
                     </Form.Group>
 
                     <Form.Group controlId="immatriculation_vehicule">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control value={formData.immatriculation_vehicule} readOnly />
                     </Form.Group>
+
                     <Form.Group controlId="km_pneu">
-                                                          <Form.Label>{translate("Km")}</Form.Label>
-                                                          <Form.Control
-                                                              type="text"
-                                                              value={formData.km_pneu}
-                                                              readOnly
-                                                          />
-                                                      </Form.Group>
-                                  
-                                                      <Form.Group controlId="date_achat_pneu">
-                                                          <Form.Label>{translate("Purchase Date")}</Form.Label>
-                                                          <Form.Control
-                                                              type="datetime-local"
-                                                              value={
-                                                                  formData.date_achat_pneu
-                                                                      ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16)
-                                                                      : ""
-                                                                  }
-                                                          />
-                                                      </Form.Group>
-                                  
-                                                      <Form.Group controlId="etat_pneu">
-                                                       <Form.Label>{translate("Pneu à installer/désinstaller")}</Form.Label>
-                                                       <Form.Control
-                                                           as="select"
-                                                           value={formData.etat_pneu}
-                                                       >
-                                                           <option value="installer">{translate("Installer")}</option>
-                                                           <option value="desinstaller">{translate("Désinstaller")}</option>
-                                                       </Form.Control>
-                                                   </Form.Group>
-                   
-                                                      <Form.Group controlId="position_pneu">
-                                                          <Form.Label>{translate("Position")}</Form.Label>
-                                                          <Form.Control
-                                                              type="text"
-                                                              value={formData.position_pneu}
-                                                          />
-                                                      </Form.Group>
-                                                      <Form.Group controlId="fournisseur_pneu">
-                                                          <Form.Label>{translate("Fournisseur")}</Form.Label>
-                                                          <Form.Control
-                                                              type="text"
-                                                              value={formData.fournisseur_pneu}
-                                                          />
-                                                      </Form.Group>
-                                                      <Form.Group controlId="temps_amort ">
-                                                          <Form.Label>{translate("Durée")}</Form.Label>
-                                                          <Form.Control
-                                                              type="text"
-                                                              value={formData.temps_amort }
-                                                          />
-                                                      </Form.Group>
-                                  
-                                                      <Form.Group controlId="cout_pneu">
-                                                          <Form.Label>{translate("Cost")}</Form.Label>
-                                                          <Form.Control
-                                                              type="text"
-                                                              value={formData.cout_pneu}
-                                                              onKeyDown={(e) => {
-                                                                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                                                  if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                                                      e.preventDefault();
-                                                                  }
-                                                              }}
-                                                              min="0"
-                                                          />
-                                                      </Form.Group>
-                   
+                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Control type="text" value={formData.km_pneu} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="etat_pneu">
+                        <Form.Label>{translate("Pneu à installer/désinstaller")}</Form.Label>
+                        <Form.Control type="text" value={formData.etat_pneu} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="position_pneu">
+                        <Form.Label>{translate("Position")}</Form.Label>
+                        <Form.Control type="text" value={formData.position_pneu} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="fournisseur_pneu">
+                        <Form.Label>{translate("Fournisseur")}</Form.Label>
+                        <Form.Control type="text" value={formData.fournisseur_pneu} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="temps_amort">
+                        <Form.Label>{translate("Durée")}</Form.Label>
+                        <Form.Control type="text" value={formData.temps_amort} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="cout_pneu">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control type="text" value={formData.cout_pneu} readOnly />
+                    </Form.Group>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>

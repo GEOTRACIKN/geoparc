@@ -15,7 +15,7 @@ interface Pneu {
     num_facture_pneu: string;
     date_achat_pneu: string;
     cout_pneu: string;
-    type_pneu: string;
+    km_pneu: string;
     immatriculation_vehicule: string;
 }
 
@@ -38,8 +38,8 @@ export function Pneu() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        Product: true,
-        Type: true,
+        "N° Facture": true,
+        Km: true,
         Vehicle: true,
         "Purchase Date": true,
         Cost: true,
@@ -135,10 +135,10 @@ export function Pneu() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Product"):
+            case translate("N° Facture"):
                 setType(1);
                 break;
-            case translate("Type"):
+            case translate("Km"):
                 setType(2);
                 break;
            
@@ -195,8 +195,8 @@ export function Pneu() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Product")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("N° Facture")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Km")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
                             </Dropdown.Menu>
@@ -269,9 +269,9 @@ export function Pneu() {
                                     {translate("ID")}
                                 </th>
                             )}
-                            {selectedColumns.Product && (
+                            {selectedColumns["N° Facture"] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("num_facture_pneu")}>
-                                    {translate("Product")}
+                                    {translate("N° Facture")}
                                 </th>
                             )}
                             {selectedColumns.Vehicle && (
@@ -290,9 +290,9 @@ export function Pneu() {
                                     {translate("Cost")}
                                 </th>
                             )}
-                            {selectedColumns.Type && (
-                                <th className="sorting" onClick={() => handleSortingColumn("type_pneu")}>
-                                    {translate("Type")}
+                            {selectedColumns.Km && (
+                                <th className="sorting" onClick={() => handleSortingColumn("km_pneu")}>
+                                    {translate("Km")}
                                 </th>
                             )}
                             <th>{translate("Actions")}</th>
@@ -319,11 +319,11 @@ export function Pneu() {
                                     {selectedColumns.ID && 
                                     <td>{Pneu.id_pneu}
                                     </td>}
-                                    {selectedColumns.Product && <td>{Pneu.num_facture_pneu}</td>}
+                                    {selectedColumns["N° Facture"] && <td>{Pneu.num_facture_pneu}</td>}
                                     {selectedColumns.Vehicle && <td>{Pneu.immatriculation_vehicule}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(Pneu.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{Pneu.cout_pneu}</td>}
-                                    {selectedColumns.Type && <td>{Pneu.type_pneu}</td>}
+                                    {selectedColumns.Km && <td>{Pneu.km_pneu}</td>}
                                     <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">
                                                 {/* View Button */}
