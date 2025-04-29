@@ -310,7 +310,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
         {
           id: 27,
-          label: "Pneu",
+          label: "Tire Change",
           icon: "",
           to: "/pneu",
           permissionId: 41,
