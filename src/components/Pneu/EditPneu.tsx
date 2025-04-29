@@ -5,6 +5,7 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
 import Select from "react-select";
+import { PropagateLoader } from "react-spinners";
 
 interface Vehicle {
     id_vehicule: number;
@@ -34,6 +35,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         temps_amort: "",
         id_vehicule: "",
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const geopuserID = localStorage.getItem("GeopUserID");
@@ -43,6 +45,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         if (!id_pneu) return;
 
         const fetchPneu = async () => {
+            setIsLoading(true);
             try {
                 const response = await axios.get(`${backendUrl}/api/geop/showpneu/${id_pneu}`);
                 const data = response.data;
@@ -56,6 +59,8 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                 if (error instanceof AxiosError) {
                     console.error("Server response:", error.response?.data);
                 }
+            }finally {
+                setIsLoading(false);
             }
         };
 
@@ -135,13 +140,38 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         return await res.json();
     };
 
+    useEffect(() => {
+        if (!show) {
+            setFormData({
+                id_pneu: "",
+                num_facture_pneu: "",
+                km_pneu: "",
+                date_achat_pneu: "",
+                etat_pneu: "",
+                position_pneu: "",
+                cout_pneu: "",
+                type_pneu: "",
+                fournisseur_pneu: "",
+                temps_amort: "",
+                id_vehicule: "",
+            });
+        }
+    }, [show]);
+    
+
     return (
-        <Modal show={show} onHide={handleClose} backdrop="static">
+        <Modal show={show && !isLoading} onHide={handleClose} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Edit Tire")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
+                {isLoading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+                            <PropagateLoader color="#0059b3" size={12} />
+                        </div>
+                    ) : (
+                        <>
                     <Form.Group controlId="num_facture_pneu">
                         <Form.Label>{translate("Invoice Number")}</Form.Label>
                         <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
@@ -239,6 +269,8 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                             min="0"
                         />
                     </Form.Group>
+                    </>
+    )}
                 </Modal.Body>
 
                 <Modal.Footer>

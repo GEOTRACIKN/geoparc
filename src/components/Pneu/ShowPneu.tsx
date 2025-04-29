@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import moment from 'moment';
+import { PropagateLoader } from "react-spinners";
 
 interface ModalShowPneuProps {
     show: boolean;
@@ -28,8 +29,10 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
     });
 
     const { translate } = useTranslate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchPneu = async () => {
+        setIsLoading(true);
         try {
             const url = `${backendUrl}/api/geop/showpneu/${id_pneu}`;
             console.log('Request URL:', url);
@@ -63,6 +66,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
         } catch (error) {
             console.error('Error fetching pneu data:', error);
         }
+            finally {
+                setIsLoading(false);
+            }
     };
 
     useEffect(() => {
@@ -71,13 +77,39 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
         }
     }, [show]);
 
+      useEffect(() => {
+            if (!show) {
+                setFormData({
+                    id_pneu: "",
+                    num_facture_pneu: "",
+                    km_pneu: "",
+                    date_achat_pneu: "",
+                    etat_pneu: "",
+                    position_pneu: "",
+                    cout_pneu: "",
+                    type_pneu: "",
+                    fournisseur_pneu: "",
+                    temps_amort: "",
+                    immatriculation_vehicule: "",
+                });
+            }
+        }, [show]);
+
+        
+
     return (
-        <Modal show={show} onHide={onHide} backdrop="static">
+        <Modal show={show && !isLoading} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
             <Form>
                 <Modal.Body>
+                {isLoading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+                            <PropagateLoader color="#0059b3" size={12} />
+                        </div>
+                    ) : (
+                        <>
                     
                     <Form.Group controlId="num_facture_pneu">
                         <Form.Label>{translate("N° Facture")}</Form.Label>
@@ -130,13 +162,18 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control type="text" value={formData.cout_pneu} readOnly />
                     </Form.Group>
+                    </>
+
+                )}
 
                 </Modal.Body>
+                {!isLoading && (
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>
                         {translate("Close")}
                     </Button>
                 </Modal.Footer>
+                 )}
             </Form>
         </Modal>
     );
