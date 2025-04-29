@@ -768,5 +768,8 @@
   "Spare Tire": "الإطار الاحتياطي",
   "Select Status": "اختر الحالة",
   "Select Position": "اختر الموضع",
-  "Select a vehicle": "اختر مركبة" 
+  "Select a vehicle": "اختر مركبة" ,
+  "Inv. No.": "رقم الفاتورة",
+  "Supplier": "المورد",
+  "Km" :"كم"
 }

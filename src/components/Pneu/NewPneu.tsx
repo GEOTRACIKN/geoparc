@@ -137,7 +137,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <Form.Group controlId="num_facture_pneu">
-                        <Form.Label>{translate("N° Facture")}</Form.Label>
+                        <Form.Label>{translate("Inv. No.")}</Form.Label>
                         <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
                     </Form.Group>
 
@@ -224,12 +224,12 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                                         </Form.Group>
 
                     <Form.Group controlId="fournisseur_pneu">
-                        <Form.Label>{translate("Fournisseur")}</Form.Label>
+                        <Form.Label>{translate("Supplier")}</Form.Label>
                         <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
                     </Form.Group>
 
                     <Form.Group controlId="temps_amort">
-                        <Form.Label>{translate("Durée")}</Form.Label>
+                        <Form.Label>{translate("Duration")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.temps_amort}

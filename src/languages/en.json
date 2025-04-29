@@ -746,7 +746,8 @@
 "Select Status": "Select Status",
 "Select Position": "Select Position",
 "Select a vehicle": "Select a vehicle",
-"Error retrieving mileage": "Error retrieving mileage"
+"Error retrieving mileage": "Error retrieving mileage",
+  "Supplier": "Supplier"
 
 
 }

@@ -755,7 +755,9 @@
   "Spare Tire": "Roue de secours",
   "Select Status": "Sélectionner un état",
   "Select Position": "Sélectionner une position",
-  "Select a vehicle": "Sélectionner un véhicule"
+  "Select a vehicle": "Sélectionner un véhicule",
+  "Inv. No.": "N° Facture",
+  "Supplier": "Fournisseur"
 
 
 }

@@ -38,7 +38,7 @@ export function Pneu() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        "N° Facture": true,
+        "Inv. No.": true,
         Km: true,
         Vehicle: true,
         "Purchase Date": true,
@@ -135,7 +135,7 @@ export function Pneu() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("N° Facture"):
+            case translate("Inv. No."):
                 setType(1);
                 break;
             case translate("Km"):
@@ -195,7 +195,7 @@ export function Pneu() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("N° Facture")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Inv. No.")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Km")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
@@ -269,9 +269,9 @@ export function Pneu() {
                                     {translate("ID")}
                                 </th>
                             )}
-                            {selectedColumns["N° Facture"] && (
+                            {selectedColumns["Inv. No."] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("num_facture_pneu")}>
-                                    {translate("N° Facture")}
+                                    {translate("Inv. No.")}
                                 </th>
                             )}
                             {selectedColumns.Vehicle && (
@@ -319,7 +319,7 @@ export function Pneu() {
                                     {selectedColumns.ID && 
                                     <td>{Pneu.id_pneu}
                                     </td>}
-                                    {selectedColumns["N° Facture"] && <td>{Pneu.num_facture_pneu}</td>}
+                                    {selectedColumns["Inv. No."] && <td>{Pneu.num_facture_pneu}</td>}
                                     {selectedColumns.Vehicle && <td>{Pneu.immatriculation_vehicule}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(Pneu.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{Pneu.cout_pneu}</td>}

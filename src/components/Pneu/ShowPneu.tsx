@@ -112,7 +112,7 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                         <>
                     
                     <Form.Group controlId="num_facture_pneu">
-                        <Form.Label>{translate("N° Facture")}</Form.Label>
+                        <Form.Label>{translate("Inv. No.")}</Form.Label>
                         <Form.Control value={formData.num_facture_pneu} readOnly />
                     </Form.Group>
 
@@ -139,7 +139,7 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                     </Form.Group>
 
                     <Form.Group controlId="etat_pneu">
-                        <Form.Label>{translate("Pneu à installer/désinstaller")}</Form.Label>
+                        <Form.Label>{translate("Tire Status")}</Form.Label>
                         <Form.Control type="text" value={formData.etat_pneu} readOnly />
                     </Form.Group>
 
@@ -149,12 +149,12 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                     </Form.Group>
 
                     <Form.Group controlId="fournisseur_pneu">
-                        <Form.Label>{translate("Fournisseur")}</Form.Label>
+                        <Form.Label>{translate("Supplier")}</Form.Label>
                         <Form.Control type="text" value={formData.fournisseur_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="temps_amort">
-                        <Form.Label>{translate("Durée")}</Form.Label>
+                        <Form.Label>{translate("Duration")}</Form.Label>
                         <Form.Control type="text" value={formData.temps_amort} readOnly />
                     </Form.Group>
 

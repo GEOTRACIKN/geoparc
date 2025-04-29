@@ -173,7 +173,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                     ) : (
                         <>
                     <Form.Group controlId="num_facture_pneu">
-                        <Form.Label>{translate("Invoice Number")}</Form.Label>
+                        <Form.Label>{translate("Inv. No.")}</Form.Label>
                         <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
                     </Form.Group>
 
@@ -250,7 +250,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                     </Form.Group>
 
                     <Form.Group controlId="temps_amort">
-                        <Form.Label>{translate("Amortization Period (months)")}</Form.Label>
+                        <Form.Label>{translate("Duration")}</Form.Label>
                         <Form.Control type="text" value={formData.temps_amort} onChange={handleChange} />
                     </Form.Group>
 
