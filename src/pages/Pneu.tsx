@@ -145,6 +145,10 @@ export function Pneu() {
             case translate("Cost"):
                 setType(4);
                 break;
+
+            case translate("Vehicle"):
+                setType(6);
+                break;
             default:
                 console.log("Unknown selection");
                 break;
@@ -176,7 +180,7 @@ export function Pneu() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Pneus")} ({total})</h4>
+                <h4>{translate("Tire Change")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPneuModal} className="btn btn-primary mt-2 mr-1">

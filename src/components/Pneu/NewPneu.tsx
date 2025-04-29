@@ -131,7 +131,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
     return (
         <Modal show={show} onHide={handleClose} backdrop="static">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("New Pneu")}</Modal.Title>
+                <Modal.Title>{translate("New")}</Modal.Title>
             </Modal.Header>
 
             <Form onSubmit={handleSubmit}>
@@ -198,6 +198,8 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                                     ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16)
                                     : ""
                             }
+                            min="2000-01-01T00:00"
+                            max={new Date().toISOString().slice(0, 16)} // empêche une date future
                             onChange={handleChange}
                         />
                     </Form.Group>

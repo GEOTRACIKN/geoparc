@@ -73,15 +73,15 @@ const ModalDeletePneu: React.FC<ModalDeletePneuProps> = ({
     return (
         <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Supprimer")}</Modal.Title>
+                <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>{translate("Êtes-vous sûr de vouloir supprimer ce pneu ?")}</Modal.Body>
+            <Modal.Body>{translate("Are you sure you want to delete?")}</Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
-                    {translate("Fermer")}
+                    {translate("Close")}
                 </Button>
                 <Button variant="danger" onClick={handleDelete}>
-                    {translate("Supprimer")}
+                    {translate("Delete")}
                 </Button>
             </Modal.Footer>
         </Modal>

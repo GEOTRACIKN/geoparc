@@ -140,13 +140,36 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
 
                     <Form.Group controlId="etat_pneu">
                         <Form.Label>{translate("Tire Status")}</Form.Label>
-                        <Form.Control type="text" value={formData.etat_pneu} readOnly />
+                        <Form.Control
+                            type="text"
+                            value={formData.etat_pneu === "installer"
+                                ? translate("Install")
+                                : formData.etat_pneu === "desinstaller"
+                                ? translate("Uninstall")
+                                : formData.etat_pneu}
+                            readOnly
+                        />
                     </Form.Group>
+
 
                     <Form.Group controlId="position_pneu">
                         <Form.Label>{translate("Position")}</Form.Label>
-                        <Form.Control type="text" value={formData.position_pneu} readOnly />
+                        <Form.Control
+                            type="text"
+                            value={(() => {
+                                switch (formData.position_pneu) {
+                                    case "front_left": return translate("Front Left");
+                                    case "front_right": return translate("Front Right");
+                                    case "rear_left": return translate("Rear Left");
+                                    case "rear_right": return translate("Rear Right");
+                                    case "spare": return translate("Spare Tire");
+                                    default: return formData.position_pneu;
+                                }
+                            })()}
+                            readOnly
+                        />
                     </Form.Group>
+
 
                     <Form.Group controlId="fournisseur_pneu">
                         <Form.Label>{translate("Supplier")}</Form.Label>

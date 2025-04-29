@@ -162,7 +162,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
     return (
         <Modal show={show && !isLoading} onHide={handleClose} backdrop="static">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Tire")}</Modal.Title>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
@@ -219,6 +219,8 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                         <Form.Control
                             type="datetime-local"
                             value={formData.date_achat_pneu ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16) : ""}
+                            min="2000-01-01T00:00"
+                            max={new Date().toISOString().slice(0, 16)} // empêche une date future
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -226,10 +228,10 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                     <Form.Group controlId="etat_pneu">
                         <Form.Label>{translate("Tire Status")}</Form.Label>
                         <Form.Control as="select" value={formData.etat_pneu} onChange={handleChange}>
-                            <option value="">{translate("Select Status")}</option>
-                            <option value="installer">{translate("Install")}</option>
-                            <option value="desinstaller">{translate("Uninstall")}</option>
-                        </Form.Control>
+                        <option value="">{translate("Select Status")}</option>
+                        <option value="installer">{translate("Install")}</option>
+                        <option value="desinstaller">{translate("Uninstall")}</option>
+                    </Form.Control>
                     </Form.Group>
 
                     <Form.Group controlId="position_pneu">
