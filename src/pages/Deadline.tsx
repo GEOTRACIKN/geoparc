@@ -20,7 +20,7 @@ import enLocale from "@fullcalendar/core/locales/en-gb";
 import esLocale from '@fullcalendar/core/locales/es';
 import arLocale from "@fullcalendar/core/locales/ar";
 import interactionPlugin from "@fullcalendar/interaction";
-import { toTimestamp } from "../utilities/functions";
+import { toTimestamp, useClipboard } from "../utilities/functions";
 
 interface DeadlineInterface {
   id_deadline: number;
@@ -71,9 +71,7 @@ export function Deadline() {
   const [sort, setSort] = useState("DESC");
   const [total, setTotal] = useState(0);
   const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
-  const [selectedDeadlineId, setSelectedDeadlineId] = useState<number | null>(
-    null
-  );
+  const [selectedDeadlineId, setSelectedDeadlineId] = useState<number | null>( null);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [isGridView, setIsGridView] = useState(true);
@@ -82,6 +80,8 @@ export function Deadline() {
   const localizer = momentLocalizer(moment);
   type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
   const [mode, setMode] = useState<ModeType>("create");
+
+    const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
   const calendarRef = useRef<FullCalendar | null>(null);
   const changeView = (view: string) => {
@@ -266,8 +266,8 @@ export function Deadline() {
     }
   };
 
-  
-  
+
+
   const generatePlainTextDescription = (deadline: any) => {
     switch (deadline.id_type) {
       case 1:
@@ -602,7 +602,7 @@ export function Deadline() {
                   </div>
                 </th>
 
-                {selectedColumns.id_deadline && id_user=="1" && (<th className="sorting " onClick={() => handleSortingColumn("id_deadline")} > {translate("ID")} </th>)}
+                {selectedColumns.id_deadline && id_user == "1" && (<th className="sorting " onClick={() => handleSortingColumn("id_deadline")} > {translate("ID")} </th>)}
                 {selectedColumns.nom_type && (<th className="sorting " onClick={() => handleSortingColumn("nom_type")} > {translate("Type")} </th>)}
                 {selectedColumns.date_creation && (<th className="sorting " onClick={() => handleSortingColumn("date_creation")}> {translate("Creation date")}</th>)}
                 {selectedColumns.date_deadline && (<th className="sorting " onClick={() => handleSortingColumn("date_deadline")}> {translate("Deadline date")}</th>)}
@@ -633,34 +633,104 @@ export function Deadline() {
                       </div>
                     </td>
 
-                    {selectedColumns.id_deadline && id_user=="1" && (<td>{Deadline.id_deadline}</td>)}
+                    {selectedColumns.id_deadline && id_user == "1" && (<td>{Deadline.id_deadline}</td>)}
                     {selectedColumns.nom_type && <td> {translate(Deadline.nom_type)} </td>}
                     {selectedColumns.date_creation && (<td>{toTimestamp(Deadline.date_creation)}</td>)}
                     {selectedColumns.date_deadline && (<td>{toTimestamp(Deadline.date_deadline)}</td>)}
-                    {selectedColumns.id_item && (<td>
-                      {(() => {
-                        switch (Deadline.id_type) {
-                          case 1: // Driving license (Conducteur)
-                            return `${Deadline.prenom_conducteur} ${Deadline.nom_conducteur}`;
-                          case 2: // Vehicle insurance
-                          return Deadline.immatriculation_vehicule;
-                          case 3: // Maintenance
-                            return Deadline.immatriculation_vehicule;
-                          case 4: // Training
-                            return `${Deadline.training_prenom_conducteur} ${Deadline.training_nom_conducteur}`;
-                          case 5: // Fire extinguisher
-                            return Deadline.feu_immatriculation_vehicule;
-                          case 6: // Technical control
-                            return Deadline.immatriculation_vehicule;
-                          case 7: // Sticker
-                            return Deadline.immatriculation_vehicule;
-                          case 8: // Draining
-                            return Deadline.immatriculation_vehicule; // Ces types sont liés aux véhicules
-                          default:
-                            return Deadline.item_name || "N/A"; // Affichage par défaut
-                        }
-                      })()}
-                    </td>)}
+                    {selectedColumns.id_item && (
+                      <td
+                        id={`vehicle-${Deadline.id_deadline}`}
+                        style={{
+                          cursor: 'pointer',
+                          position: 'relative',
+                          color: copiedId === Deadline.id_deadline?.toString() ? '#28a745' : '#007bff',
+                        }}
+                        title={translate("Click to copy")}
+                        onClick={() => {
+                          let textToCopy = '';
+                          switch (Deadline.id_type) {
+                            case 1: // Driving license (Conducteur)
+                              textToCopy = `${Deadline.prenom_conducteur} ${Deadline.nom_conducteur}`;
+                              break;
+                            case 2: // Vehicle insurance
+                              textToCopy = Deadline.immatriculation_vehicule;
+                              break;
+                            case 3: // Maintenance
+                              textToCopy = Deadline.immatriculation_vehicule;
+                              break;
+                            case 4: // Training
+                              textToCopy = `${Deadline.training_prenom_conducteur} ${Deadline.training_nom_conducteur}`;
+                              break;
+                            case 5: // Fire extinguisher
+                              textToCopy = Deadline.feu_immatriculation_vehicule.toString();
+                              break;
+                            case 6: // Technical control
+                              textToCopy = Deadline.immatriculation_vehicule;
+                              break;
+                            case 7: // Sticker
+                              textToCopy = Deadline.immatriculation_vehicule;
+                              break;
+                            case 8: // Draining
+                              textToCopy = Deadline.immatriculation_vehicule;
+                              break;
+                            default:
+                              textToCopy = Deadline.item_name || "N/A";
+                          }
+
+                          if (textToCopy && Deadline.id_deadline?.toString()) {
+                            copyToClipboard(textToCopy, Deadline.id_deadline.toString());
+                          }
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: copiedId === Deadline.id_deadline?.toString() ? '#28a745' : '#007bff',
+                          }}
+                        >
+                          {(() => {
+                            switch (Deadline.id_type) {
+                              case 1: // Driving license (Conducteur)
+                                return `${Deadline.prenom_conducteur} ${Deadline.nom_conducteur}`;
+                              case 2: // Vehicle insurance
+                                return Deadline.immatriculation_vehicule;
+                              case 3: // Maintenance
+                                return Deadline.immatriculation_vehicule;
+                              case 4: // Training
+                                return `${Deadline.training_prenom_conducteur} ${Deadline.training_nom_conducteur}`;
+                              case 5: // Fire extinguisher
+                                return Deadline.feu_immatriculation_vehicule;
+                              case 6: // Technical control
+                                return Deadline.immatriculation_vehicule;
+                              case 7: // Sticker
+                                return Deadline.immatriculation_vehicule;
+                              case 8: // Draining
+                                return Deadline.immatriculation_vehicule;
+                              default:
+                                return Deadline.item_name || "N/A";
+                            }
+                          })()}
+                        </span>
+
+                        {copiedId === Deadline.id_deadline?.toString() && (
+                          <span
+                            style={{
+                              position: 'absolute',
+                              top: '-20px',
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              backgroundColor: '#28a745',
+                              color: '#fff',
+                              padding: '2px 5px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                            }}
+                          >
+                            {translate("Copied")}
+                          </span>
+                        )}
+                      </td>
+                    )}
+
 
                     <td className="text-center">
                       <div className="d-flex justify-content-center align-items-center list-action">
@@ -777,7 +847,7 @@ export function Deadline() {
             eventClick={(info: { event: { id: number } }) =>
               handleCalendarDeadlineModal(info.event.id)
             }
-            
+
             dayCellContent={renderDayCellContent}
             dayRender={(info: any) => {
               const date = info.dateStr;

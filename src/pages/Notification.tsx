@@ -3,7 +3,7 @@ import { Dropdown, Table } from "react-bootstrap";
 import { Link, NavLink, useParams } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { formatToTimestamp } from "../utilities/functions";
+import { formatToTimestamp, useClipboard } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
 
 interface NotificationsProps {
@@ -53,6 +53,8 @@ export function Notifications() {
   const handleSubmit = () => {
     // Votre logique de soumission ici
   };
+
+      const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
   const getNotifications = async (
     limitValue: number,
@@ -280,96 +282,144 @@ export function Notifications() {
   };
 
   const generateDescription = (alarme: NotificationsProps) => {
-    const highlight = (value: any) => (
-      <span style={{color:"#3b82f6"}} className="text-blue-500 font-semibold">{value}</span>
-    );
-
+    const highlight = (value: any, copyKey?: string) => {
+      const isCopied = copiedId === copyKey;
+      const color = isCopied ? "#28a745" : "#3b82f6";
+      return (
+        <span
+          onClick={() => {
+            if (value && copyKey) {
+              copyToClipboard(value, copyKey);
+            }
+          }}
+          title={copyKey ? translate("Click to copy") : ""}
+          style={{
+            color,
+            cursor: copyKey ? "pointer" : "default",
+            position: "relative",
+            fontWeight: 600,
+          }}
+        >
+          {value}
+          {isCopied && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: '#28a745',
+                color: '#fff',
+                padding: '2px 5px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                zIndex: 10,
+              }}
+            >
+              {translate("Copied")}
+            </span>
+          )}
+        </span>
+      );
+    };
+  
     switch (alarme.id_type) {
       case 1: // Driving license
         return (
           <>
             {translate("The driving license of")}{" "}
-            {highlight(alarme.nom_conducteur)}{" "}
-            {highlight(alarme.prenom_conducteur)} {translate("will expire on")}{" "}
-            {highlight(alarme.timestamp.split("T")[0].split("T")[0])}
+            {highlight(alarme.nom_conducteur, `nom-${alarme.id_item}`)}{" "}
+            {highlight(alarme.prenom_conducteur, `prenom-${alarme.id_item}`)}{" "}
+            {translate("will expire on")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 2: // Vehicle insurance
         return (
           <>
-            {translate("The insurance for")} {highlight(alarme.id_item)} 
-            {highlight(alarme.immatriculation_vehicule)}{" "}
-            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+            {translate("The insurance for")}{" "}
+            {highlight(alarme.id_item)}{" "}
+            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
+            {translate("will expire on")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 3: // Maintenance
         return (
           <>
             {translate("The next maintenance for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule)}{" "}
-            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
+            {translate("is due by")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 4: // Training
         return (
           <>
             {translate("The training certificate of")}{" "}
-            {highlight(alarme.training_nom_conducteur)}{" "}
-            {highlight(alarme.training_prenom_conducteur)}{" "}
-            {translate("will expire on")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.training_nom_conducteur, `train-nom-${alarme.id_item}`)}{" "}
+            {highlight(alarme.training_prenom_conducteur, `train-prenom-${alarme.id_item}`)}{" "}
+            {translate("will expire on")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 5: // Fire extinguisher verification
         return (
           <>
             {translate("The fire extinguisher verification for vehicle")}{" "}
-            {highlight(alarme.feu_immatriculation_vehicule)}{" "}
-            {translate("is due by")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.feu_immatriculation_vehicule, `feu-${alarme.id_item}`)}{" "}
+            {translate("is due by")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 6: // Technical control
         return (
           <>
             {translate("The technical inspection for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule)}{" "}
-            {translate("must be done before")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
+            {translate("must be done before")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 7: // Sticker
         return (
           <>
             {translate("The vehicle sticker verification for")}{" "}
-            {highlight(alarme.immatriculation_vehicule)}{" "}
-            {translate("should be done by")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
+            {translate("should be done by")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       case 8: // Draining
         return (
           <>
             {translate("The draining verification for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule)}{" "}
-            {translate("is scheduled for")} {highlight(alarme.timestamp.split("T")[0])}
+            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
+            {translate("is scheduled for")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
-
+  
       default:
         return (
           <>
-            {translate("The deadline for")} {highlight(alarme.id_item)} (
-            {highlight(alarme.immatriculation_vehicule)}){" "}
-            {translate("is set for")} {highlight(alarme.timestamp.split("T")[0])}
+            {translate("The deadline for")}{" "}
+            {highlight(alarme.id_item)} (
+            {highlight(alarme.immatriculation_vehicule, `default-${alarme.id_item}`)}){" "}
+            {translate("is set for")}{" "}
+            {highlight(alarme.timestamp.split("T")[0])}
           </>
         );
     }
   };
-
+  
   return (
     <>
       <div className="row">
