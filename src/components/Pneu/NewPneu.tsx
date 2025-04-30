@@ -22,6 +22,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
     const [formData, setFormData] = useState({
         id_pneu: "",
         num_facture_pneu: "",
+        source_pneu:"",
         km_pneu: "",
         date_achat_pneu: "",
         etat_pneu: "",
@@ -29,6 +30,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
         cout_pneu: "",
         type_pneu: "",
         fournisseur_pneu: "",
+        technicien_pneu:"",        
         temps_amort: "",
         id_vehicule: "",
     });
@@ -66,6 +68,9 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
         setFormData({
             id_pneu: "",
             num_facture_pneu: "",
+            source_pneu:"",
+            technicien_pneu:"",        
+            
             km_pneu: "",
             date_achat_pneu: "",
             etat_pneu: "",
@@ -141,6 +146,8 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                         <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
                     </Form.Group>
 
+                    
+
                     <Form.Group controlId="id_vehicule">
                         <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
                         <Select
@@ -199,7 +206,6 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                                     : ""
                             }
                             min="2000-01-01T00:00"
-                            max={new Date().toISOString().slice(0, 16)} // empêche une date future
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -211,7 +217,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                                                 <option value="installer">{translate("Install")}</option>
                                                 <option value="desinstaller">{translate("Uninstall")}</option>
                                             </Form.Control>
-                                        </Form.Group>
+                        </Form.Group>
 
                     <Form.Group controlId="position_pneu">
                                             <Form.Label>{translate("Position")}</Form.Label>
@@ -225,6 +231,19 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                                             </Form.Control>
                                         </Form.Group>
 
+
+
+                    <Form.Group controlId="source_pneu">
+                    <Form.Label>{translate("Tire Source")}</Form.Label>
+                        <Form.Control as="select" value={formData.source_pneu} onChange={handleChange}>
+                        <option value="">{translate("Select Source")}</option>
+                        <option value="internal">{translate("Internal")}</option>
+                        <option value="external">{translate("External")}</option>
+                        </Form.Control>
+                    </Form.Group>
+
+                                        {formData.source_pneu === "external" && (
+    <>
                     <Form.Group controlId="fournisseur_pneu">
                         <Form.Label>{translate("Supplier")}</Form.Label>
                         <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
@@ -259,6 +278,25 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                             }}
                         />
                     </Form.Group>
+                </>
+            )}
+
+            {formData.source_pneu === "internal" && (
+                <Form.Group controlId="technicien_pneu">
+                    <Form.Label>{translate("Technician")}</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={formData.technicien_pneu || ""}
+                        onChange={(e) =>
+                            setFormData((prev) => ({
+                                ...prev,
+                                technicien_pneu: e.target.value,
+                            }))
+                        }
+                    />
+                </Form.Group>
+            )}
+
                 </Modal.Body>
 
                 <Modal.Footer>

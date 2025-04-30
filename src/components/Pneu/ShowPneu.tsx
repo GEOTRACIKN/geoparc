@@ -17,6 +17,7 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
     const [formData, setFormData] = useState({
         id_pneu: "",
         num_facture_pneu: "",
+        source_pneu:"",
         km_pneu: "",
         date_achat_pneu: "",
         etat_pneu: "",
@@ -26,6 +27,7 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
         fournisseur_pneu: "",
         temps_amort: "",
         immatriculation_vehicule: "",
+        technicien_pneu: "",
     });
 
     const { translate } = useTranslate();
@@ -50,6 +52,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                 setFormData({
                     id_pneu: data.id_pneu,
                     num_facture_pneu: data.num_facture_pneu,
+                    source_pneu:data.source_pneu,
+                    technicien_pneu: data.technicien_pneu,
+
                     date_achat_pneu: data.date_achat_pneu,
                     km_pneu: data.km_pneu,
                     cout_pneu: data.cout_pneu,
@@ -82,6 +87,9 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                 setFormData({
                     id_pneu: "",
                     num_facture_pneu: "",
+                    technicien_pneu: "",
+
+                    source_pneu:"",
                     km_pneu: "",
                     date_achat_pneu: "",
                     etat_pneu: "",
@@ -170,21 +178,49 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                         />
                     </Form.Group>
 
+                    <Form.Group controlId="source_pneu">
+                    <Form.Label>{translate("Tire Source")}</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={
+                            formData.source_pneu === "internal"
+                                ? translate("Internal")
+                                : formData.source_pneu === "external"
+                                ? translate("External")
+                                : formData.source_pneu
+                        }
+                        readOnly
+                    />
+                </Form.Group>
+                                    
 
-                    <Form.Group controlId="fournisseur_pneu">
-                        <Form.Label>{translate("Supplier")}</Form.Label>
-                        <Form.Control type="text" value={formData.fournisseur_pneu} readOnly />
-                    </Form.Group>
+                     {formData.source_pneu === "internal" && (
+                        <Form.Group controlId="technicien_pneu">
+                            <Form.Label>{translate("Technician")}</Form.Label>
+                            <Form.Control type="text" value={formData.technicien_pneu} readOnly />
+                        </Form.Group>
+                     )}
 
-                    <Form.Group controlId="temps_amort">
-                        <Form.Label>{translate("Duration")}</Form.Label>
-                        <Form.Control type="text" value={formData.temps_amort} readOnly />
-                    </Form.Group>
 
-                    <Form.Group controlId="cout_pneu">
-                        <Form.Label>{translate("Cost")}</Form.Label>
-                        <Form.Control type="text" value={formData.cout_pneu} readOnly />
-                    </Form.Group>
+                    {formData.source_pneu === "external" && (
+                        <>
+                            <Form.Group controlId="fournisseur_pneu">
+                                <Form.Label>{translate("Supplier")}</Form.Label>
+                                <Form.Control type="text" value={formData.fournisseur_pneu} readOnly />
+                            </Form.Group>
+
+                            <Form.Group controlId="temps_amort">
+                                <Form.Label>{translate("Duration")}</Form.Label>
+                                <Form.Control type="text" value={formData.temps_amort} readOnly />
+                            </Form.Group>
+
+                            <Form.Group controlId="cout_pneu">
+                                <Form.Label>{translate("Cost")}</Form.Label>
+                                <Form.Control type="text" value={formData.cout_pneu} readOnly />
+                            </Form.Group>
+                        </>
+                    )}
+
                     </>
 
                 )}

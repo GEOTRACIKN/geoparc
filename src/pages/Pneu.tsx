@@ -410,7 +410,6 @@ export function Pneu() {
             <ModalNewPneu show={showNewPneuModal} onHide={handleCloseNewPneuModal} onSuccess={refreshData} />
             <ModalEditPneu show={showEditPneuModal} onHide={handleCloseEditPneuModal} id_pneu={selectedPneuId} onSuccess={refreshData} />
             <ModalDeletePneu show={showDeletePneuModal} onHide={handleCloseDeletePneuModal} id_pneu ={selectedPneuId} onSuccess={refreshData} />
-
             <ModalShowPneu show={showShowPneuModal} onHide={handleCloseShowPneuModal} id_pneu={selectedPneuId} />
 
            

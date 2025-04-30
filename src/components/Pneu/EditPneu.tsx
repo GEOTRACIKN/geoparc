@@ -25,6 +25,9 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
     const [formData, setFormData] = useState({
         id_pneu: "",
         num_facture_pneu: "",
+        source_pneu:"",
+        technicien_pneu:"",        
+
         km_pneu: "",
         date_achat_pneu: "",
         etat_pneu: "",
@@ -42,8 +45,8 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
     const { translate } = useTranslate();
 
     useEffect(() => {
-        if (!id_pneu) return;
-
+        if (!id_pneu || !show) return;
+    
         const fetchPneu = async () => {
             setIsLoading(true);
             try {
@@ -59,13 +62,14 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                 if (error instanceof AxiosError) {
                     console.error("Server response:", error.response?.data);
                 }
-            }finally {
+            } finally {
                 setIsLoading(false);
             }
         };
-
+    
         fetchPneu();
-    }, [id_pneu]);
+    }, [id_pneu, show]); // <-- ajout de show ici
+    
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -92,6 +96,9 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         setFormData({
             id_pneu: "",
             num_facture_pneu: "",
+            source_pneu:"",
+            technicien_pneu:"",        
+
             km_pneu: "",
             date_achat_pneu: "",
             etat_pneu: "",
@@ -145,6 +152,9 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
             setFormData({
                 id_pneu: "",
                 num_facture_pneu: "",
+                source_pneu:"",
+                technicien_pneu:"",        
+
                 km_pneu: "",
                 date_achat_pneu: "",
                 etat_pneu: "",
@@ -220,7 +230,6 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                             type="datetime-local"
                             value={formData.date_achat_pneu ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16) : ""}
                             min="2000-01-01T00:00"
-                            max={new Date().toISOString().slice(0, 16)} // empêche une date future
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -246,31 +255,72 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                         </Form.Control>
                     </Form.Group>
 
-                    <Form.Group controlId="fournisseur_pneu">
-                        <Form.Label>{translate("Supplier")}</Form.Label>
-                        <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
-                    </Form.Group>
 
-                    <Form.Group controlId="temps_amort">
-                        <Form.Label>{translate("Duration")}</Form.Label>
-                        <Form.Control type="text" value={formData.temps_amort} onChange={handleChange} />
-                    </Form.Group>
+                    <Form.Group controlId="source_pneu">
+                                        <Form.Label>{translate("Tire Source")}</Form.Label>
+                                            <Form.Control as="select" value={formData.source_pneu} onChange={handleChange}>
+                                            <option value="">{translate("Select Source")}</option>
+                                            <option value="internal">{translate("Internal")}</option>
+                                            <option value="external">{translate("External")}</option>
+                                            </Form.Control>
+                                        </Form.Group>
 
-                    <Form.Group controlId="cout_pneu">
-                        <Form.Label>{translate("Cost")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.cout_pneu}
-                            onChange={handleChange}
-                            onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
-                            min="0"
-                        />
-                    </Form.Group>
+                    
+                     
+                                                             {formData.source_pneu === "external" && (
+                         <>
+                                         <Form.Group controlId="fournisseur_pneu">
+                                             <Form.Label>{translate("Supplier")}</Form.Label>
+                                             <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
+                                         </Form.Group>
+                     
+                                         <Form.Group controlId="temps_amort">
+                                             <Form.Label>{translate("Duration")}</Form.Label>
+                                             <Form.Control
+                                                 type="text"
+                                                 value={formData.temps_amort}
+                                                 onChange={handleChange}
+                                                 onKeyDown={(e) => {
+                                                     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                                     if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                                         e.preventDefault();
+                                                     }
+                                                 }}
+                                             />
+                                         </Form.Group>
+                     
+                                         <Form.Group controlId="cout_pneu">
+                                             <Form.Label>{translate("Cost")}</Form.Label>
+                                             <Form.Control
+                                                 type="text"
+                                                 value={formData.cout_pneu}
+                                                 onChange={handleChange}
+                                                 onKeyDown={(e) => {
+                                                     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                                     if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                                         e.preventDefault();
+                                                     }
+                                                 }}
+                                             />
+                                         </Form.Group>
+                                     </>
+                                 )}
+                     
+                                 {formData.source_pneu === "internal" && (
+                                     <Form.Group controlId="technicien_pneu">
+                                         <Form.Label>{translate("Technician")}</Form.Label>
+                                         <Form.Control
+                                             type="text"
+                                             value={formData.technicien_pneu || ""}
+                                             onChange={(e) =>
+                                                 setFormData((prev) => ({
+                                                     ...prev,
+                                                     technicien_pneu: e.target.value,
+                                                 }))
+                                             }
+                                         />
+                                     </Form.Group>
+                                 )}
                     </>
     )}
                 </Modal.Body>
