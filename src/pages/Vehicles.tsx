@@ -26,9 +26,9 @@ import { Link, NavLink } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
 import { ButtonCustomHover } from "../components/ButtonHover";
 import { useNavigate } from "react-router-dom";
-import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
-import { toast } from "react-toastify";import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
-;
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, useClipboard } from "../utilities/functions";
+import { toast } from "react-toastify"; import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
+
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
 
@@ -144,14 +144,15 @@ export function Vehicles() {
   const [IdVehicle, setIdDVehicle] = useState<number>(0);
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
-const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); // Véhicules de la page actuelle
-  
+  const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); 
+  const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
+
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const etat = queryParams.get("etat_vehicule") || ""; // Récupère le paramètre `etat`  
   // State pour stocker les véhicules filtrés
-  
+
   console.log("État extrait de l'URL :", etat); // Vérifiez la valeur dans la console
   const handleClickLink = (navigateTo: string) => {
     if (navigateTo) {
@@ -168,7 +169,7 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
 
   const searchColum: { [key: string]: number } = {
     id_vehicule: 0,
-    immatriculation_vehicule: 1, 
+    immatriculation_vehicule: 1,
     vehicule_type: 2,
     // nom_conducteur: 3,
     username_user: 4,
@@ -177,10 +178,10 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
   const HandleDelete = async (id_vehicle: number) => {
     try {
       console.log(id_vehicle);
-       setModalStatus('Do you want to delete this vehicle');
-       setTitleStatus('Delete vehicle');
-       setIdUser(userID ? Number(userID) : 0);
-       setIdDVehicle(id_vehicle);
+      setModalStatus('Do you want to delete this vehicle');
+      setTitleStatus('Delete vehicle');
+      setIdUser(userID ? Number(userID) : 0);
+      setIdDVehicle(id_vehicle);
       // After successful deletion, update the vehicle list
       //  await updateVehicleList();
     } catch (error) {
@@ -259,24 +260,24 @@ const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface
 
 
   const filteredVehicles = etat
-  ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
-  : vehicles;
+    ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
+    : vehicles;
 
-console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+  console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
-const startIndex = (currentPage - 1) * limit;
-const endIndex = startIndex + limit;
-//const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
-console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
+  const startIndex = (currentPage - 1) * limit;
+  const endIndex = startIndex + limit;
+  //const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
+  console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
 
-const handleStateChange = (state: string) => {
-  const newStates = selectedStates.includes(state)
-    ? selectedStates.filter(s => s !== state)
-    : [...selectedStates, state];
-  setSelectedStates(newStates);
-  setCurrentPage(1); // Réinitialiser la page actuelle à 1
-};
+  const handleStateChange = (state: string) => {
+    const newStates = selectedStates.includes(state)
+      ? selectedStates.filter(s => s !== state)
+      : [...selectedStates, state];
+    setSelectedStates(newStates);
+    setCurrentPage(1); // Réinitialiser la page actuelle à 1
+  };
   // Dans le gestionnaire de changement d'état
   const handleStateFilter = (selectedStates: string[]) => {
     setSelectedStates(selectedStates);
@@ -285,12 +286,12 @@ const handleStateChange = (state: string) => {
   };
   const refreshVehiculeData = async () => {
     await getVehicles(
-      limit, 
-      currentPage, 
-      search, 
-      type, 
-      column, 
-      sort, 
+      limit,
+      currentPage,
+      search,
+      type,
+      column,
+      sort,
       selectedStates.join(',') // Envoi des états sélectionnés
     );
   };
@@ -394,7 +395,7 @@ const handleStateChange = (state: string) => {
     //setVehicles(commentsFormServer);
     window.scrollTo(0, 0);
   };
-  
+
 
   const handleResetSearch = async () => {
     setSearch("");
@@ -448,7 +449,7 @@ const handleStateChange = (state: string) => {
 
     console.log(updatedSetSelectedVehicles);
   };
-  
+
   useEffect(() => {
     const startIndex = (currentPage - 1) * limit;
     const endIndex = startIndex + limit;
@@ -466,7 +467,7 @@ const handleStateChange = (state: string) => {
     getVehicles(limit, currentPage, search, type, column, sort, etat);
   }, [currentPage, etat]);
 
- 
+
 
   const vehicleHeaders = [
     translate("ID"),
@@ -530,9 +531,9 @@ const handleStateChange = (state: string) => {
         vehicle.date_dernier_vidange || "",
         vehicle.kilometrage_prochain_entretien || "",
       ]);
-  
+
     const vehicleHeadersExcel = [
-     
+
       translate("Vehicle ID"),
       translate("License Plate"),
       translate("Category"),
@@ -574,14 +575,14 @@ const handleStateChange = (state: string) => {
       translate("Vignette Number"),
       translate("Vignette Date"),
       translate("Vignette Cost"),
-      
+
       translate("Last Oil Change (km)"),
       translate("Next Oil Change (km)"),
       translate("Last Oil Change Date"),
       translate("Next Maintenance Mileage"),
-      
+
     ];
-  
+
     generateExcelFile(translate("Vehicle List"), vehicleHeadersExcel, selectedData);
   };
   const downloadVehiclePDF = () => {
@@ -637,9 +638,9 @@ const handleStateChange = (state: string) => {
           >
             <h4 className="mb-3 text-nowrap">
               <i className="las la-car mr-2"></i>
-              {translate("Total Vehicles")} {totalVehiclesToDisplay}            
+              {translate("Total Vehicles")} {totalVehiclesToDisplay}
             </h4>
-           
+
           </div>
           <div className="col-sm-12 col-md-6">
             <div className="text-right">
@@ -705,7 +706,7 @@ const handleStateChange = (state: string) => {
                     </Dropdown.Menu>
 
                   </Dropdown>
-         {/*  <div className="col-sm-12 col-md-6">
+                  {/*  <div className="col-sm-12 col-md-6">
               <div className="input-group">
                 <Dropdown className="mr-2">
                   <Dropdown.Toggle variant="secondary" id="dropdown-states">
@@ -882,7 +883,7 @@ const handleStateChange = (state: string) => {
                   </div>
                 </th>
 
-                {selectedColumns.id_vehicule && userID=="1" && (
+                {selectedColumns.id_vehicule && userID == "1" && (
                   <th
                     className="sorting"
                     onClick={() => handleSortingColum("id_vehicule")}
@@ -980,9 +981,42 @@ const handleStateChange = (state: string) => {
                       </div>
                     </td>
 
-                    {selectedColumns.id_vehicule && userID=="1" && <td>{item.id_vehicule}</td>}
+                    {selectedColumns.id_vehicule && userID == "1" && <td>{item.id_vehicule}</td>}
                     {selectedColumns.model && (<td className="text-center">{item.modele_vehicule}</td>)}
-                    {selectedColumns.immatriculation_vehicule && (<td className="text-center">{item.immatriculation_vehicule}</td>)}
+                        {selectedColumns.immatriculation_vehicule && <td
+                        id={`vehicle-${item.id_vehicule}`}
+                        style={{ cursor: 'pointer', position: 'relative', color: copiedId === item.id_vehicule.toString() ? '#28a745' : '#007bff' }}
+                        title={translate("Click to copy the registration matriculation")}
+                        onClick={() => {
+                          if (item.immatriculation_vehicule && item.id_vehicule.toString()) {
+                            copyToClipboard(item.immatriculation_vehicule, item.id_vehicule.toString());
+                          }
+                        }} >{
+                          <>
+                            <span style={{ color: copiedId === item.id_vehicule.toString() ? '#28a745' : '#007bff' }}>
+                              {item.immatriculation_vehicule}
+                            </span>
+
+                            {copiedId === item.id_vehicule.toString() && (
+                              <span
+                                style={{
+                                  position: 'absolute',
+                                  top: '-20px',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  backgroundColor: '#28a745',
+                                  color: '#fff',
+                                  padding: '2px 5px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                }}
+                              >
+                                {translate("Matriculation Copied")}
+                              </span>
+                            )}
+                          </>
+                        }
+                      </td>}
                     {selectedColumns.state && (<td className="text-center"><span className="badge p-1 fs-6 btn"> {item.etat_vehicule}</span></td>)}
                     {/* {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)} */}
                     {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
@@ -1026,39 +1060,39 @@ const handleStateChange = (state: string) => {
               </span>
             </div>
             <div className="col-md-6 d-flex justify-content-end">
-            <ReactPaginate
-  previousLabel={translate("previous")}
-  nextLabel={translate("next")}
-  breakLabel={"..."}
-  pageCount={pageCount} // Nombre total de pages
-  marginPagesDisplayed={2}
-  pageRangeDisplayed={3}
-  onPageChange={handlePageClick} // Gérer le changement de page
-  containerClassName={"pagination justify-content-end"}
-  pageClassName={"page-item"}
-  pageLinkClassName={"page-link"}
-  previousClassName={"page-item"}
-  previousLinkClassName={"page-link"}
-  nextClassName={"page-item"}
-  nextLinkClassName={"page-link"}
-  breakClassName={"page-item"}
-  breakLinkClassName={"page-link"}
-  activeClassName={"active"}
-  forcePage={currentPage - 1} // Forcer la page active
-/>
+              <ReactPaginate
+                previousLabel={translate("previous")}
+                nextLabel={translate("next")}
+                breakLabel={"..."}
+                pageCount={pageCount} // Nombre total de pages
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={3}
+                onPageChange={handlePageClick} // Gérer le changement de page
+                containerClassName={"pagination justify-content-end"}
+                pageClassName={"page-item"}
+                pageLinkClassName={"page-link"}
+                previousClassName={"page-item"}
+                previousLinkClassName={"page-link"}
+                nextClassName={"page-item"}
+                nextLinkClassName={"page-link"}
+                breakClassName={"page-item"}
+                breakLinkClassName={"page-link"}
+                activeClassName={"active"}
+                forcePage={currentPage - 1} // Forcer la page active
+              />
             </div>
           </div>
         </div>
       </div>
       <VehicleModal
-          show={modalStatus !== null}
-          onHide={closeModal}
-          status={modalStatus}
-          title={titleStatus}
-          IdUser={IdUser}
-          IdVehicle={IdVehicle}
-          updateVehicleList={refreshVehiculeData}
-        />
+        show={modalStatus !== null}
+        onHide={closeModal}
+        status={modalStatus}
+        title={titleStatus}
+        IdUser={IdUser}
+        IdVehicle={IdVehicle}
+        updateVehicleList={refreshVehiculeData}
+      />
       <DownloadModal
         show={showDownloadModal}
         onHide={() => setShowDownloadModal(false)}
