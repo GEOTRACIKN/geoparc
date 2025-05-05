@@ -199,7 +199,7 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                                 <Form.Group controlId="date_achat_pneu">
                                     <Form.Label>{translate("Purchase Date")}</Form.Label>
                                     <Form.Control
-                                        type="date"
+                                        type="datetime-local"
                                         value={formData.date_achat_pneu}
                                         onChange={handleChange}
                                     />
