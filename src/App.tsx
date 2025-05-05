@@ -35,6 +35,9 @@ import { Garage } from "./pages/Garage";
 import { Servicing } from "./pages/Servicing";
 import { Pneu } from "./pages/Pneu";
 
+import { PneuStock } from "./pages/PneuStock";
+
+
 
 
 import { InterviewSchedule } from "./pages/Planning_interviews";
@@ -162,6 +165,8 @@ function App() {
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
+          <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
+
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
