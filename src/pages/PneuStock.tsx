@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalNewPneuStock from "../components/PneuStock/NewPneuStock";
-//import ModalShowPneuStock from "../components/PneuStock/ShowPneuStock";
+import ModalShowPneuStock from "../components/PneuStock/ShowPneuStock";
 import { PropagateLoader } from "react-spinners";
 //import ModalEditPneuStock from "../components/PneuStock/EditPneuStock";
 //import ModalDeletePneuStock from "../components/PneuStock/DeletePneuStock";
@@ -443,9 +443,10 @@ export function PneuStock() {
                 
             </div>
           <ModalNewPneuStock show={showNewPneuStockModal} onHide={handleCloseNewPneuStockModal} onSuccess={refreshData} />
-          { /*<ModalEditPneuStock show={showEditPneuStockModal} onHide={handleCloseEditPneuStockModal} id_pneu={selectedPneuStockId} onSuccess={refreshData} />
-            <ModalDeletePneuStock show={showDeletePneuStockModal} onHide={handleCloseDeletePneuStockModal} id_pneu ={selectedPneuStockId} onSuccess={refreshData} />
-            <ModalShowPneuStock show={showShowPneuStockModal} onHide={handleCloseShowPneuStockModal} id_pneu={selectedPneuStockId} />
+          <ModalShowPneuStock show={showShowPneuStockModal} onHide={handleCloseShowPneuStockModal} id_pneu_stock={selectedPneuStockId} />
+
+          { /*<ModalEditPneuStock show={showEditPneuStockModal} onHide={handleCloseEditPneuStockModal} id_pneu_stock={selectedPneuStockId} onSuccess={refreshData} />
+            <ModalDeletePneuStock show={showDeletePneuStockModal} onHide={handleCloseDeletePneuStockModal} id_pneu_stock ={selectedPneuStockId} onSuccess={refreshData} />
 */}
            
         </>
