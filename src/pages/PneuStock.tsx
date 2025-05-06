@@ -292,42 +292,42 @@ export function PneuStock() {
                                 </div>
                             </th>
                             {selectedColumns.ID && (
-                                <th onClick={() => handleSortingColumn("id_pneu_stock")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("id_pneu_stock")}>
                                     {translate("ID")}
                                 </th>
                             )}
                             {selectedColumns.Type && (
-                                <th onClick={() => handleSortingColumn("type_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("type_pneu")}>
                                     {translate("Type")}
                                 </th>
                             )}
                             {selectedColumns.Model && (
-                                <th onClick={() => handleSortingColumn("modele_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("modele_pneu")}>
                                     {translate("Model")}
                                 </th>
                             )}
                             {selectedColumns.Reference && (
-                                <th onClick={() => handleSortingColumn("ref_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("ref_pneu")}>
                                     {translate("Reference")}
                                 </th>
                             )}
                             {selectedColumns.Serial && (
-                                <th onClick={() => handleSortingColumn("num_serie_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("num_serie_pneu")}>
                                     {translate("Serial")}
                                 </th>
                             )}
                             {selectedColumns.Location && (
-                                <th onClick={() => handleSortingColumn("loc_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("loc_pneu")}>
                                     {translate("Location")}
                                 </th>
                             )}
                             {selectedColumns["Purchase Date"] && (
-                                <th onClick={() => handleSortingColumn("date_achat_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_pneu")}>
                                     {translate("Purchase Date")}
                                 </th>
                             )}
                             {selectedColumns.Cost && (
-                                <th onClick={() => handleSortingColumn("cout_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("cout_pneu")}>
                                     {translate("Cost")}
                                 </th>
                             )}
