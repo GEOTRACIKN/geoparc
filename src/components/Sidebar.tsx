@@ -357,13 +357,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
     {
       id: 42, // ID principal du menu Store
-      label: "Store",
+      label: "Stock",
       icon: "las la-store",
       permissionId: 42, // Doit exister dans ta table des permissions
       subItems: [
         {
           id: 42,
-          label: "Stock",
+          label: "Tire",
           icon: "las la-boxes",
           to: "/pneu_stock",
           permissionId: 42, // Permission spécifique à la vue "Stock"
