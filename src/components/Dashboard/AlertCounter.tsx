@@ -33,7 +33,7 @@ const AlertCounter: React.FC<AlertCounterProps> = ({
     
     const navigate = useNavigate();
     const handleNavigate = () => {
-        navigate(`/deadline/0/${id}`);
+        navigate(`/deadline/${id}`);
     };
 
     const [showModal, setShowModal] = React.useState(false);

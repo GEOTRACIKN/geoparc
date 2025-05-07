@@ -150,6 +150,7 @@ function App() {
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
           <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+          <Route path="/deadline/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/deadline/:id_alarm/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
