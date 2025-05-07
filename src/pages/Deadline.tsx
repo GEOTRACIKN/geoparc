@@ -764,7 +764,7 @@ export function Deadline() {
             <thead className="bg-white text-uppercase">
               <tr className="ligth ligth-data">
                 <th>
-                  <div className="form-check" style={{paddingLeft: "25px"}}>
+                  <div className="form-check" style={{paddingLeft: "0px"}}>
                     <input
                       className="form-check-input"
                       type="checkbox"
@@ -801,7 +801,7 @@ export function Deadline() {
                 list_Deadline.map((Deadline, index) => (
                   <tr key={index}>
                     <td>
-                      <div className="form-check form-check-inline" style={{paddingLeft: "25px"}}>
+                      <div className="form-check form-check-inline"  style={{paddingLeft: "80px"}}>
                         <input
                           type="checkbox"
                           className="form-check-input"
