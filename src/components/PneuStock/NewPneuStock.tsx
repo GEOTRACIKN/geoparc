@@ -101,6 +101,8 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
             });
         }
     };
+   
+      
 
     return (
         <Modal show={show} onHide={handleClose} backdrop="static">
@@ -110,110 +112,109 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
 
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <div className="row">
+                <div className="row">
+                    <Form.Group controlId="type_pneu">
+                        <Form.Label>{translate("Tire Type")} *</Form.Label>
+                        <Form.Control as="select" value={formData.type_pneu} onChange={handleChange} required>
+                            <option value="">{translate("-- Tire type --")}</option>
+                            <option value="utilitaire">{translate("Utility/Van")}</option>
+                            <option value="poids lourd">{translate("Heavy Truck")}</option>
+                            <option value="suv">{translate("SUV / 4x4")}</option>
+                            <option value="remorque">{translate("Trailer (small luggage)")}</option>
+                            <option value="voiture">{translate("Car/Passenger")}</option>
+                            <option value="agricole">{translate("Agricultural")}</option>
+                        </Form.Control>
+                    </Form.Group>
+
                     <Form.Group controlId="marque_pneu">
-                                <Form.Label>{translate("Brand")} *</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.marque_pneu} 
-                                    onChange={handleChange} 
-                                    required 
-                                />
-                            </Form.Group>
+                        <Form.Label>{translate("Brand")} *</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={formData.marque_pneu} 
+                            onChange={handleChange} 
+                            required 
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="type_pneu">
-                                <Form.Label>{translate("Tire Type")} *</Form.Label>
-                                <Form.Control as="select" value={formData.type_pneu} onChange={handleChange}>
-                                 
-                                <option value="">-- Tire type --</option>
-                                <option value="utilitaire">Utility/Van</option>
-                                <option value="poids lourd">Heavy Truck</option>
-                                <option value="suv">SUV / 4x4</option>
-                                <option value="remorque">Trailer (small luggage)</option>
-                                <option value="voiture">Car/Passenger</option>
-                                <option value="agricole">Agricultural</option>
+                    <Form.Group controlId="modele_pneu">
+                        <Form.Label>{translate("Model")} *</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={formData.modele_pneu} 
+                            onChange={handleChange} 
+                            required 
+                        />
+                    </Form.Group>
 
-                              </Form.Control>
-                            </Form.Group>
+                    <Form.Group controlId="ref_pneu">
+                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            placeholder={translate("Dimension/Load/Speed")}
+                            value={formData.ref_pneu} 
+                            onChange={handleChange} 
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="modele_pneu">
-                                <Form.Label>{translate("Model")} *</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.modele_pneu} 
-                                    onChange={handleChange} 
-                                    required 
-                                />
-                            </Form.Group>
+                    <Form.Group controlId="num_serie_pneu">
+                        <Form.Label>{translate("Serial Number")}</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={formData.num_serie_pneu} 
+                            onChange={handleChange} 
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="ref_pneu">
-                                <Form.Label>{translate("Reference")}</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    placeholder="Dimension/Charge/Vitesse"
-                                    value={formData.ref_pneu} 
-                                    onChange={handleChange} 
-                                />
-                            </Form.Group>
+                    <Form.Group controlId="loc_pneu">
+                        <Form.Label>{translate("Position")}</Form.Label>
+                        <Form.Control as="select" value={formData.loc_pneu} onChange={handleChange}>
+                            <option value="">{translate("Select Position")}</option>
+                            <option value="front_left">{translate("Front Left")}</option>
+                            <option value="front_right">{translate("Front Right")}</option>
+                            <option value="rear_left">{translate("Rear Left")}</option>
+                            <option value="rear_right">{translate("Rear Right")}</option>
+                            <option value="spare">{translate("Spare Tire")}</option>
+                        </Form.Control>
+                    </Form.Group>
 
-                            <Form.Group controlId="num_serie_pneu">
-                                <Form.Label>{translate("Serial Number")}</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.num_serie_pneu} 
-                                    onChange={handleChange} 
-                                />
-                            </Form.Group>
+                    <Form.Group controlId="date_achat_pneu">
+                        <Form.Label>{translate("Purchase Date")}</Form.Label>
+                        <Form.Control
+                            type="datetime-local"
+                            value={formData.date_achat_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="loc_pneu">
-                                <Form.Label>{translate("Position")}</Form.Label>
-                                <Form.Control as="select" value={formData.loc_pneu} onChange={handleChange}>
-                                                                                <option value="">{translate("Select Position")}</option>
-                                                                                <option value="front_left">{translate("Front Left")}</option>
-                                                                                <option value="front_right">{translate("Front Right")}</option>
-                                                                                <option value="rear_left">{translate("Rear Left")}</option>
-                                                                                <option value="rear_right">{translate("Rear Right")}</option>
-                                                                                <option value="spare">{translate("Spare Tire")}</option>
-                                                                            </Form.Control>
-                            </Form.Group>
+                    <Form.Group controlId="fourn_pneu">
+                        <Form.Label>{translate("Supplier")}</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={formData.fourn_pneu} 
+                            onChange={handleChange} 
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="date_achat_pneu">
-                                <Form.Label>{translate("Purchase Date")}</Form.Label>
-                                <Form.Control
-                                    type="date"
-                                    value={formData.date_achat_pneu}
-                                    onChange={handleChange}
-                                />
-                            </Form.Group>
+                    <Form.Group controlId="fact_pneu">
+                        <Form.Label>{translate("Invoice Number")}</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={formData.fact_pneu} 
+                            onChange={handleChange} 
+                        />
+                    </Form.Group>
 
-                            <Form.Group controlId="cout_pneu">
-                                <Form.Label>{translate("Cost")}</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.cout_pneu}
-                                    onChange={handleChange}
-                                />
-                            </Form.Group>
+                    <Form.Group controlId="cout_pneu">
+                        <Form.Label>{translate("Cost")} (DZD)</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.cout_pneu}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                </div>
 
-                            <Form.Group controlId="fourn_pneu">
-                                <Form.Label>{translate("Supplier")}</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.fourn_pneu} 
-                                    onChange={handleChange} 
-                                />
-                            </Form.Group>
 
-                            <Form.Group controlId="fact_pneu">
-                                <Form.Label>{translate("Invoice Number")}</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.fact_pneu} 
-                                    onChange={handleChange} 
-                                />
-                            </Form.Group>
-                        </div>
                     
                 </Modal.Body>
 

@@ -198,6 +198,22 @@ export function PneuStock() {
         getCountPneuStock();
         getPneuStock();
     };
+     const typePneuLabels: { [key: string]: string } = {
+            utilitaire: "Utility/Van",
+            "poids lourd": "Heavy Truck",
+            suv: "SUV / 4x4",
+            remorque: "Trailer (small luggage)",
+            voiture: "Car/Passenger",
+            agricole: "Agricultural",
+          };
+          
+          const positionLabels: { [key: string]: string } = {
+            front_left: "Front Left",
+            front_right: "Front Right",
+            rear_left: "Rear Left",
+            rear_right: "Rear Right",
+            spare: "Spare Tire",
+          };
 
     return (
         <>
@@ -356,11 +372,11 @@ export function PneuStock() {
                                     
                                     
                                     {selectedColumns.ID && <td>{PneuStock.id_pneu_stock}</td>}
-                                    {selectedColumns.Type && <td>{PneuStock.type_pneu}</td>}
+                                    {selectedColumns.Type && <td>{typePneuLabels[PneuStock.type_pneu] || PneuStock.type_pneu}</td>}
                                     {selectedColumns.Model && <td>{PneuStock.modele_pneu}</td>}
                                     {selectedColumns.Reference && <td>{PneuStock.ref_pneu}</td>}
                                     {selectedColumns.Serial && <td>{PneuStock.num_serie_pneu}</td>}
-                                    {selectedColumns.Location && <td>{PneuStock.loc_pneu}</td>}
+                                    {selectedColumns.Location && <td>{positionLabels[PneuStock.loc_pneu] || PneuStock.loc_pneu}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(PneuStock.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{PneuStock.cout_pneu} </td>}
                                     <td className="text-center">
