@@ -23,6 +23,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
         date_achat_pneu: "",
         cout_pneu: "",
         fourn_pneu: "",
+        marque_pneu:"",
         fact_pneu: ""
     });
 
@@ -44,6 +45,8 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
             date_achat_pneu: "",
             cout_pneu: "",
             fourn_pneu: "",
+            marque_pneu:"",
+
             fact_pneu: ""
         });
         onHide();
@@ -108,14 +111,29 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <div className="row">
-                            <Form.Group controlId="type_pneu">
-                                <Form.Label>{translate("Tire Type")} *</Form.Label>
+                    <Form.Group controlId="marque_pneu">
+                                <Form.Label>{translate("Brand")} *</Form.Label>
                                 <Form.Control 
                                     type="text" 
-                                    value={formData.type_pneu} 
+                                    value={formData.marque_pneu} 
                                     onChange={handleChange} 
                                     required 
                                 />
+                            </Form.Group>
+
+                            <Form.Group controlId="type_pneu">
+                                <Form.Label>{translate("Tire Type")} *</Form.Label>
+                                <Form.Control as="select" value={formData.type_pneu} onChange={handleChange}>
+                                 
+                                <option value="">-- Tire type --</option>
+                                <option value="utilitaire">Utility/Van</option>
+                                <option value="poids lourd">Heavy Truck</option>
+                                <option value="suv">SUV / 4x4</option>
+                                <option value="remorque">Trailer (small luggage)</option>
+                                <option value="voiture">Car/Passenger</option>
+                                <option value="agricole">Agricultural</option>
+
+                              </Form.Control>
                             </Form.Group>
 
                             <Form.Group controlId="modele_pneu">
@@ -132,6 +150,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                                 <Form.Label>{translate("Reference")}</Form.Label>
                                 <Form.Control 
                                     type="text" 
+                                    placeholder="Dimension/Charge/Vitesse"
                                     value={formData.ref_pneu} 
                                     onChange={handleChange} 
                                 />
@@ -147,12 +166,15 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                             </Form.Group>
 
                             <Form.Group controlId="loc_pneu">
-                                <Form.Label>{translate("Storage Location")}</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    value={formData.loc_pneu} 
-                                    onChange={handleChange} 
-                                />
+                                <Form.Label>{translate("Position")}</Form.Label>
+                                <Form.Control as="select" value={formData.loc_pneu} onChange={handleChange}>
+                                                                                <option value="">{translate("Select Position")}</option>
+                                                                                <option value="front_left">{translate("Front Left")}</option>
+                                                                                <option value="front_right">{translate("Front Right")}</option>
+                                                                                <option value="rear_left">{translate("Rear Left")}</option>
+                                                                                <option value="rear_right">{translate("Rear Right")}</option>
+                                                                                <option value="spare">{translate("Spare Tire")}</option>
+                                                                            </Form.Control>
                             </Form.Group>
 
                             <Form.Group controlId="date_achat_pneu">

@@ -203,7 +203,7 @@ export function PneuStock() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                <h4>{translate("Tire Change")} ({total})</h4>
+                <h4>{translate("Tire")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPneuStockModal} className="btn btn-primary mt-2 mr-1">

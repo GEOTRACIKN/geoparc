@@ -25,6 +25,8 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
         date_achat_pneu: "",
         cout_pneu: "",
         fourn_pneu: "",
+        marque_pneu:"",
+
         fact_pneu: ""
     });
 
@@ -54,6 +56,9 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                     date_achat_pneu: data.date_achat_pneu,
                     cout_pneu: data.cout_pneu,
                     fourn_pneu: data.fourn_pneu,
+                    marque_pneu:data.marque_pneu,
+                    
+
                     fact_pneu: data.fact_pneu
                 });
 
@@ -86,6 +91,8 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
             date_achat_pneu: "",
             cout_pneu: "",
             fourn_pneu: "",
+            marque_pneu:"",
+
             fact_pneu: ""
         });
         onHide();
@@ -147,13 +154,24 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
                             <PropagateLoader color="#0059b3" size={12} />
                         </div>
-                    ) : (
+                    ) : (                        
+
                         <div className="row">
                                 <Form.Group controlId="type_pneu">
                                     <Form.Label>{translate("Type")} *</Form.Label>
                                     <Form.Control 
                                         type="text" 
                                         value={formData.type_pneu} 
+                                        onChange={handleChange} 
+                                        required 
+                                    />
+                                </Form.Group>
+
+                                <Form.Group controlId="marque_pneu">
+                                    <Form.Label>{translate("Brand")} *</Form.Label>
+                                    <Form.Control 
+                                        type="text" 
+                                        value={formData.marque_pneu} 
                                         onChange={handleChange} 
                                         required 
                                     />
