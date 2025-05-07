@@ -47,6 +47,13 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
             const data = await response.json();
             console.log('API response for pneu stock:', data);
 
+            const formatDatetimeLocal = (value: string) => {
+                const date = new Date(value);
+                const offset = date.getTimezoneOffset();
+                const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                return localDate.toISOString().slice(0, 16);
+            };
+
             if (data && data.id_pneu_stock) {
                 setFormData({
                     id_pneu_stock: data.id_pneu_stock,
@@ -55,7 +62,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                     ref_pneu: data.ref_pneu,
                     num_serie_pneu: data.num_serie_pneu,
                     loc_pneu: data.loc_pneu,
-                    date_achat_pneu: data.date_achat_pneu,
+                    date_achat_pneu: formatDatetimeLocal(data.date_achat_pneu),
                     cout_pneu: data.cout_pneu,
                     fourn_pneu: data.fourn_pneu,
                     marque_pneu:data.marque_pneu,
@@ -167,7 +174,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                                     <Form.Control
                                         value={
                                             formData.date_achat_pneu
-                                                ? moment(formData.date_achat_pneu).format('YYYY-MM-DD')
+                                             ? moment(formData.date_achat_pneu).format('YYYY-MM-DD HH:mm')
                                                 : ""
                                         }
                                         readOnly

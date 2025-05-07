@@ -3,7 +3,6 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { formatDateToTimestamp } from "../utilities/functions";
 import ModalNewPneuStock from "../components/PneuStock/NewPneuStock";
 import ModalShowPneuStock from "../components/PneuStock/ShowPneuStock";
 import { PropagateLoader } from "react-spinners";
@@ -215,6 +214,13 @@ export function PneuStock() {
             spare: "Spare Tire",
           };
 
+          function formatDatetimeLocal(dateString: string): string {
+            if (!dateString) return "";
+            const date = new Date(dateString);
+            return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+        
+
     return (
         <>
             <div className="row">
@@ -377,7 +383,7 @@ export function PneuStock() {
                                     {selectedColumns.Reference && <td>{PneuStock.ref_pneu}</td>}
                                     {selectedColumns.Serial && <td>{PneuStock.num_serie_pneu}</td>}
                                     {selectedColumns.Location && <td>{positionLabels[PneuStock.loc_pneu] || PneuStock.loc_pneu}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(PneuStock.date_achat_pneu)}</td>}
+                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(PneuStock.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{PneuStock.cout_pneu} </td>}
                                     <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">

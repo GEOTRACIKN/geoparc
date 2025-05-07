@@ -46,6 +46,13 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                     toast.error(translate("Stock data not found."));
                     return;
                 }
+                const formatDatetimeLocal = (value: string) => {
+                    const date = new Date(value);
+                    const offset = date.getTimezoneOffset();
+                    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                    return localDate.toISOString().slice(0, 16);
+                };
+                
 
                 setFormData({
                     type_pneu: data.type_pneu,
@@ -53,7 +60,7 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                     ref_pneu: data.ref_pneu,
                     num_serie_pneu: data.num_serie_pneu,
                     loc_pneu: data.loc_pneu,
-                    date_achat_pneu: data.date_achat_pneu,
+                    date_achat_pneu: formatDatetimeLocal(data.date_achat_pneu),
                     cout_pneu: data.cout_pneu,
                     fourn_pneu: data.fourn_pneu,
                     marque_pneu:data.marque_pneu,
