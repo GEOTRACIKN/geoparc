@@ -20,7 +20,9 @@ import enLocale from "@fullcalendar/core/locales/en-gb";
 import esLocale from '@fullcalendar/core/locales/es';
 import arLocale from "@fullcalendar/core/locales/ar";
 import interactionPlugin from "@fullcalendar/interaction";
-import { toTimestamp, useClipboard } from "../utilities/functions";
+import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp, useClipboard } from "../utilities/functions";
+import { set } from "lodash";
+import { toast } from "react-toastify";
 
 interface DeadlineInterface {
   id_deadline: number;
@@ -42,8 +44,6 @@ interface DeadlineInterface {
   feu_immatriculation_vehicule: number;
   item_name: string;
 }
-
-
 
 
 export function Deadline() {
@@ -71,7 +71,7 @@ export function Deadline() {
   const [sort, setSort] = useState("DESC");
   const [total, setTotal] = useState(0);
   const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
-  const [selectedDeadlineId, setSelectedDeadlineId] = useState<number | null>( null);
+  const [selectedDeadlineId, setSelectedDeadlineId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [isGridView, setIsGridView] = useState(true);
@@ -80,8 +80,71 @@ export function Deadline() {
   const localizer = momentLocalizer(moment);
   type ModeType = "create" | "edit" | "yourModeValue"; // Add "yourModeValue" to the allowed types
   const [mode, setMode] = useState<ModeType>("create");
+  const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
-    const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
+  const [selectedDeadlines, setSelectedDeadlines] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+
+
+  const onDownloadConfirm = (format: string) => {
+    if (selectedDeadlines.length > 0) {
+      handleDownloadConfirm(format, downloadVehicleExcel, downloadVehiclePDF);
+    } else {
+      toast.warn("Please select at least one driver", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+
+
+  const driverHeaders = [
+    translate("ID"),
+    translate("Type deadline"),
+    translate("Creation date"),
+    translate("Deadline date"),
+    translate("Deadline for"),
+  ];
+
+
+
+  const downloadVehicleExcel = () => {
+
+    const selectedData = list_Deadline.filter((Deadline) =>
+      selectedDeadlines.includes(Deadline.id_deadline.toString())
+    ).map((deadline) => [
+      deadline.id_deadline,
+      deadline.nom_type,
+      toTimestamp(deadline.date_creation),
+      toTimestamp(deadline.date_deadline),
+      generatePlainTextDescription(deadline)
+    ]);
+
+
+    generateExcelFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
+  };
+
+  const downloadVehiclePDF = () => {
+
+    const selectedData = list_Deadline.filter((Deadline) =>
+      selectedDeadlines.includes(Deadline.id_deadline.toString())
+    ).map((deadline) => [
+      deadline.id_deadline,
+      deadline.nom_type,
+      toTimestamp(deadline.date_creation),
+      toTimestamp(deadline.date_deadline),
+      generatePlainTextDescription(deadline)
+    ]);
+
+    generatePDFFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
+  };
+
+
+
+
 
   const calendarRef = useRef<FullCalendar | null>(null);
   const changeView = (view: string) => {
@@ -101,21 +164,17 @@ export function Deadline() {
   // Define the calendar events (empty for now)
   const initialColumns = {
     id_deadline: true,
+    nom_type: true,
     date_deadline: true,
     date_creation: true,
-    status: true,
-    description: true,
-    nom_type: true,
     id_item: true,
   };
 
   const [selectedColumns, setSelectedColumns] = useState({
     id_deadline: true,
+    nom_type: true,
     date_deadline: true,
     date_creation: true,
-    status: true,
-    description: true,
-    nom_type: true,
     id_item: true,
   });
 
@@ -173,12 +232,11 @@ export function Deadline() {
 
   const searchColumn: { [key: string]: number } = {
     id_deadline: 0,
-    username_user: 1,
-    nom_type: 2,
-    date_deadline: 3,
-    date_creation: 4,
-    status: 5,
-    description: 6,
+    nom_type: 1,
+    date_deadline: 2,
+    date_creation: 3,
+    status: 4,
+    description: 5,
   };
 
   const getDeadlines = async (
@@ -322,16 +380,31 @@ export function Deadline() {
 
   useEffect(() => {
 
-    if (id_alarm) { getDeadlines(limit, currentPage, id_alarm, type, column, sort); }
-    else { getDeadlines(limit, currentPage, search, type, column, sort); }
-    if (typeId && typeId != 0) { getDeadlines(limit, currentPage, search, typeId, column, sort); }
 
+
+
+    if (typeId) {
+
+      setSearch(getDeadlineTypeName(typeId))
+      setType(1);
+      setTypeSearch(translate("Type"));
+      getDeadlines(limit, currentPage, getDeadlineTypeName(typeId), 1, column, sort);
+
+    }
+    else {
+      if (id_alarm) { getDeadlines(limit, currentPage, id_alarm, type, column, sort); }
+      else { getDeadlines(limit, currentPage, search, type, column, sort); }
+
+    }
 
     // getCalendarDeadlines();
   }, []);
 
-  const handleTypeSearch = (event: any) => {
-    const selectedValue = event.target.textContent;
+  const handleTypeSearch = (selectedValue: string) => {
+
+
+    console.log(selectedValue);
+
 
     switch (selectedValue) {
       case translate("ID"):
@@ -356,9 +429,34 @@ export function Deadline() {
     setTypeSearch(selectedValue);
   };
 
+  function getDeadlineTypeName(id_type: number): string {
+    switch (id_type) {
+      case 1:
+        return 'Driving license';
+      case 2:
+        return 'Vehicle insurance';
+      case 3:
+        return 'Maintenance';
+      case 4:
+        return 'Training';
+      case 5:
+        return 'Extinguisher';
+      case 6:
+        return 'Technical control';
+      case 7:
+        return 'Sticker';
+      case 8:
+        return 'Draining';
+      default:
+        return 'Unknown type';
+    }
+  }
+
+
+
 
   const menuItems = [
-    translate("ID"),
+    //  translate("ID"),
     translate("Type"),
     translate("Creation date"),
     translate("Deadline date"),
@@ -418,23 +516,29 @@ export function Deadline() {
       </div>
     );
   };
-  const handleAdvancedSearch = (event: any) => {
+  const handleAdvancedSearch = async (event: any) => {
     setSearch(event.target.value);
     setCurrentPage(1);
+
+    const commentsFormServer = await getDeadlines(limit, currentPage, event.target.value, type, column, sort);
+    setDeadline(commentsFormServer);
   };
 
-  const handleSelectChange = (event: any) => {
+  const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
     setLimit(parseInt(newValue));
     setCurrentPage(1);
+    const commentsFormServer = await getDeadlines(parseInt(newValue), currentPage, search, type, column, sort);
+    setDeadline(commentsFormServer);
+    window.scrollTo(0, 0);
   };
-  const handlePageClick = (data: any) => {
-    setCurrentPage(data.selected + 1);
+  const handlePageClick = async (data: any) => {
+    let currentPage = data.selected + 1;
+    const commentsFormServer = await getDeadlines(limit, currentPage, search, type, column, sort);
+    setDeadline(commentsFormServer);
+    window.scrollTo(0, 0);
   };
 
-  const refreshData = () => {
-    getCalendarDeadlines();
-  };
 
   const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
     {}
@@ -472,6 +576,64 @@ export function Deadline() {
     );
   };
 
+
+  const columnsMap = {
+    nom_type: "Type",
+    date_creation: "Creation date",
+    date_deadline: "Deadline date",
+    id_item: "Deadline for",
+  };
+
+
+
+  const [isDeadlinesSelected, setIsDeadlinesSelected] = useState(false);
+
+
+  const handleDeadlinesSelect = (DeadlineID: string) => {
+    let updatedSetSelectedDeadlines: string[] = [];
+
+    // If "Select All Deadlines" is enabled, selects or deselects all Deadlines
+    if (selectAll) {
+      updatedSetSelectedDeadlines = selectedDeadlines.includes(DeadlineID)
+        ? selectedDeadlines.filter(id => id !== DeadlineID) //Deselect if already selected
+        : list_Deadline.map(deadline => deadline.id_deadline.toString()); // Select all vehicles
+    } else {
+      //Managing selection/normal selection of an individual Deadline
+      if (selectedDeadlines.includes(DeadlineID)) {
+        updatedSetSelectedDeadlines = selectedDeadlines.filter(id => id !== DeadlineID);
+      } else {
+        updatedSetSelectedDeadlines = [...selectedDeadlines, DeadlineID];
+      }
+    }
+
+    // Updates the list of selected Deadlines
+    setSelectedDeadlines(updatedSetSelectedDeadlines);
+
+    // Updates the Deadlines Selected state (activate if at least one is selected)
+    setIsDeadlinesSelected(updatedSetSelectedDeadlines.length > 0);
+
+    console.log(updatedSetSelectedDeadlines);
+  };
+
+
+  // In the handleSelectAllDrivers function
+  const handleSelectAllDrivers = (checked: boolean) => {
+    setSelectAll(checked);
+    console.log(checked)
+    if (checked) {
+      // Select all POIs
+      const allDeadlineIDs = list_Deadline.map((deadline) => deadline.id_deadline.toString());
+      setSelectedDeadlines(allDeadlineIDs);
+      setIsDeadlinesSelected(true);// Mark as selected
+    } else {
+      // Select all POIs
+      setSelectedDeadlines([]);
+      setIsDeadlinesSelected(false); // Mark as unselected
+    }
+  };
+
+
+
   return (
     <>
       <div className="row">
@@ -481,6 +643,13 @@ export function Deadline() {
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right d-flex justify-content-end">
+          <button
+            className="btn btn-outline-secondary  mt-2 mr-1"
+            onClick={() => setShowDownloadModal(true)}
+          >
+            <i className="las la-download"></i>
+            {translate("Export")}
+          </button>
           <Button
             onClick={() => setIsGridView(!isGridView)}
             style={{
@@ -517,7 +686,7 @@ export function Deadline() {
                   style={{ fontSize: "20px" }}
                 ></i>
               </Dropdown.Toggle>
-              <Dropdown.Menu onClick={handleTypeSearch}>
+              <Dropdown.Menu>
                 {menuItems.map((item, index) => (
                   <Dropdown.Item
                     key={index}
@@ -567,7 +736,7 @@ export function Deadline() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {Object.keys(initialColumns).map((col, idx) => (
+              {Object.entries(columnsMap).map(([colKey, translation], idx) => (
                 <Dropdown.Item
                   key={idx}
                   as="button"
@@ -576,14 +745,12 @@ export function Deadline() {
                   <input
                     type="checkbox"
                     className="form-check-input"
-                    checked={
-                      selectedColumns[col as keyof typeof initialColumns]
-                    }
+                    checked={selectedColumns[colKey as keyof typeof initialColumns]}
                     onChange={() =>
-                      handleColumnChange(col as keyof typeof initialColumns)
+                      handleColumnChange(colKey as keyof typeof initialColumns)
                     }
                   />
-                  <span style={{ marginLeft: "10px" }}>{translate(col)}</span>
+                  <span style={{ marginLeft: "10px" }}>{translate(translation)}</span>
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
@@ -596,9 +763,15 @@ export function Deadline() {
           <Table className="dataTable" responsive>
             <thead className="bg-white text-uppercase">
               <tr className="ligth ligth-data">
-                <th className="text-center">
-                  <div className="form-check form-check-inline">
-                    <input className="form-check-input" type="checkbox" />
+                <th>
+                  <div className="form-check" style={{paddingLeft: "0px"}}>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={(e) => handleSelectAllDrivers(e.target.checked)}
+                    />
+                    <label className="form-check-label"></label>
                   </div>
                 </th>
 
@@ -627,12 +800,18 @@ export function Deadline() {
               ) : Array.isArray(list_Deadline) && list_Deadline.length !== 0 ? (
                 list_Deadline.map((Deadline, index) => (
                   <tr key={index}>
-                    <td className="text-center">
-                      <div className="form-check form-check-inline">
-                        <input className="form-check-input" type="checkbox" />
+                    <td>
+                      <div className="form-check form-check-inline"  style={{paddingLeft: "80px"}}>
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id={`checkbox-${Deadline.id_deadline}`}
+                          checked={selectedDeadlines.includes(Deadline.id_deadline.toString())}
+                          onChange={() => handleDeadlinesSelect(Deadline.id_deadline.toString())}
+                        />
+                        <label htmlFor={`checkbox-${Deadline.id_deadline}`} className="mb-0"></label>
                       </div>
                     </td>
-
                     {selectedColumns.id_deadline && id_user == "1" && (<td>{Deadline.id_deadline}</td>)}
                     {selectedColumns.nom_type && <td> {translate(Deadline.nom_type)} </td>}
                     {selectedColumns.date_creation && (<td>{toTimestamp(Deadline.date_creation)}</td>)}
@@ -734,7 +913,6 @@ export function Deadline() {
 
                     <td className="text-center">
                       <div className="d-flex justify-content-center align-items-center list-action">
-                        {/* View Button */}
                         <Link
                           to={``}
                           className="badge bg-primary mr-2"
@@ -751,24 +929,7 @@ export function Deadline() {
                           ></i>
                         </Link>
 
-                        {/* Edit Button */}
-                        {/* <Link
-                          to={``}
-                          className="badge badge-success mr-2"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Edit"
-                          onClick={() =>
-                            handleEditDeadlineModal(Deadline.id_deadline)
-                          }
-                        >
-                          <i
-                            className="las la-edit"
-                            style={{ fontSize: "1.2em" }}
-                          ></i>
-                        </Link> */}
 
-                        {/* Delete Button */}
                         <Link
                           to={``}
                           className="badge bg-danger mr-2"
@@ -907,6 +1068,12 @@ export function Deadline() {
         onHide={handleCloseShowDeadlineModal}
         id_deadline={selectedDeadlineId}
       />
+      <DownloadModal
+        show={showDownloadModal}
+        onHide={() => setShowDownloadModal(false)}
+        onDownloadConfirm={onDownloadConfirm}
+      />
+
     </>
   );
 }
