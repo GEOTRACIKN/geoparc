@@ -11,6 +11,18 @@ interface Vehicle {
     id_vehicule: number;
     immatriculation_vehicule: string;
 }
+interface StockPneu {
+    id_pneu_stock: number;
+    marque_pneu: string;
+    modele_pneu: string;
+    ref_pneu: string;
+}
+
+interface StockPneuSelectProps {
+    onSelect: (id: number) => void;
+    value?: number; // Ajouter cette ligne
+}
+
 
 interface EditPneuModalProps {
     show: boolean;
@@ -27,7 +39,6 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         num_facture_pneu: "",
         source_pneu:"",
         technicien_pneu:"",        
-
         km_pneu: "",
         date_achat_pneu: "",
         etat_pneu: "",
@@ -37,8 +48,11 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         fournisseur_pneu: "",
         temps_amort: "",
         id_vehicule: "",
+        id_pneu_stock: "" 
+
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [stockPneus, setStockPneus] = useState<StockPneu[]>([]); // État pour les pneus en stock
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const geopuserID = localStorage.getItem("GeopUserID");
@@ -91,7 +105,20 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         const { id, value } = e.target;
         setFormData((prevState) => ({ ...prevState, [id]: value }));
     };
+    const handleStockPneuSelect = (selectedPneu: StockPneu) => {
+        console.log('Pneu sélectionné:', selectedPneu);
 
+        setFormData(prev => ({
+            
+            ...prev,
+            id_pneu_stock: selectedPneu.id_pneu_stock.toString(),
+            marque_pneu: selectedPneu.marque_pneu, // Utilisez le vrai champ type_pneu
+            ref_pneu: selectedPneu.ref_pneu,
+            modele_pneu: selectedPneu.modele_pneu,
+        }));
+        console.log('Pneu sélectionné:', selectedPneu);
+
+    };
     const handleClose = () => {
         setFormData({
             id_pneu: "",
@@ -107,6 +134,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
             fournisseur_pneu: "",
             temps_amort: "",
             id_vehicule: "",
+            id_pneu_stock: "" ,
         });
         onHide();
     };
@@ -145,6 +173,53 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
         if (!res.ok) throw new Error("Error fetching mileage");
         return await res.json();
     };
+      useEffect(() => {
+            const fetchStockPneus = async () => {
+                if (!geopuserID || formData.source_pneu !== "internal") return;
+                
+                try {
+                    const response = await fetch(`${backendUrl}/api/geop/pneu_stock/available/${geopuserID}`, {
+                        headers: { 
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    setStockPneus(data);
+                    
+                } catch (error) {
+                    console.error("Error fetching stock tires:", error);
+                    setStockPneus([]);
+                }
+            };
+            fetchStockPneus();
+        }, [formData.source_pneu]);
+
+      const StockPneuSelect: React.FC<StockPneuSelectProps> = ({ onSelect, value }) => (
+            <Form.Group controlId="id_pneu_stock">
+                <Form.Label>{translate("Select Stock Tire")} *</Form.Label>
+                <Select
+                    options={stockPneus.map(pneu => ({
+                        value: pneu.id_pneu_stock,
+                        label: `${pneu.marque_pneu} ${pneu.modele_pneu} (${pneu.ref_pneu})`
+                    }))}
+                    onChange={(selectedOption) => {
+                        if (selectedOption) onSelect(selectedOption.value);
+                    }}
+                    value={stockPneus
+                        .map(pneu => ({ 
+                            value: pneu.id_pneu_stock, 
+                            label: `${pneu.marque_pneu} ${pneu.modele_pneu} (${pneu.ref_pneu})` 
+                        }))
+                        .find(option => option.value === value)}
+                    placeholder={translate("Select a tire from stock")}
+                    isSearchable
+                    noOptionsMessage={() => translate("No tires available in stock")}
+                />
+            </Form.Group>
+        );
 
     useEffect(() => {
         if (!show) {
@@ -162,6 +237,8 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                 fournisseur_pneu: "",
                 temps_amort: "",
                 id_vehicule: "",
+                id_pneu_stock: "" ,
+
             });
         }
     }, [show]);
@@ -307,19 +384,26 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                                  )}
                      
                                  {formData.source_pneu === "internal" && (
-                                     <Form.Group controlId="technicien_pneu">
-                                         <Form.Label>{translate("Technician")}</Form.Label>
-                                         <Form.Control
-                                             type="text"
-                                             value={formData.technicien_pneu || ""}
-                                             onChange={(e) =>
-                                                 setFormData((prev) => ({
-                                                     ...prev,
-                                                     technicien_pneu: e.target.value,
-                                                 }))
-                                             }
-                                         />
-                                     </Form.Group>
+
+                                    <><Form.Group className="mb-3">
+                                        <StockPneuSelect
+                                            onSelect={(id) => setFormData(prev => ({
+                                                ...prev,
+                                                id_pneu_stock: id.toString()
+                                            }))}
+                                            value={Number(formData.id_pneu_stock)} // Ajouter cette ligne
+                                        />
+                                    </Form.Group><Form.Group controlId="technicien_pneu">
+                                            <Form.Label>{translate("Technician")}</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                value={formData.technicien_pneu || ""}
+                                                onChange={(e) => setFormData((prev) => ({
+                                                    ...prev,
+                                                    technicien_pneu: e.target.value,
+                                                }))} />
+                                        </Form.Group></>
+                                     
                                  )}
                     </>
     )}
