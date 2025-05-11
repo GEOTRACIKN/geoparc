@@ -98,7 +98,6 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
             num_facture_pneu: "",
             source_pneu:"",
             technicien_pneu:"",        
-
             km_pneu: "",
             date_achat_pneu: "",
             etat_pneu: "",
@@ -154,7 +153,6 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                 num_facture_pneu: "",
                 source_pneu:"",
                 technicien_pneu:"",        
-
                 km_pneu: "",
                 date_achat_pneu: "",
                 etat_pneu: "",
@@ -182,10 +180,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                         </div>
                     ) : (
                         <>
-                    <Form.Group controlId="num_facture_pneu">
-                        <Form.Label>{translate("Inv. No.")}</Form.Label>
-                        <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
-                    </Form.Group>
+                    
 
                     <Form.Group controlId="id_vehicule">
                         <Form.Label>{translate("Vehicle")} *</Form.Label>
@@ -267,42 +262,47 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
 
                     
                      
-                                                             {formData.source_pneu === "external" && (
+                    {formData.source_pneu === "external" && (
                          <>
-                                         <Form.Group controlId="fournisseur_pneu">
-                                             <Form.Label>{translate("Supplier")}</Form.Label>
-                                             <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
-                                         </Form.Group>
+                    <Form.Group controlId="num_facture_pneu">
+                        <Form.Label>{translate("Inv. No.")}</Form.Label>
+                        <Form.Control type="text" value={formData.num_facture_pneu} onChange={handleChange} />
+                    </Form.Group>
+
+                    <Form.Group controlId="fournisseur_pneu">
+                        <Form.Label>{translate("Supplier")}</Form.Label>
+                        <Form.Control type="text" value={formData.fournisseur_pneu} onChange={handleChange} />
+                    </Form.Group>
                      
-                                         <Form.Group controlId="temps_amort">
-                                             <Form.Label>{translate("Duration")}</Form.Label>
-                                             <Form.Control
-                                                 type="text"
-                                                 value={formData.temps_amort}
-                                                 onChange={handleChange}
-                                                 onKeyDown={(e) => {
-                                                     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                                     if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                                         e.preventDefault();
-                                                     }
-                                                 }}
-                                             />
-                                         </Form.Group>
+                    <Form.Group controlId="temps_amort">
+                        <Form.Label>{translate("Duration")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.temps_amort}
+                            onChange={handleChange}
+                            onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                        />
+                    </Form.Group>
                      
-                                         <Form.Group controlId="cout_pneu">
-                                             <Form.Label>{translate("Cost")}</Form.Label>
-                                             <Form.Control
-                                                 type="text"
-                                                 value={formData.cout_pneu}
-                                                 onChange={handleChange}
-                                                 onKeyDown={(e) => {
-                                                     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                                     if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                                         e.preventDefault();
-                                                     }
-                                                 }}
-                                             />
-                                         </Form.Group>
+                    <Form.Group controlId="cout_pneu">
+                        <Form.Label>{translate("Cost")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.cout_pneu}
+                            onChange={handleChange}
+                            onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                        />
+                    </Form.Group>
                                      </>
                                  )}
                      

@@ -106,7 +106,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
 
     const typePneuLabels: { [key: string]: string } = {
         utilitaire: translate("Utility/Van"),
-        "poids lourd": translate("Heavy Truck"),
+        poids_lourd: translate("Heavy Truck"),
         suv: translate("SUV / 4x4"),
         remorque: translate("Trailer (small luggage)"),
         voiture: translate("Car/Passenger"),

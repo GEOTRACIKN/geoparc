@@ -180,7 +180,7 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                                             
                                         <option value="">-- Tire type --</option>
                                         <option value="utilitaire">Utility/Van</option>
-                                        <option value="poids lourd">Heavy Truck</option>
+                                        <option value="poids_lourd">Heavy Truck</option>
                                         <option value="suv">SUV / 4x4</option>
                                         <option value="remorque">Trailer (small luggage)</option>
                                         <option value="voiture">Car/Passenger</option>

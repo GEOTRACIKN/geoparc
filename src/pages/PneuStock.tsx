@@ -199,7 +199,7 @@ export function PneuStock() {
     };
      const typePneuLabels: { [key: string]: string } = {
             utilitaire: "Utility/Van",
-            "poids lourd": "Heavy Truck",
+            poids_lourd: "Heavy Truck",
             suv: "SUV / 4x4",
             remorque: "Trailer (small luggage)",
             voiture: "Car/Passenger",
