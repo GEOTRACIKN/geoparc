@@ -98,7 +98,6 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                 cout_pneu: "",
                 fourn_pneu: "",
                 marque_pneu:"",
-
                 fact_pneu: ""
             });
         }
@@ -135,8 +134,8 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                         </div>
                     ) : (
                         <div className="row">
-                            <Form.Group controlId="marque_pneu">
-                                    <Form.Label>{translate("Brand")} *</Form.Label>
+                                <Form.Group controlId="marque_pneu">
+                                    <Form.Label>{translate("Brand")} </Form.Label>
                                     <Form.Control 
                                         type="text" 
                                         value={formData.marque_pneu} 
@@ -180,8 +179,6 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                                         readOnly
                                     />
                                 </Form.Group>
-
-                                
 
                                 <Form.Group controlId="fourn_pneu">
                                     <Form.Label>{translate("Supplier")}</Form.Label>

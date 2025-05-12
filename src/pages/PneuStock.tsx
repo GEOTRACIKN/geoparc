@@ -99,27 +99,28 @@ export function PneuStock() {
     const handleCloseShowPneuStockModal = () => setShowShowPneuStockModal(false);
 
     const getCountPneuStock = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `${backendUrl}/api/geop/pneu_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
-            );
-            const result = await response.json();
-    
-            if (typeof result === "number") {
-                setTotal(result);
-                setPageCount(Math.ceil(result / limit));
-            } else {
-                console.error("Unexpected count response:", result);
-                setTotal(0);
-            }
-        } catch (error) {
-            console.error(error);
+    try {
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/pneu_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
+        );
+        const result = await response.json();
+        
+        // Check if result has a count property
+        if (result && typeof result.count === "number") {
+            setTotal(result.count);
+            setPageCount(Math.ceil(result.count / limit));
+        } else {
+            console.error("Unexpected count structure:", result);
             setTotal(0);
-        } finally {
-            setLoading(false);
         }
-    };
+    } catch (error) {
+        console.error(error);
+        setTotal(0);
+    } finally {
+        setLoading(false);
+    }
+};
     
 
     const getPneuStock = async () => {
