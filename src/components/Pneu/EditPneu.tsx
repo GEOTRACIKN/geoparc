@@ -140,7 +140,7 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
     };
 
     const validateForm = () => {
-        if (!formData.num_facture_pneu || !formData.id_vehicule) {
+        if ( !formData.id_vehicule) {
             toast.error(translate("Please fill all required fields."), { position: "bottom-right", autoClose: 2400, transition: Bounce });
             return false;
         }
@@ -327,17 +327,14 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
                         </Form.Control>
                     </Form.Group>
 
-
                     <Form.Group controlId="source_pneu">
-                                        <Form.Label>{translate("Tire Source")}</Form.Label>
-                                            <Form.Control as="select" value={formData.source_pneu} onChange={handleChange}>
-                                            <option value="">{translate("Select Source")}</option>
-                                            <option value="internal">{translate("Internal")}</option>
-                                            <option value="external">{translate("External")}</option>
-                                            </Form.Control>
-                                        </Form.Group>
-
-                    
+                    <Form.Label>{translate("Tire Source")}</Form.Label>
+                        <Form.Control as="select" value={formData.source_pneu} onChange={handleChange}>
+                        <option value="">{translate("Select Source")}</option>
+                        <option value="internal">{translate("Internal")}</option>
+                        <option value="external">{translate("External")}</option>
+                        </Form.Control>
+                    </Form.Group>
                      
                     {formData.source_pneu === "external" && (
                          <>

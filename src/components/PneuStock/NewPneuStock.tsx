@@ -210,6 +210,17 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                             type="text"
                             value={formData.cout_pneu}
                             onChange={handleChange}
+                             onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                 </div>

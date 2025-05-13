@@ -279,8 +279,7 @@ const ModalNewPneu: React.FC<ModalNewPneuProps> = ({ show, onHide, onSuccess }) 
                             type="datetime-local"
                             value={
                                 formData.date_achat_pneu
-                                    ? new Date(formData.date_achat_pneu).toISOString().slice(0, 16)
-                                    : ""
+                                    
                             }
                             min="2000-01-01T00:00"
                             onChange={handleChange}

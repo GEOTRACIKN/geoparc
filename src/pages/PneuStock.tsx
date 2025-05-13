@@ -44,7 +44,7 @@ export function PneuStock() {
         "Model": true,
         "Reference": true,
         "Serial": true,
-        "Location": true,
+        "Position": true,
         "Purchase Date": true,
         "Cost": true
     };
@@ -167,7 +167,7 @@ export function PneuStock() {
                 setType(3);
                 break;
 
-            case translate("Location"):
+            case translate("Position"):
                 setType(4);
                 break;
 
@@ -199,21 +199,22 @@ export function PneuStock() {
         getPneuStock();
     };
      const typePneuLabels: { [key: string]: string } = {
-            utilitaire: "Utility/Van",
-            poids_lourd: "Heavy Truck",
-            suv: "SUV / 4x4",
-            remorque: "Trailer (small luggage)",
-            voiture: "Car/Passenger",
-            agricole: "Agricultural",
-          };
-          
-          const positionLabels: { [key: string]: string } = {
-            front_left: "Front Left",
-            front_right: "Front Right",
-            rear_left: "Rear Left",
-            rear_right: "Rear Right",
-            spare: "Spare Tire",
-          };
+        utilitaire: translate("Utility/Van"),
+        poids_lourd: translate("Heavy Truck"),
+        suv: translate("SUV / 4x4"),
+        remorque: translate("Trailer (small luggage)"),
+        voiture: translate("Car/Passenger"),
+        agricole: translate("Agricultural"),
+        };
+
+        const positionLabels: { [key: string]: string } = {
+        front_left: translate("Front Left"),
+        front_right: translate("Front Right"),
+        rear_left: translate("Rear Left"),
+        rear_right: translate("Rear Right"),
+        spare: translate("Spare Tire"),
+        };
+
 
           function formatDatetimeLocal(dateString: string): string {
             if (!dateString) return "";
@@ -248,7 +249,7 @@ export function PneuStock() {
                                 <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Model")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Serial")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Location")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Position")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -339,9 +340,9 @@ export function PneuStock() {
                                     {translate("Serial")}
                                 </th>
                             )}
-                            {selectedColumns.Location && (
+                            {selectedColumns.Position && (
                                 <th className="sorting" onClick={() => handleSortingColumn("loc_pneu")}>
-                                    {translate("Location")}
+                                    {translate("Position")}
                                 </th>
                             )}
                             {selectedColumns["Purchase Date"] && (
@@ -383,7 +384,7 @@ export function PneuStock() {
                                     {selectedColumns.Model && <td>{PneuStock.modele_pneu}</td>}
                                     {selectedColumns.Reference && <td>{PneuStock.ref_pneu}</td>}
                                     {selectedColumns.Serial && <td>{PneuStock.num_serie_pneu}</td>}
-                                    {selectedColumns.Location && <td>{positionLabels[PneuStock.loc_pneu] || PneuStock.loc_pneu}</td>}
+                                    {selectedColumns.Position && <td>{positionLabels[PneuStock.loc_pneu] || PneuStock.loc_pneu}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(PneuStock.date_achat_pneu)}</td>}
                                     {selectedColumns.Cost && <td>{PneuStock.cout_pneu} </td>}
                                     <td className="text-center">

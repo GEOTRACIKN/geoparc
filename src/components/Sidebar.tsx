@@ -275,49 +275,49 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
+  id: 41,
+  label: "GMAO",
+  icon: "las la-cogs",
+  permissionId: 41,
+  subItems: [
+    {
       id: 41,
-      label: "GMAO",
-      icon: "las la-cogs",
-      permissionId: 41, // ID de permission à ajuster
-      subItems: [
-        {
-          id: 41,
-          label: "Reception",
-          icon: "",
-          to: "/reception",
-          permissionId: 41,
-        },
-        {
-          id: 25,
-          label: "Garage",
-          icon: "",
-          to: "/garage",
-          permissionId: 41,
-        },
-        {
-          id: 26,
-          label: "Planned interviews",
-          icon: "",
-          to: "/planning-interviews",
-          permissionId: 41,
-        },
-        {
-          id: 27,
-          label: "Servicing",
-          icon: "",
-          to: "/servicing",
-          permissionId: 41,
-        },
-        {
-          id: 27,
-          label: "Tire Change",
-          icon: "",
-          to: "/pneu",
-          permissionId: 41,
-        },
-      ],
+      label: "Reception",
+      icon: "las la-clipboard-check", // Réception / vérification
+      to: "/reception",
+      permissionId: 41,
     },
-    
+    {
+      id: 25,
+      label: "Garage",
+      icon: "las la-warehouse", // Représente un garage ou entrepôt
+      to: "/garage",
+      permissionId: 41,
+    },
+    {
+      id: 26,
+      label: "Planned interviews",
+      icon: "las la-calendar-alt", // Pour la planification
+      to: "/planning-interviews",
+      permissionId: 41,
+    },
+    {
+      id: 27,
+      label: "Servicing",
+      icon: "las la-tools", // Outils d’entretien
+      to: "/servicing",
+      permissionId: 41,
+    },
+    {
+      id: 28,
+      label: "Tire Change",
+      icon: "las la-car", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+      to: "/pneu",
+      permissionId: 41,
+    },
+  ],
+},
+  
     {
       id: 42,
       label: "Fuel",
