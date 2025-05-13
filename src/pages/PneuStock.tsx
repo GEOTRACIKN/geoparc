@@ -358,11 +358,17 @@ export function PneuStock() {
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                     <tbody className="light-body">
                         {loading ? (
-                            <tr>
-                                <td colSpan={8} className="text-center">
-                                    <PropagateLoader color="#0059b3" size={15} />
+                            <tr style={{ textAlign: "center" }}>
+                                <td className="text-center" colSpan={10}>
+                                    <p>
+                                        <PropagateLoader
+                                            color={"#123abc"}
+                                            loading={loading}
+                                            size={20}
+                                        />
+                                    </p>
                                 </td>
                             </tr>
                         ) : Array.isArray(list_pneu) && list_pneu.length !== 0 ? (
