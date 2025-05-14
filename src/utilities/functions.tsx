@@ -1,62 +1,79 @@
-
-import ExcelJS from 'exceljs';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { Button, Modal } from 'react-bootstrap';
-import { toast, Bounce } from 'react-toastify';
-import { polygon } from '@turf/helpers';
-import area from '@turf/area';
-import { lineString } from '@turf/helpers';
-import length from '@turf/length';
+import ExcelJS from "exceljs";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Button, Modal } from "react-bootstrap";
+import { toast, Bounce } from "react-toastify";
+import { polygon } from "@turf/helpers";
+import area from "@turf/area";
+import { lineString } from "@turf/helpers";
+import length from "@turf/length";
 import { format, parseISO, isValid } from "date-fns";
+import { useState } from "react";
 
 export function formatDateToTimestamp(dateString: string): string {
-    if (!dateString) {
-      return "-";
-    }
-    // Créer une nouvelle instance de Date à partir de la chaîne de caractères
-    const date = new Date(dateString);
-  
-    // Extraire les composantes de la date
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // +1 car les mois vont de 0 à 11
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-  
-    // Concaténer les composantes dans le format souhaité
-    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  
-    return formattedDate;
+  if (!dateString) {
+    return "-";
   }
- 
+  // Créer une nouvelle instance de Date à partir de la chaîne de caractères
+  const date = new Date(dateString);
 
+  // Extraire les composantes de la date
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // +1 car les mois vont de 0 à 11
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
 
-  export function formatToTimestamp(timestamp: string | number | Date) {
-    const date = new Date(timestamp);
-    const formattedDate = date.toLocaleString(); // ou utilisez des méthodes spécifiques pour obtenir le format souhaité
-    return formattedDate;
+  // Concaténer les composantes dans le format souhaité
+  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+  return formattedDate;
+}
+
+// Exporter la fonction de copie vers le presse-papiers
+export function useClipboard(name: string) {
+  const [copiedId, setCopiedId] = useState<string>(name);
+
+  function copyToClipboard(tagValue: string, tagId: string) {
+    const tempTextArea = document.createElement("textarea");
+    tempTextArea.value = tagValue;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempTextArea);
+
+    // Marquer le tag comme copié
+    setCopiedId(tagId);
+    setTimeout(() => setCopiedId(name), 2000); // Effacer le feedback après 2 secondes
   }
-  
 
-  //Fonction sans heure juste la date
-  export function toTimestamp(dateString: string): string {
-    if (!dateString) {
-        return "-";
-    }
-    // Créer une nouvelle instance de Date à partir de la chaîne de caractères
-    const date = new Date(dateString);
-  
-    // Extraire les composantes de la date
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // +1 car les mois vont de 0 à 11
-    const day = date.getDate().toString().padStart(2, '0');
-  
-    // Concaténer les composantes dans le format souhaité
-    const formattedDate = `${year}-${month}-${day}`;
-  
-    return formattedDate;
+  return { copyToClipboard, copiedId };
+}
+
+export function formatToTimestamp(timestamp: string | number | Date) {
+  const date = new Date(timestamp);
+  const formattedDate = date.toLocaleString(); // ou utilisez des méthodes spécifiques pour obtenir le format souhaité
+  return formattedDate;
+}
+
+//Fonction sans heure juste la date
+export function toTimestamp(dateString: string): string {
+  if (!dateString) {
+    return "-";
+  }
+  // Créer une nouvelle instance de Date à partir de la chaîne de caractères
+  const date = new Date(dateString);
+
+  // Extraire les composantes de la date
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // +1 car les mois vont de 0 à 11
+  const day = date.getDate().toString().padStart(2, "0");
+
+  // Concaténer les composantes dans le format souhaité
+  const formattedDate = `${year}-${month}-${day}`;
+
+  return formattedDate;
 }
 
 // Fonction généralisée pour générer un fichier Excel
@@ -85,7 +102,9 @@ export async function generateExcelFile(
     const buffer = await workbook.xlsx.writeBuffer();
 
     // Créer un blob pour le téléchargement
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -109,17 +128,20 @@ export async function generateExcelFile(
     console.error("Erreur lors de la génération du fichier Excel :", error);
 
     // Notification d'erreur
-    toast.error("Une erreur s'est produite lors de la génération du fichier Excel.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
+    toast.error(
+      "Une erreur s'est produite lors de la génération du fichier Excel.",
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      }
+    );
   }
 }
 
@@ -172,20 +194,22 @@ export async function generatePDFFile(
     console.error("Erreur lors de la génération du fichier PDF :", error);
 
     // Notification d'erreur
-    toast.error("Une erreur s'est produite lors de la génération du fichier PDF.", {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
+    toast.error(
+      "Une erreur s'est produite lors de la génération du fichier PDF.",
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      }
+    );
   }
 }
-
 
 // Fonction pour gérer la confirmation de téléchargement
 export function handleDownloadConfirm(
@@ -194,9 +218,9 @@ export function handleDownloadConfirm(
   downloadPDFFunction: () => void
 ) {
   // Sélectionnez le format de téléchargement
-  if (format === 'excel') {
+  if (format === "excel") {
     downloadExcelFunction();
-  } else if (format === 'pdf') {
+  } else if (format === "pdf") {
     downloadPDFFunction();
   }
 }
@@ -210,19 +234,14 @@ export function DownloadModal({
   show: boolean;
   onHide: () => void;
   onDownloadConfirm: (format: string) => void;
- 
 }) {
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      centered
-    >
+    <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
         <Modal.Title>Select Download Format</Modal.Title>
       </Modal.Header>
       <Modal.Body className="text-center">
-       Please select the format to download the data
+        Please select the format to download the data
         <div className="mt-3 d-flex justify-content-center">
           <Button
             variant="success"
@@ -231,10 +250,7 @@ export function DownloadModal({
           >
             Excel
           </Button>
-          <Button
-            variant="danger"
-            onClick={() => onDownloadConfirm("pdf")}
-          >
+          <Button variant="danger" onClick={() => onDownloadConfirm("pdf")}>
             PDF
           </Button>
         </div>
@@ -243,22 +259,25 @@ export function DownloadModal({
   );
 }
 
-
-export function engineStat(enginestat: number, speed: number, translate?: (key: string) => string) {
+export function engineStat(
+  enginestat: number,
+  speed: number,
+  translate?: (key: string) => string
+) {
   let iconState = "asset/images/mapicon/stop.png";
-  let tooltipMessage = translate ? translate("engineStopped") : "Engine stopped";
-
+  let tooltipMessage = translate
+    ? translate("engineStopped")
+    : "Engine stopped";
 
   if (enginestat == 0) {
-
     iconState = "asset/images/mapicon/stop.png";
     tooltipMessage = translate ? translate("engineStopped") : "Engine stopped";
-
   } else {
-
     if (enginestat == 1 && speed > 5) {
       iconState = "asset/images/mapicon/on-icon.png";
-      tooltipMessage = translate ? translate("engineRunning") : "Engine running";
+      tooltipMessage = translate
+        ? translate("engineRunning")
+        : "Engine running";
     } else {
       iconState = "asset/images/mapicon/pause.png";
       tooltipMessage = translate ? translate("enginePaused") : "Engine paused";
@@ -268,45 +287,43 @@ export function engineStat(enginestat: number, speed: number, translate?: (key: 
   return { iconState, tooltipMessage };
 }
 
-
-
-export async function getAddressFromCoordinates(lat: number, lon: number): Promise<string> {
-
+export async function getAddressFromCoordinates(
+  lat: number,
+  lon: number
+): Promise<string> {
   const apiUrl = `https://geotrackin.xyz/nominatim/reverse.php?format=jsonv2&lat=${lat}&lon=${lon}`;
   try {
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error('Failed to fetch address');
+      throw new Error("Failed to fetch address");
     }
     const data = await response.json();
     // Assuming your API returns an object with an 'address' property
     const address = data.display_name;
     return address;
-  } catch (error: any) { // Explicitly type error as 'any' or 'unknown'
-    console.error('Error:', error.message);
-    throw new Error('Failed to fetch address');
+  } catch (error: any) {
+    // Explicitly type error as 'any' or 'unknown'
+    console.error("Error:", error.message);
+    throw new Error("Failed to fetch address");
   }
 }
-
 
 export function formatDateForAlgeriaTimeZone(dateString: any) {
   // Parse the dateString into a Date object
   const date = new Date(dateString);
 
   // Convert the date to Algeria time zone
-  const options = { timeZone: 'Africa/Algiers' };
+  const options = { timeZone: "Africa/Algiers" };
   const formattedDate = date.toLocaleString(undefined, options);
 
   // Return the formatted date
   return formattedDate;
 }
 
-
-
 export function extractObjectName(str: string) {
   // Utilisation d'une expression régulière pour extraire le nom de l'objet
   const match = str.match(/^([A-Z]+)\(.+\)$/);
-  console.log(match)
+  console.log(match);
   // Vérification si le nom de l'objet a été trouvé dans la chaîne
   if (match && match[1]) {
     // Retourne le nom de l'objet extrait
@@ -325,27 +342,36 @@ export interface Geofence {
   position?: [number, number];
 }
 
-
-
-export function parseGeofenceAttributes(areageof: string, id: number): Geofence {
+export function parseGeofenceAttributes(
+  areageof: string,
+  id: number
+): Geofence {
   try {
     let result: Geofence = { id };
 
     if (areageof.startsWith("POLYGON")) {
       result.type = "polygon";
       const coordinatesString = areageof.slice(9, -2); // Remove "POLYGON((" at the start and "))" at the end
-      const coordinatesArray: [number, number][] = coordinatesString.split(",")
+      const coordinatesArray: [number, number][] = coordinatesString
+        .split(",")
         .map((coordinatePairString: string) => {
-          const [lat, lon] = coordinatePairString.trim().split(" ").map(parseFloat);
+          const [lat, lon] = coordinatePairString
+            .trim()
+            .split(" ")
+            .map(parseFloat);
           return [lat, lon];
         });
       result.positions = coordinatesArray;
     } else if (areageof.startsWith("LINESTRING")) {
       result.type = "polyline";
       const coordinatesString = areageof.slice(11, -1); // Remove "LINESTRING(" at the start and ")" at the end
-      const coordinatesArray: [number, number][] = coordinatesString.split(",")
+      const coordinatesArray: [number, number][] = coordinatesString
+        .split(",")
         .map((coordinatePairString: string) => {
-          const [lat, lon] = coordinatePairString.trim().split(" ").map(parseFloat);
+          const [lat, lon] = coordinatePairString
+            .trim()
+            .split(" ")
+            .map(parseFloat);
           return [lat, lon];
         });
       result.positions = coordinatesArray;
@@ -360,7 +386,10 @@ export function parseGeofenceAttributes(areageof: string, id: number): Geofence 
 
     return result;
   } catch (error) {
-    console.error("Erreur lors de l'analyse de la chaîne d'attributs geofence :", error);
+    console.error(
+      "Erreur lors de l'analyse de la chaîne d'attributs geofence :",
+      error
+    );
     return {
       id: id,
       type: undefined,
@@ -368,28 +397,25 @@ export function parseGeofenceAttributes(areageof: string, id: number): Geofence 
   }
 }
 
-
-
-
 // Définir les types pour les géofences
 type CircleGeofence = {
-  type: 'CIRCLE';
+  type: "CIRCLE";
   radius: number; // en mètres
 };
 
 type RectangleGeofence = {
-  type: 'RECTANGLE';
+  type: "RECTANGLE";
   width: number; // en mètres
   height: number; // en mètres
 };
 
 type PolygonGeofence = {
-  type: 'POLYGON';
+  type: "POLYGON";
   vertices: { x: number; y: number }[]; // Liste des sommets du polygone
 };
 
 type LineStringGeofence = {
-  type: 'LINESTRING';
+  type: "LINESTRING";
   points: { x: number; y: number }[]; // Liste des points de la ligne
 };
 
@@ -400,61 +426,57 @@ type Geofencing = CircleGeofence | PolygonGeofence | LineStringGeofence;
 export function parseGeofencing(input: string): Geofencing {
   const match = input.match(/^(\w+)\(([^,]+),[^,]+,(\d+(\.\d+)?)\)$/);
 
-
-  if (match && match[1] === 'CIRCLE') {
+  if (match && match[1] === "CIRCLE") {
     return {
-      type: 'CIRCLE',
+      type: "CIRCLE",
       radius: parseFloat(match[3]),
     };
   }
 
-
   // Expression régulière pour capturer le type POLYGON
   const polygonMatch = input.match(/^POLYGON\(\(([^)]+)\)\)$/);
   if (polygonMatch) {
-
     // Capturer les coordonnées des sommets
     const vertices = polygonMatch[1]
-      .split(',')
-      .map(coord => coord.trim().split(' ')
-        .map(Number))
+      .split(",")
+      .map((coord) => coord.trim().split(" ").map(Number))
       .map(([x, y]) => ({ x, y })); // Convertir en objets { x, y }
 
     return {
-      type: 'POLYGON',
+      type: "POLYGON",
       vertices,
     };
   }
 
   const lineStringMatch = input.match(/^LINESTRING\(([^)]+)\)$/);
   if (lineStringMatch) {
-    const points = lineStringMatch[1].split(',').map(point => {
-      const [x, y] = point.split(' ').map(coord => parseFloat(coord));
+    const points = lineStringMatch[1].split(",").map((point) => {
+      const [x, y] = point.split(" ").map((coord) => parseFloat(coord));
       return { x, y };
     });
     return {
-      type: 'LINESTRING',
+      type: "LINESTRING",
       points,
     };
   }
 
-  throw new Error('Type de géofence inconnu ou format invalide');
-};
+  throw new Error("Type de géofence inconnu ou format invalide");
+}
 
 // Fonction pour calculer la surface ou la longueur
 export const calculateSurfaceOrLength = (geofence: Geofencing): number => {
   switch (geofence.type) {
-    case 'CIRCLE':
+    case "CIRCLE":
       // Surface d'un cercle: π * r^2
-      return Math.PI * Math.pow(geofence.radius, 2)/1000;
+      return (Math.PI * Math.pow(geofence.radius, 2)) / 1000;
 
-    case 'POLYGON':
+    case "POLYGON":
       // Surface d'un polygone: algorithme de l'aire de Shoelace
 
       console.log("geofence.vertices");
 
       const vertices = geofence.vertices;
-      const coordinates = vertices.map(vertex => [vertex.x, vertex.y]);
+      const coordinates = vertices.map((vertex) => [vertex.x, vertex.y]);
 
       // Ajouter le premier point à la fin pour fermer le polygone
       coordinates.push(coordinates[0]);
@@ -465,35 +487,28 @@ export const calculateSurfaceOrLength = (geofence: Geofencing): number => {
       // Calculer l'aire en mètres carrés
       const areaInSquareMeters = area(poly);
 
-
       // Conversion en kilomètres carrés
-      const areaInSquareKilometers = areaInSquareMeters / 1000; 
-      console.log('Area in square:', areaInSquareKilometers);
+      const areaInSquareKilometers = areaInSquareMeters / 1000;
+      console.log("Area in square:", areaInSquareKilometers);
       return areaInSquareKilometers;
 
-    case 'LINESTRING':
+    case "LINESTRING":
       // Longueur d'une ligne: somme des distances entre les points
 
-
-      const points = geofence.points.map(vertex => [vertex.x, vertex.y])
+      const points = geofence.points.map((vertex) => [vertex.x, vertex.y]);
 
       // Créer un LINESTRING avec Turf
       const line = lineString(points);
 
       // Calculer la distance du LINESTRING
-      const distance = length(line, { units: 'kilometers' });
-
-
+      const distance = length(line, { units: "kilometers" });
 
       return distance;
 
     default:
-      throw new Error('Type de géofence inconnu');
+      throw new Error("Type de géofence inconnu");
   }
-
-  
 };
-
 
 export const formatDate = (inputDate: string | Date | null | undefined) => {
   if (!inputDate) return "--/--/----"; // Valeur par défaut si null ou undefined

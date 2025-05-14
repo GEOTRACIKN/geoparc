@@ -756,6 +756,21 @@
 "Vehicle states": "حالة المركبات",
 " Fleet status": " حالة أسطول المركبات ",
 "Available-Out of Service": "متاح معطل",
-"Assigned": "مخصص"
- 
+"Assigned": "مخصص",
+"Tire Status": "حالة الإطار",
+  "Install": "تثبيت",
+  "Uninstall": "إزالة التثبيت",
+  "Position": "الموضع",
+  "Front Left": "أمامي يسار",
+  "Front Right": "أمامي يمين",
+  "Rear Left": "خلفي يسار",
+  "Rear Right": "خلفي يمين",
+  "Spare Tire": "الإطار الاحتياطي",
+  "Select Status": "اختر الحالة",
+  "Select Position": "اختر الموضع",
+  "Select a vehicle": "اختر مركبة" ,
+  "Inv. No.": "رقم الفاتورة",
+  "Supplier": "المورد",
+  "Km" :"كم",
+  "Tire Change": "تغيير الإطار"
 }

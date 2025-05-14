@@ -742,5 +742,20 @@
 "Vehicle states": "Estados de los vehículos",
 " Fleet status": " Estado de la flota",
 "Available-OS": "Disponible defectuoso",
-"Assigned": "Asignado"
+"Assigned": "Asignado",
+"Tire Status": "Estado del neumático",
+  "Install": "Instalar",
+  "Uninstall": "Desinstalar",
+  "Position": "Posición",
+  "Front Left": "Delantero izquierdo",
+  "Front Right": "Delantero derecho",
+  "Rear Left": "Trasero izquierdo",
+  "Rear Right": "Trasero derecho",
+  "Spare Tire": "Neumático de repuesto",
+  "Select Status": "Seleccionar estado",
+  "Select Position": "Seleccionar posición",
+  "Select a vehicle": "Seleccionar un vehículo",
+  "Inv. No.": "N.º Factura",
+  "Supplier": "Proveedor",
+  "Tire Change": "Cambio de neumático"
 }

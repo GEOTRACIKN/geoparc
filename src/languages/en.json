@@ -733,7 +733,24 @@
 "Under repair": "Under repair",
 "Available": "Available",
 "Available-OS": "Available-OS",
-"Assigned": "Assigned"
+"Assigned": "Assigned",
+"Tire Status": "Tire Status",
+"Install": "Install",
+"Uninstall": "Uninstall",
+"Position": "Position",
+"Front Left": "Front Left",
+"Front Right": "Front Right",
+"Rear Left": "Rear Left",
+"Rear Right": "Rear Right",
+"Spare Tire": "Spare Tire",
+"Select Status": "Select Status",
+"Select Position": "Select Position",
+"Select a vehicle": "Select a vehicle",
+"Error retrieving mileage": "Error retrieving mileage",
+"Supplier": "Supplier",
+"Tire Change": "Tire Change"
+
+
 
 
 }

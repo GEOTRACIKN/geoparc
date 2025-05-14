@@ -253,18 +253,10 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                                     
                                 </option>
 
-                                
-
-
                             ))}
                            
                         </Form.Control>
                     </Form.Group>
-
-                
-                  
-
-                   
 
                     <Form.Group controlId="place_servicing">
                         <Form.Label>{translate("Place")}</Form.Label>
@@ -273,17 +265,7 @@ const ModalEditServicing: React.FC<ModalEditServicingProps> = ({
                             //placeholder="Entrez le nom du client"
                             value={formData.place_servicing}
                             onChange={handleChange}
-                            onKeyDown={(e) => {
-                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (
-                                  !/[0-9]/.test(e.key) &&
-                                  !allowedKeys.includes(e.key)
-                                ) {
-                                  e.preventDefault();
-                                }
-                              }}
-                              min="0"
+                           
                         />
                     </Form.Group>
 

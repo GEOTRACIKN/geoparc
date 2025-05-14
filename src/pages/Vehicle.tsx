@@ -613,20 +613,20 @@ export function Vehicle() {
     { id: "immatriculation_vehicule", label: translate("Immatriculation") + " *", type: "text", placeholder: "Immatriculation", icon: "fas fa-barcode", required: true },
     { id: "id_parc", label: "Parc", type: "SelectGroup", options: parksOptions, onChange: handleParkChange, icon: "fas fa-warehouse", required: false, mode: true },
     { id: "nom_conducteur", label: "Conducteur", placeholder: "Select conducteur", type: "SelectGroup", options: drivesrOptions, onChange: handleDriverChange, icon: "fas fa-user", required: false, },
-    { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: true, },
-    { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: true },
-    { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: true, },
-    { id: "nom_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: true, },
-    { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], onChange: handleStateVehiculeChange, icon: "fas fa-info-circle", required: true, },
-    { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: true, },
+    { id: "category_vehicule", label: "Catégorie", type: "SelectGroup", options: categoryOptions, onChange: handleCategoryChange, icon: "fas fa-list", required: false, },
+    { id: "modele_vehicule", label: "Modèle", type: "text", placeholder: "Modèle", icon: "fas fa-cube", required: false },
+    { id: "vehicule_type", label: "Type", type: "SelectGroup", options: typesOptions, onChange: handleTypeChange, icon: "fas fa-list", required: false, },
+    { id: "nom_marque", label: "Marque", type: "SelectGroup", options: brandOptions, onChange: handleBrandChange, icon: "fas fa-tag", required: false, },
+    { id: "etat_vehicule", label: "État", type: "select", options: ["État", "Disponible", "Disponible-Hs", "Affecté", "En panne", "En réparation", "HS"], onChange: handleStateVehiculeChange, icon: "fas fa-info-circle", required: false, },
+    { id: "type_carburant_vehicule", label: "Type carburant", type: "select", options: ["Type carburant", "Essence", "Gas oil", "GPL", "Électrique"], icon: "fas fa-gas-pump", required: false, },
     { id: "inService_vehicule", label: "Service", type: "select", options: ["Service"], icon: "fas fa-tools", required: false, mode: true },
     { id: "capacite_res_vehicule", label: "Capacité réservoir (L)", type: "text", placeholder: "Capacité réservoir (L)", icon: "fas fa-tachometer-alt", required: false, mode: true },
     { id: "consommation_moyenne_vehicule", label: "Consommation moyenne (l/100km)", type: "text", placeholder: "Consommation moyenne", icon: "fas fa-road", required: false, mode: true },
     { id: "kilometrage_vehicule", label: "Kilométrage (Km)", type: "text", placeholder: "Kilométrage", icon: "fas fa-road", required: false },
     { id: "image_vehicule", label: "Photo Véhicule", type: "file", placeholder: "", icon: "fas fa-image", required: false, mode: true },
-    { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: true, mode: true },
-    { id: "couleur_vehicule", label: "Couleur vehicule", type: "text", placeholder: "Couleur vehicule", icon: "fas fa-paint-brush", required: true, mode: true },
-    { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: true, mode: true },
+    { id: "propriete_vehicule", label: "Acquisition", type: "select", options: ["Acquisition", "Achat", "Leasing", "Location"], icon: "fas fa-shopping-cart", required: false, mode: true },
+    { id: "couleur_vehicule", label: "Couleur vehicule", type: "text", placeholder: "Couleur vehicule", icon: "fas fa-paint-brush", required: false, mode: true },
+    { id: "num_porte_vehicule", label: "Codification véhicule", type: "text", placeholder: "Numéro de porte", icon: "fas fa-hashtag", required: false, mode: true },
     { id: "gamme_vehicule", label: "Gamme", type: "text", placeholder: "Moteur", icon: "fas fa-cogs", required: false, mode: true },
     { id: "nom_user", label: "User", type: "SelectGroup", options: usersOptions, onChange: handleUserChange, icon: "fas fa-user", required: false, mode: true },
   ];
@@ -672,10 +672,10 @@ export function Vehicle() {
 
 
   const fieldsTab6: Field[] = [
-    { id: "dernier_vidange_vehicule", label: "Dernier Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: true },
-    { id: "prochain_vidange_vehicule", label: "Prochain Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: true },
-    { id: "date_dernier_vidange", label: "Date du Dernier Vidange *", type: "date", placeholder: "Sélectionnez la date", icon: "fas fa-calendar", required: true },
-    { id: "kilometrage_prochain_entretien", label: "Prochain Entretien *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tools", required: true },
+    { id: "dernier_vidange_vehicule", label: "Dernier Vidange (Km)", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: false },
+    { id: "prochain_vidange_vehicule", label: "Prochain Vidange (Km)", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: false },
+    { id: "date_dernier_vidange", label: "Date du Dernier Vidange", type: "date", placeholder: "Sélectionnez la date", icon: "fas fa-calendar", required: false },
+    { id: "kilometrage_prochain_entretien", label: "Prochain Entretien", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tools", required: false },
   ];
 
 

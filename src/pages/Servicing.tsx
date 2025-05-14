@@ -7,6 +7,8 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
+import { Bounce, toast } from "react-toastify";
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
 interface Servicing {
@@ -22,14 +24,19 @@ interface Servicing {
     next_oil_change_servicing: number;
     
 }
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
+
 
 
 export function Servicing() {
 
+    const id_user = localStorage.getItem("GeopUserID");
+
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
+        // Ajouter temporairement au début de votre composant
+useEffect(() => {
+    localStorage.removeItem("selectedColumns"); // À retirer après utilisation
+}, []);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -42,6 +49,7 @@ export function Servicing() {
 
     
     
+
     const [selectedServicingId, setSelectedServicingId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -51,16 +59,14 @@ export function Servicing() {
    ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
-        InvoiceNo: true,
-        Type: true,
-        Vehicle: true,
         Date: true,
-        Place: true,
-        Cost: true,
-        //Depreciation: true,
+        Vehicle: true,
         KM: true,
-        //NextOilChange: true,
-    
+        InvoiceNo: false,
+        Service: false,
+        Cost: false,
+        Place: false,
+        //Depreciation: true
     };
     
     const serviceMapping: { [key: number]: string } = {
@@ -80,9 +86,33 @@ export function Servicing() {
     };
 
     // Load selected columns from localStorage or use initial state
-    const loadSelectedColumns = () => {
+    /*const loadSelectedColumns = () => {
         const savedColumns = localStorage.getItem("selectedColumns");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
+    };*/
+
+    const loadSelectedColumns = () => {
+        const savedColumns = localStorage.getItem("selectedColumns");
+        
+        if (savedColumns) {
+            const parsedColumns = JSON.parse(savedColumns);
+            
+            // Vérifier la structure des colonnes
+            const isValid = [
+                parsedColumns.ID !== undefined,
+                parsedColumns.Vehicle !== undefined,
+                parsedColumns.KM !== undefined
+            ].every(Boolean);
+    
+            if (!isValid) {
+                localStorage.removeItem("selectedColumns");
+                return initialColumns;
+            }
+            
+            return parsedColumns;
+        }
+        
+        return initialColumns;
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
@@ -231,6 +261,75 @@ export function Servicing() {
         getServicing();
     };
 
+     const handleUpdateState = async () => {
+            if (selectedServicingId) {
+                try {
+                    // Effectuer la mise à jour de l'état de l'entretien via l'API
+                    const response = await fetch(`${backendUrl}/api/geop/Servicing/updatestate/${selectedServicingId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            statut: "Cloturé", // Le statut que vous souhaitez mettre à jour
+                        }),
+                    });
+    
+                    // Vérifier si la requête a réussi
+                    if (response.ok) {
+                        // Afficher une notification de succès
+                        toast.success("Statut de l'entretien mis à jour avec succès!", {
+                            position: "bottom-right",
+                            autoClose: 3000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+    
+                        });
+    
+                        refreshData(); // Rafraîchir les données après la mise à jour
+                    } else {
+                        // Afficher une notification d'erreur si la requête a échoué
+                        toast.error("Erreur lors de la mise à jour du statut de l'entretien.", {
+                            position: "bottom-right",
+                            autoClose: 3000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+    
+                        });
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la clôture de l'entretien:", error);
+    
+                    // Afficher une notification d'erreur en cas d'exception
+                    toast.error("Une erreur s'est produite. Veuillez réessayer.", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+    
+                    });
+                } finally {
+                    setShowConfirmModal(false); // Fermer la modal après l'opération
+                }
+            }
+        };
+    
+
 
     return (
         <>
@@ -375,7 +474,7 @@ export function Servicing() {
                                 </th>
                             )}
                             
-                            {selectedColumns.Type && (
+                            {selectedColumns.Service && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("type_servicing")}
@@ -446,13 +545,13 @@ export function Servicing() {
                                              {selectedColumns.Vehicle && (
                                                 <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
-                                             {selectedColumns.Km && (
+                                             {selectedColumns.KM && (
                                                 <td>{Servicing.km_servicing}</td>
                                             )}
                                               {selectedColumns.InvoiceNo && (
                                                 <td>{Servicing.invoice_no_servicing}</td>
                                             )}
-                                            {selectedColumns.Type && (
+                                            {selectedColumns.Service && (
                                                 <td>
                                                     {serviceMapping[Servicing.type_servicing]}
                                                 </td>
@@ -575,7 +674,7 @@ export function Servicing() {
                     <Button variant="secondary" onClick={handleCloseConfirmModal}>
                         {translate("No")}
                     </Button>
-                    <Button variant="primary" onClick={handleCloseConfirmModal}>
+                    <Button variant="primary" onClick={handleUpdateState}>
                         {translate("Yes")}
                     </Button>
                     </Modal.Footer>

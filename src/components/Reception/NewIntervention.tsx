@@ -6,7 +6,7 @@ import { formatDateToTimestamp } from "../../utilities/functions";
 import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
 
-const geopuserID = localStorage.getItem("GeopUserID");
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface ModalNewInterventionnProps {
     show: boolean;
@@ -19,7 +19,6 @@ interface Vehicle {
     immatriculation_vehicule: string;
 }
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
 const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
@@ -39,6 +38,7 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
         receptionistName: "",
         service: 0,
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
 
     const { translate } = useTranslate();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
@@ -183,6 +183,11 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
             });
         }
     };
+    const getVehicleKm = async (id_vehicule: string | number) => {
+        const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+        if (!res.ok) throw new Error("Erreur récupération km");
+        return await res.json();
+    };
 
 
     return (
@@ -238,35 +243,45 @@ const ModalNewIntervention: React.FC<ModalNewInterventionnProps> = ({
                             .find(option => String(option.value) === String(formData.id_vehicule)) || null
                         }
 
-                        onChange={(selectedOption) => {
-                            setFormData(prev => ({
-                                ...prev,
-                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
-                            }));
+                        onChange={async (selectedOption) => {
+                            const id = selectedOption ? String(selectedOption.value) : "";
+                        
+                            if (id) {
+                                try {
+                                    const data = await getVehicleKm(id);
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        id_vehicule: id,
+                                        km: data.kilometrage_vehicule || "",
+                                    }));
+                                } catch (error) {
+                                    console.error("Erreur lors de la récupération du km:", error);
+                                    toast.error("Erreur récupération kilométrage", {
+                                        position: "bottom-right",
+                                        autoClose: 2400,
+                                        transition: Bounce,
+                                    });
+                                }
+                            } else {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    id_vehicule: "",
+                                    km: "",
+                                }));
+                            }
                         }}
+                        
                     />
                 </Form.Group>
 
-                    <Form.Group controlId="km">
-                        <Form.Label>{translate("Km")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            placeholder="Entrez le kilométrage"
-                            value={formData.km}
-                            onChange={handleChange}
-                            onKeyDown={(e) => {
-                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (
-                                  !/[0-9]/.test(e.key) &&
-                                  !allowedKeys.includes(e.key)
-                                ) {
-                                  e.preventDefault();
-                                }
-                              }}
-                              min="0"
-                        />
-                    </Form.Group>
+                <Form.Group controlId="km">
+                    <Form.Label>{translate("Km")}</Form.Label>
+                    <Form.Control
+                        value={formData.km}
+                        readOnly
+                    />
+                </Form.Group>
+
 
                     <Form.Group controlId="subject">
                         <Form.Label>{translate("Subject")}</Form.Label>

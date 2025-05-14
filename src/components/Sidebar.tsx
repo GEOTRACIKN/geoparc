@@ -308,8 +308,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           to: "/servicing",
           permissionId: 41,
         },
+        {
+          id: 27,
+          label: "Tire Change",
+          icon: "",
+          to: "/pneu",
+          permissionId: 41,
+        },
       ],
     },
+    
     {
       id: 42,
       label: "Fuel",
@@ -343,6 +351,22 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           icon: "las fa-money-bill-wave",
           to: "/cash-management",
           permissionId: 42,
+        },
+      ],
+    },
+
+    {
+      id: 42, // ID principal du menu Store
+      label: "Stock",
+      icon: "las la-store",
+      permissionId: 42, // Doit exister dans ta table des permissions
+      subItems: [
+        {
+          id: 42,
+          label: "Tire",
+          icon: "las la-boxes",
+          to: "/pneu_stock",
+          permissionId: 42, // Permission spécifique à la vue "Stock"
         },
       ],
     },
