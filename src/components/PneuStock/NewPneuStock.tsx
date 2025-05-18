@@ -150,7 +150,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                         <Form.Label>{translate("Reference")}* </Form.Label>
                         <Form.Control 
                             type="text" 
-                            placeholder={translate("Dimension/Load/Speed")}
+                            placeholder={translate("Size / Load Index / Speed Rating")}
                             value={formData.ref_pneu} 
                             onChange={handleChange} 
                         />

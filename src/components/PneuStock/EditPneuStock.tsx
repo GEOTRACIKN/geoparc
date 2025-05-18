@@ -203,7 +203,7 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                                         <Form.Label>{translate("Reference")} *</Form.Label>
                                         <Form.Control 
                                             type="text" 
-                                            placeholder="Dimension/Charge/Vitesse"
+                                            placeholder={translate("Size / Load Index / Speed Rating")}
                                             value={formData.ref_pneu} 
                                             onChange={handleChange} 
                                         />
