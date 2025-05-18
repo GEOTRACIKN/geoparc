@@ -116,7 +116,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                     <Form.Group controlId="type_pneu">
                         <Form.Label>{translate("Tire Type")} *</Form.Label>
                         <Form.Control as="select" value={formData.type_pneu} onChange={handleChange} required>
-                            <option value="">{translate("-- Tire type --")}</option>
+                            <option value="">{translate("-- Tire Type --")}</option>
                             <option value="utilitaire">{translate("Utility/Van")}</option>
                             <option value="poids_lourd">{translate("Heavy Truck")}</option>
                             <option value="suv">{translate("SUV / 4x4")}</option>
@@ -196,7 +196,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                     </Form.Group>
 
                     <Form.Group controlId="fact_pneu">
-                        <Form.Label>{translate("Invoice Number")}</Form.Label>
+                        <Form.Label>{translate("Invoice No")}</Form.Label>
                         <Form.Control 
                             type="text" 
                             value={formData.fact_pneu} 

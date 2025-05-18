@@ -739,7 +739,6 @@
 "Under Repair": "قيد الإصلاح",
 "Available": "متاح",
 "Please fill out all fields": "يرجى ملء جميع الحقول",
-
 "Error updating. Please try again.": "حدث خطأ أثناء التحديث. يرجى المحاولة مرة أخرى.",
 "Updated successfully!": "تم التحديث بنجاح!",
 "Error adding. Please try again.": "حدث خطأ أثناء الإضافة. يرجى المحاولة مرة أخرى.",
@@ -778,5 +777,6 @@
 "SUV / 4x4": "دفع رباعي / SUV",
 "Trailer (small luggage)": "مقطورة (أمتعة صغيرة)",
 "Car/Passenger": "سيارة / ركاب",
-"Agricultural": "زراعية"
+"Agricultural": "زراعية",
+"Tire Type": "نوع الإطار"
 }

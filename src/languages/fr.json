@@ -764,7 +764,10 @@
 "SUV / 4x4": "SUV / 4x4",
 "Trailer (small luggage)": "Remorque (petit bagage)",
 "Car/Passenger": "Voiture / Tourisme",
-"Agricultural": "Agricole"
+"Agricultural": "Agricole",
+"Tire Type": "Type de pneu",
+"Brand": "Marque",
+"Serial Number": "Numéro de série"
 
 
 }

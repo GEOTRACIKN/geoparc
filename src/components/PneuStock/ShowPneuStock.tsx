@@ -186,7 +186,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                                 </Form.Group>
 
                                 <Form.Group controlId="fact_pneu">
-                                    <Form.Label>{translate("Invoice Number")}</Form.Label>
+                                    <Form.Label>{translate("Invoice No")}</Form.Label>
                                     <Form.Control value={formData.fact_pneu} readOnly />
                                 </Form.Group>
                                 <Form.Group controlId="cout_pneu">

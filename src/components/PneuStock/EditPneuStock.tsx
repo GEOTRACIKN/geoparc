@@ -251,7 +251,7 @@ const EditPneuStockModal: React.FC<EditPneuStockModalProps> = ({ show, onHide, i
                                     </Form.Group>
         
                                     <Form.Group controlId="fact_pneu">
-                                        <Form.Label>{translate("Invoice Number")}</Form.Label>
+                                        <Form.Label>{translate("Invoice No")}</Form.Label>
                                         <Form.Control 
                                             type="text" 
                                             value={formData.fact_pneu} 
