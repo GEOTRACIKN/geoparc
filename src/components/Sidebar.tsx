@@ -372,7 +372,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 42,
           label: "Items",
           icon: "las la-cogs",
-          to: "/",
+          to: "/piece_stock",
           permissionId: 42, 
         },
       ],

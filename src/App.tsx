@@ -36,6 +36,8 @@ import { Servicing } from "./pages/Servicing";
 import { Pneu } from "./pages/Pneu";
 
 import { PneuStock } from "./pages/PneuStock";
+import { PieceStock } from "./pages/PieceStock";
+
 
 
 
@@ -167,6 +169,8 @@ function App() {
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
           <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
+          <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
+
 
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
