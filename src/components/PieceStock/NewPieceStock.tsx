@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { useTranslate } from "../../hooks/LanguageProvider";
+import { Bounce, toast } from "react-toastify";
+
 
 interface NewPieceStockProps {
     show: boolean;
@@ -110,6 +112,11 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
             });
 
             if (response.ok) {
+                  toast.success(translate("Added to stock successfully!"), {
+                                position: "bottom-right",
+                                autoClose: 2400,
+                                transition: Bounce,
+                            });
                 onSuccess();
                 onHide();
                 setNewPiece(prev => ({
@@ -121,6 +128,11 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
             }
         } catch (error) {
             console.error("Erreur réseau:", error);
+              toast.error(translate("Error adding to stock. Please try again"), {
+                            position: "bottom-right",
+                            autoClose: 2400,
+                            transition: Bounce,
+                        });
         }
     };
 

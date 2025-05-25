@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 
 interface EditPieceStockProps {
     show: boolean;
@@ -84,6 +85,7 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
                 
             } catch (error) {
                 console.error("Erreur de chargement des données:", error);
+                toast.error(translate("Error loading stock data"));
             } finally {
                 setIsLoading(false);
             }
@@ -104,15 +106,29 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
 
     const handleSubmit = async () => {
         try {
-            await axios.put(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`, {
+            const response = await axios.put(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`, {
                 ...formData,
                 id_user: id_user
             });
 
             onSuccess();
             onHide();
+             if (response.status === 200) {
+                            toast.success(translate("Update successful!"), { 
+                                position: "bottom-right", 
+                                autoClose: 2400, 
+                                transition: Bounce 
+                            });
+                            if (onSuccess) onSuccess();
+                            handleClose();
+                        }
         } catch (error) {
             console.error("Erreur de mise à jour:", error);
+            toast.error(translate("Update failed. Please try again."), { 
+                            position: "bottom-right", 
+                            autoClose: 2400, 
+                            transition: Bounce 
+                        });
         }
     };
 
