@@ -42,7 +42,7 @@ export function PieceStock() {
         "ID": true,
         "Type": true,
         "Reference": true,
-        "Nom": true,
+        "Brand": true,
         "Model": true,
         "Quantity": true,
         "Purchase Cost": true,
@@ -157,7 +157,7 @@ export function PieceStock() {
             case translate("Reference"):
                 setType(1);
                 break;
-            case translate("Nom"):
+            case translate("Brand"):
                 setType(2);
                 break;
             case translate("Model"):
@@ -231,7 +231,7 @@ export function PieceStock() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Nom")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Brand")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Model")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                             </Dropdown.Menu>
@@ -314,9 +314,9 @@ export function PieceStock() {
                                     {translate("Reference")}
                                 </th>
                             )}
-                            {selectedColumns.Nom && (
+                            {selectedColumns.Brand && (
                                 <th className="sorting" onClick={() => handleSortingColumn("marque_ps")}>
-                                    {translate("Nom")}
+                                    {translate("Brand")}
                                 </th>
                             )}
                             {selectedColumns.Model && (
@@ -369,7 +369,7 @@ export function PieceStock() {
                                     {selectedColumns.ID && <td>{piece.id_piece_stock}</td>}
                                     {selectedColumns.Type && <td>{typePieceLabels[piece.type_piece_ps] || piece.type_piece_ps}</td>}
                                     {selectedColumns.Reference && <td>{piece.reference_ps}</td>}
-                                    {selectedColumns.Nom && <td>{piece.marque_ps}</td>}
+                                    {selectedColumns.Brand && <td>{piece.marque_ps}</td>}
                                     {selectedColumns.Model && <td>{piece.modele_ps}</td>}
                                     {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
                                     {selectedColumns["Purchase Cost"] && <td>{piece.cout_achat_ps}</td>}

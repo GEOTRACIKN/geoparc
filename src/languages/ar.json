@@ -779,6 +779,15 @@
 "Car/Passenger": "سيارة / ركاب",
 "Agricultural": "زراعية",
 "Tire Type": "نوع الإطار",
-"Items" : "قطع"
+"Items" : "قطع",
+"Invoice Number": "رقم الفاتورة",
+"Manufacturer": "الشركة المصنعة",
+"Brand": "العلامة التجارية",
+"Designation": "التسمية",
+"Purchase Cost (DZD)": "تكلفة الشراء (دج)",
+"Quantity": "الكمية",
+"Minimum Stock": "الحد الأدنى للمخزون",
+"Depreciation Duration (days)": "مدة الإهلاك (بالأيام)",
+"Depreciation KM": "إهلاك حسب الكيلومترات"
 
 }

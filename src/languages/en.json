@@ -756,6 +756,15 @@
 "Car/Passenger": "Car/Passenger",
 "Agricultural": "Agricultural",
 "Tire Type": "Tire Type",
-"Items": "Items"
+"Items": "Items",
+"Invoice Number": "Invoice Number",
+"Manufacturer": "Manufacturer",
+"Brand": "Brand",
+"Designation": "Designation",
+"Purchase Cost (DZD)": "Purchase Cost (DZD)",
+"Quantity": "Quantity",
+"Minimum Stock": "Minimum Stock",
+"Depreciation Duration (days)": "Depreciation Duration (days)",
+"Depreciation KM": "Depreciation KM"
 
 }

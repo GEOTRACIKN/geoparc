@@ -132,12 +132,12 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
                 <Modal.Title>{translate("Nouvelle pièce en stock")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-           <Form>
-    {/* 1 - Date d'achat & N° Facture */}
+         <Form>
+    {/* 1 - Purchase Date & Invoice Number */}
     <div className="row">
-            <div className="col-md-6">
+        <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("N° Facture")}</Form.Label>
+                <Form.Label>{translate("Invoice Number")}</Form.Label>
                 <Form.Control
                     name="num_facture_ps"
                     value={newPiece.num_facture_ps}
@@ -146,10 +146,10 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
                 />
             </Form.Group>
         </div>
-        
+
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Date d'achat")}</Form.Label>
+                <Form.Label>{translate("Purchase Date")}</Form.Label>
                 <Form.Control
                     type="date"
                     name="date_achat_ps"
@@ -159,14 +159,13 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
                 />
             </Form.Group>
         </div>
-    
     </div>
 
-    {/* 2 - Constructeur & Marque */}
+    {/* 2 - Manufacturer & Brand */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Constructeur")}</Form.Label>
+                <Form.Label>{translate("Manufacturer")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="constructeur_ps"
@@ -182,7 +181,7 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Marque")}</Form.Label>
+                <Form.Label>{translate("Brand")}</Form.Label>
                 <Form.Control
                     name="marque_ps"
                     value={newPiece.marque_ps}
@@ -192,11 +191,11 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
     </div>
 
-    {/* 3 - Modèle & Catégorie */}
+    {/* 3 - Model & Category */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Modèle")}</Form.Label>
+                <Form.Label>{translate("Model")}</Form.Label>
                 <Form.Control
                     name="modele_ps"
                     value={newPiece.modele_ps}
@@ -206,7 +205,7 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Catégorie")}</Form.Label>
+                <Form.Label>{translate("Category")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="categorie_ps"
@@ -222,7 +221,7 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
     </div>
 
-    {/* 4 - Type & Désignation */}
+    {/* 4 - Type & Designation */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
@@ -242,7 +241,7 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Désignation")}</Form.Label>
+                <Form.Label>{translate("Designation")}</Form.Label>
                 <Form.Control
                     name="designation_ps"
                     value={newPiece.designation_ps}
@@ -252,26 +251,23 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
     </div>
 
-    {/* 5 - Référence & Fournisseur */}
+    {/* 5 - Reference & Supplier */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Référence")}</Form.Label>
+                <Form.Label>{translate("Reference")}</Form.Label>
                 <InputGroup>
                     <Form.Control
                         name="reference_ps"
                         value={newPiece.reference_ps}
                         onChange={handleChange}
                     />
-                    <Button variant="outline-secondary">
-                        <i className="las la-barcode"></i>
-                    </Button>
                 </InputGroup>
             </Form.Group>
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Fournisseur")}</Form.Label>
+                <Form.Label>{translate("Supplier")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="fournisseur_ps"
@@ -287,75 +283,105 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
         </div>
     </div>
 
-    {/* 6 - Coût d'achat, Quantité, Stock min */}
+    {/* 6 - Purchase Cost, Quantity, Min Stock */}
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Coût d'achat")} (€)</Form.Label>
+                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
                 <Form.Control
-                    type="number"
-                    step="0.01"
+                    type="text"
                     name="cout_achat_ps"
                     value={newPiece.cout_achat_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Quantité")}</Form.Label>
+                <Form.Label>{translate("Quantity")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="quantite_ps"
                     value={newPiece.quantite_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Stock min")}</Form.Label>
+                <Form.Label>{translate("Minimum Stock")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="stock_min_ps"
                     value={newPiece.stock_min_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
     </div>
 
-    {/* 7 - Amortissement */}
+    {/* 7 - Depreciation */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Durée d'amort (jours)")}</Form.Label>
+                <Form.Label>{translate("Depreciation Duration (days)")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="duree_amort_ps"
                     value={newPiece.duree_amort_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("KM d'amort")}</Form.Label>
+                <Form.Label>{translate("Depreciation KM")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="km_amort_ps"
                     value={newPiece.km_amort_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
     </div>
 </Form>
+
 
             </Modal.Body>
             <Modal.Footer>

@@ -765,5 +765,14 @@
 "Car/Passenger": "Coche / Turismo",
 "Agricultural": "Agrícola",
 "Tire Type": "Tipo de neumático",
-"Items" : "Piezas"
+"Items" : "Piezas",
+"Invoice Number": "Número de factura",
+"Manufacturer": "Fabricante",
+"Brand": "Marca",
+"Designation": "Designación",
+"Purchase Cost (DZD)": "Costo de compra (DZD)",
+"Quantity": "Cantidad",
+"Minimum Stock": "Stock mínimo",
+"Depreciation Duration (days)": "Duración de depreciación (días)",
+"Depreciation KM": "Depreciación por kilometraje"
 }
