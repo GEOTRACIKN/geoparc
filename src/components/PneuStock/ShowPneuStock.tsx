@@ -173,7 +173,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                                     <Form.Control
                                         value={
                                             formData.date_achat_pneu
-                                             ? moment(formData.date_achat_pneu).format('YYYY-MM-DD HH:mm')
+                                             ? moment(formData.date_achat_pneu).format('YYYY-MM-DD hh:mm A')
                                                 : ""
                                         }
                                         readOnly

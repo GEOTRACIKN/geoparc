@@ -99,7 +99,8 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
                 <Form.Control readOnly 
                 value={
                 formData.date_achat_ps
-                    ? moment(formData.date_achat_ps).format('YYYY-MM-DD HH:mm')
+                    ? moment(formData.date_achat_ps).format('YYYY-MM-DD hh:mm A')
+
                     : ""
             } />
                 </Form.Group>
