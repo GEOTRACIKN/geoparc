@@ -39,26 +39,27 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         stock_min_ps: 0
     });
 
-    const categories = {
-        freinage: translate("Freinage"),
-        filtration: translate("Filtration"),
-        moteur: translate("Moteur"),
-        suspension_direction: translate("Suspension/Direction"),
-        echappement: translate("Échappement"),
-        electricite: translate("Électricité"),
-        chauffage_refroidissement: translate("Chauffage/Refroidissement"),
-        carrosserie: translate("Carrosserie"),
-        accessoires: translate("Accessoires"),
-        liquide_lubrifiant: translate("Liquide/Lubrifiant"),
-        autres: translate("AUTRES"),
-    };
+const categories: { [key: string]: string } = {
+    freinage: translate("Braking"),
+    filtration: translate("Filtration"),
+    moteur: translate("Engine"),
+    suspension_direction: translate("Suspension/Steering"),
+    echappement: translate("Exhaust"),
+    electricite: translate("Electricity"),
+    chauffage_refroidissement: translate("Heating/Cooling"),
+    carrosserie: translate("Bodywork"),
+    accessoires: translate("Accessories"),
+    liquide_lubrifiant: translate("Fluids/Lubricants"),
+    autres: translate("OTHERS"),
+};
 
-    const typesPiece = {
-        origine: translate("Pièce d'origine"),
-        apresmarket: translate("Pièce après-vente"),
-        reconditionne: translate("Reconditionné"),
-        occasion: translate("Occasion")
-    };
+// List of part types
+const typesPiece: { [key: string]: string } = {
+    origine: translate("Original part"),
+    apresmarket: translate("Aftermarket part"),
+    reconditionne: translate("Refurbished"),
+    occasion: translate("Used"),
+};
 
     useEffect(() => {
         const fetchData = async () => {

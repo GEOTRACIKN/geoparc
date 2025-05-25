@@ -788,6 +788,22 @@
 "Quantity": "الكمية",
 "Minimum Stock": "الحد الأدنى للمخزون",
 "Depreciation Duration (days)": "مدة الإهلاك (بالأيام)",
-"Depreciation KM": "إهلاك حسب الكيلومترات"
+"Depreciation KM": "إهلاك حسب الكيلومترات",
+"Braking": "الفرامل",
+"Filtration": "الترشيح",
+"Engine": "المحرك",
+"Suspension/Steering": "التعليق / التوجيه",
+"Exhaust": "العادم",
+"Electricity": "الكهرباء",
+"Heating/Cooling": "التدفئة / التبريد",
+"Bodywork": "الهيكل الخارجي",
+"Accessories": "الملحقات",
+"Fluids/Lubricants": "السوائل / الزيوت",
+"OTHERS": "أخرى",
+
+"Original part": "قطعة أصلية",
+"Aftermarket part": "قطعة ما بعد البيع",
+"Refurbished": "معاد تصنيعه",
+"Used": "مستعمل"
 
 }

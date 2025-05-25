@@ -774,5 +774,21 @@
 "Quantity": "Cantidad",
 "Minimum Stock": "Stock mínimo",
 "Depreciation Duration (days)": "Duración de depreciación (días)",
-"Depreciation KM": "Depreciación por kilometraje"
+"Depreciation KM": "Depreciación por kilometraje",
+"Braking": "Frenado",
+"Filtration": "Filtración",
+"Engine": "Motor",
+"Suspension/Steering": "Suspensión/Dirección",
+"Exhaust": "Escape",
+"Electricity": "Electricidad",
+"Heating/Cooling": "Calefacción/Refrigeración",
+"Bodywork": "Carrocería",
+"Accessories": "Accesorios",
+"Fluids/Lubricants": "Líquidos/Lubricantes",
+"OTHERS": "OTROS",
+
+"Original part": "Pieza original",
+"Aftermarket part": "Pieza de posventa",
+"Refurbished": "Reacondicionado",
+"Used": "Usado"
 }
