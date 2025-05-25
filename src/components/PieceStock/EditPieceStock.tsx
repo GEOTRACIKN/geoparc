@@ -82,7 +82,7 @@ const typesPiece: { [key: string]: string } = {
 
                 // Charger les listes
                 setConstructeurs(['Facel Vega', 'Renault', 'Peugeot', 'Citroën', 'Autre']);
-                setFournisseurs(['Fournisseur A', 'Fournisseur B', 'Fournisseur C']);
+                setFournisseurs(['A', 'B', 'C']);
                 
             } catch (error) {
                 console.error("Erreur de chargement des données:", error);

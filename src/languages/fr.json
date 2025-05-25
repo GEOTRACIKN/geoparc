@@ -780,21 +780,28 @@
 "Depreciation Duration (days)": "Durée d'amortissement (jours)",
 "Depreciation KM": "Amortissement par kilométrage",
 "Braking": "Freinage",
-  "Filtration": "Filtration",
-  "Engine": "Moteur",
-  "Suspension/Steering": "Suspension/Direction",
-  "Exhaust": "Échappement",
-  "Electricity": "Électricité",
-  "Heating/Cooling": "Chauffage/Refroidissement",
-  "Bodywork": "Carrosserie",
-  "Accessories": "Accessoires",
-  "Fluids/Lubricants": "Liquide/Lubrifiant",
-  "OTHERS": "AUTRES",
+"Filtration": "Filtration",
+"Engine": "Moteur",
+"Suspension/Steering": "Suspension/Direction",
+"Exhaust": "Échappement",
+"Electricity": "Électricité",
+"Heating/Cooling": "Chauffage/Refroidissement",
+"Bodywork": "Carrosserie",
+"Accessories": "Accessoires",
+"Fluids/Lubricants": "Liquide/Lubrifiant",
+"OTHERS": "AUTRES",
 
-  "Original part": "Pièce d'origine",
-  "Aftermarket part": "Pièce après-vente",
-  "Refurbished": "Reconditionné",
-  "Used": "Occasion"
+"Original part": "Pièce d'origine",
+"Aftermarket part": "Pièce après-vente",
+"Refurbished": "Reconditionné",
+"Used": "Occasion",
+"Update successful!": "Mise à jour réussie !",
+"Update failed. Please try again.": "Échec de la mise à jour. Veuillez réessayer.",
+"Error loading stock data": "Erreur lors du chargement des données de stock",
+"Added to stock successfully!": "Ajouté au stock avec succès !",
+"Error adding to stock. Please try again": "Erreur lors de l'ajout au stock. Veuillez réessayer"
+
+
 
 
 

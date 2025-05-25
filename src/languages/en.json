@@ -777,10 +777,14 @@
 "Accessories": "Accessories",
 "Fluids/Lubricants": "Fluids/Lubricants",
 "OTHERS": "OTHERS",
-
 "Original part": "Original part",
 "Aftermarket part": "Aftermarket part",
 "Refurbished": "Refurbished",
-"Used": "Used"
+"Used": "Used",
+"Update successful!": "Update successful!",
+"Update failed. Please try again.": "Update failed. Please try again.",
+"Error loading stock data": "Error loading stock data",
+"Added to stock successfully!": "Added to stock successfully!",
+"Error adding to stock. Please try again": "Error adding to stock. Please try again"
 
 }

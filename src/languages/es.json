@@ -790,5 +790,10 @@
 "Original part": "Pieza original",
 "Aftermarket part": "Pieza de posventa",
 "Refurbished": "Reacondicionado",
-"Used": "Usado"
+"Used": "Usado",
+"Update successful!": "¡Actualización exitosa!",
+"Update failed. Please try again.": "Error en la actualización. Por favor, inténtalo de nuevo.",
+"Error loading stock data": "Error al cargar los datos de stock",
+"Added to stock successfully!": "¡Añadido al stock con éxito!",
+"Error adding to stock. Please try again": "Error al añadir al stock. Por favor, inténtalo de nuevo"
 }

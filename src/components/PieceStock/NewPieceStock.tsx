@@ -65,7 +65,7 @@ const typesPiece: { [key: string]: string } = {
         // Charger les listes depuis l'API
         // fetch(`${backendUrl}/api/constructeur_pss`).then(...)
         setConstructeurs(['Facel Vega', 'Renault', 'Peugeot', 'Citroën', 'Autre']);
-        setFournisseurs(['Fournisseur A', 'Fournisseur B', 'Fournisseur C']);
+        setFournisseurs(['A', 'B', 'C']);
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

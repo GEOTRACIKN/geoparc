@@ -804,6 +804,11 @@
 "Original part": "قطعة أصلية",
 "Aftermarket part": "قطعة ما بعد البيع",
 "Refurbished": "معاد تصنيعه",
-"Used": "مستعمل"
+"Used": "مستعمل",
+"Update successful!": "تم التحديث بنجاح!",
+"Update failed. Please try again.": "فشل التحديث. يرجى المحاولة مرة أخرى.",
+"Error loading stock data": "خطأ في تحميل بيانات المخزون",
+"Added to stock successfully!": "تمت الإضافة إلى المخزون بنجاح!",
+"Error adding to stock. Please try again": "حدث خطأ أثناء الإضافة إلى المخزون. الرجاء المحاولة مرة أخرى"
 
 }
