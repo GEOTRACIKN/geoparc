@@ -3,6 +3,7 @@ import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import axios from "axios";
 import PropagateLoader from "react-spinners/PropagateLoader";
+import moment from "moment";
 
 interface ShowPieceStockProps {
     show: boolean;
@@ -50,10 +51,7 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
                 const response = await axios.get(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`);
                 const data = response.data;
 
-                setFormData({
-                    ...data,
-                    date_achat_ps: data.date_achat_ps?.split('T')[0] || ''
-                });
+                           setFormData(data); // Ne pas modifier la date ici
 
             } catch (error) {
                 console.error("Erreur de chargement:", error);
@@ -98,8 +96,13 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Purchase Date")}</Form.Label>
-                <Form.Control type="date" readOnly value={formData.date_achat_ps} />
-            </Form.Group>
+                <Form.Control readOnly 
+                value={
+                formData.date_achat_ps
+                    ? moment(formData.date_achat_ps).format('YYYY-MM-DD HH:mm')
+                    : ""
+            } />
+                </Form.Group>
         </div>
     </div>
 

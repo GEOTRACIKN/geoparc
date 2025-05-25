@@ -66,10 +66,16 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
             try {
                 const response = await axios.get(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`);
                 const data = response.data;
+                 const formatDatetimeLocal = (value: string) => {
+                    const date = new Date(value);
+                    const offset = date.getTimezoneOffset();
+                    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                    return localDate.toISOString().slice(0, 16);
+                };
 
                 setFormData({
                     ...data,
-                    date_achat_ps: data.date_achat_ps.split('T')[0] // Formatage de la date
+                    date_achat_ps: formatDatetimeLocal(data.date_achat_ps)
                 });
 
                 // Charger les listes
@@ -162,13 +168,13 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Purchase Date")}</Form.Label>
-                <Form.Control
-                    type="date"
-                    name="date_achat_ps"
-                    value={formData.date_achat_ps}
-                    onChange={handleChange}
-                    required
-                />
+                  <Form.Control
+            type="datetime-local"
+            name="date_achat_ps"
+            value={formData.date_achat_ps || ""}
+            onChange={handleChange}
+            required
+        />
             </Form.Group>
         </div>
     </div>
@@ -215,6 +221,8 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
                 />
             </Form.Group>
         </div>
+
+
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Category")}</Form.Label>

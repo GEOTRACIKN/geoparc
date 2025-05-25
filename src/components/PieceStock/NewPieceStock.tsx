@@ -151,10 +151,11 @@ export default function ModalNewPieceStock({ show, onHide, onSuccess }: NewPiece
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Purchase Date")}</Form.Label>
                 <Form.Control
-                    type="date"
+                    type="datetime-local"
                     name="date_achat_ps"
                     value={newPiece.date_achat_ps}
                     onChange={handleChange}
+                    min="2000-01-01T00:00"
                     required
                 />
             </Form.Group>
