@@ -799,8 +799,17 @@
 "Update failed. Please try again.": "Échec de la mise à jour. Veuillez réessayer.",
 "Error loading stock data": "Erreur lors du chargement des données de stock",
 "Added to stock successfully!": "Ajouté au stock avec succès !",
-"Error adding to stock. Please try again": "Erreur lors de l'ajout au stock. Veuillez réessayer"
-
+"Error adding to stock. Please try again": "Erreur lors de l'ajout au stock. Veuillez réessayer",
+"Operation Type": "Type d'opération",
+"Select Operation": "Sélectionner une opération",
+"Replace": "Remplacer",
+"Source": "Source",
+"Select Source": "Sélectionner une source",
+"Technician": "Technicien",
+"Internal Stock Piece": "Pièce du stock interne",
+"Select Internal Stock Piece": "Sélectionner une pièce du stock interne",
+"Details": "Détails"
+ 
 
 
 

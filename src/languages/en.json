@@ -785,6 +785,15 @@
 "Update failed. Please try again.": "Update failed. Please try again.",
 "Error loading stock data": "Error loading stock data",
 "Added to stock successfully!": "Added to stock successfully!",
-"Error adding to stock. Please try again": "Error adding to stock. Please try again"
+"Error adding to stock. Please try again": "Error adding to stock. Please try again",
+"Operation Type": "Operation Type",
+"Select Operation": "Select Operation",
+"Replace": "Replace",
+"Source": "Source",
+"Select Source": "Select Source",
+"Technician": "Technician",
+"Internal Stock Piece": "Internal Stock Piece",
+"Select Internal Stock Piece": "Select Internal Stock Piece",
+"Details": "Details"
 
 }

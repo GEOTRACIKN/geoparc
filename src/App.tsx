@@ -34,6 +34,8 @@ import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
 import { Servicing } from "./pages/Servicing";
 import { Pneu } from "./pages/Pneu";
+import { Piece } from "./pages/Piece";
+
 
 import { PneuStock } from "./pages/PneuStock";
 import { PieceStock } from "./pages/PieceStock";
@@ -168,6 +170,8 @@ function App() {
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
           <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
+          <Route path="/piece" element={<DashboardLayout>{<Piece />}</DashboardLayout>} />
+
           <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
           <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
 
