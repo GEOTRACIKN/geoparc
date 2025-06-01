@@ -329,7 +329,9 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
 
                     <Form.Group controlId="source_pneu">
                     <Form.Label>{translate("Tire Source")}</Form.Label>
-                        <Form.Control as="select" value={formData.source_pneu} onChange={handleChange}>
+                        <Form.Control as="select" value={formData.source_pneu}
+                         onChange={handleChange}
+                         disabled>
                         <option value="">{translate("Select Source")}</option>
                         <option value="internal">{translate("Internal")}</option>
                         <option value="external">{translate("External")}</option>

@@ -4,8 +4,10 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewPiece from "../components/Piece/NewPiece";
+import ModalEditPiece from "../components/Piece/EditPiece";
+
 import { Link } from "react-router-dom";
-// import ModalShowPiece from "../components/Piece/ShowPiece";
+import ModalShowPiece from "../components/Piece/ShowPiece";
 // import ModalDeletePiece from "../components/Piece/DeletePiece";
 
 interface Piece {
@@ -217,6 +219,24 @@ export function Piece() {
         repair: translate("Repair"),
     };
 
+      const translateOperationType = (type: string) => {
+        switch (type) {
+            case "add": return translate("Add");
+            case "replace": return translate("Replace");
+            default: return type;
+        }
+    };
+    const translateSourceType = (source: string) => {
+    switch (source) {
+        case "internal":
+            return translate("Internal");
+        case "external":
+            return translate("External");
+        default:
+            return source;
+    }
+};
+
     return (
         <>
             <div className="row">
@@ -384,10 +404,11 @@ export function Piece() {
                         </td>
 
                         {selectedColumns.Operation && (
-                            <td>{operationLabels[piece.type_operation_piece] || piece.type_operation_piece}</td>
-                        )}
+                        <td>{translateOperationType(piece.type_operation_piece)}</td>
+                    )}
+
                         {selectedColumns.Vehicle && <td>{piece.id_vehicule_piece}</td>}
-                        {selectedColumns.Source && <td>{piece.source_piece}</td>}
+                        {selectedColumns.Source && <td>{translateSourceType(piece.source_piece)}</td>}
                         {selectedColumns.Cost && <td>{piece.cout_piece}</td>}
                         {selectedColumns.Date && <td>{formatDate(piece.date_piece)}</td>}
                         {selectedColumns.Position && <td>{piece.position_piece}</td>}
@@ -470,10 +491,14 @@ export function Piece() {
                 onHide={handleCloseNewPieceModal} 
                 onSuccess={refreshData} 
             />
+            <ModalEditPiece 
+            show={showEditPieceModal} 
+            onHide={handleCloseEditPieceModal} 
+            id_piece={selectedPieceId} 
+            onSuccess={refreshData} />
             
-            {/* Modal Edit Piece */}
-            {/* Ajouter ici ModalEditPiece si nécessaire */}
             
+          
             {/* 
             <ModalDeletePiece 
                 show={showDeletePieceModal} 
@@ -481,13 +506,14 @@ export function Piece() {
                 id_piece={selectedPieceId} 
                 onSuccess={refreshData} 
             />
+             */}
             
             <ModalShowPiece 
                 show={showShowPieceModal} 
                 onHide={handleCloseShowPieceModal} 
                 id_piece={selectedPieceId} 
             />
-            */}
+           
         </>
     );
 }
