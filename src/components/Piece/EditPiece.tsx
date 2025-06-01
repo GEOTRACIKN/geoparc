@@ -5,15 +5,17 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
 
-interface ModalNewPieceProps {
-    show: boolean;
-    onHide: () => void;
-    onSuccess?: () => void;
+interface ModalEditPieceProps {
+  show: boolean;
+  onHide: () => void;
+  onSuccess?: () => void;
+    id_piece: number | null;
+  pieceData?: any;
 }
 
 interface Vehicle {
-    id_vehicule: number;
-    immatriculation_vehicule: string;
+  id_vehicule: number;
+  immatriculation_vehicule: string;
 }
 
 interface StockPiece {
@@ -25,155 +27,102 @@ interface StockPiece {
   marque_ps: string;
 }
 
-
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }) => {
-    const [formData, setFormData] = useState({
-      id_piece:"",
-        type_operation_piece: "",
-        id_vehicule_piece: "",
-        source_piece: "",
-        piece_id_piece: "",
-        position_piece: "",
-        technicien_piece: "",
-        num_facture_piece: "",
-        fournisseur_piece: "",
-        date_piece: "",
-        duree_piece: "",
-        cout_piece: "",
-        details_piece: "",
-        id_piece_stock:"",
-        id_user_piece: ""
-    });
+const ModalEditPiece: React.FC<ModalEditPieceProps> = ({ show, onHide, onSuccess, pieceData }) => {
+  const { translate } = useTranslate();
+  const geopuserID = localStorage.getItem("GeopUserID");
 
-    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-        const [stockPieces, setStockPieces] = useState<StockPiece[]>([]); // État pour les pneus en stock
-    
-    const { translate } = useTranslate();
-    const geopuserID = localStorage.getItem("GeopUserID");
+  const [formData, setFormData] = useState({ ...pieceData });
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [stockPieces, setStockPieces] = useState<StockPiece[]>([]);
 
-    useEffect(() => {
-        if (geopuserID) {
-            setFormData(prev => ({ ...prev, id_user_piece: geopuserID }));
+  useEffect(() => {
+    setFormData({ ...pieceData });
 
-            fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`)
-                .then(res => res.json())
-                .then(data => setVehicles(data.vehicles || []))
-                .catch(err => {
-                    console.error("Error fetching vehicles:", err);
-                    toast.error(translate("Error fetching vehicles."), {
-                        position: "bottom-right",
-                        autoClose: 2400,
-                        transition: Bounce,
-                    });
-                });
-        }
-    }, [geopuserID, translate]);
-
-    useEffect(() => {
-    const fetchStockPieces = async () => {
-        if (!geopuserID || formData.source_piece !== "internal") return;
-        
-        try {
-            const response = await fetch(`${backendUrl}/api/geop/piece_stock/available/${geopuserID}`, {
-                headers: { 
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const data = await response.json();
-            setStockPieces(data); // Assure-toi que setStockPieces est défini avec useState
-        
-        } catch (error) {
-            console.error("Error fetching stock pieces:", error);
-            setStockPieces([]);
-        }
-    };
-
-    fetchStockPieces();
-}, [formData.source_piece]);
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { id, value } = e.target;
-        setFormData(prev => ({ ...prev, [id]: value }));
-    };
-
-    const handleClose = () => {
-        setFormData({
-           id_piece:"",
-            type_operation_piece: "",
-            id_vehicule_piece: "",
-            source_piece: "",
-            piece_id_piece: "",
-            position_piece: "",
-            technicien_piece: "",
-            num_facture_piece: "",
-            fournisseur_piece: "",
-            date_piece: "",
-            duree_piece: "",
-            cout_piece: "",
-            details_piece: "",
-            id_piece_stock:"",
-            id_user_piece: geopuserID || ""
+    if (geopuserID) {
+      fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`)
+        .then(res => res.json())
+        .then(data => setVehicles(data.vehicles || []))
+        .catch(err => {
+          console.error("Error fetching vehicles:", err);
+          toast.error(translate("Error fetching vehicles."), {
+            position: "bottom-right",
+            autoClose: 2400,
+            transition: Bounce,
+          });
         });
-        onHide();
+    }
+  }, [pieceData, geopuserID, translate]);
+
+  useEffect(() => {
+    const fetchStockPieces = async () => {
+      if (!geopuserID || formData.source_piece !== "internal") return;
+      try {
+        const response = await fetch(`${backendUrl}/api/geop/piece_stock/available/${geopuserID}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        setStockPieces(data);
+      } catch (error) {
+        console.error("Error fetching stock pieces:", error);
+        setStockPieces([]);
+      }
     };
+    fetchStockPieces();
+  }, [formData.source_piece, geopuserID]);
 
-    const validateForm = () => {
-        if (!formData.id_vehicule_piece || !formData.type_operation_piece) {
-            toast.error(translate("Please fill out all required fields"), {
-                position: "bottom-right",
-                autoClose: 2400,
-                transition: Bounce,
-            });
-            return false;
-        }
-        return true;
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev: any) => ({ ...prev, [id]: value }));
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+  const handleClose = () => {
+    onHide();
+  };
 
-        try {
-            const response = await fetch(`${backendUrl}/api/geop/addnewpiece/${geopuserID}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-            if (!response.ok) throw new Error("Error adding piece");
+    try {
+      const response = await fetch(`${backendUrl}/api/geop/updatepiece/${pieceData.id_piece}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-            toast.success(translate("Added successfully!"), {
-                position: "bottom-right",
-                autoClose: 2400,
-                transition: Bounce,
-            });
+      if (!response.ok) throw new Error("Error updating piece");
 
-            if (onSuccess) onSuccess();
-            handleClose();
-        } catch (error) {
-            console.error("Error adding piece:", error);
-            toast.error(translate("Error adding. Please try again"), {
-                position: "bottom-right",
-                autoClose: 2400,
-                transition: Bounce,
-            });
-        }
-    };
+      toast.success(translate("Updated successfully!"), {
+        position: "bottom-right",
+        autoClose: 2400,
+        transition: Bounce,
+      });
 
-    return (
-<Modal show={show} onHide={handleClose} size="lg" backdrop="static">
-  <Modal.Header closeButton>
-    <Modal.Title>{translate("New Piece")}</Modal.Title>
-  </Modal.Header>
+      if (onSuccess) onSuccess();
+      handleClose();
+    } catch (error) {
+      console.error("Error updating piece:", error);
+      toast.error(translate("Error updating. Please try again"), {
+        position: "bottom-right",
+        autoClose: 2400,
+        transition: Bounce,
+      });
+    }
+  };
 
-  <Form onSubmit={handleSubmit}>
- <Modal.Body>
+  return (
+    <Modal show={show} onHide={handleClose} size="lg" backdrop="static">
+      <Modal.Header closeButton>
+        <Modal.Title>{translate("Edit Piece")}</Modal.Title>
+      </Modal.Header>
+
+      <Form onSubmit={handleSubmit}>
+         <Modal.Body>
   {/* Line 1: Operation Type & Vehicle */}
   <div className="row">
     <div className="col-md-6">
@@ -198,7 +147,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
           value={vehicles
             .map(v => ({ value: v.id_vehicule, label: v.immatriculation_vehicule }))
             .find(opt => String(opt.value) === String(formData.id_vehicule_piece)) || null}
-          onChange={(opt) => setFormData(prev => ({ ...prev, id_vehicule_piece: opt?.value.toString() || "" }))}
+          onChange={(opt) => setFormData((prev: any) => ({ ...prev, id_vehicule_piece: opt?.value.toString() || "" }))}
           placeholder={translate("Select Vehicle")}
           isSearchable
         />
@@ -305,7 +254,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
               type="text"
               value={formData.technicien_piece || ""}
               onChange={(e) =>
-                setFormData((prev) => ({
+                setFormData((prev: any) => ({
                   ...prev,
                   technicien_piece: e.target.value,
                 }))
@@ -328,7 +277,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
                 }))
                 .find(opt => String(opt.value) === String(formData.id_piece_stock)) || null}
               onChange={(opt) =>
-                setFormData((prev) => ({
+                setFormData((prev: any) => ({
                   ...prev,
                   id_piece_stock: opt?.value?.toString() || "",
                 }))
@@ -369,21 +318,17 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
   </div>
 </Modal.Body>
 
-
-  <Modal.Footer>
-    <Button variant="secondary" onClick={handleClose}>
-      Close
-    </Button>
-    <Button variant="primary" type="submit">
-      Add
-    </Button>
-  </Modal.Footer>
-</Form>
-
-</Modal>
-
-
-    );
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            {translate("Cancel")}
+          </Button>
+          <Button variant="primary" type="submit">
+            {translate("Update")}
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  );
 };
 
-export default ModalNewPiece;
+export default ModalEditPiece;

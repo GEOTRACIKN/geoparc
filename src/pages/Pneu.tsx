@@ -38,7 +38,6 @@ export function Pneu() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        
         Vehicle: true,
         Km: true,
         "Purchase Date": true,
@@ -206,7 +205,8 @@ const stateLabels: { [key: string]: string } = {
                 <div className="col-md-6 col-sm-12">
                 <h4>{translate("Tire Change")} ({total})</h4>
                 </div>
-                <div className="col-md-6 col-sm-12 text-right">
+                <div
+                 className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPneuModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
                         {translate("New Request")}
