@@ -315,6 +315,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       to: "/pneu",
       permissionId: 41,
     },
+    {
+      id: 28,
+      label: "Items Change",
+      icon: "las la-wrench", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+      to: "/piece",
+      permissionId: 41,
+    },
   ],
 },
   

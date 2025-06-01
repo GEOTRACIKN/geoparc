@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useState, useEffect } from "react";
+import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { useTranslate } from "../../hooks/LanguageProvider";
-import moment from 'moment';
-import { PropagateLoader } from "react-spinners";
+import axios from "axios";
+import PropagateLoader from "react-spinners/PropagateLoader";
+import moment from "moment";
 
-interface ModalShowPieceStockProps {
+interface ShowPieceStockProps {
     show: boolean;
     onHide: () => void;
     id_piece_stock: number | null;
@@ -13,248 +13,230 @@ interface ModalShowPieceStockProps {
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const ModalShowPieceStock: React.FC<ModalShowPieceStockProps> = ({ show, onHide, id_piece_stock }) => {
-    const [formData, setFormData] = useState({
-        num_facture_ps: '',
-        date_achat_ps: '',
-        constructeur_ps: '',
-        modele_ps: '',
-        marque_ps: '',
-        categorie_ps: '',
-        type_piece_ps: '',
-        duree_amort_ps: 0,
-        km_amort_ps: 0,
-        designation_ps: '',
-        reference_ps: '',
-        fournisseur_ps: '',
-        cout_achat_ps: 0,
-        quantite_ps: 0,
-        stock_min_ps: 0
-    });
-
+export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: ShowPieceStockProps) {
     const { translate } = useTranslate();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [formData, setFormData] = useState<any>(null);
 
-    const categoryLabels: { [key: string]: string } = {
-        freinage: translate("Braking"),
-        suspension: translate("Suspension"),
-        moteur: translate("Engine"),
-        carrosserie: translate("Bodywork")
+    // Liste des catégories (identique à l'édition)
+    const categories : { [key: string]: string } = {
+        freinage: translate("Freinage"),
+        filtration: translate("Filtration"),
+        moteur: translate("Moteur"),
+        suspension_direction: translate("Suspension/Direction"),
+        echappement: translate("Échappement"),
+        electricite: translate("Électricité"),
+        chauffage_refroidissement: translate("Chauffage/Refroidissement"),
+        carrosserie: translate("Carrosserie"),
+        accessoires: translate("Accessoires"),
+        liquide_lubrifiant: translate("Liquide/Lubrifiant"),
+        autres: translate("AUTRES"),
     };
 
-    const partTypeLabels: { [key: string]: string } = {
-        origine: translate("OEM"),
-        apres_marche: translate("Aftermarket"),
-        reconditionne: translate("Refurbished")
+    // Liste des types de pièces (identique à l'édition)
+    const typesPiece : { [key: string]: string } = {
+        origine: translate("Pièce d'origine"),
+        apresmarket: translate("Pièce après-vente"),
+        reconditionne: translate("Reconditionné"),
+        occasion: translate("Occasion")
     };
 
-    const fetchPieceStock = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`);
-            
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            const data = await response.json();
-            
-            if (data?.id_piece_stock) {
-                setFormData({
-                    num_facture_ps: data.num_facture_ps,
-                    date_achat_ps: data.date_achat_ps,
-                    constructeur_ps: data.constructeur_ps,
-                    modele_ps: data.modele_ps,
-                    marque_ps: data.marque_ps,
-                    categorie_ps: data.categorie_ps,
-                    type_piece_ps: data.type_piece_ps,
-                    duree_amort_ps: data.duree_amort_ps,
-                    km_amort_ps: data.km_amort_ps,
-                    designation_ps: data.designation_ps,
-                    reference_ps: data.reference_ps,
-                    fournisseur_ps: data.fournisseur_ps,
-                    cout_achat_ps: data.cout_achat_ps,
-                    quantite_ps: data.quantite_ps,
-                    stock_min_ps: data.stock_min_ps
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching stock data:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    
 
     useEffect(() => {
-        if (show && id_piece_stock) fetchPieceStock();
+        const fetchData = async () => {
+            if (!id_piece_stock || !show) return;
+            
+            try {
+                const response = await axios.get(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`);
+                const data = response.data;
+
+                           setFormData(data); // Ne pas modifier la date ici
+
+            } catch (error) {
+                console.error("Erreur de chargement:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (show) {
+            setIsLoading(true);
+            fetchData();
+        }
     }, [show, id_piece_stock]);
 
-    useEffect(() => {
-        if (!show) {
-            setFormData({
-                num_facture_ps: '',
-                date_achat_ps: '',
-                constructeur_ps: '',
-                modele_ps: '',
-                marque_ps: '',
-                categorie_ps: '',
-                type_piece_ps: '',
-                duree_amort_ps: 0,
-                km_amort_ps: 0,
-                designation_ps: '',
-                reference_ps: '',
-                fournisseur_ps: '',
-                cout_achat_ps: 0,
-                quantite_ps: 0,
-                stock_min_ps: 0
-            });
-        }
-    }, [show]);
+    const handleClose = () => {
+        setFormData(null);
+        onHide();
+    };
 
     return (
-        <Modal show={show && !isLoading} onHide={onHide} backdrop="static" size="lg">
+        <Modal show={show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Stock Details")}</Modal.Title>
+                <Modal.Title>{translate("Détails de la pièce")}</Modal.Title>
             </Modal.Header>
-            <Form>
-                <Modal.Body>
-                    {isLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
-                            <PropagateLoader color="#0059b3" size={12} />
-                        </div>
-                    ) : (
-                        <div className="row gap-2">
-                            <div className="col-md-5">
-                                <Form.Group controlId="constructeur_ps">
-                                    <Form.Label>{translate("Manufacturer")}</Form.Label>
-                                    <Form.Control value={formData.constructeur_ps} readOnly />
-                                </Form.Group>
+            
+            <Modal.Body>
+                {isLoading ? (
+                    <div className="d-flex justify-content-center py-5">
+                        <PropagateLoader color="#0d6efd" size={15} />
+                    </div>
+                ) : (
+                    formData && (
+                       <Form>
+    {/* Line 1 - Invoice Number & Purchase Date */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Invoice Number")}</Form.Label>
+                <Form.Control readOnly value={formData.num_facture_ps || '-'} />
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Purchase Date")}</Form.Label>
+                <Form.Control readOnly 
+                value={
+                formData.date_achat_ps
+                    ? moment(formData.date_achat_ps).format('YYYY-MM-DD hh:mm A')
 
-                                <Form.Group controlId="modele_ps">
-                                    <Form.Label>{translate("Model")}</Form.Label>
-                                    <Form.Control value={formData.modele_ps} readOnly />
-                                </Form.Group>
+                    : ""
+            } />
+                </Form.Group>
+        </div>
+    </div>
 
-                                <Form.Group controlId="marque_ps">
-                                    <Form.Label>{translate("Brand")}</Form.Label>
-                                    <Form.Control value={formData.marque_ps} readOnly />
-                                </Form.Group>
+    {/* Line 2 - Manufacturer & Brand */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Manufacturer")}</Form.Label>
+                <Form.Control readOnly value={formData.constructeur_ps || '-'} />
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Brand")}</Form.Label>
+                <Form.Control readOnly value={formData.marque_ps || '-'} />
+            </Form.Group>
+        </div>
+    </div>
 
-                                <Form.Group controlId="categorie_ps">
-                                    <Form.Label>{translate("Category")}</Form.Label>
-                                    <Form.Control 
-                                        value={categoryLabels[formData.categorie_ps] || formData.categorie_ps} 
-                                        readOnly 
-                                    />
-                                </Form.Group>
+    {/* Line 3 - Model & Category */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Model")}</Form.Label>
+                <Form.Control readOnly value={formData.modele_ps || '-'} />
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Category")}</Form.Label>
+                <Form.Control
+                    readOnly
+                    value={categories[formData.categorie_ps] || formData.categorie_ps || '-'}
+                />
+            </Form.Group>
+        </div>
+    </div>
 
-                                <Form.Group controlId="type_piece_ps">
-                                    <Form.Label>{translate("Part Type")}</Form.Label>
-                                    <Form.Control 
-                                        value={partTypeLabels[formData.type_piece_ps] || formData.type_piece_ps} 
-                                        readOnly 
-                                    />
-                                </Form.Group>
-                            </div>
+    {/* Line 4 - Type & Designation */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Type")}</Form.Label>
+                <Form.Control
+                    readOnly
+                    value={typesPiece[formData.type_piece_ps] || formData.type_piece_ps || '-'}
+                />
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Designation")}</Form.Label>
+                <Form.Control
+                    readOnly
+                    as="textarea"
+                    value={formData.designation_ps || '-'}
+                />
+            </Form.Group>
+        </div>
+    </div>
 
-                            <div className="col-md-6">
-                                <Form.Group controlId="designation_ps">
-                                    <Form.Label>{translate("Designation")}</Form.Label>
-                                    <Form.Control 
-                                        as="textarea"
-                                        value={formData.designation_ps} 
-                                        readOnly 
-                                    />
-                                </Form.Group>
+    {/* Line 5 - Reference & Supplier */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Reference")}</Form.Label>
+                <InputGroup>
+                    <Form.Control
+                        readOnly
+                        value={formData.reference_ps || '-'}
+                    />
+                </InputGroup>
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Supplier")}</Form.Label>
+                <Form.Control
+                    readOnly
+                    value={formData.fournisseur_ps || '-'}
+                />
+            </Form.Group>
+        </div>
+    </div>
 
-                                <Form.Group controlId="reference_ps">
-                                    <Form.Label>{translate("Reference")}</Form.Label>
-                                    <Form.Control value={formData.reference_ps} readOnly />
-                                </Form.Group>
+    {/* Line 6 - Cost & Stock */}
+    <div className="row">
+        <div className="col-md-4">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
+                <Form.Control readOnly value={formData.cout_achat_ps} />
+            </Form.Group>
+        </div>
+        <div className="col-md-4">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Quantity")}</Form.Label>
+                <Form.Control readOnly value={formData.quantite_ps || '0'} />
+            </Form.Group>
+        </div>
+        <div className="col-md-4">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Minimum Stock")}</Form.Label>
+                <Form.Control readOnly value={formData.stock_min_ps || '0'} />
+            </Form.Group>
+        </div>
+    </div>
 
-                                <Form.Group controlId="fournisseur_ps">
-                                    <Form.Label>{translate("Supplier")}</Form.Label>
-                                    <Form.Control value={formData.fournisseur_ps} readOnly />
-                                </Form.Group>
+    {/* Line 7 - Depreciation */}
+    <div className="row">
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Depreciation Duration (days)")}</Form.Label>
+                <Form.Control readOnly value={formData.duree_amort_ps || '0'} />
+            </Form.Group>
+        </div>
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Depreciation KM")}</Form.Label>
+                <Form.Control readOnly value={`${formData.km_amort_ps || '0'} km`} />
+            </Form.Group>
+        </div>
+    </div>
+</Form>
 
-                                <div className="row">
-                                    <div className="col">
-                                        <Form.Group controlId="cout_achat_ps">
-                                            <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
-                                            <Form.Control
-                                                value={formData.cout_achat_ps.toLocaleString()}
-                                                readOnly
-                                            />
-                                        </Form.Group>
-                                    </div>
-                                    <div className="col">
-                                        <Form.Group controlId="quantite_ps">
-                                            <Form.Label>{translate("Quantity")}</Form.Label>
-                                            <Form.Control
-                                                value={formData.quantite_ps}
-                                                readOnly
-                                            />
-                                        </Form.Group>
-                                    </div>
-                                </div>
+                    )
+                )}
+            </Modal.Body>
 
-                                <div className="row mt-2">
-                                    <div className="col">
-                                        <Form.Group controlId="date_achat_ps">
-                                            <Form.Label>{translate("Purchase Date")}</Form.Label>
-                                            <Form.Control
-                                                value={moment(formData.date_achat_ps).format('YYYY-MM-DD HH:mm')}
-                                                readOnly
-                                            />
-                                        </Form.Group>
-                                    </div>
-                                    <div className="col">
-                                        <Form.Group controlId="num_facture_ps">
-                                            <Form.Label>{translate("Invoice Number")}</Form.Label>
-                                            <Form.Control value={formData.num_facture_ps} readOnly />
-                                        </Form.Group>
-                                    </div>
-                                </div>
-
-                                <div className="row mt-2">
-                                    <div className="col">
-                                        <Form.Group controlId="duree_amort_ps">
-                                            <Form.Label>{translate("Amort. Duration (months)")}</Form.Label>
-                                            <Form.Control
-                                                value={formData.duree_amort_ps}
-                                                readOnly
-                                            />
-                                        </Form.Group>
-                                    </div>
-                                    <div className="col">
-                                        <Form.Group controlId="km_amort_ps">
-                                            <Form.Label>{translate("Amort. KM")}</Form.Label>
-                                            <Form.Control
-                                                value={formData.km_amort_ps.toLocaleString()}
-                                                readOnly
-                                            />
-                                        </Form.Group>
-                                    </div>
-                                </div>
-
-                                <Form.Group controlId="stock_min_ps" className="mt-2">
-                                    <Form.Label>{translate("Min Stock")}</Form.Label>
-                                    <Form.Control
-                                        value={formData.stock_min_ps}
-                                        readOnly
-                                    />
-                                </Form.Group>
-                            </div>
-                        </div>
-                    )}
-                </Modal.Body>
-
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
-                        {translate("Close")}
-                    </Button>
-                </Modal.Footer>
-            </Form>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    {translate("Fermer")}
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
-};
-
-export default ModalShowPieceStock;
+}

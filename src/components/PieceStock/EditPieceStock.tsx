@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 
 interface EditPieceStockProps {
     show: boolean;
@@ -38,26 +39,27 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         stock_min_ps: 0
     });
 
-    const categories = {
-        freinage: translate("Freinage"),
-        filtration: translate("Filtration"),
-        moteur: translate("Moteur"),
-        suspension_direction: translate("Suspension/Direction"),
-        echappement: translate("Échappement"),
-        electricite: translate("Électricité"),
-        chauffage_refroidissement: translate("Chauffage/Refroidissement"),
-        carrosserie: translate("Carrosserie"),
-        accessoires: translate("Accessoires"),
-        liquide_lubrifiant: translate("Liquide/Lubrifiant"),
-        autres: translate("AUTRES"),
-    };
+const categories: { [key: string]: string } = {
+    freinage: translate("Braking"),
+    filtration: translate("Filtration"),
+    moteur: translate("Engine"),
+    suspension_direction: translate("Suspension/Steering"),
+    echappement: translate("Exhaust"),
+    electricite: translate("Electricity"),
+    chauffage_refroidissement: translate("Heating/Cooling"),
+    carrosserie: translate("Bodywork"),
+    accessoires: translate("Accessories"),
+    liquide_lubrifiant: translate("Fluids/Lubricants"),
+    autres: translate("OTHERS"),
+};
 
-    const typesPiece = {
-        origine: translate("Pièce d'origine"),
-        apresmarket: translate("Pièce après-vente"),
-        reconditionne: translate("Reconditionné"),
-        occasion: translate("Occasion")
-    };
+// List of part types
+const typesPiece: { [key: string]: string } = {
+    origine: translate("Original part"),
+    apresmarket: translate("Aftermarket part"),
+    reconditionne: translate("Refurbished"),
+    occasion: translate("Used"),
+};
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,18 +68,25 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
             try {
                 const response = await axios.get(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`);
                 const data = response.data;
+                 const formatDatetimeLocal = (value: string) => {
+                    const date = new Date(value);
+                    const offset = date.getTimezoneOffset();
+                    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                    return localDate.toISOString().slice(0, 16);
+                };
 
                 setFormData({
                     ...data,
-                    date_achat_ps: data.date_achat_ps.split('T')[0] // Formatage de la date
+                    date_achat_ps: formatDatetimeLocal(data.date_achat_ps)
                 });
 
                 // Charger les listes
                 setConstructeurs(['Facel Vega', 'Renault', 'Peugeot', 'Citroën', 'Autre']);
-                setFournisseurs(['Fournisseur A', 'Fournisseur B', 'Fournisseur C']);
+                setFournisseurs(['A', 'B', 'C']);
                 
             } catch (error) {
                 console.error("Erreur de chargement des données:", error);
+                toast.error(translate("Error loading stock data"));
             } finally {
                 setIsLoading(false);
             }
@@ -98,15 +107,29 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
 
     const handleSubmit = async () => {
         try {
-            await axios.put(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`, {
+            const response = await axios.put(`${backendUrl}/api/geop/piece_stock/${id_piece_stock}`, {
                 ...formData,
                 id_user: id_user
             });
 
             onSuccess();
             onHide();
+             if (response.status === 200) {
+                            toast.success(translate("Update successful!"), { 
+                                position: "bottom-right", 
+                                autoClose: 2400, 
+                                transition: Bounce 
+                            });
+                            if (onSuccess) onSuccess();
+                            handleClose();
+                        }
         } catch (error) {
             console.error("Erreur de mise à jour:", error);
+            toast.error(translate("Update failed. Please try again."), { 
+                            position: "bottom-right", 
+                            autoClose: 2400, 
+                            transition: Bounce 
+                        });
         }
     };
 
@@ -144,12 +167,12 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
                         </div>
                     </div>
                 ) : (
-                    <Form>
-    {/* 1 - Date d'achat & N° Facture */}
+                   <Form>
+    {/* 1 - Purchase Date & Invoice Number */}
     <div className="row">
-            <div className="col-md-6">
+        <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("N° Facture")}</Form.Label>
+                <Form.Label>{translate("Invoice Number")}</Form.Label>
                 <Form.Control
                     name="num_facture_ps"
                     value={formData.num_facture_ps}
@@ -158,27 +181,26 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
                 />
             </Form.Group>
         </div>
-        
+
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Date d'achat")}</Form.Label>
-                <Form.Control
-                    type="date"
-                    name="date_achat_ps"
-                    value={formData.date_achat_ps}
-                    onChange={handleChange}
-                    required
-                />
+                <Form.Label>{translate("Purchase Date")}</Form.Label>
+                  <Form.Control
+            type="datetime-local"
+            name="date_achat_ps"
+            value={formData.date_achat_ps || ""}
+            onChange={handleChange}
+            required
+        />
             </Form.Group>
         </div>
-    
     </div>
 
-    {/* 2 - Constructeur & Marque */}
+    {/* 2 - Manufacturer & Brand */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Constructeur")}</Form.Label>
+                <Form.Label>{translate("Manufacturer")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="constructeur_ps"
@@ -194,7 +216,7 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Marque")}</Form.Label>
+                <Form.Label>{translate("Brand")}</Form.Label>
                 <Form.Control
                     name="marque_ps"
                     value={formData.marque_ps}
@@ -204,11 +226,11 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
     </div>
 
-    {/* 3 - Modèle & Catégorie */}
+    {/* 3 - Model & Category */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Modèle")}</Form.Label>
+                <Form.Label>{translate("Model")}</Form.Label>
                 <Form.Control
                     name="modele_ps"
                     value={formData.modele_ps}
@@ -216,9 +238,11 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
                 />
             </Form.Group>
         </div>
+
+
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Catégorie")}</Form.Label>
+                <Form.Label>{translate("Category")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="categorie_ps"
@@ -234,7 +258,7 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
     </div>
 
-    {/* 4 - Type & Désignation */}
+    {/* 4 - Type & Designation */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
@@ -254,7 +278,7 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Désignation")}</Form.Label>
+                <Form.Label>{translate("Designation")}</Form.Label>
                 <Form.Control
                     name="designation_ps"
                     value={formData.designation_ps}
@@ -264,26 +288,23 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
     </div>
 
-    {/* 5 - Référence & Fournisseur */}
+    {/* 5 - Reference & Supplier */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Référence")}</Form.Label>
+                <Form.Label>{translate("Reference")}</Form.Label>
                 <InputGroup>
                     <Form.Control
                         name="reference_ps"
                         value={formData.reference_ps}
                         onChange={handleChange}
                     />
-                    <Button variant="outline-secondary">
-                        <i className="las la-barcode"></i>
-                    </Button>
                 </InputGroup>
             </Form.Group>
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Fournisseur")}</Form.Label>
+                <Form.Label>{translate("Supplier")}</Form.Label>
                 <Form.Control
                     as="select"
                     name="fournisseur_ps"
@@ -299,75 +320,105 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
         </div>
     </div>
 
-    {/* 6 - Coût d'achat, Quantité, Stock min */}
+    {/* 6 - Purchase Cost, Quantity, Min Stock */}
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Coût d'achat")} (€)</Form.Label>
+                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
                 <Form.Control
-                    type="number"
-                    step="0.01"
+                    type="text"
                     name="cout_achat_ps"
                     value={formData.cout_achat_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Quantité")}</Form.Label>
+                <Form.Label>{translate("Quantity")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="quantite_ps"
                     value={formData.quantite_ps}
                     onChange={handleChange}
                     min="0"
+                    onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Stock min")}</Form.Label>
+                <Form.Label>{translate("Minimum Stock")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="stock_min_ps"
                     value={formData.stock_min_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
     </div>
 
-    {/* 7 - Amortissement */}
+    {/* 7 - Depreciation */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Durée d'amort (jours)")}</Form.Label>
+                <Form.Label>{translate("Depreciation Duration (days)")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="duree_amort_ps"
                     value={formData.duree_amort_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
         <div className="col-md-6">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("KM d'amort")}</Form.Label>
+                <Form.Label>{translate("Depreciation KM")}</Form.Label>
                 <Form.Control
-                    type="number"
+                    type="text"
                     name="km_amort_ps"
                     value={formData.km_amort_ps}
                     onChange={handleChange}
                     min="0"
+                     onKeyDown={(e) => {
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                    e.preventDefault();
+                                }
+                            }}
                 />
             </Form.Group>
         </div>
     </div>
 </Form>
+
                 )}
             </Modal.Body>
             <Modal.Footer>

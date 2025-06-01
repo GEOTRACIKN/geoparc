@@ -42,7 +42,7 @@ export function PieceStock() {
         "ID": true,
         "Type": true,
         "Reference": true,
-        "Nom": true,
+        "Brand": true,
         "Model": true,
         "Quantity": true,
         "Purchase Cost": true,
@@ -157,7 +157,7 @@ export function PieceStock() {
             case translate("Reference"):
                 setType(1);
                 break;
-            case translate("Nom"):
+            case translate("Brand"):
                 setType(2);
                 break;
             case translate("Model"):
@@ -193,13 +193,29 @@ export function PieceStock() {
         getPieceStock();
     };
 
-    const typePieceLabels: { [key: string]: string } = {
-        moteur: translate("Engine"),
-        carrosserie: translate("Bodywork"),
-        suspension: translate("Suspension"),
-        freinage: translate("Braking"),
-        electronique: translate("Electronics"),
-    };
+  
+const categories: { [key: string]: string } = {
+    freinage: translate("Braking"),
+    filtration: translate("Filtration"),
+    moteur: translate("Engine"),
+    suspension_direction: translate("Suspension/Steering"),
+    echappement: translate("Exhaust"),
+    electricite: translate("Electricity"),
+    chauffage_refroidissement: translate("Heating/Cooling"),
+    carrosserie: translate("Bodywork"),
+    accessoires: translate("Accessories"),
+    liquide_lubrifiant: translate("Fluids/Lubricants"),
+    autres: translate("OTHERS"),
+};
+
+// List of part types
+const typesPiece: { [key: string]: string } = {
+    origine: translate("Original part"),
+    apresmarket: translate("Aftermarket part"),
+    reconditionne: translate("Refurbished"),
+    occasion: translate("Used"),
+};
+
 
     function formatDatetimeLocal(dateString: string): string {
         if (!dateString) return "";
@@ -231,7 +247,7 @@ export function PieceStock() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Nom")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Brand")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Model")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                             </Dropdown.Menu>
@@ -314,9 +330,9 @@ export function PieceStock() {
                                     {translate("Reference")}
                                 </th>
                             )}
-                            {selectedColumns.Nom && (
+                            {selectedColumns.Brand && (
                                 <th className="sorting" onClick={() => handleSortingColumn("marque_ps")}>
-                                    {translate("Nom")}
+                                    {translate("Brand")}
                                 </th>
                             )}
                             {selectedColumns.Model && (
@@ -367,9 +383,9 @@ export function PieceStock() {
                                         </div>
                                     </td>
                                     {selectedColumns.ID && <td>{piece.id_piece_stock}</td>}
-                                    {selectedColumns.Type && <td>{typePieceLabels[piece.type_piece_ps] || piece.type_piece_ps}</td>}
+                                    {selectedColumns.Type && <td>{typesPiece[piece.type_piece_ps]}</td>}
                                     {selectedColumns.Reference && <td>{piece.reference_ps}</td>}
-                                    {selectedColumns.Nom && <td>{piece.marque_ps}</td>}
+                                    {selectedColumns.Brand && <td>{piece.marque_ps}</td>}
                                     {selectedColumns.Model && <td>{piece.modele_ps}</td>}
                                     {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
                                     {selectedColumns["Purchase Cost"] && <td>{piece.cout_achat_ps}</td>}
