@@ -169,7 +169,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
     return (
 <Modal show={show} onHide={handleClose} size="lg" backdrop="static">
   <Modal.Header closeButton>
-    <Modal.Title>{translate("New Piece")}</Modal.Title>
+    <Modal.Title>{translate("New")}</Modal.Title>
   </Modal.Header>
 
   <Form onSubmit={handleSubmit}>

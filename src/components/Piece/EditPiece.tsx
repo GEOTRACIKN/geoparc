@@ -264,7 +264,7 @@ const EditPieceModal: React.FC<EditPieceModalProps> = ({ show, onHide, id_piece,
     return (
         <Modal show={show} onHide={handleClose} backdrop="static" size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Edit Piece")}</Modal.Title>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>

@@ -115,9 +115,9 @@ const ModalShowPiece: React.FC<ModalShowPieceProps> = ({ show, onHide, id_piece 
     };
 
     return (
-        <Modal show={show} onHide={onHide} backdrop="static">
+        <Modal show={show} onHide={onHide} backdrop="static" size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Show Piece Details")}</Modal.Title>
+                <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
             <Form>
                 <Modal.Body>
@@ -187,8 +187,7 @@ const ModalShowPiece: React.FC<ModalShowPieceProps> = ({ show, onHide, id_piece 
                                 <Form.Group className="mb-3">
                                     <Form.Label>{translate("Details")}</Form.Label>
                                     <Form.Control 
-                                        as="textarea"
-                                        rows={3}
+                                      
                                         value={formData.details_piece} 
                                         readOnly 
                                     />

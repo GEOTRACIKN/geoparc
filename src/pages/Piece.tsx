@@ -49,7 +49,6 @@ export function Piece() {
         Operation: true,
         Vehicle: true,
         Source: true,
-        Cost: true,
         Date: true,
         Position: true,
     };
@@ -173,9 +172,7 @@ export function Piece() {
             case translate("Source"):
                 setType(3);
                 break;
-            case translate("Cost"):
-                setType(4);
-                break;
+           
             default:
                 setType(0);
                 break;
@@ -212,6 +209,13 @@ export function Piece() {
         }
     };
 
+     function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
     // Libellés spéciaux
     const operationLabels: Record<string, string> = {
         installation: translate("Installation"),
@@ -241,7 +245,7 @@ export function Piece() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Parts Management")} ({total})</h4>
+                    <h4>{translate("Items Management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button 
@@ -275,9 +279,7 @@ export function Piece() {
                                 <Dropdown.Item onClick={() => handleTypeSearch(translate("Source"))}>
                                     {translate("Source")}
                                 </Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleTypeSearch(translate("Cost"))}>
-                                    {translate("Cost")}
-                                </Dropdown.Item>
+                               
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -370,11 +372,7 @@ export function Piece() {
                         {translate("Source")}
                     </th>
                 )}
-                {selectedColumns.Cost && (
-                    <th className="sorting" onClick={() => handleSortingColumn("cout_piece")}>
-                        {translate("Cost")}
-                    </th>
-                )}
+           
                 {selectedColumns.Date && (
                     <th className="sorting" onClick={() => handleSortingColumn("date_piece")}>
                         {translate("Date")}
@@ -409,8 +407,7 @@ export function Piece() {
 
                         {selectedColumns.Vehicle && <td>{piece.id_vehicule_piece}</td>}
                         {selectedColumns.Source && <td>{translateSourceType(piece.source_piece)}</td>}
-                        {selectedColumns.Cost && <td>{piece.cout_piece}</td>}
-                        {selectedColumns.Date && <td>{formatDate(piece.date_piece)}</td>}
+                        {selectedColumns.Date && <td>{formatDatetimeLocal(piece.date_piece)}</td>}
                         {selectedColumns.Position && <td>{piece.position_piece}</td>}
 
                         <td className="text-center">

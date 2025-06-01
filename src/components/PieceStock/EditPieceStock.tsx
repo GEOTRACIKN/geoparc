@@ -157,7 +157,7 @@ const typesPiece: { [key: string]: string } = {
     return (
         <Modal show={show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Modifier la pièce en stock")}</Modal.Title>
+                <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {isLoading ? (
@@ -324,7 +324,7 @@ const typesPiece: { [key: string]: string } = {
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
+                <Form.Label>{translate("Cost (DZD)")} </Form.Label>
                 <Form.Control
                     type="text"
                     name="cout_achat_ps"

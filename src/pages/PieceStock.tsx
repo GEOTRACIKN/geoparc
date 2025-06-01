@@ -227,7 +227,7 @@ const typesPiece: { [key: string]: string } = {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Parts")} ({total})</h4>
+                    <h4>{translate("Items")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPieceStockModal} className="btn btn-primary mt-2 mr-1">
