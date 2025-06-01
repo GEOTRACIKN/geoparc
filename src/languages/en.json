@@ -748,9 +748,14 @@
 "Select a vehicle": "Select a vehicle",
 "Error retrieving mileage": "Error retrieving mileage",
 "Supplier": "Supplier",
-"Tire Change": "Tire Change"
-
-
-
+"Tire Change": "Tire Change",
+"Utility/Van": "Utility/Van",
+"Heavy Truck": "Heavy Truck",
+"SUV / 4x4": "SUV / 4x4",
+"Trailer (small luggage)": "Trailer (small luggage)",
+"Car/Passenger": "Car/Passenger",
+"Agricultural": "Agricultural",
+"Tire Type": "Tire Type",
+"Items": "Items"
 
 }

@@ -12,9 +12,9 @@ import ModalDeletePneu from "../components/Pneu/DeletePneu";
 
 interface Pneu {
     id_pneu: number;
-    num_facture_pneu: string;
+    etat_pneu: string;
     date_achat_pneu: string;
-    cout_pneu: string;
+    position_pneu: string;
     km_pneu: string;
     immatriculation_vehicule: string;
 }
@@ -38,11 +38,12 @@ export function Pneu() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        "Inv. No.": true,
-        Km: true,
+        
         Vehicle: true,
+        Km: true,
         "Purchase Date": true,
-        Cost: true,
+        State: true,
+        Position: true,
     };
 
     const loadSelectedColumns = () => {
@@ -135,14 +136,16 @@ export function Pneu() {
             case translate("ID"):
                 setType(0);
                 break;
-            case translate("Inv. No."):
+
+            case translate("State"):
                 setType(1);
                 break;
+           
             case translate("Km"):
                 setType(2);
                 break;
            
-            case translate("Cost"):
+            case translate("Position"):
                 setType(4);
                 break;
 
@@ -175,6 +178,27 @@ export function Pneu() {
         getCountPneu();
         getPneu();
     };
+    
+    function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
+const positionLabels: { [key: string]: string } = {
+  front_left: translate("Front Left"),
+  front_right: translate("Front Right"),
+  rear_left: translate("Rear Left"),
+  rear_right: translate("Rear Right"),
+  spare: translate("Spare Tire"),
+};
+
+const stateLabels: { [key: string]: string } = {
+  installer: translate("Install"),
+  desinstaller: translate("Uninstall"),
+};
+
 
     return (
         <>
@@ -199,10 +223,9 @@ export function Pneu() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Inv. No.")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("State")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Km")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -268,45 +291,51 @@ export function Pneu() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
-                                <th className="sorting" onClick={() => handleSortingColumn("id_pneu")}>
-                                    {translate("ID")}
-                                </th>
-                            )}
-                            {selectedColumns["Inv. No."] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("num_facture_pneu")}>
-                                    {translate("Inv. No.")}
-                                </th>
-                            )}
+  
                             {selectedColumns.Vehicle && (
                                 <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns["Purchase Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_pneu")}>
-                                    {translate("Purchase Date")}
-                                </th>
-                            )}
-                        
-                            {selectedColumns.Cost && (
-                                <th className="sorting" onClick={() => handleSortingColumn("cout_pneu")}>
-                                    {translate("Cost")}
-                                </th>
-                            )}
+
                             {selectedColumns.Km && (
                                 <th className="sorting" onClick={() => handleSortingColumn("km_pneu")}>
                                     {translate("Km")}
                                 </th>
                             )}
+
+                            {selectedColumns["Purchase Date"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_pneu")}>
+                                    {translate("Purchase Date")}
+                                </th>
+                            )}
+
+                             {selectedColumns.State && (
+                                <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
+                                    {translate("State")}
+                                </th>
+                            )}
+                        
+                            {selectedColumns.Position && (
+                                <th className="sorting" onClick={() => handleSortingColumn("position_pneu")}>
+                                    {translate("Position")}
+                                </th>
+                            )}
+                            
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="light-body">
                         {loading ? (
-                            <tr>
-                                <td colSpan={8} className="text-center">
-                                    <PropagateLoader color="#0059b3" size={15} />
+                            <tr style={{ textAlign: "center" }}>
+                                <td className="text-center" colSpan={10}>
+                                    <p>
+                                        <PropagateLoader
+                                            color={"#123abc"}
+                                            loading={loading}
+                                            size={20}
+                                        />
+                                    </p>
                                 </td>
                             </tr>
                         ) : Array.isArray(list_pneu) && list_pneu.length !== 0 ? (
@@ -320,14 +349,15 @@ export function Pneu() {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.ID && 
-                                    <td>{Pneu.id_pneu}
-                                    </td>}
-                                    {selectedColumns["Inv. No."] && <td>{Pneu.num_facture_pneu}</td>}
+                                   
+                                    
                                     {selectedColumns.Vehicle && <td>{Pneu.immatriculation_vehicule}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDateToTimestamp(Pneu.date_achat_pneu)}</td>}
-                                    {selectedColumns.Cost && <td>{Pneu.cout_pneu}</td>}
                                     {selectedColumns.Km && <td>{Pneu.km_pneu}</td>}
+                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(Pneu.date_achat_pneu)}</td>}
+                                    {selectedColumns.State && 
+                                    <td>{stateLabels[Pneu.etat_pneu]}
+                                    </td>}
+                                    {selectedColumns.Position && <td>{positionLabels[Pneu.position_pneu]}</td>}
                                     <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center list-action">
                                                 {/* View Button */}

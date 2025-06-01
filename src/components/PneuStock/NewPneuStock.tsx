@@ -116,9 +116,9 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                     <Form.Group controlId="type_pneu">
                         <Form.Label>{translate("Tire Type")} *</Form.Label>
                         <Form.Control as="select" value={formData.type_pneu} onChange={handleChange} required>
-                            <option value="">{translate("-- Tire type --")}</option>
+                            <option value="">{translate("-- Tire Type --")}</option>
                             <option value="utilitaire">{translate("Utility/Van")}</option>
-                            <option value="poids lourd">{translate("Heavy Truck")}</option>
+                            <option value="poids_lourd">{translate("Heavy Truck")}</option>
                             <option value="suv">{translate("SUV / 4x4")}</option>
                             <option value="remorque">{translate("Trailer (small luggage)")}</option>
                             <option value="voiture">{translate("Car/Passenger")}</option>
@@ -147,10 +147,10 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                     </Form.Group>
 
                     <Form.Group controlId="ref_pneu">
-                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Label>{translate("Reference")}* </Form.Label>
                         <Form.Control 
                             type="text" 
-                            placeholder={translate("Dimension/Load/Speed")}
+                            placeholder={translate("Size / Load Index / Speed Rating")}
                             value={formData.ref_pneu} 
                             onChange={handleChange} 
                         />
@@ -196,7 +196,7 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                     </Form.Group>
 
                     <Form.Group controlId="fact_pneu">
-                        <Form.Label>{translate("Invoice Number")}</Form.Label>
+                        <Form.Label>{translate("Invoice No")}</Form.Label>
                         <Form.Control 
                             type="text" 
                             value={formData.fact_pneu} 
@@ -210,6 +210,17 @@ const ModalNewPneuStock: React.FC<ModalNewPneuStockProps> = ({ show, onHide, onS
                             type="text"
                             value={formData.cout_pneu}
                             onChange={handleChange}
+                             onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                 </div>

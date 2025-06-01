@@ -3,54 +3,54 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import ModalNewPneuStock from "../components/PneuStock/NewPneuStock";
-import ModalShowPneuStock from "../components/PneuStock/ShowPneuStock";
+import ModalNewPieceStock from "../components/PieceStock/NewPieceStock";
+import ModalShowPieceStock from "../components/PieceStock/ShowPieceStock";
 import { PropagateLoader } from "react-spinners";
-import ModalEditPneuStock from "../components/PneuStock/EditPneuStock";
-import ModalDeletePneuStock from "../components/PneuStock/DeletePneuStock";
+import ModalEditPieceStock from "../components/PieceStock/EditPieceStock";
+import ModalDeletePieceStock from "../components/PieceStock/DeletePieceStock";
 
-interface PneuStock {
-    id_pneu_stock: number;
-    type_pneu: string;
-    modele_pneu: string;
-    ref_pneu: string;
-    num_serie_pneu: string;
-    loc_pneu: string;
-    date_achat_pneu: string;
-    cout_pneu: number;
+interface PieceStock {
+    id_piece_stock: number;
+    type_piece_ps: string;
+    reference_ps: string;
+    marque_ps: string;
+    modele_ps: string;
+    quantite_ps: number;
+    cout_achat_ps: number;
+    date_achat_ps: string;
 }
 
-export function PneuStock() {
+export function PieceStock() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const { translate } = useTranslate();
-    const [list_pneu, setPneuStock] = useState<PneuStock[]>([]);
+    const [list_piece, setPieceStock] = useState<PieceStock[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
     const [typeSearch, setTypeSearch] = useState("ID");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_pneu_stock");
+    const [column, setSortColumn] = useState("id_piece_stock");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [selectedPneuStockId, setSelectedPneuStockId] = useState<number | null>(null);
+    const [selectedPieceStockId, setSelectedPieceStockId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
         "ID": true,
         "Type": true,
-        "Model": true,
         "Reference": true,
-        "Serial": true,
-        "Position": true,
-        "Purchase Date": true,
-        "Cost": true
+        "Nom": true,
+        "Model": true,
+        "Quantity": true,
+        "Purchase Cost": true,
+        "Purchase Date": true
     };
 
     const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumns");
+        const savedColumns = localStorage.getItem("selectedColumnsPiece");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
     };
     
@@ -62,83 +62,81 @@ export function PneuStock() {
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns));
+        localStorage.setItem("selectedColumnsPiece", JSON.stringify(updatedColumns));
     };
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getPneuStock();
+        getPieceStock();
     };
 
-    const [showNewPneuStockModal, setShowNewPneuStockModal] = useState(false);
-    const [showEditPneuStockModal, setShowEditPneuStockModal] = useState(false);
-    const [showShowPneuStockModal, setShowShowPneuStockModal] = useState(false);
-    const [showDeletePneuStockModal, setShowDeletePneuStockModal] = useState(false);
+    const [showNewPieceStockModal, setShowNewPieceStockModal] = useState(false);
+    const [showEditPieceStockModal, setShowEditPieceStockModal] = useState(false);
+    const [showShowPieceStockModal, setShowShowPieceStockModal] = useState(false);
+    const [showDeletePieceStockModal, setShowDeletePieceStockModal] = useState(false);
 
-    const handleShowNewPneuStockModal = () => setShowNewPneuStockModal(true);
-    const handleCloseNewPneuStockModal = () => setShowNewPneuStockModal(false);
+    const handleShowNewPieceStockModal = () => setShowNewPieceStockModal(true);
+    const handleCloseNewPieceStockModal = () => setShowNewPieceStockModal(false);
 
-    const handleDeletePneuStockModal = (id: number) => {
-        setSelectedPneuStockId(id);
-        setShowDeletePneuStockModal(true);
+    const handleDeletePieceStockModal = (id: number) => {
+        setSelectedPieceStockId(id);
+        setShowDeletePieceStockModal(true);
     };
-    const handleCloseDeletePneuStockModal = () => setShowDeletePneuStockModal(false);
+    const handleCloseDeletePieceStockModal = () => setShowDeletePieceStockModal(false);
 
-    const handleEditPneuStockModal = (id: number) => {
-        setSelectedPneuStockId(id);
-        setShowEditPneuStockModal(true);
+    const handleEditPieceStockModal = (id: number) => {
+        setSelectedPieceStockId(id);
+        setShowEditPieceStockModal(true);
     };
-    const handleCloseEditPneuStockModal = () => setShowEditPneuStockModal(false);
+    const handleCloseEditPieceStockModal = () => setShowEditPieceStockModal(false);
 
-    const handleShowShowPneuStockModal = (id: number) => {
-        setSelectedPneuStockId(id);
-        setShowShowPneuStockModal(true);
+    const handleShowShowPieceStockModal = (id: number) => {
+        setSelectedPieceStockId(id);
+        setShowShowPieceStockModal(true);
     };
-    const handleCloseShowPneuStockModal = () => setShowShowPneuStockModal(false);
+    const handleCloseShowPieceStockModal = () => setShowShowPieceStockModal(false);
 
-    const getCountPneuStock = async () => {
-    try {
-        setLoading(true);
-        const response = await fetch(
-            `${backendUrl}/api/geop/pneu_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
-        );
-        const result = await response.json();
-        
-        // Check if result has a count property
-        if (result && typeof result.count === "number") {
-            setTotal(result.count);
-            setPageCount(Math.ceil(result.count / limit));
-        } else {
-            console.error("Unexpected count structure:", result);
+    const getCountPieceStock = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `${backendUrl}/api/geop/piece_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
+            );
+            const result = await response.json();
+            
+            if (result && typeof result.count === "number") {
+                setTotal(result.count);
+                setPageCount(Math.ceil(result.count / limit));
+            } else {
+                console.error("Unexpected count structure:", result);
+                setTotal(0);
+            }
+        } catch (error) {
+            console.error(error);
             setTotal(0);
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error(error);
-        setTotal(0);
-    } finally {
-        setLoading(false);
-    }
-};
-    
+    };
 
-    const getPneuStock = async () => {
+    const getPieceStock = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/pneu_stock/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/piece_stock/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
             const data = await response.json();
     
             if (Array.isArray(data)) {
-                setPneuStock(data);
+                setPieceStock(data);
             } else {
                 console.error("Unexpected API response:", data);
-                setPneuStock([]); // ou afficher un message d'erreur
+                setPieceStock([]);
             }
         } catch (error) {
             console.error(error);
-            setPneuStock([]); // fallback
+            setPieceStock([]);
         } finally {
             setLoading(false);
         }
@@ -146,8 +144,8 @@ export function PneuStock() {
     
 
     useEffect(() => {
-        getCountPneuStock();
-        getPneuStock();
+        getCountPieceStock();
+        getPieceStock();
     }, [currentPage, limit, search, type, column, sort]);
 
     const handleTypeSearch = (event: any) => {
@@ -159,19 +157,15 @@ export function PneuStock() {
             case translate("Reference"):
                 setType(1);
                 break;
-            case translate("Model"):
+            case translate("Nom"):
                 setType(2);
                 break;
-           
-            case translate("Serial"):
+            case translate("Model"):
                 setType(3);
                 break;
-
-            case translate("Position"):
+            case translate("Type"):
                 setType(4);
                 break;
-
-           
             default:
                 console.log("Unknown selection");
                 break;
@@ -195,44 +189,34 @@ export function PneuStock() {
     };
 
     const refreshData = () => {
-        getCountPneuStock();
-        getPneuStock();
+        getCountPieceStock();
+        getPieceStock();
     };
-     const typePneuLabels: { [key: string]: string } = {
-        utilitaire: translate("Utility/Van"),
-        poids_lourd: translate("Heavy Truck"),
-        suv: translate("SUV / 4x4"),
-        remorque: translate("Trailer (small luggage)"),
-        voiture: translate("Car/Passenger"),
-        agricole: translate("Agricultural"),
-        };
 
-        const positionLabels: { [key: string]: string } = {
-        front_left: translate("Front Left"),
-        front_right: translate("Front Right"),
-        rear_left: translate("Rear Left"),
-        rear_right: translate("Rear Right"),
-        spare: translate("Spare Tire"),
-        };
+    const typePieceLabels: { [key: string]: string } = {
+        moteur: translate("Engine"),
+        carrosserie: translate("Bodywork"),
+        suspension: translate("Suspension"),
+        freinage: translate("Braking"),
+        electronique: translate("Electronics"),
+    };
 
-
-          function formatDatetimeLocal(dateString: string): string {
-            if (!dateString) return "";
-            const date = new Date(dateString);
-            return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        }
-        
+    function formatDatetimeLocal(dateString: string): string {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
 
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                <h4>{translate("Tire")} ({total})</h4>
+                    <h4>{translate("Parts")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewPneuStockModal} className="btn btn-primary mt-2 mr-1">
+                    <Button onClick={handleShowNewPieceStockModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Request")}
+                        {translate("New Part")}
                     </Button>
                 </div>
             </div>
@@ -247,9 +231,9 @@ export function PneuStock() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Nom")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Model")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Serial")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Position")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -316,49 +300,49 @@ export function PneuStock() {
                                 </div>
                             </th>
                             {selectedColumns.ID && (
-                                <th className="sorting" onClick={() => handleSortingColumn("id_pneu_stock")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("id_piece_stock")}>
                                     {translate("ID")}
                                 </th>
                             )}
                             {selectedColumns.Type && (
-                                <th className="sorting" onClick={() => handleSortingColumn("type_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("type_piece_ps")}>
                                     {translate("Type")}
                                 </th>
                             )}
-                            {selectedColumns.Model && (
-                                <th className="sorting" onClick={() => handleSortingColumn("modele_pneu")}>
-                                    {translate("Model")}
-                                </th>
-                            )}
                             {selectedColumns.Reference && (
-                                <th className="sorting" onClick={() => handleSortingColumn("ref_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("reference_ps")}>
                                     {translate("Reference")}
                                 </th>
                             )}
-                            {selectedColumns.Serial && (
-                                <th className="sorting" onClick={() => handleSortingColumn("num_serie_pneu")}>
-                                    {translate("Serial")}
+                            {selectedColumns.Nom && (
+                                <th className="sorting" onClick={() => handleSortingColumn("marque_ps")}>
+                                    {translate("Nom")}
                                 </th>
                             )}
-                            {selectedColumns.Position && (
-                                <th className="sorting" onClick={() => handleSortingColumn("loc_pneu")}>
-                                    {translate("Position")}
+                            {selectedColumns.Model && (
+                                <th className="sorting" onClick={() => handleSortingColumn("modele_ps")}>
+                                    {translate("Model")}
+                                </th>
+                            )}
+                            {selectedColumns.Quantity && (
+                                <th className="sorting" onClick={() => handleSortingColumn("quantite_ps")}>
+                                    {translate("Quantity")}
+                                </th>
+                            )}
+                            {selectedColumns["Purchase Cost"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("cout_achat_ps")}>
+                                    {translate("Purchase Cost")}
                                 </th>
                             )}
                             {selectedColumns["Purchase Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_pneu")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_ps")}>
                                     {translate("Purchase Date")}
-                                </th>
-                            )}
-                            {selectedColumns.Cost && (
-                                <th className="sorting" onClick={() => handleSortingColumn("cout_pneu")}>
-                                    {translate("Cost")}
                                 </th>
                             )}
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
-                     <tbody className="light-body">
+                    <tbody className="light-body">
                         {loading ? (
                             <tr style={{ textAlign: "center" }}>
                                 <td className="text-center" colSpan={10}>
@@ -371,8 +355,8 @@ export function PneuStock() {
                                     </p>
                                 </td>
                             </tr>
-                        ) : Array.isArray(list_pneu) && list_pneu.length !== 0 ? (
-                            list_pneu.map((PneuStock, index) => (
+                        ) : Array.isArray(list_piece) && list_piece.length !== 0 ? (
+                            list_piece.map((piece, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -382,62 +366,45 @@ export function PneuStock() {
                                             />
                                         </div>
                                     </td>
-                                   
-                                    
-                                    
-                                    {selectedColumns.ID && <td>{PneuStock.id_pneu_stock}</td>}
-                                    {selectedColumns.Type && <td>{typePneuLabels[PneuStock.type_pneu] || PneuStock.type_pneu}</td>}
-                                    {selectedColumns.Model && <td>{PneuStock.modele_pneu}</td>}
-                                    {selectedColumns.Reference && <td>{PneuStock.ref_pneu}</td>}
-                                    {selectedColumns.Serial && <td>{PneuStock.num_serie_pneu}</td>}
-                                    {selectedColumns.Position && <td>{positionLabels[PneuStock.loc_pneu] || PneuStock.loc_pneu}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(PneuStock.date_achat_pneu)}</td>}
-                                    {selectedColumns.Cost && <td>{PneuStock.cout_pneu} </td>}
+                                    {selectedColumns.ID && <td>{piece.id_piece_stock}</td>}
+                                    {selectedColumns.Type && <td>{typePieceLabels[piece.type_piece_ps] || piece.type_piece_ps}</td>}
+                                    {selectedColumns.Reference && <td>{piece.reference_ps}</td>}
+                                    {selectedColumns.Nom && <td>{piece.marque_ps}</td>}
+                                    {selectedColumns.Model && <td>{piece.modele_ps}</td>}
+                                    {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
+                                    {selectedColumns["Purchase Cost"] && <td>{piece.cout_achat_ps}</td>}
+                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(piece.date_achat_ps)}</td>}
                                     <td className="text-center">
-                                            <div className="d-flex justify-content-center align-items-center list-action">
-                                                {/* View Button */}
-                                                <Link
-                                                    to={``}
-                                                    className="badge bg-primary mr-2"
-                                                    data-toggle="tooltip"
-                                                    data-placement="top"
-                                                    title="Détail"
-                                                    onClick={() => handleShowShowPneuStockModal(PneuStock.id_pneu_stock)}
-                                                >
-                                                    <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
-                                                </Link>
-
-                                                {/* Edit Button */}
-                                                <Link
-                                                    to={``}
-                                                    className="badge badge-success mr-2"
-                                                    data-toggle="tooltip"
-                                                    data-placement="top"
-                                                    title="Edit"
-                                                    onClick={() => handleEditPneuStockModal(PneuStock.id_pneu_stock)}
-                                                >
-                                                    <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
-                                                </Link>
-
-                                                {/* Delete Button */}
-                                                <Link
-                                                    to={``}
-                                                    className="badge bg-danger mr-2"
-                                                    data-toggle="tooltip"
-                                                    data-placement="top"
-                                                    title="Delete"
-                                                    onClick={() => handleDeletePneuStockModal(PneuStock.id_pneu_stock)}
-                                                >
-                                                    <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
-                                                </Link>
-                                            </div>
-                                        </td>
+                                        <div className="d-flex justify-content-center align-items-center list-action">
+                                            <Link
+                                                to={``}
+                                                className="badge bg-primary mr-2"
+                                                onClick={() => handleShowShowPieceStockModal(piece.id_piece_stock)}
+                                            >
+                                                <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                                            </Link>
+                                            <Link
+                                                to={``}
+                                                className="badge badge-success mr-2"
+                                                onClick={() => handleEditPieceStockModal(piece.id_piece_stock)}
+                                            >
+                                                <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
+                                            </Link>
+                                            <Link
+                                                to={``}
+                                                className="badge bg-danger mr-2"
+                                                onClick={() => handleDeletePieceStockModal(piece.id_piece_stock)}
+                                            >
+                                                <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
+                                            </Link>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         ): (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={selectedColumns.length || 10}>
-                                    No data available
+                                <td colSpan={Object.keys(selectedColumns).length + 2}>
+                                    {translate("No data available")}
                                 </td>
                             </tr>
                         )}
@@ -447,7 +414,7 @@ export function PneuStock() {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>Affichage 1 à {limit} sur {total} </span>
+                    <span>{translate("Displaying 1 to")} {limit} {translate("of")} {total} </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -470,17 +437,14 @@ export function PneuStock() {
                         activeClassName={"active"}
                     />
                 </div>
-                
             </div>
-          <ModalNewPneuStock show={showNewPneuStockModal} onHide={handleCloseNewPneuStockModal} onSuccess={refreshData} />
-          <ModalShowPneuStock show={showShowPneuStockModal} onHide={handleCloseShowPneuStockModal} id_pneu_stock={selectedPneuStockId} />
 
-          <ModalEditPneuStock show={showEditPneuStockModal} onHide={handleCloseEditPneuStockModal} id_pneu_stock={selectedPneuStockId} onSuccess={refreshData} />
-        <ModalDeletePneuStock show={showDeletePneuStockModal} onHide={handleCloseDeletePneuStockModal} id_pneu_stock ={selectedPneuStockId} onSuccess={refreshData} />
-
-           
+           <ModalNewPieceStock show={showNewPieceStockModal} onHide={handleCloseNewPieceStockModal} onSuccess={refreshData} />
+            <ModalShowPieceStock show={showShowPieceStockModal} onHide={handleCloseShowPieceStockModal} id_piece_stock={selectedPieceStockId} />
+            <ModalEditPieceStock show={showEditPieceStockModal} onHide={handleCloseEditPieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
+            <ModalDeletePieceStock show={showDeletePieceStockModal} onHide={handleCloseDeletePieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
         </>
     );
 }
 
-export default PneuStock;
+export default PieceStock;

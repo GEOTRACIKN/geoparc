@@ -28,6 +28,10 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
         temps_amort: "",
         immatriculation_vehicule: "",
         technicien_pneu: "",
+        marque_pneu: "",
+        modele_pneu: "",
+        ref_pneu: "",
+        id_pneu_stock: ""
     });
 
     const { translate } = useTranslate();
@@ -63,7 +67,11 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                     etat_pneu: data.etat_pneu || "",
                     position_pneu: data.position_pneu || "",
                     fournisseur_pneu: data.fournisseur_pneu || "",
-                    temps_amort: data.temps_amort || ""
+                    temps_amort: data.temps_amort || "",
+                    marque_pneu: data.marque_pneu || "",
+                    modele_pneu: data.modele_pneu || "",
+                    ref_pneu: data.ref_pneu || "",
+                    id_pneu_stock: data.id_pneu_stock || ""
                 });
             } else {
                 console.warn('No pneu data found for the provided ID.');
@@ -99,6 +107,10 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                     fournisseur_pneu: "",
                     temps_amort: "",
                     immatriculation_vehicule: "",
+                    marque_pneu:  "",
+                    modele_pneu: "",
+                    ref_pneu:"",
+                    id_pneu_stock:""
                 });
             }
         }, [show]);
@@ -119,9 +131,14 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                     ) : (
                         <>
                     
-                    <Form.Group controlId="num_facture_pneu">
-                        <Form.Label>{translate("Inv. No.")}</Form.Label>
-                        <Form.Control value={formData.num_facture_pneu} readOnly />
+                    <Form.Group controlId="immatriculation_vehicule">
+                        <Form.Label>{translate("Vehicle")}</Form.Label>
+                        <Form.Control value={formData.immatriculation_vehicule} readOnly />
+                    </Form.Group>
+
+                    <Form.Group controlId="km_pneu">
+                        <Form.Label>{translate("Km")}</Form.Label>
+                        <Form.Control type="text" value={formData.km_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="date_achat_pneu">
@@ -134,16 +151,6 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                             }
                             readOnly
                         />
-                    </Form.Group>
-
-                    <Form.Group controlId="immatriculation_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control value={formData.immatriculation_vehicule} readOnly />
-                    </Form.Group>
-
-                    <Form.Group controlId="km_pneu">
-                        <Form.Label>{translate("Km")}</Form.Label>
-                        <Form.Control type="text" value={formData.km_pneu} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="etat_pneu">
@@ -194,12 +201,24 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                 </Form.Group>
                                     
 
-                     {formData.source_pneu === "internal" && (
+                    {formData.source_pneu === "internal" && (
+                    <>
                         <Form.Group controlId="technicien_pneu">
                             <Form.Label>{translate("Technician")}</Form.Label>
                             <Form.Control type="text" value={formData.technicien_pneu} readOnly />
                         </Form.Group>
-                     )}
+
+                        <Form.Group controlId="stock_pneu_info">
+                            <Form.Label>{translate("Stock Tire Details")}</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                value={`${formData.marque_pneu} ${formData.modele_pneu} (${formData.ref_pneu})`} 
+                                readOnly 
+                            />
+                        </Form.Group>
+                    </>
+                )}
+                      
 
 
                     {formData.source_pneu === "external" && (
@@ -214,10 +233,16 @@ const ModalShowPneu: React.FC<ModalShowPneuProps> = ({ show, onHide, id_pneu }) 
                                 <Form.Control type="text" value={formData.temps_amort} readOnly />
                             </Form.Group>
 
+                            <Form.Group controlId="num_facture_pneu">
+                                <Form.Label>{translate("Inv. No.")}</Form.Label>
+                                <Form.Control value={formData.num_facture_pneu} readOnly />
+                            </Form.Group>
+
                             <Form.Group controlId="cout_pneu">
                                 <Form.Label>{translate("Cost")}</Form.Label>
                                 <Form.Control type="text" value={formData.cout_pneu} readOnly />
                             </Form.Group>
+
                         </>
                     )}
 

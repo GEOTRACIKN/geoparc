@@ -98,7 +98,6 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                 cout_pneu: "",
                 fourn_pneu: "",
                 marque_pneu:"",
-
                 fact_pneu: ""
             });
         }
@@ -106,7 +105,7 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
 
     const typePneuLabels: { [key: string]: string } = {
         utilitaire: translate("Utility/Van"),
-        "poids lourd": translate("Heavy Truck"),
+        poids_lourd: translate("Heavy Truck"),
         suv: translate("SUV / 4x4"),
         remorque: translate("Trailer (small luggage)"),
         voiture: translate("Car/Passenger"),
@@ -135,8 +134,8 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                         </div>
                     ) : (
                         <div className="row">
-                            <Form.Group controlId="marque_pneu">
-                                    <Form.Label>{translate("Brand")} *</Form.Label>
+                                <Form.Group controlId="marque_pneu">
+                                    <Form.Label>{translate("Brand")} </Form.Label>
                                     <Form.Control 
                                         type="text" 
                                         value={formData.marque_pneu} 
@@ -181,15 +180,13 @@ const ModalShowPneuStock: React.FC<ModalShowPneuStockProps> = ({ show, onHide, i
                                     />
                                 </Form.Group>
 
-                                
-
                                 <Form.Group controlId="fourn_pneu">
                                     <Form.Label>{translate("Supplier")}</Form.Label>
                                     <Form.Control value={formData.fourn_pneu} readOnly />
                                 </Form.Group>
 
                                 <Form.Group controlId="fact_pneu">
-                                    <Form.Label>{translate("Invoice Number")}</Form.Label>
+                                    <Form.Label>{translate("Invoice No")}</Form.Label>
                                     <Form.Control value={formData.fact_pneu} readOnly />
                                 </Form.Group>
                                 <Form.Group controlId="cout_pneu">
