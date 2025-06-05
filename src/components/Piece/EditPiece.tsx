@@ -59,6 +59,16 @@ const EditPieceModal: React.FC<EditPieceModalProps> = ({ show, onHide, id_piece,
     const geopuserID = localStorage.getItem("GeopUserID");
     const { translate } = useTranslate();
 
+    const toLocalISOString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+
     useEffect(() => {
         if (!id_piece || !show) return;
     
@@ -122,6 +132,15 @@ const EditPieceModal: React.FC<EditPieceModalProps> = ({ show, onHide, id_piece,
             marque_ps: selectedPiece.marque_ps
         }));
     };
+    
+    function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
+    
 
     const handleClose = () => {
         setFormData({
@@ -440,8 +459,7 @@ const EditPieceModal: React.FC<EditPieceModalProps> = ({ show, onHide, id_piece,
                                         <Form.Label>{translate("Date")}</Form.Label>
                                         <Form.Control
                                             type="datetime-local"
-                                            value={formData.date_piece ? new Date(formData.date_piece).toISOString().slice(0, 16) : ""}
-                                            min="2000-01-01T00:00"
+                                            value={formData.date_piece ? toLocalISOString(new Date(formData.date_piece)) : ""}                                            min="2000-01-01T00:00"
                                             onChange={handleChange}
                                         />
                                     </Form.Group>

@@ -797,15 +797,16 @@
 "Added to stock successfully!": "¡Añadido al stock con éxito!",
 "Error adding to stock. Please try again": "Error al añadir al stock. Por favor, inténtalo de nuevo",
 
- "Operation Type": "Tipo de operación",
-  "Select Operation": "Seleccionar una operación",
-  "Replace": "Reemplazar",
-  "Source": "Fuente",
-  "Select Source": "Seleccionar una fuente",
-  "Technician": "Técnico",
-  "Internal Stock Piece": "Pieza del stock interno",
-  "Select Internal Stock Piece": "Seleccionar una pieza del stock interno",
-  "Details": "Detalles",
-    "Cost (DZD)": "Costo (DZD)"
+"Operation Type": "Tipo de operación",
+"Select Operation": "Seleccionar una operación",
+"Replace": "Reemplazar",
+"Source": "Fuente",
+"Select Source": "Seleccionar una fuente",
+"Technician": "Técnico",
+"Internal Stock Piece": "Pieza del stock interno",
+"Select Internal Stock Piece": "Seleccionar una pieza del stock interno",
+"Details": "Detalles",
+"Cost (DZD)": "Costo (DZD)",
+"Operation": "Operación"
 
 }
