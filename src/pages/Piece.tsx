@@ -111,51 +111,39 @@ export function Piece() {
     const handleCloseShowPieceModal = () => setShowShowPieceModal(false);
 
     // Récupération des données
-    const getCountPiece = useCallback(async () => {
-  try {
-    const response = await fetch(
-      `${backendUrl}/api/geop/piece/count/${id_user}?searchTerm=${search}&searchType=${type}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch count");
-    const result = await response.json();
-    // Correction ici ↓
-    setTotal(result.count); // Extrait la valeur numérique de l'objet
-  } catch (error) {
-    console.error(error);
-    setError(translate("Failed to load data count"));
-  }
-}, [id_user, search, type, backendUrl, translate]);
+   const getCountPiece = async () => {
+    try {
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/piece/count/${id_user}?searchTerm=${search}&searchType=${type}`
+        );
+        const result = await response.json();
+        setTotal(result.count);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+};
 
-    const getPiece = useCallback(async () => {
+    const getPiece = async () => {
         try {
             const response = await fetch(
                 `${backendUrl}/api/geop/piece/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
-            if (!response.ok) throw new Error("Failed to fetch pieces");
             const data = await response.json();
             setPiece(data);
         } catch (error) {
             console.error(error);
-            setError(translate("Failed to load pieces data"));
+        } finally {
+            setLoading(false);
         }
-    }, [id_user, currentPage, limit, search, type, column, sort, backendUrl, translate]);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                await Promise.all([getCountPiece(), getPiece()]);
-            } catch (error) {
-                console.error(error);
-                setError(translate("Failed to load data"));
-            } finally {
-                setLoading(false);
-            }
-        };
-        
-        fetchData();
-    }, [getCountPiece, getPiece, translate]);
+        getCountPiece();
+        getPiece();
+    }, [currentPage, limit, search, type, column, sort]);
 
     // Handlers UI
     const handleTypeSearch = (selectedValue: string) => {
@@ -389,17 +377,30 @@ export function Piece() {
 
         <tbody className="light-body">
             {loading ? (
-                <tr style={{ textAlign: "center" }}>
-                    <td colSpan={visibleColumnsCount + 2}>
-                        <PropagateLoader color={"#123abc"} loading={loading} size={20} />
-                    </td>
-                </tr>
-            ) : list_piece.length > 0 ? (
-                list_piece.map((piece) => (
-                    <tr key={piece.id_piece}>
-                        <td className="text-center">
-                            <input type="checkbox" className="form-check-input" />
-                        </td>
+                <td 
+  className="text-center" 
+  colSpan={visibleColumnsCount + 2}
+  style={{ width: "100%" }}
+>
+  <div className="d-flex justify-content-center">
+    <PropagateLoader 
+      color={"#123abc"} 
+      loading={loading} 
+      size={20} 
+    />
+  </div>
+</td>
+            ) : Array.isArray(list_piece) && list_piece.length !== 0 ? (
+                            list_piece.map((piece, index) => (
+                                <tr key={index}>
+                                    <td className="text-center">
+                                        <div className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                            />
+                                        </div>
+                                    </td>
 
                         {selectedColumns.Operation && (
                         <td>{translateOperationType(piece.type_operation_piece)}</td>
@@ -413,7 +414,7 @@ export function Piece() {
                         <td className="text-center">
                             <div className="d-flex justify-content-center align-items-center list-action">
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge bg-primary mr-2"
                                     title="View"
                                     onClick={() => handleShowPieceModal(piece.id_piece)}
@@ -421,7 +422,7 @@ export function Piece() {
                                     <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                                 </Link>
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge badge-success mr-2"
                                     title="Edit"
                                     onClick={() => handleEditPieceModal(piece.id_piece)}
@@ -429,7 +430,7 @@ export function Piece() {
                                     <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
                                 </Link>
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge bg-danger mr-2"
                                     title="Delete"
                                     onClick={() => handleDeletePieceModal(piece.id_piece)}
@@ -493,8 +494,6 @@ export function Piece() {
             onHide={handleCloseEditPieceModal} 
             id_piece={selectedPieceId} 
             onSuccess={refreshData} />
-            
-            
           
             {/* 
             <ModalDeletePiece 
