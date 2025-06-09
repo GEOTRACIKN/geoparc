@@ -8,7 +8,7 @@ import ModalEditPiece from "../components/Piece/EditPiece";
 
 import { Link } from "react-router-dom";
 import ModalShowPiece from "../components/Piece/ShowPiece";
-// import ModalDeletePiece from "../components/Piece/DeletePiece";
+import ModalDeletePiece from "../components/Piece/DeletePiece";
 
 interface Piece {
     id_piece: number;
@@ -495,14 +495,14 @@ export function Piece() {
             id_piece={selectedPieceId} 
             onSuccess={refreshData} />
           
-            {/* 
+           
             <ModalDeletePiece 
                 show={showDeletePieceModal} 
                 onHide={handleCloseDeletePieceModal} 
                 id_piece={selectedPieceId} 
                 onSuccess={refreshData} 
             />
-             */}
+         
             
             <ModalShowPiece 
                 show={showShowPieceModal} 
