@@ -317,7 +317,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     },
     {
       id: 28,
-      label: "Items Change",
+      label: "Parts Replacement",
       icon: "las la-wrench", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
       to: "/piece",
       permissionId: 41,

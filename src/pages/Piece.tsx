@@ -233,7 +233,7 @@ export function Piece() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Items Management")} ({total})</h4>
+                    <h4>{translate("Parts Replacement")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button 
