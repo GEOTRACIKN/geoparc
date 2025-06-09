@@ -145,7 +145,7 @@ const typesPiece: { [key: string]: string } = {
             </Modal.Header>
             <Modal.Body>
          <Form>
-    {/* 1 - Purchase Date & Invoice Number */}
+    {/* 1 - Date & Invoice Number */}
     <div className="row">
         <div className="col-md-6">
             <Form.Group className="mb-3">
@@ -296,11 +296,10 @@ const typesPiece: { [key: string]: string } = {
         </div>
     </div>
 
-    {/* 6 - Purchase Cost, Quantity, Min Stock */}
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
+                <Form.Label>{translate("Cost (DZD)")}</Form.Label>
                 <Form.Control
                     type="text"
                     name="cout_achat_ps"

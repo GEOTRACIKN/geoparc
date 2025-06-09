@@ -241,7 +241,7 @@ export function Piece() {
                         className="btn btn-primary mt-2 mr-1"
                     >
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Part")}
+                        {translate("New")}
                     </Button>
                 </div>
             </div>

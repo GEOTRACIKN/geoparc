@@ -45,7 +45,7 @@ export function PieceStock() {
         "Brand": true,
         "Model": true,
         "Quantity": true,
-        "Purchase Cost": true,
+        "Cost": true,
         "Purchase Date": true
     };
 
@@ -232,7 +232,7 @@ const typesPiece: { [key: string]: string } = {
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewPieceStockModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Part")}
+                        {translate("New")}
                     </Button>
                 </div>
             </div>
@@ -345,9 +345,9 @@ const typesPiece: { [key: string]: string } = {
                                     {translate("Quantity")}
                                 </th>
                             )}
-                            {selectedColumns["Purchase Cost"] && (
+                            {selectedColumns["Cost"] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("cout_achat_ps")}>
-                                    {translate("Purchase Cost")}
+                                    {translate("Cost")}
                                 </th>
                             )}
                             {selectedColumns["Purchase Date"] && (
@@ -388,7 +388,7 @@ const typesPiece: { [key: string]: string } = {
                                     {selectedColumns.Brand && <td>{piece.marque_ps}</td>}
                                     {selectedColumns.Model && <td>{piece.modele_ps}</td>}
                                     {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
-                                    {selectedColumns["Purchase Cost"] && <td>{piece.cout_achat_ps}</td>}
+                                    {selectedColumns["Cost"] && <td>{piece.cout_achat_ps}</td>}
                                     {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(piece.date_achat_ps)}</td>}
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
