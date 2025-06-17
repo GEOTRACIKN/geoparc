@@ -84,66 +84,75 @@ export function MissionOrder() {
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
 
-  //
-  const getMissionOrder = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
-    try {
-      setLoading(true);
+  const getMissionOrder = async (
+  limitValue: number, 
+  currentPage: number, 
+  search: string, 
+  type: number, 
+  colum: string, 
+  sort: string
+) => {
+  try {
+    setLoading(true);
 
-      // Preparing the data to send
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
+    // Préparation des paramètres pour la requête
+    const params = {
+      limitValue,
+      currentPage,
+      id_user,
+      search,
+      type,
+      colum,
+      sort
+    };
+
+    // 1. Récupération du nombre total de missions
+    const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/totalpage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        id_user, 
         search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
+        type // Ajout du type si nécessaire dans votre backend
+      }),
+      mode: 'cors',
+    });
 
-      // Retrieve the total number of pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
-
-      // Retrieve driver data
-      const MissionOrderResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-      //setDrivers et data et dDreiversResponse
-      // DriversReesponse et serDrivers 
-
-
-      //partie mission
-      
-
-      const data = await MissionOrderResponse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-      setMissionOrder(data);
-      return data;
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
+    if (!totalPagesResponse.ok) {
+      throw new Error("Failed to fetch total pages");
     }
-  };
 
+    const totalData = await totalPagesResponse.json();
+    const total = totalData.count; // Accès direct à la propriété count
+    settotal(total);
 
+    // 2. Récupération des données paginées
+    const missionOrderResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+      mode: 'cors',
+    });
+
+    if (!missionOrderResponse.ok) {
+      throw new Error("Failed to fetch mission orders");
+    }
+
+    const data = await missionOrderResponse.json();
+    
+    // Calcul de la pagination
+    setPageCount(Math.ceil(total / limitValue));
+    setLimit(limitValue);
+    setMissionOrder(data);
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching mission orders:", error);
+    // Gestion d'erreur avec toast ou autre
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
