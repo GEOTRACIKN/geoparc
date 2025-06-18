@@ -168,84 +168,77 @@ setVehicles(vehiclesData.vehicles || []);
   };
 
 
-  const updateMission = async (mission: MissionOrderInterface) => {
-    try {
-        // Prepare the mission data by filtering out null values
-        let missionOrderData = {
-            id_mission: mission.id_mission,
-            ref_mission: mission.ref_mission,
-            object_mission: mission.object_mission,
-            fuel_loading_mission: mission.fuel_loading_mission,
-            fuel_type_mission: mission.fuel_type_mission,
-            expenses_mission: mission.expenses_mission,
-            tank_mission: mission.tank_mission,
-            trailer_mission: mission.trailer_mission,
-            driver_mission: mission.driver_mission,
-            accomp_mission: mission.accomp_mission,
-            dep_loc_mission: mission.dep_loc_mission,
-            dep_date_mission: mission.dep_date_mission,
-            dep_dest_mission: mission.dep_dest_mission,
-            return_date_mission: mission.return_date_mission,
-            itinerary_mission: mission.itinerary_mission,
-            vehicle_km_mission: mission.vehicle_km_mission,
-            new_km_mission: mission.new_km_mission,
-            fuel_cost_mission: mission.fuel_cost_mission,
-            fuel_level_mission: mission.fuel_level_mission,
-            voucher_mission: mission.voucher_mission,
-        };
-
-        // Update the mission
-        const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/update`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            mode: "cors",
-            body: JSON.stringify(missionOrderData),
-        });
-
-        if (!res.ok) {
-            toast.warn("Can't update mission", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
-            console.error("Error updating mission");
-            return;
-        }
-
-        toast.success("Mission updated successfully", {
-            position: "bottom-right",
-            autoClose: 2400,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-        });
-
-        navigate("/mission-order");
-    } catch (error) {
-        toast.warn("Can't update mission", {
-            position: "bottom-right",
-            autoClose: 2400,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-        });
+const updateMission = async (mission: MissionOrderInterface) => {
+  try {
+    // Vérifier que l'ID mission et l'ID utilisateur sont présents
+    if (!mission.id_mission || !id_user) {
+      toast.error("Mission ID or User ID is missing");
+      return;
     }
+
+    // Préparer les données avec l'ID utilisateur
+    const missionOrderData = {
+      id_mission: mission.id_mission,
+      id_user: id_user, // Ajout crucial de l'ID utilisateur
+      ref_mission: mission.ref_mission,
+      object_mission: mission.object_mission,
+      fuel_loading_mission: mission.fuel_loading_mission,
+      fuel_type_mission: mission.fuel_type_mission,
+      expenses_mission: mission.expenses_mission,
+      tank_mission: mission.tank_mission,
+      trailer_mission: mission.trailer_mission,
+      driver_mission: mission.driver_mission,
+      accomp_mission: mission.accomp_mission,
+      dep_loc_mission: mission.dep_loc_mission,
+      dep_date_mission: mission.dep_date_mission,
+      dep_dest_mission: mission.dep_dest_mission,
+      return_date_mission: mission.return_date_mission,
+      itinerary_mission: mission.itinerary_mission,
+      vehicle_km_mission: mission.vehicle_km_mission,
+      new_km_mission: mission.new_km_mission,
+      fuel_cost_mission: mission.fuel_cost_mission,
+      fuel_level_mission: mission.fuel_level_mission,
+      voucher_mission: mission.voucher_mission,
+      id_vehicule: mission.id_vehicule,
+    };
+
+    // Envoyer la requête
+    const response = await fetch(`${backendUrl}/api/geop/missionOrderManage/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(missionOrderData),
+    });
+
+    // Gérer la réponse
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Échec de la mise à jour");
+    }
+
+    toast.success("Mission mise à jour avec succès", {
+      position: "bottom-right",
+      autoClose: 2400,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+
+    navigate("/mission-order");
+  } catch (error) {
+    console.error("Update error:", error);
+    toast.error("Erreur lors de la mise à jour", {
+      position: "bottom-right",
+      autoClose: 3000,
+      transition: Bounce,
+    });
+  }
 };
 
 const createMission = async (mission: MissionOrderInterface) => {
@@ -352,27 +345,48 @@ const createMission = async (mission: MissionOrderInterface) => {
         return res.json();
     };
 
-     
-
-  // Utilisez l'interface ChangeEvent pour le gestionnaire d'événements
-  const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     handleChange(name, value);  // Appel de la fonction de changement générique
   };
+
+     
+
+ const validateDates = () => {
+  if (mission?.dep_date_mission && mission?.return_date_mission) {
+    const depDate = new Date(mission.dep_date_mission);
+    const returnDate = new Date(mission.return_date_mission);
+    
+    if (depDate > returnDate) {
+      toast.error(translate("Departure date cannot be after return date"), {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+      return false;
+    }
+  }
+  return true;
+};
   
   // Fonction générique de gestion des changements dans les formulaires
   const handleChange = (name: string, value: string) => {
-    console.log("name: " + name);
-    console.log("value: " + value);
     if (mission) {
-      setMission({
+      const updatedMission = {
         ...mission,
         [name]: value,
-      });
+      };
+      
+      setMission(updatedMission);
+      
+      // Valider les dates après la mise à jour
+      if (name === "dep_date_mission" || name === "return_date_mission") {
+        validateDates();
+      }
     }
-    console.log(mission);
   };
-  
+
+
 
 
   return (
@@ -782,9 +796,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle KM")} (*)
               </Form.Label>
               <Form.Control
-                type="number"
+                type="text"
                 name="vehicle_km_mission"               
-                placeholder="Enter vehicle KM"
                 value={mission?.vehicle_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -798,7 +811,7 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
+              readOnly
               />
             </Form.Group>
 
