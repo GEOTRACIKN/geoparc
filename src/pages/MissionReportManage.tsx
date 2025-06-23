@@ -4,49 +4,67 @@ import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
+import Select from 'react-select';
+import { InputActionMeta } from "react-select";
+interface Vehicle {
+    id_vehicule: number;
+    immatriculation_vehicule: string;
+}
+interface Driver {
+    id_conducteur: number;
+   driver_mission: string;
+}
+
+interface Trailer {
+  id_remorque?: number;       // Ajoutez si disponible
+  trailer_mission: string;   // Modifiez pour correspondre au champ retourné par l'API
+}
 
 interface MissionReportInterface {
-    id_misrap?: number | null;               // Primary key with AUTO_INCREMENT
-    ref_misrap: string | null;               // Reference, varchar(20)
-    objt_misrap: string | null;              // Object of the mission, varchar(20)
-    carb_misrap: string | null;              // Type of fuel, varchar(20)
-    frais_misrap: number | null;             // Expenses, int(11)
-    vehicule_misrap: string | null;         // Vehicle registration, varchar(20)
-    remorque_misrap: string | null;         // Trailer, varchar(20)
-    cond_misrap: string | null;             // Driver, varchar(20)
-    acc_misrap: string | null;              // Accomplice, varchar(20)
-    itnr_misrap: string | null;             // Itinerary, varchar(20)
-    amort_misrap: number | null;            // Amortization, int(11)
-    dep_misrap: string | null;              // Departure location, varchar(20)
-    date_dep_misrap: string | null;         // Departure date, varchar(20)
-    lieu_misrap: string | null;             // Place, varchar(20)
-    date_arr_misrap: string | null;         // Arrival date, varchar(20)
-    km_dep_misrap: number | null;           // Departure km, int(11)
-    nuit_misrap: number | null;             // Night, int(11)
-    immob_misrap: number | null;            // Immobilization, int(11)
-    durr_misrap: number | null;             // Duration, int(11)
-    km_ret_misrap: number | null;           // Return km, int(11)
-    dist_misrap: number | null;            // Distance, int(11)
+    id_misrap?: number | null;              
+    ref_misrap: string | null;              
+    objt_misrap: string | null;            
+    carb_misrap: string | null;              
+    frais_misrap: number | null;            
+    remorque_misrap: string | null;        
+    cond_misrap: string | null;            
+    acc_misrap: string | null;            
+    itnr_misrap: string | null;            
+    amort_misrap: number | null;        
+    dep_misrap: string | null;          
+    date_dep_misrap: string | null;     
+    lieu_misrap: string | null;             
+    date_arr_misrap: string | null;    
+    km_dep_misrap: number | null;          
+    nuit_misrap: number | null;          
+    immob_misrap: number | null;            
+    durr_misrap: number | null;             
+    km_ret_misrap: number | null;          
+    dist_misrap: number | null;
+    id_vehicule: number | null;
     id_user: string | null;
   }
   
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const id_user = localStorage.getItem("GeopUserID");
+
 
 
 export function MissionReportManage() {
   const { id_misrap } = useParams<{ id_misrap?: string }>();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const isEditing = Boolean(id_misrap);
   const navigate = useNavigate();
   const { translate } = useTranslate();
-  const id_user = localStorage.getItem("GeopUserID");
-  const [vehicles, setVehicles] = useState<string[]>([]);
-  const [mission, setMission] = useState<MissionReportInterface | null>({
-    id_misrap: isEditing && id_misrap ? Number(id_misrap) : null,
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [trailers, setTrailers] = useState<Trailer[]>([]);
+const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+// Ajoutez cette constante au début de votre composant (après les interfaces)
+const initialMissionState: MissionReportInterface = {
+  id_misrap: null,
   ref_misrap: null,
   objt_misrap: null,
   carb_misrap: null,
   frais_misrap: null,
-  vehicule_misrap: null,
   remorque_misrap: null,
   cond_misrap: null,
   acc_misrap: null,
@@ -62,8 +80,16 @@ export function MissionReportManage() {
   durr_misrap: null,
   km_ret_misrap: null,
   dist_misrap: null,
-  id_user: isEditing ? null : id_user, // Set id_user only if not editing
-});
+  id_vehicule: null,
+  id_user: id_user
+};
+
+// Puis modifiez votre useState pour utiliser cette constante
+const [mission, setMission] = useState<MissionReportInterface | null>(
+  isEditing && id_misrap 
+    ? { ...initialMissionState, id_misrap: Number(id_misrap) } 
+    : initialMissionState
+);
 
   const [loading, setLoading] = useState<boolean | null>(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,43 +100,70 @@ export function MissionReportManage() {
     navigate("/mission-report");
   };
   
-   useEffect(() => {
-    const getMissionReport = async () => {
-      try {
-        // Récupération des informations du conducteur
-        const res = await fetch(
-          `${backendUrl}/api/geop/missionReportManage/find/${id_misrap}`,
-          {
-            mode: "cors",
-          }
-        );
-
-        if (!res.ok) {
-          console.error("Erreur lors de la récupération du conducteur");
-          setError("Erreur lors de la récupération du conducteur");
-          return;
-        }
-
-        const data: MissionReportInterface = await res.json();
-        setMission(data);
-
-
-
-      } catch (error) {
-        console.error("Erreur lors de la récupération du conducteur", error);
-        setError("Erreur lors de la récupération du conducteur");
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const getMissionReport = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (!id_user) {
+        throw new Error("User ID is required");
       }
-    };
-    if (isEditing) { getMissionReport(); }
-    else { setLoading(false); }
 
+      const [
+        vehiclesRes,
+        driversRes,
+        trailersRes,
+        reportRes
+      ] = await Promise.all([
+        fetch(`${backendUrl}/api/geop/vehicule/${id_user}`),
+        fetch(`${backendUrl}/api/geop/driver/${id_user}`),
+        fetch(`${backendUrl}/api/geop/trailer/${id_user}`),
+        isEditing && id_misrap 
+          ? fetch(`${backendUrl}/api/geop/missionReportManage/find/${id_misrap}`)
+          : Promise.resolve(new Response(null, { status: 404 })) // Retourne une vraie Response
+      ]);
 
+      // Vérification des réponses
+      if (!vehiclesRes.ok) throw new Error("Failed to load vehicles");
+      if (!driversRes.ok) throw new Error("Failed to load drivers");
+      if (!trailersRes.ok) throw new Error("Failed to load trailers");
 
-  }, [id_misrap]);
+      const [
+        vehiclesData,
+        driversData,
+        trailersData
+      ] = await Promise.all([
+        vehiclesRes.json(),
+        driversRes.json(),
+        trailersRes.json()
+      ]);
 
-  
+      setVehicles(vehiclesData.vehicles || []);
+      setDrivers(Array.isArray(driversData) ? driversData : []);
+      setTrailers(Array.isArray(trailersData) ? trailersData : []);
+
+      // Traitement du rapport si en mode édition
+      if (isEditing && reportRes.ok) {
+        const reportData: MissionReportInterface = await reportRes.json();
+        setMission(reportData);
+      }
+
+    } catch (error) {
+      console.error("Data loading error:", error);
+      setError(error instanceof Error ? error.message : "Unknown error");
+      toast.error("Failed to load data", {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getMissionReport();
+}, [id_misrap, id_user, isEditing]);
 
 
 
@@ -123,7 +176,6 @@ export function MissionReportManage() {
           objt_misrap: misrap.objt_misrap,
           carb_misrap: misrap.carb_misrap,
           frais_misrap: misrap.frais_misrap,
-          vehicule_misrap: misrap.vehicule_misrap,
           remorque_misrap: misrap.remorque_misrap,
           cond_misrap: misrap.cond_misrap,
           acc_misrap: misrap.acc_misrap,
@@ -139,6 +191,7 @@ export function MissionReportManage() {
           durr_misrap: misrap.durr_misrap,
           km_ret_misrap: misrap.km_ret_misrap,
           dist_misrap: misrap.dist_misrap,
+          id_vehicule: misrap.id_vehicule,
           id_user: misrap.id_user,
               };
               
@@ -311,7 +364,11 @@ const createMission = async (mission: MissionReportInterface) => {
 };
 
 
-
+  const getVehicleKm = async (id_vehicule: string | number) => {
+        const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+        if (!res.ok) throw new Error("Erreur récupération km");
+        return res.json();
+    };
 
 
   // Utilisez l'interface ChangeEvent pour le gestionnaire d'événements
@@ -448,49 +505,76 @@ const createMission = async (mission: MissionReportInterface) => {
 
                 
 
-                <Form.Group className="form-group" controlId="formVehicle">
-                <Form.Label>
-                    <i className="fas fa-car" style={{ color: 'orange' }}></i> Vehicle (*)
-                </Form.Label>
-                <Form.Control
-                    type="text"
-                    name="vehicule_misrap"
-                    placeholder="Enter vehicle"
-                    value={mission?.vehicule_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
-
-
-                <Form.Group className="form-group" controlId="formTrailer">
-                <Form.Label>
-                    <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
-                </Form.Label>
-                <Form.Control
-                    type="number"
-                    name="remorque_misrap"
-                    placeholder="Enter trailer"
-                    value={mission?.remorque_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
-              
-                <Form.Group className="form-group" controlId="formDriver">
-                <Form.Label>
-                    <i className="fas fa-user" style={{ color: 'orange' }}></i> Driver (*)
-                </Form.Label>
-                <Form.Control
-                    type="text"
-                    name="cond_misrap"
-                    placeholder="Enter driver's name"
-                    value={mission?.cond_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
-
+        <Form.Group controlId="id_vehicule">
+                                        <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                                        <Select
+                                            options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule,
+                                                label: vehicle.immatriculation_vehicule
+                                            }))}
+                                            placeholder={translate("Select Vehicle")}
+                                            isLoading={vehicles.length === 0}
+                                            noOptionsMessage={() => translate("No vehicles available")}
+                                            isSearchable
+                                            value={vehicles
+                                                .map(vehicle => ({
+                                                    value: vehicle.id_vehicule,
+                                                    label: vehicle.immatriculation_vehicule
+                                                }))
+                                                .find(option => option.value === mission?.id_vehicule) || null}
+                                           // Dans le onChange du Select
+onChange={async (selectedOption) => {
+  const id = selectedOption?.value ?? null;
+  
+  if (id) {
+    try {
+      const vehicleData = await getVehicleKm(id);
+      // Utiliser la même clé que MissionOrderManage
+      const km = vehicleData.kilometrage_vehicule || null;
+      
+      setMission(prev => ({
+        ...(prev || initialMissionState),
+        id_vehicule: id,
+        km_dep_misrap: km
+      }));
+      
+    } catch (error) {
+      console.error("Erreur kilométrage", error);
+      toast.error("Erreur kilométrage");
+    }
+  } else {
+    setMission(prev => ({
+      ...(prev || initialMissionState),
+      id_vehicule: null,
+      km_dep_misrap: null
+    }));
+  }
+}}
+                                            inputValue={""}
+                                            onInputChange={function (newValue: string, actionMeta: InputActionMeta): void {}}
+                                            onMenuOpen={function (): void {}}
+                                            onMenuClose={function (): void {}}
+                                        />
+                                    </Form.Group>
+          
+             
+              <Form.Group className="form-group" controlId="formDriver">
+  <Form.Label>Driver (*)</Form.Label>
+  <Form.Control
+    as="select"
+    name="cond_misrap"
+    value={mission?.cond_misrap || ''}
+    onChange={(e) => handleChange(e.target.name, e.target.value)}
+    required
+  >
+    <option value="">Select Driver</option>
+    {drivers.map((driver, index) => (
+      <option key={index} value={driver.driver_mission}>
+        {driver.driver_mission}
+      </option>
+    ))}
+  </Form.Control>
+</Form.Group>
                 <Form.Group className="form-group" controlId="formAccomp">
                 <Form.Label>
                     <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> Accompaniment (*)
@@ -519,34 +603,38 @@ const createMission = async (mission: MissionReportInterface) => {
                 />
                 </Form.Group>
 
-                <Form.Group className="form-group" controlId="formAmortizationPeriod">
-                  <Form.Label>
-                    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Amortization Period (*)
-                  </Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="amort_misrap"
-                    placeholder="Enter amortization period"
-                    value={mission?.amort_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    onKeyDown={(e) => {
-                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
-                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                      if (
-                        !/[0-9]/.test(e.key) &&
-                        !allowedKeys.includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    min="0"
-                    required
-                  />
-                </Form.Group>
+<Form.Group className="form-group" controlId="formTrailer">
+  <Form.Label>
+    <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
+  </Form.Label>
+
+  <Form.Control
+    as="select"
+    name="remorque_misrap"
+    value={mission?.remorque_misrap || ''}
+    onChange={(e) => handleChange(e.target.name, e.target.value)}
+    required
+    disabled={trailers.length === 0} // <-- désactive si vide
+  >
+    <option value="">
+      {trailers.length === 0 ? 'Aucune remorque disponible' : 'Select Trailer'}
+    </option>
+    {trailers.map((trailer, index) => (
+      <option key={index} value={trailer.trailer_mission}>
+        {trailer.trailer_mission}
+      </option>
+    ))}
+  </Form.Control>
+
+  {trailers.length === 0 && (
+    <div style={{ color: 'red', marginTop: '5px' }}>
+      ⚠️ Aucune remorque disponible.
+    </div>
+  )}
+</Form.Group>
+
                 </div>
                 <div className="col-md-6">
-
-
                 <Form.Group className="form-group" controlId="formDepLoc">
                 <Form.Label>
                     <i className="fas fa-map-marker-alt" style={{ color: 'orange' }}></i> Departure Location (*)
@@ -599,33 +687,7 @@ const createMission = async (mission: MissionReportInterface) => {
                     required
                   />
                   </Form.Group>
-
-             
-
-                <Form.Group className="form-group" controlId="formVehicleKm">
-                <Form.Label>
-                    <i className="fas fa-car" style={{ color: 'orange' }}></i> Vehicle KM (*)
-                </Form.Label>
-                <Form.Control
-                    type="number"
-                    name="km_dep_misrap"
-                    placeholder="Enter vehicle KM"
-                    value={mission?.km_dep_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    onKeyDown={(e) => {
-                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
-                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                      if (
-                        !/[0-9]/.test(e.key) &&
-                        !allowedKeys.includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    min="0"
-                    required
-                />
-                </Form.Group>
+              
                 <Form.Group className="form-group" controlId="formNumberOfNights">
                   <Form.Label>
                     <i className="fas fa-bed" style={{ color: 'orange' }}></i> Number of Nights (*)
@@ -751,11 +813,30 @@ const createMission = async (mission: MissionReportInterface) => {
               />
             </Form.Group>
 
-
-
-
-
-          
+             <Form.Group className="form-group" controlId="formAmortizationPeriod">
+                  <Form.Label>
+                    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Amortization Period (*)
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="amort_misrap"
+                    placeholder="Enter amortization period"
+                    value={mission?.amort_misrap || ''}
+                    onChange={(e) => handleChange(e.target.name, e.target.value)}
+                    onKeyDown={(e) => {
+                      // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        !allowedKeys.includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    min="0"
+                    required
+                  />
+                </Form.Group>
 
                 </div>
             </div>

@@ -19,7 +19,7 @@ interface MissionReport {
   objt_misrap: string;              // Object of the mission, varchar(20)
   carb_misrap: string;              // Type of fuel, varchar(20)
   frais_misrap: number;             // Expenses, int(11)
-  vehicule_misrap: string;         // Vehicle registration, varchar(20)
+  immatriculation_vehicule: string;         // Vehicle registration, varchar(20)
   remorque_misrap: string;         // Trailer, varchar(20)
   cond_misrap: string;             // Driver, varchar(20)
   acc_misrap: string;              // Accomplice, varchar(20)
@@ -34,7 +34,8 @@ interface MissionReport {
   immob_misrap: number;            // Immobilization, int(11)
   durr_misrap: number;             // Duration, int(11)
   km_ret_misrap: number;           // Return km, int(11)
-  dist_misrap: number;            // Distance, int(11)
+  dist_misrap: number;
+ id_vehicule : number;
   id_user: string;
 
 
@@ -82,70 +83,56 @@ export function MissionReport() {
 
   
 
-  //
-  const getMissionReport = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
-    try {
-      setLoading(true);
+const getMissionReport = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string): Promise<MissionReport[]> => {
+  try {
+    setLoading(true);
 
-      // Preparing the data to send
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
+    const bodyData = JSON.stringify({
+      limitValue,
+      currentPage,
+      search,
+      type,
+      id_user,
+      colum: searchColum[colum],
+      sort
+    });
 
-      // Retrieve the total number of pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
+    // Récupération du total
+    const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/totalpage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+      mode: 'cors',
+    });
 
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
+    const totalPagesJson = await totalPagesResponse.json();
+    const total = totalPagesJson.total || totalPagesJson.count;
+    settotal(total);
 
-      // Retrieve driver data
-      const MissionReportResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-      //setDrivers et data et dDreiversResponse
-      // DriversReesponse et serDrivers 
+    // Récupération des données
+    const MissionReportResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+      mode: 'cors',
+    });
 
-
-      //partie mission
-      
-
-      const data = await MissionReportResponse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-      setMissionReport(data);
-      return data;
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
-
-
+    const data = await MissionReportResponse.json();
+    
+    setPageCount(Math.ceil(total / limitValue));
+    setMissionReport(data);
+    return data; // Ajout du return explicite
+  } catch (error) {
+    console.error("Error fetching mission reports:", error);
+    return []; // Retourner un tableau vide en cas d'erreur
+  } finally {
+    setLoading(false);
+  }
+};
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getMissionReport(limit, currentPage, search, type, colum, sort);
@@ -156,7 +143,6 @@ export function MissionReport() {
     getMissionReport(limit, currentPage, search, type, colum, sort);
   }, []);
 
- 
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -175,7 +161,7 @@ export function MissionReport() {
     objt_misrap: true,
     carb_misrap: true,
     frais_misrap: true,
-    vehicule_misrap: true,
+    immatriculation_vehicule: true,
     remorque_misrap: true,
     cond_misrap: true,
     acc_misrap: true,
@@ -208,7 +194,7 @@ export function MissionReport() {
     objt_misrap: 1,
     ref_misrap: 2,
     date_dep_misrap: 3,
-    vehicule_misrap: 4,
+    immatriculation_vehicule: 4,
     cond_misrap: 5
   };
 
@@ -318,13 +304,10 @@ export function MissionReport() {
         </div>
         <div className="col-md-6 col-sm-12 text-right">
 
-
           <NavLink to="/mission-report-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
             {translate("New")} {translate("Missions Report")}
           </NavLink>
-
-        
 
         </div>
       </div>
@@ -478,8 +461,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.vehicule_misrap }
-                  onChange={() => handleColumnChange("vehicule_misrap ")}
+                  checked={selectedColumns.immatriculation_vehicule }
+                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -504,7 +487,7 @@ export function MissionReport() {
               {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrapon")}>{translate("Reference")}</th>)}
               {selectedColumns.objt_misrap && (<th className="sorting" onClick={() => handleSortingColum("objt_misrap")}>{translate("Object")}</th>)}
               {selectedColumns.date_dep_misrap && (<th className="sorting" onClick={() => handleSortingColum("date_dep_misrap")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.vehicule_misrap  && (<th className="sorting" onClick={() => handleSortingColum("vehicule_misrap ")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.cond_misrap && (<th className="sorting" onClick={() => handleSortingColum("cond_misrap")}>{translate("Driver")}</th>)}
 
 
@@ -536,7 +519,7 @@ export function MissionReport() {
                       {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
                       {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
                       {selectedColumns.date_dep_misrap && (<td>{missionReport.date_dep_misrap}</td>)}
-                      {selectedColumns.vehicule_misrap  && (<td>{missionReport.vehicule_misrap }</td>)}
+                      {selectedColumns.immatriculation_vehicule  && (<td>{missionReport.immatriculation_vehicule }</td>)}
                       {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
 
 
