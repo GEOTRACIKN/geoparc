@@ -32,9 +32,10 @@ interface MissionReportInterface {
     itnr_misrap: string | null;            
     amort_misrap: number | null;        
     dep_misrap: string | null;          
-    date_dep_misrap: string | null;     
+    date_dep_misrap: string | null;
+        date_arr_misrap: string | null;    
+     
     lieu_misrap: string | null;             
-    date_arr_misrap: string | null;    
     km_dep_misrap: number | null;          
     nuit_misrap: number | null;          
     immob_misrap: number | null;            
@@ -58,6 +59,7 @@ export function MissionReportManage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
 const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+const [dateError, setDateError] = useState<string | null>(null);
 // Ajoutez cette constante au début de votre composant (après les interfaces)
 const initialMissionState: MissionReportInterface = {
   id_misrap: null,
@@ -141,6 +143,12 @@ useEffect(() => {
 
       setVehicles(vehiclesData.vehicles || []);
       setDrivers(Array.isArray(driversData) ? driversData : []);
+      console.log("Drivers data:", drivers);
+drivers.forEach(driver => {
+  if (typeof driver.driver_mission !== 'string') {
+    console.warn("Driver with non-string value:", driver);
+  }
+});
       setTrailers(Array.isArray(trailersData) ? trailersData : []);
 
       // Traitement du rapport si en mode édition
@@ -258,26 +266,10 @@ const createMission = async (mission: MissionReportInterface) => {
     );
 
     const dateFields = [
-      'ref_misrap',
-      'objt_misrap',
-      'carb_misrap',
-      'frais_misrap',
-      'vehicule_misrap',
-      'remorque_misrap',
-      'cond_misrap',
-      'acc_misrap',
-      'itnr_misrap',
-      'amort_misrap',
-      'dep_misrap',
+     
       'date_dep_misrap',
-      'lieu_misrap',
       'date_arr_misrap',
-      'km_dep_misrap',
-      'nuit_misrap',
-      'immob_misrap',
-      'durr_misrap',
-      'km_ret_misrap',
-      'dist_misrap',
+     
 
     ];
 
@@ -362,7 +354,32 @@ const createMission = async (mission: MissionReportInterface) => {
     setButtonClicked(false);
   }
 };
+const validateDates = (departure: string | null, arrival: string | null): boolean => {
+  if (!departure || !arrival) return true; // Permettre si l'une des dates est vide
+  
+  const depDate = new Date(departure);
+  const arrDate = new Date(arrival);
+  
+  return depDate <= arrDate;
+};
+const handleDateChange = (name: string, value: string) => {
+  if (!mission) return;
 
+  const updatedMission = {
+    ...mission,
+    [name]: value || null
+  };
+
+  setMission(updatedMission);
+
+  // Valider seulement si les deux dates sont renseignées
+  if (updatedMission.date_dep_misrap && updatedMission.date_arr_misrap) {
+    const isValid = validateDates(updatedMission.date_dep_misrap, updatedMission.date_arr_misrap);
+    setDateError(isValid ? null : "La date de départ doit être antérieure ou égale à la date de retour");
+  } else {
+    setDateError(null);
+  }
+};
 
   const getVehicleKm = async (id_vehicule: string | number) => {
         const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
@@ -384,7 +401,7 @@ const createMission = async (mission: MissionReportInterface) => {
     if (mission) {
       setMission({
         ...mission,
-        [name]: value,
+        [name]: String(value),
       });
     }
     console.log(mission);
@@ -501,80 +518,80 @@ const createMission = async (mission: MissionReportInterface) => {
                   
                     required
                 />
-                </Form.Group>
+                </Form.Group>     
 
+     <Form.Group controlId="id_vehicule">
+        <Form.Label>
+          <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle")}{translate(" *")}
+        </Form.Label>
+        <Select
+          options={vehicles.map(vehicle => ({
+            value: vehicle.id_vehicule,
+            label: vehicle.immatriculation_vehicule
+          }))}
+          placeholder={translate("Select Vehicle")}
+          isLoading={vehicles.length === 0}
+          noOptionsMessage={() => translate("No vehicles available")}
+          isSearchable
+          value={vehicles
+            .map(vehicle => ({
+              value: vehicle.id_vehicule,
+              label: vehicle.immatriculation_vehicule
+            }))
+            .find(option => option.value === mission?.id_vehicule) || null}
+          onChange={async (selectedOption) => {
+            const id = selectedOption?.value ?? null;
+            
+            if (id) {
+              try {
+                const vehicleData = await getVehicleKm(id);
+                const km = vehicleData.kilometrage_vehicule || null;
                 
-
-        <Form.Group controlId="id_vehicule">
-                                        <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
-                                        <Select
-                                            options={vehicles.map(vehicle => ({
-                                                value: vehicle.id_vehicule,
-                                                label: vehicle.immatriculation_vehicule
-                                            }))}
-                                            placeholder={translate("Select Vehicle")}
-                                            isLoading={vehicles.length === 0}
-                                            noOptionsMessage={() => translate("No vehicles available")}
-                                            isSearchable
-                                            value={vehicles
-                                                .map(vehicle => ({
-                                                    value: vehicle.id_vehicule,
-                                                    label: vehicle.immatriculation_vehicule
-                                                }))
-                                                .find(option => option.value === mission?.id_vehicule) || null}
-                                           // Dans le onChange du Select
-onChange={async (selectedOption) => {
-  const id = selectedOption?.value ?? null;
-  
-  if (id) {
-    try {
-      const vehicleData = await getVehicleKm(id);
-      // Utiliser la même clé que MissionOrderManage
-      const km = vehicleData.kilometrage_vehicule || null;
-      
-      setMission(prev => ({
-        ...(prev || initialMissionState),
-        id_vehicule: id,
-        km_dep_misrap: km
-      }));
-      
-    } catch (error) {
-      console.error("Erreur kilométrage", error);
-      toast.error("Erreur kilométrage");
-    }
-  } else {
-    setMission(prev => ({
-      ...(prev || initialMissionState),
-      id_vehicule: null,
-      km_dep_misrap: null
-    }));
-  }
-}}
-                                            inputValue={""}
-                                            onInputChange={function (newValue: string, actionMeta: InputActionMeta): void {}}
-                                            onMenuOpen={function (): void {}}
-                                            onMenuClose={function (): void {}}
-                                        />
-                                    </Form.Group>
+                setMission(prev => ({
+                  ...(prev || initialMissionState),
+                  id_vehicule: id,
+                  km_dep_misrap: km
+                }));
+                
+              } catch (error) {
+                console.error("Erreur kilométrage", error);
+                toast.error("Erreur kilométrage");
+              }
+            } else {
+              setMission(prev => ({
+                ...(prev || initialMissionState),
+                id_vehicule: null,
+                km_dep_misrap: null
+              }));
+            }
+          }}
+          inputValue={""}
+          onInputChange={function (newValue: string, actionMeta: InputActionMeta): void {}}
+          onMenuOpen={function (): void {}}
+          onMenuClose={function (): void {}}
+        />
+      </Form.Group>
           
-             
-              <Form.Group className="form-group" controlId="formDriver">
-  <Form.Label>Driver (*)</Form.Label>
-  <Form.Control
-    as="select"
-    name="cond_misrap"
-    value={mission?.cond_misrap || ''}
-    onChange={(e) => handleChange(e.target.name, e.target.value)}
-    required
-  >
-    <option value="">Select Driver</option>
-    {drivers.map((driver, index) => (
-      <option key={index} value={driver.driver_mission}>
-        {driver.driver_mission}
-      </option>
-    ))}
-  </Form.Control>
-</Form.Group>
+      <Form.Group className="form-group" controlId="formDriver">
+        <Form.Label>
+          <i className="fas fa-user" style={{ color: 'orange' }}></i> Driver (*)
+        </Form.Label>
+        <Form.Control
+  as="select"
+  name="cond_misrap"
+  value={mission?.cond_misrap || ''}
+  onChange={(e) => handleChange(e.target.name, e.target.value)}
+  required
+>
+  <option value="">Select Driver</option>
+  {drivers.map((driver, index) => (
+    <option key={index} value={String(driver.driver_mission)}>
+      {driver.driver_mission}
+    </option>
+  ))}
+</Form.Control>
+      </Form.Group>
+
                 <Form.Group className="form-group" controlId="formAccomp">
                 <Form.Label>
                     <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> Accompaniment (*)
@@ -603,28 +620,28 @@ onChange={async (selectedOption) => {
                 />
                 </Form.Group>
 
-<Form.Group className="form-group" controlId="formTrailer">
-  <Form.Label>
-    <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
-  </Form.Label>
+            <Form.Group className="form-group" controlId="formTrailer">
+              <Form.Label>
+                <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
+              </Form.Label>
 
-  <Form.Control
-    as="select"
-    name="remorque_misrap"
-    value={mission?.remorque_misrap || ''}
-    onChange={(e) => handleChange(e.target.name, e.target.value)}
-    required
-    disabled={trailers.length === 0} // <-- désactive si vide
-  >
-    <option value="">
-      {trailers.length === 0 ? 'Aucune remorque disponible' : 'Select Trailer'}
-    </option>
-    {trailers.map((trailer, index) => (
-      <option key={index} value={trailer.trailer_mission}>
-        {trailer.trailer_mission}
-      </option>
-    ))}
-  </Form.Control>
+              <Form.Control
+                as="select"
+                name="remorque_misrap"
+                value={mission?.remorque_misrap || ''}
+                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                required
+                disabled={trailers.length === 0} // <-- désactive si vide
+              >
+                <option value="">
+                  {trailers.length === 0 ? 'Aucune remorque disponible' : 'Select Trailer'}
+                </option>
+                {trailers.map((trailer, index) => (
+                  <option key={index} value={trailer.trailer_mission}>
+                    {trailer.trailer_mission}
+                  </option>
+                ))}
+              </Form.Control>
 
   {trailers.length === 0 && (
     <div style={{ color: 'red', marginTop: '5px' }}>
@@ -649,18 +666,38 @@ onChange={async (selectedOption) => {
                 />
                 </Form.Group>
 
-                <Form.Group className="form-group" controlId="formDepDate">
-                <Form.Label>
-                    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date (*)
-                </Form.Label>
-                <Form.Control
-                    type="date"
-                    name="date_dep_misrap"
-                    value={mission?.date_dep_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
+               <Form.Group className="form-group" controlId="formDepDate">
+  <Form.Label>
+    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date (*)
+  </Form.Label>
+  <Form.Control
+    type="date"
+    name="date_dep_misrap"
+    value={mission?.date_dep_misrap || ''}
+    onChange={(e) => handleDateChange(e.target.name, e.target.value)}
+    required
+    isInvalid={!!dateError}
+  />
+</Form.Group>
+
+<Form.Group className="form-group" controlId="formArrivalDate">
+  <Form.Label>
+    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Arrival Date (*)
+  </Form.Label>
+  <Form.Control
+    type="date"
+    name="date_arr_misrap"
+    value={mission?.date_arr_misrap || ''}
+    onChange={(e) => handleDateChange(e.target.name, e.target.value)}
+    required
+    isInvalid={!!dateError}
+  />
+  {dateError && (
+    <Form.Control.Feedback type="invalid">
+      {dateError}
+    </Form.Control.Feedback>
+  )}
+</Form.Group>
 
                 <Form.Group className="form-group" controlId="formDepDest">
                 <Form.Label>
@@ -675,18 +712,6 @@ onChange={async (selectedOption) => {
                     required
                 />
                 </Form.Group>
-                <Form.Group className="form-group" controlId="formArrivalDate">
-                  <Form.Label>
-                    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Arrival Date (*)
-                  </Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="date_arr_misrap"
-                    value={mission?.date_arr_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                  />
-                  </Form.Group>
               
                 <Form.Group className="form-group" controlId="formNumberOfNights">
                   <Form.Label>

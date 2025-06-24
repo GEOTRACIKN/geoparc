@@ -19,7 +19,7 @@ interface MissionReport {
   objt_misrap: string;              // Object of the mission, varchar(20)
   carb_misrap: string;              // Type of fuel, varchar(20)
   frais_misrap: number;             // Expenses, int(11)
-  immatriculation_vehicule: string;         // Vehicle registration, varchar(20)
+  immatriculation_vehicule : string;         // Vehicle registration, varchar(20)
   remorque_misrap: string;         // Trailer, varchar(20)
   cond_misrap: string;             // Driver, varchar(20)
   acc_misrap: string;              // Accomplice, varchar(20)
@@ -161,7 +161,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     objt_misrap: true,
     carb_misrap: true,
     frais_misrap: true,
-    immatriculation_vehicule: true,
+    immatriculation_vehicule : true,
     remorque_misrap: true,
     cond_misrap: true,
     acc_misrap: true,
@@ -194,7 +194,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     objt_misrap: 1,
     ref_misrap: 2,
     date_dep_misrap: 3,
-    immatriculation_vehicule: 4,
+    immatriculation_vehicule : 4,
     cond_misrap: 5
   };
 
@@ -299,8 +299,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate("Missions Report")} <span>{total}</span>
-          </h4>
+  {translate("Missions Report")} <span>{total < 10 ? `0${total}` : total}</span>          </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
 
@@ -461,8 +460,8 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.immatriculation_vehicule }
-                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
+                  checked={selectedColumns.immatriculation_vehicule  }
+                  onChange={() => handleColumnChange("immatriculation_vehicule  ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -487,7 +486,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
               {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrapon")}>{translate("Reference")}</th>)}
               {selectedColumns.objt_misrap && (<th className="sorting" onClick={() => handleSortingColum("objt_misrap")}>{translate("Object")}</th>)}
               {selectedColumns.date_dep_misrap && (<th className="sorting" onClick={() => handleSortingColum("date_dep_misrap")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.immatriculation_vehicule   && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule  ")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.cond_misrap && (<th className="sorting" onClick={() => handleSortingColum("cond_misrap")}>{translate("Driver")}</th>)}
 
 
@@ -519,7 +518,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
                       {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
                       {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
                       {selectedColumns.date_dep_misrap && (<td>{missionReport.date_dep_misrap}</td>)}
-                      {selectedColumns.immatriculation_vehicule  && (<td>{missionReport.immatriculation_vehicule }</td>)}
+                      {selectedColumns.immatriculation_vehicule   && (<td>{missionReport.immatriculation_vehicule  }</td>)}
                       {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
 
 

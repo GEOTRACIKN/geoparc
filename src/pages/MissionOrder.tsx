@@ -212,7 +212,6 @@ export function MissionOrder() {
     fuel_level_mission: true,
     voucher_mission: true,
     immatriculation_vehicule : true,
-    id_vehicule: true,
   });
   
 
@@ -391,7 +390,7 @@ export function MissionOrder() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate("Missions Order")} <span>{total}</span>
+            {translate("Missions Order")} <span>{total < 10 ? `0${total}` : total}</span> 
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
