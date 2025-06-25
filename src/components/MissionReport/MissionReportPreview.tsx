@@ -69,6 +69,8 @@ const handleDownloadPreview = () => {
   doc.text("Remorque:", 20, yPosition + 30);
   doc.text("Conducteur:", 20, yPosition + 40);
   doc.text("Lieu de départ:", 20, yPosition + 50);
+  doc.text("Lieu de mission:", 20, yPosition + 50);
+  doc.text("Ammortization:", 20, yPosition + 50);
 
   // Colonne droite
   doc.text("Date de départ:", 110, yPosition);
@@ -85,6 +87,9 @@ const handleDownloadPreview = () => {
   doc.text(String(selectedMissionReport?.remorque_misrap || "N/A"), 60, yPosition + 30);
   doc.text(String(selectedMissionReport?.cond_misrap || "N/A"), 60, yPosition + 40);
   doc.text(String(selectedMissionReport?.lieu_misrap || "N/A"), 60, yPosition + 50);
+    doc.text(String(selectedMissionReport?.dep_misrap || "N/A"), 60, yPosition + 50);
+  doc.text(String(selectedMissionReport?.amort_misrap || "N/A"), 60, yPosition + 50);
+
 
   doc.text(String(selectedMissionReport?.date_dep_misrap || "N/A"), 150, yPosition);
   doc.text(String(selectedMissionReport?.date_arr_misrap || "N/A"), 150, yPosition + 10);
@@ -94,9 +99,8 @@ const handleDownloadPreview = () => {
 
   // Préparation des données du tableau avec conversion en string
   const tableData = [
-    ["KM Départ", "KM Retour", "Distance", "Nuits", "Immobilisation", "Durée"],
+    ["KM Retour", "Distance", "Nuits", "Immobilisation", "Durée"],
     [
-      String(selectedMissionReport?.km_dep_misrap || "N/A"),
       String(selectedMissionReport?.km_ret_misrap || "N/A"),
       String(selectedMissionReport?.dist_misrap || "N/A"),
       String(selectedMissionReport?.nuit_misrap || "N/A"),
@@ -339,7 +343,9 @@ const handleDownloadPreview = () => {
                     }}>
                       {selectedMissionReport.lieu_misrap}
                     </div>
+                    
                   </div>
+             
                 </div>
 
                 {/* Colonne droite */}
@@ -438,6 +444,45 @@ const handleDownloadPreview = () => {
                       {selectedMissionReport.itnr_misrap || "-"}
                     </div>
                   </div>
+
+                       <div style={{ marginBottom: '15px' }}>
+                    <label style={{
+                      display: 'block',
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      color: '#34495e'
+                    }}>
+                      Lieu de mission
+                    </label>
+                    <div style={{
+                      padding: '8px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      border: '1px solid #ddd'
+                    }}>
+                      {selectedMissionReport.lieu_misrap}
+                    </div>
+                    
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{
+                      display: 'block',
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      color: '#34495e'
+                    }}>
+                      Ammortisation
+                    </label>
+                    <div style={{
+                      padding: '8px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      border: '1px solid #ddd'
+                    }}>
+                      {selectedMissionReport.lieu_misrap}
+                    </div>
+                    
+                  </div>
                 </div>
               </div>
 
@@ -471,13 +516,7 @@ const handleDownloadPreview = () => {
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          KM Départ
-                        </th>
-                        <th style={{
-                          padding: '12px',
-                          textAlign: 'center',
-                          border: '1px solid #ddd'
-                        }}>
+                        
                           KM Retour
                         </th>
                         <th style={{
@@ -512,13 +551,7 @@ const handleDownloadPreview = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td style={{
-                          padding: '12px',
-                          textAlign: 'center',
-                          border: '1px solid #ddd'
-                        }}>
-                          {selectedMissionReport.km_dep_misrap || "N/A"}
-                        </td>
+                       
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
