@@ -309,6 +309,13 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     translate("Driver")
    ];
 
+    function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
   return (
     <>
       <div className="row">
@@ -533,7 +540,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
                       {selectedColumns.id_misrap && (<td>{missionReport.id_misrap}</td>)}
                       {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
                       {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
-                      {selectedColumns.date_dep_misrap && (<td>{missionReport.date_dep_misrap}</td>)}
+                      {selectedColumns.date_dep_misrap && (<td>{formatDatetimeLocal(missionReport.date_dep_misrap)}</td>)}
                       {selectedColumns.immatriculation_vehicule   && (<td>{missionReport.immatriculation_vehicule  }</td>)}
                       {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
 

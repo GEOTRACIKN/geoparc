@@ -33,8 +33,7 @@ interface MissionReportInterface {
     amort_misrap: number | null;        
     dep_misrap: string | null;          
     date_dep_misrap: string | null;
-        date_arr_misrap: string | null;    
-     
+    date_arr_misrap: string | null;     
     lieu_misrap: string | null;             
     km_dep_misrap: number | null;          
     nuit_misrap: number | null;          
@@ -48,8 +47,6 @@ interface MissionReportInterface {
   
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const id_user = localStorage.getItem("GeopUserID");
-
-
 
 export function MissionReportManage() {
   const { id_misrap } = useParams<{ id_misrap?: string }>();
@@ -362,24 +359,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
   
   return depDate <= arrDate;
 };
-const handleDateChange = (name: string, value: string) => {
-  if (!mission) return;
 
-  const updatedMission = {
-    ...mission,
-    [name]: value || null
-  };
-
-  setMission(updatedMission);
-
-  // Valider seulement si les deux dates sont renseignées
-  if (updatedMission.date_dep_misrap && updatedMission.date_arr_misrap) {
-    const isValid = validateDates(updatedMission.date_dep_misrap, updatedMission.date_arr_misrap);
-    setDateError(isValid ? null : "La date de départ doit être antérieure ou égale à la date de retour");
-  } else {
-    setDateError(null);
-  }
-};
 
   const getVehicleKm = async (id_vehicule: string | number) => {
         const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
@@ -406,9 +386,51 @@ const handleDateChange = (name: string, value: string) => {
     }
     console.log(mission);
   };
+const formatToDatetimeLocal = (isoString: string | null | undefined): string => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
+    
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  } catch {
+    return '';
+  }
+};
+
+const parseDatetimeLocal = (localString: string): string | null => {
+  if (!localString) return null;
+  try {
+    const [datePart, timePart] = localString.split('T');
+    return `${datePart}T${timePart || '00:00'}:00`;
+  } catch {
+    return null;
+  }
+};
+
+// Gestionnaire d'événements avec typage
+const handleDateTimeChange = (name: string, value: string) => {
+  if (!mission) return;
+
+  const isoValue = parseDatetimeLocal(value);
   
+  const updatedMission: MissionReportInterface = {
+    ...mission,
+    [name]: isoValue
+  };
 
+  setMission(updatedMission);
 
+  // Validation des dates
+  if (updatedMission.date_dep_misrap && updatedMission.date_arr_misrap) {
+    const isValid = validateDates(updatedMission.date_dep_misrap, updatedMission.date_arr_misrap);
+    setDateError(isValid ? null : "La date de départ doit être antérieure ou égale à la date de retour");
+  } else {
+    setDateError(null);
+  }
+};
+ 
   return (
     <>
       <style>
@@ -476,9 +498,6 @@ const handleDateChange = (name: string, value: string) => {
                     required
                 />
                 </Form.Group>
-
-              
-
                 <Form.Group className="form-group" controlId="formFuelType">
                 <Form.Label>
                     <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> Fuel Type (*)
@@ -665,16 +684,15 @@ const handleDateChange = (name: string, value: string) => {
                     required
                 />
                 </Form.Group>
-
-               <Form.Group className="form-group" controlId="formDepDate">
+<Form.Group className="form-group" controlId="formDepDate">
   <Form.Label>
-    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date (*)
+    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date/Time (*)
   </Form.Label>
   <Form.Control
-    type="date"
+    type="datetime-local"
     name="date_dep_misrap"
-    value={mission?.date_dep_misrap || ''}
-    onChange={(e) => handleDateChange(e.target.name, e.target.value)}
+    value={formatToDatetimeLocal(mission?.date_dep_misrap)}
+    onChange={(e) => handleDateTimeChange('date_dep_misrap', e.target.value)}
     required
     isInvalid={!!dateError}
   />
@@ -682,13 +700,13 @@ const handleDateChange = (name: string, value: string) => {
 
 <Form.Group className="form-group" controlId="formArrivalDate">
   <Form.Label>
-    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Arrival Date (*)
+    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Arrival Date/Time (*)
   </Form.Label>
   <Form.Control
-    type="date"
+    type="datetime-local"
     name="date_arr_misrap"
-    value={mission?.date_arr_misrap || ''}
-    onChange={(e) => handleDateChange(e.target.name, e.target.value)}
+    value={formatToDatetimeLocal(mission?.date_arr_misrap)}
+    onChange={(e) => handleDateTimeChange('date_arr_misrap', e.target.value)}
     required
     isInvalid={!!dateError}
   />
@@ -790,7 +808,7 @@ const handleDateChange = (name: string, value: string) => {
 
             <Form.Group className="form-group" controlId="formReturnMileage">
               <Form.Label>
-                <i className="fas fa-road" style={{ color: 'orange' }}></i> Return Mileage (km) (*)
+                <i className="fas fa-road" style={{ color: 'orange' }}></i> Return Km (km) (*)
               </Form.Label>
               <Form.Control
                 type="number"

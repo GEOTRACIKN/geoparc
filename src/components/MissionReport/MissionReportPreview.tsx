@@ -27,9 +27,115 @@ const MissionReportModal: React.FC<MissionReportModalProps> = ({
 }) => {
   const { translate } = useTranslate();
 
-const handleDownloadPreview = () => {
-  if (!selectedMissionReport) {
-    toast.warn("Aucun ordre de mission sélectionné", {
+  function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  }
+
+  const handleDownloadPreview = () => {
+    if (!selectedMissionReport) {
+      toast.warn(translate("No mission order selected"), {
+        position: "bottom-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Configuration du document
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`${translate("Mission order No")} : ${String(selectedMissionReport.id_misrap)}`, 105, 20, { align: "center" });
+    
+    doc.setFontSize(16);
+    doc.text(`${translate("Subject")} : ${String(selectedMissionReport.objt_misrap || '')}`, 105, 30, { align: "center" });
+
+    // Ligne de séparation
+    doc.setDrawColor(0, 0, 0);
+    doc.line(20, 40, 190, 40);
+  
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+
+    // Colonne gauche
+    let yPosition = 50;
+    doc.setFont("helvetica", "bold");
+    doc.text(`${translate("Mission reference")}:`, 20, yPosition);
+    doc.text(`${translate("Fuel type")}:`, 20, yPosition + 10);
+    doc.text(`${translate("Vehicle")}:`, 20, yPosition + 20);
+    doc.text(`${translate("Trailer")}:`, 20, yPosition + 30);
+    doc.text(`${translate("Driver")}:`, 20, yPosition + 40);
+    doc.text(`${translate("Departure place")}:`, 20, yPosition + 50);
+    doc.text(`${translate("Mission place")}:`, 20, yPosition + 60);
+    doc.text(`${translate("Amortization")}:`, 20, yPosition + 70);
+
+    // Colonne droite
+    doc.text(`${translate("Departure date")}:`, 110, yPosition);
+    doc.text(`${translate("Return date")}:`, 110, yPosition + 10);
+    doc.text(`${translate("Expenses")}:`, 110, yPosition + 20);
+    doc.text(`${translate("Accompaniment")}:`, 110, yPosition + 30);
+    doc.text(`${translate("Itinerary")}:`, 110, yPosition + 40);
+
+    // Valeurs
+    doc.setFont("helvetica", "normal");
+    doc.text(String(selectedMissionReport?.ref_misrap || "N/A"), 60, yPosition);
+    doc.text(String(selectedMissionReport?.carb_misrap || "N/A"), 60, yPosition + 10);
+    doc.text(String(selectedMissionReport?.immatriculation_vehicule || "N/A"), 60, yPosition + 20);
+    doc.text(String(selectedMissionReport?.remorque_misrap || "N/A"), 60, yPosition + 30);
+    doc.text(String(selectedMissionReport?.cond_misrap || "N/A"), 60, yPosition + 40);
+    doc.text(String(selectedMissionReport?.dep_misrap || "N/A"), 60, yPosition + 50);
+    doc.text(String(selectedMissionReport?.lieu_misrap || "N/A"), 60, yPosition + 60);
+    doc.text(String(selectedMissionReport?.amort_misrap || "N/A"), 60, yPosition + 70);
+
+    doc.text(formatDatetimeLocal(selectedMissionReport?.date_dep_misrap) || "N/A", 150, yPosition);
+    doc.text(formatDatetimeLocal(selectedMissionReport?.date_arr_misrap) || "N/A", 150, yPosition + 10);
+    doc.text(String(selectedMissionReport?.frais_misrap || "N/A"), 150, yPosition + 20);
+    doc.text(String(selectedMissionReport?.acc_misrap || "N/A"), 150, yPosition + 30);
+    doc.text(String(selectedMissionReport?.itnr_misrap || "N/A"), 150, yPosition + 40);
+
+    // Table data
+    const tableData = [
+      [
+        translate("Return KM"), 
+        translate("Distance"), 
+        translate("Nights"), 
+        translate("Immobilization"), 
+        translate("Duration")
+      ],
+      [
+        String(selectedMissionReport?.km_ret_misrap || "N/A"),
+        String(selectedMissionReport?.dist_misrap || "N/A"),
+        String(selectedMissionReport?.nuit_misrap || "N/A"),
+        String(selectedMissionReport?.immob_misrap || "N/A"),
+        String(selectedMissionReport?.durr_misrap || "N/A")
+      ]
+    ];
+
+    // Génération du tableau
+    autoTable(doc, {
+      head: [tableData[0]],
+      body: [tableData[1]],
+      startY: yPosition + 90,
+      headStyles: {
+        fillColor: [51, 51, 51],
+        textColor: [255, 255, 255],
+        fontStyle: "bold"
+      },
+      margin: { left: 20 }
+    });
+
+    doc.save(`${translate("Mission_order")}_${selectedMissionReport.id_misrap}.pdf`);
+
+    toast.success(translate("PDF generated successfully"), {
       position: "bottom-right",
       autoClose: 2500,
       hideProgressBar: false,
@@ -40,102 +146,7 @@ const handleDownloadPreview = () => {
       theme: "light",
       transition: Bounce,
     });
-    return;
-  }
-
-  const doc = new jsPDF();
-
-  // Configuration du document
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(`Ordre de mission N° : ${String(selectedMissionReport.id_misrap)}`, 105, 20, { align: "center" });
-  
-  doc.setFontSize(16);
-  doc.text(`Objet : ${String(selectedMissionReport.objt_misrap || '')}`, 105, 30, { align: "center" });
-
-  // Ligne de séparation
-  doc.setDrawColor(0, 0, 0);
-  doc.line(20, 40, 190, 40);
- 
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-
-  // Colonne gauche
-  let yPosition = 50;
-  doc.setFont("helvetica", "bold");
-  doc.text("Référence mission:", 20, yPosition);
-  doc.text("Type carburant:", 20, yPosition + 10);
-  doc.text("Véhicule:", 20, yPosition + 20);
-  doc.text("Remorque:", 20, yPosition + 30);
-  doc.text("Conducteur:", 20, yPosition + 40);
-  doc.text("Lieu de départ:", 20, yPosition + 50);
-  doc.text("Lieu de mission:", 20, yPosition + 50);
-  doc.text("Ammortization:", 20, yPosition + 50);
-
-  // Colonne droite
-  doc.text("Date de départ:", 110, yPosition);
-  doc.text("Date de retour:", 110, yPosition + 10);
-  doc.text("Frais:", 110, yPosition + 20);
-  doc.text("Accompagnement:", 110, yPosition + 30);
-  doc.text("Itinéraire:", 110, yPosition + 40);
-
-  // Valeurs - conversion explicite en string
-  doc.setFont("helvetica", "normal");
-  doc.text(String(selectedMissionReport?.ref_misrap || "N/A"), 60, yPosition);
-  doc.text(String(selectedMissionReport?.carb_misrap || "N/A"), 60, yPosition + 10);
-  doc.text(String(selectedMissionReport?.immatriculation_vehicule || "N/A"), 60, yPosition + 20);
-  doc.text(String(selectedMissionReport?.remorque_misrap || "N/A"), 60, yPosition + 30);
-  doc.text(String(selectedMissionReport?.cond_misrap || "N/A"), 60, yPosition + 40);
-  doc.text(String(selectedMissionReport?.lieu_misrap || "N/A"), 60, yPosition + 50);
-    doc.text(String(selectedMissionReport?.dep_misrap || "N/A"), 60, yPosition + 50);
-  doc.text(String(selectedMissionReport?.amort_misrap || "N/A"), 60, yPosition + 50);
-
-
-  doc.text(String(selectedMissionReport?.date_dep_misrap || "N/A"), 150, yPosition);
-  doc.text(String(selectedMissionReport?.date_arr_misrap || "N/A"), 150, yPosition + 10);
-  doc.text(String(selectedMissionReport?.frais_misrap || "N/A"), 150, yPosition + 20);
-  doc.text(String(selectedMissionReport?.acc_misrap || "N/A"), 150, yPosition + 30);
-  doc.text(String(selectedMissionReport?.itnr_misrap || "N/A"), 150, yPosition + 40);
-
-  // Préparation des données du tableau avec conversion en string
-  const tableData = [
-    ["KM Retour", "Distance", "Nuits", "Immobilisation", "Durée"],
-    [
-      String(selectedMissionReport?.km_ret_misrap || "N/A"),
-      String(selectedMissionReport?.dist_misrap || "N/A"),
-      String(selectedMissionReport?.nuit_misrap || "N/A"),
-      String(selectedMissionReport?.immob_misrap || "N/A"),
-      String(selectedMissionReport?.durr_misrap || "N/A")
-    ]
-  ];
-
-  // Génération du tableau
-  autoTable(doc, {
-    head: [tableData[0]],
-    body: [tableData[1]],
-    startY: yPosition + 70,
-    headStyles: {
-      fillColor: [51, 51, 51],
-      textColor: [255, 255, 255],
-      fontStyle: "bold"
-    },
-    margin: { left: 20 }
-  });
-
-  doc.save(`Ordre_mission_${selectedMissionReport.id_misrap}.pdf`);
-
-  toast.success("PDF généré avec succès", {
-    position: "bottom-right",
-    autoClose: 2500,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    transition: Bounce,
-  });
-};
+  };
 
   if (!show) return null;
 
@@ -161,7 +172,7 @@ const handleDownloadPreview = () => {
         overflow: 'hidden',
         boxShadow: '0 5px 15px rgba(0,0,0,0.3)'
       }}>
-        {/* En-tête */}
+        {/* Header */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -176,7 +187,7 @@ const handleDownloadPreview = () => {
             fontWeight: 'bold',
             color: '#333'
           }}>
-            Détails Ordre de Mission
+            {translate("Mission Order Details")}
           </h2>
           <button 
             onClick={onHide}
@@ -193,7 +204,7 @@ const handleDownloadPreview = () => {
           </button>
         </div>
 
-        {/* Corps */}
+        {/* Body */}
         <div style={{
           padding: '20px',
           overflowY: 'auto',
@@ -201,7 +212,7 @@ const handleDownloadPreview = () => {
         }}>
           {selectedMissionReport ? (
             <>
-              {/* Titre principal */}
+              {/* Main title */}
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <h3 style={{
                   fontSize: '1.4rem',
@@ -209,27 +220,27 @@ const handleDownloadPreview = () => {
                   marginBottom: '5px',
                   color: '#2c3e50'
                 }}>
-                  Ordre de mission N° : {selectedMissionReport.id_misrap}
+                  {translate("Mission order No")} : {selectedMissionReport.id_misrap}
                 </h3>
                 <p style={{
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   color: '#7f8c8d'
                 }}>
-                  Objet : {selectedMissionReport.objt_misrap}
+                  {translate("Subject")} : {selectedMissionReport.objt_misrap}
                 </p>
               </div>
 
               <hr style={{ border: '1px solid #eee', margin: '20px 0' }} />
 
-              {/* Contenu en deux colonnes */}
+              {/* Two columns content */}
               <div style={{
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: '20px',
                 marginBottom: '25px'
               }}>
-                {/* Colonne gauche */}
+                {/* Left column */}
                 <div style={{ flex: 1, minWidth: '300px' }}>
                   <div style={{ marginBottom: '15px' }}>
                     <label style={{
@@ -238,7 +249,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Référence mission
+                      {translate("Mission reference")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -257,7 +268,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Type carburant
+                      {translate("Fuel type")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -276,7 +287,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Véhicule
+                      {translate("Vehicle")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -295,7 +306,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Remorque
+                      {translate("Trailer")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -314,7 +325,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Conducteur
+                      {translate("Driver")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -333,7 +344,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Lieu de départ
+                      {translate("Departure place")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -343,12 +354,10 @@ const handleDownloadPreview = () => {
                     }}>
                       {selectedMissionReport.lieu_misrap}
                     </div>
-                    
                   </div>
-             
                 </div>
 
-                {/* Colonne droite */}
+                {/* Right column */}
                 <div style={{ flex: 1, minWidth: '300px' }}>
                   <div style={{ marginBottom: '15px' }}>
                     <label style={{
@@ -357,7 +366,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Date de départ
+                      {translate("Departure date")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -365,7 +374,7 @@ const handleDownloadPreview = () => {
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionReport.date_dep_misrap}
+                      {formatDatetimeLocal(selectedMissionReport.date_dep_misrap)}
                     </div>
                   </div>
 
@@ -376,7 +385,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Date de retour
+                      {translate("Return date")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -384,7 +393,7 @@ const handleDownloadPreview = () => {
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionReport.date_arr_misrap || "-"}
+                      {formatDatetimeLocal(selectedMissionReport.date_arr_misrap)}
                     </div>
                   </div>
 
@@ -395,7 +404,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Frais
+                      {translate("Expenses")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -414,7 +423,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Accompagnement
+                      {translate("Accompaniment")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -433,7 +442,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Itinéraire
+                      {translate("Itinerary")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -445,25 +454,6 @@ const handleDownloadPreview = () => {
                     </div>
                   </div>
 
-                       <div style={{ marginBottom: '15px' }}>
-                    <label style={{
-                      display: 'block',
-                      fontWeight: 'bold',
-                      marginBottom: '5px',
-                      color: '#34495e'
-                    }}>
-                      Lieu de mission
-                    </label>
-                    <div style={{
-                      padding: '8px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '4px',
-                      border: '1px solid #ddd'
-                    }}>
-                      {selectedMissionReport.lieu_misrap}
-                    </div>
-                    
-                  </div>
                   <div style={{ marginBottom: '15px' }}>
                     <label style={{
                       display: 'block',
@@ -471,7 +461,7 @@ const handleDownloadPreview = () => {
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      Ammortisation
+                      {translate("Mission place")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -481,12 +471,30 @@ const handleDownloadPreview = () => {
                     }}>
                       {selectedMissionReport.lieu_misrap}
                     </div>
-                    
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{
+                      display: 'block',
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      color: '#34495e'
+                    }}>
+                      {translate("Amortization")}
+                    </label>
+                    <div style={{
+                      padding: '8px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      border: '1px solid #ddd'
+                    }}>
+                      {selectedMissionReport.amort_misrap}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Tableau des détails techniques */}
+              {/* Technical details table */}
               <div style={{ margin: '25px 0' }}>
                 <h4 style={{
                   fontSize: '1.2rem',
@@ -495,7 +503,7 @@ const handleDownloadPreview = () => {
                   color: '#2c3e50',
                   textAlign: 'center'
                 }}>
-                  Détails Techniques
+                  {translate("Technical Details")}
                 </h4>
                 <div style={{
                   overflowX: 'auto',
@@ -516,42 +524,40 @@ const handleDownloadPreview = () => {
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                        
-                          KM Retour
+                          {translate("Return KM")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          Distance
+                          {translate("Distance")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          Nuits
+                          {translate("Nights")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          Immobilisation
+                          {translate("Immobilization")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          Durée
+                          {translate("Duration")}
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                       
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
@@ -593,7 +599,7 @@ const handleDownloadPreview = () => {
                 </div>
               </div>
 
-              {/* Bouton de téléchargement */}
+              {/* Download button */}
               <div style={{ textAlign: 'center', marginTop: '25px' }}>
                 <button
                   onClick={handleDownloadPreview}
@@ -611,7 +617,7 @@ const handleDownloadPreview = () => {
                   onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1a252f'}
                   onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2c3e50'}
                 >
-                  Télécharger PDF
+                  {translate("Download PDF")}
                 </button>
               </div>
             </>
@@ -621,12 +627,12 @@ const handleDownloadPreview = () => {
               padding: '40px 20px',
               color: '#7f8c8d'
             }}>
-              Aucune donnée disponible
+              {translate("No data available")}
             </div>
           )}
         </div>
 
-        {/* Pied de page */}
+        {/* Footer */}
         <div style={{
           padding: '15px',
           borderTop: '1px solid #ddd',
@@ -646,16 +652,16 @@ const handleDownloadPreview = () => {
               fontSize: '16px',
               transition: 'all 0.3s'
             }}
-           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#2c3e50';
-            e.currentTarget.style.color = 'white';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'white';
-            e.currentTarget.style.color = '#2c3e50';
-          }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#2c3e50';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.color = '#2c3e50';
+            }}
           >
-            Fermer
+            {translate("Close")}
           </button>
         </div>
       </div>
@@ -664,26 +670,3 @@ const handleDownloadPreview = () => {
 };
 
 export default MissionReportModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
