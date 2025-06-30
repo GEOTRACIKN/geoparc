@@ -643,9 +643,9 @@
 "Driver's License": "Driver's License",
 "Edit a Driver": "Edit a Driver",
 "Add a Driver": "Add a Driver",
-"Driver's Last Name (*)": "Driver's Last Name (*)",
-"Driver's First Name (*)": "Driver's First Name (*)",
-"Identification Code (*)": "Identification Code (*)",
+"Driver's Last Name": "Driver's Last Name",
+"Driver's First Name": "Driver's First Name",
+"Identification Code": "Identification Code",
 "Driver's Role": "Driver's Role",
 "Date of Birth": "Date of Birth",
 "Driver's Address": "Driver's Address",
@@ -797,6 +797,17 @@
 "Details": "Details",
 "Cost (DZD)": "Cost (DZD)",
 "Operation": "Operation",
-"Parts Replacement": "Parts Replacement"
+"Parts Replacement": "Parts Replacement",
+"Mission Reference": "Mission Reference",
+"Aucune remorque disponible.": "No trailer available.",
+"Departure Date/Time": "Departure Date/Time",
+"Arrival Date/Time": "Arrival Date/Time",
+"Mission Location": "Mission Location",
+"Number of Nights": "Number of Nights",
+"Immobilization (Days)": "Immobilization (Days)",
+"Duration (Days)": "Duration (Days)",
+"Return Km (km)": "Return Km (km)",
+"Distance (km)": "Distance (km)",
+"Amortization Period": "Amortization Period"
 
 }

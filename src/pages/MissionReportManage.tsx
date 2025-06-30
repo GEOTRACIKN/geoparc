@@ -473,12 +473,11 @@ const handleDateTimeChange = (name: string, value: string) => {
               <div className="col-md-6">
               <Form.Group className="form-group" controlId="formRefMisrap">
                 <Form.Label>
-                    <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Mission Reference (*)
+                    <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> {translate("Mission Reference")} (*)
                 </Form.Label>
                 <Form.Control
                     type="text"
                     name="ref_misrap"
-                    placeholder="Enter the mission reference"
                     value={mission?.ref_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     required
@@ -487,12 +486,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
                 <Form.Group className="form-group" controlId="formObjtMisrap">
                 <Form.Label>
-                    <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> Mission Object (*)
+                    <i className="fas fa-clipboard" style={{ color: 'orange' }}></i> {translate("Mission Object")} (*)
                 </Form.Label>
                 <Form.Control
                     type="text"
                     name="objt_misrap"
-                    placeholder="Enter the mission object"
                     value={mission?.objt_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     required
@@ -500,12 +498,11 @@ const handleDateTimeChange = (name: string, value: string) => {
                 </Form.Group>
                 <Form.Group className="form-group" controlId="formFuelType">
                 <Form.Label>
-                    <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> Fuel Type (*)
+                    <i className="fas fa-tachometer-alt" style={{ color: 'orange' }}></i> {translate("Fuel Type")} (*)
                 </Form.Label>
                 <Form.Control
                     type="text"
                     name="carb_misrap"
-                    placeholder="Enter fuel type"
                     value={mission?.carb_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     required
@@ -515,12 +512,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
                 <Form.Group className="form-group" controlId="formExpenses">
                 <Form.Label>
-                    <i className="fas fa-money-bill" style={{ color: 'orange' }}></i> Expenses (*)
+                    <i className="fas fa-money-bill" style={{ color: 'orange' }}></i> {translate("Expenses")} (*)
                 </Form.Label>
                 <Form.Control
                     type="number"
                     name="frais_misrap"
-                    placeholder="Enter expenses"
                     value={mission?.frais_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     onKeyDown={(e) => {
@@ -592,56 +588,54 @@ const handleDateTimeChange = (name: string, value: string) => {
       </Form.Group>
           
       <Form.Group className="form-group" controlId="formDriver">
-        <Form.Label>
-          <i className="fas fa-user" style={{ color: 'orange' }}></i> Driver (*)
-        </Form.Label>
-        <Form.Control
-  as="select"
-  name="cond_misrap"
-  value={mission?.cond_misrap || ''}
-  onChange={(e) => handleChange(e.target.name, e.target.value)}
-  required
->
-  <option value="">Select Driver</option>
-  {drivers.map((driver, index) => (
-    <option key={index} value={String(driver.driver_mission)}>
-      {driver.driver_mission}
-    </option>
-  ))}
-</Form.Control>
+      <Form.Label>
+        <i className="fas fa-user" style={{ color: 'orange' }}></i> {translate("Driver")} (*)
+      </Form.Label>
+      <Form.Control
+      as="select"
+      name="cond_misrap"
+      value={mission?.cond_misrap || ''}
+      onChange={(e) => handleChange(e.target.name, e.target.value)}
+      required
+    >
+      <option value="">{translate("Select Driver")}</option>
+      {drivers.map((driver, index) => (
+        <option key={index} value={String(driver.driver_mission)}>
+          {driver.driver_mission}
+        </option>
+      ))}
+    </Form.Control>
       </Form.Group>
 
-                <Form.Group className="form-group" controlId="formAccomp">
-                <Form.Label>
-                    <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> Accompaniment (*)
-                </Form.Label>
-                <Form.Control
-                    type="text"
-                    name="acc_misrap"
-                    placeholder="Enter accompanying persons"
-                    value={mission?.acc_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
+        <Form.Group className="form-group" controlId="formAccomp">
+        <Form.Label>
+            <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> {translate("Accompaniment")} (*)
+        </Form.Label>
+        <Form.Control
+            type="text"
+            name="acc_misrap"
+            value={mission?.acc_misrap || ''}
+            onChange={(e) => handleChange(e.target.name, e.target.value)}
+            required
+        />
+        </Form.Group>
 
-                <Form.Group className="form-group" controlId="formItinerary">
-                <Form.Label>
-                    <i className="fas fa-route" style={{ color: 'orange' }}></i> Itinerary (*)
-                </Form.Label>
-                <Form.Control
-                    type="text"
-                    name="itnr_misrap"
-                    placeholder="Enter itinerary"
-                    value={mission?.itnr_misrap || ''}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    required
-                />
-                </Form.Group>
+        <Form.Group className="form-group" controlId="formItinerary">
+        <Form.Label>
+            <i className="fas fa-route" style={{ color: 'orange' }}></i> {translate("Itinerary")} (*)
+        </Form.Label>
+        <Form.Control
+            type="text"
+            name="itnr_misrap"
+            value={mission?.itnr_misrap || ''}
+            onChange={(e) => handleChange(e.target.name, e.target.value)}
+            required
+        />
+        </Form.Group>
 
             <Form.Group className="form-group" controlId="formTrailer">
               <Form.Label>
-                <i className="fas fa-trailer" style={{ color: 'orange' }}></i> Trailer (*)
+                <i className="fas fa-trailer" style={{ color: 'orange' }}></i> {translate("Trailer")} (*)
               </Form.Label>
 
               <Form.Control
@@ -664,7 +658,7 @@ const handleDateTimeChange = (name: string, value: string) => {
 
   {trailers.length === 0 && (
     <div style={{ color: 'red', marginTop: '5px' }}>
-      ⚠️ Aucune remorque disponible.
+      ⚠️ {translate("Aucune remorque disponible.")}
     </div>
   )}
 </Form.Group>
@@ -673,12 +667,11 @@ const handleDateTimeChange = (name: string, value: string) => {
                 <div className="col-md-6">
                 <Form.Group className="form-group" controlId="formDepLoc">
                 <Form.Label>
-                    <i className="fas fa-map-marker-alt" style={{ color: 'orange' }}></i> Departure Location (*)
+                    <i className="fas fa-map-marker-alt" style={{ color: 'orange' }}></i> {translate("Departure Location")} (*)
                 </Form.Label>
                 <Form.Control
                     type="text"
                     name="lieu_misrap"
-                    placeholder="Enter departure location"
                     value={mission?.lieu_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     required
@@ -686,7 +679,7 @@ const handleDateTimeChange = (name: string, value: string) => {
                 </Form.Group>
 <Form.Group className="form-group" controlId="formDepDate">
   <Form.Label>
-    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Departure Date/Time (*)
+    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> {translate("Departure Date/Time")} (*)
   </Form.Label>
   <Form.Control
     type="datetime-local"
@@ -700,7 +693,7 @@ const handleDateTimeChange = (name: string, value: string) => {
 
 <Form.Group className="form-group" controlId="formArrivalDate">
   <Form.Label>
-    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> Arrival Date/Time (*)
+    <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> {translate("Arrival Date/Time")} (*)
   </Form.Label>
   <Form.Control
     type="datetime-local"
@@ -719,12 +712,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
                 <Form.Group className="form-group" controlId="formDepDest">
                 <Form.Label>
-                    <i className="fas fa-map" style={{ color: 'orange' }}></i> Mission Location (*)
+                    <i className="fas fa-map" style={{ color: 'orange' }}></i> {translate("Mission Location")} (*)
                 </Form.Label>
                 <Form.Control
                     type="text"
                     name="dep_misrap"
-                    placeholder="Enter mission location"
                     value={mission?.dep_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     required
@@ -733,12 +725,11 @@ const handleDateTimeChange = (name: string, value: string) => {
               
                 <Form.Group className="form-group" controlId="formNumberOfNights">
                   <Form.Label>
-                    <i className="fas fa-bed" style={{ color: 'orange' }}></i> Number of Nights (*)
+                    <i className="fas fa-bed" style={{ color: 'orange' }}></i> {translate("Number of Nights")} (*)
                   </Form.Label>
                   <Form.Control
                     type="number"
                     name="nuit_misrap"
-                    placeholder="Enter number of nights"
                     value={mission?.nuit_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     onKeyDown={(e) => {
@@ -759,12 +750,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
               <Form.Group className="form-group" controlId="formImmobilizationDays">
               <Form.Label>
-                <i className="fas fa-calendar-day" style={{ color: 'orange' }}></i> Immobilization (Days) (*)
+                <i className="fas fa-calendar-day" style={{ color: 'orange' }}></i> {translate("Immobilization (Days)")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
                 name="immob_misrap"
-                placeholder="Enter immobilization days"
                 value={mission?.immob_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -783,12 +773,11 @@ const handleDateTimeChange = (name: string, value: string) => {
             </Form.Group>
             <Form.Group className="form-group" controlId="formDuration">
               <Form.Label>
-                <i className="fas fa-clock" style={{ color: 'orange' }}></i> Duration (Days) (*)
+                <i className="fas fa-clock" style={{ color: 'orange' }}></i> {translate("Duration (Days)")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
                 name="durr_misrap"
-                placeholder="Enter duration in days"
                 value={mission?.durr_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -808,12 +797,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
             <Form.Group className="form-group" controlId="formReturnMileage">
               <Form.Label>
-                <i className="fas fa-road" style={{ color: 'orange' }}></i> Return Km (km) (*)
+                <i className="fas fa-road" style={{ color: 'orange' }}></i> {translate("Return Km (km)")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
                 name="km_ret_misrap"
-                placeholder="Enter return mileage"
                 value={mission?.km_ret_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -833,12 +821,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
             <Form.Group className="form-group" controlId="formDistance">
               <Form.Label>
-                <i className="fas fa-random" style={{ color: 'orange' }}></i> Distance (km) (*)
+                <i className="fas fa-random" style={{ color: 'orange' }}></i> {translate("Distance (km)")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
                 name="dist_misrap"
-                placeholder="Enter distance"
                 value={mission?.dist_misrap || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -858,12 +845,11 @@ const handleDateTimeChange = (name: string, value: string) => {
 
              <Form.Group className="form-group" controlId="formAmortizationPeriod">
                   <Form.Label>
-                    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> Amortization Period (*)
+                    <i className="fas fa-calendar" style={{ color: 'orange' }}></i> {translate("Amortization Period")} (*)
                   </Form.Label>
                   <Form.Control
                     type="number"
                     name="amort_misrap"
-                    placeholder="Enter amortization period"
                     value={mission?.amort_misrap || ''}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     onKeyDown={(e) => {

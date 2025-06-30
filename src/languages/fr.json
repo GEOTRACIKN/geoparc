@@ -654,9 +654,9 @@
 "Driver's License": "Permis de conduire",
 "Edit a Driver": "Modifier un conducteur",
 "Add a Driver": "Ajouter un conducteur",
-"Driver's Last Name (*)": "Nom du conducteur (*)",
-"Driver's First Name (*)": "Prénom du conducteur (*)",
-"Identification Code (*)": "Code d'identification (*)",
+"Driver's Last Name": "Nom du conducteur",
+"Driver's First Name": "Prénom du conducteur",
+"Identification Code": "Code d'identification",
 "Driver's Role": "Fonction du conducteur",
 "Date of Birth": "Date de naissance",
 "Driver's Address": "Adresse du conducteur",
@@ -811,7 +811,23 @@
 "Details": "Détails",
 "Cost (DZD)": "Coût (DZD)",
 "Operation": "Opération",
-  "Parts Replacement": "Changement de pièce"
+"Parts Replacement": "Changement de pièce",
+
+
+"Mission Reference": "Référence de la mission",
+
+"Aucune remorque disponible.": "Aucune remorque disponible.",
+"Departure Date/Time": "Date/Heure de départ",
+"Arrival Date/Time": "Date/Heure d’arrivée",
+"Mission Location": "Lieu de mission",
+"Number of Nights": "Nombre de nuitées",
+"Immobilization (Days)": "Immobilisation (jours)",
+"Duration (Days)": "Durée (jours)",
+"Return Km (km)": "Kilométrage retour (km)",
+"Distance (km)": "Distance parcourue (km)",
+"Amortization Period": "Période d’amortissement"
+
+
 
  
 

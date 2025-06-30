@@ -808,6 +808,25 @@
 "Details": "Detalles",
 "Cost (DZD)": "Costo (DZD)",
 "Operation": "Operación",
-"Parts Replacement": "Reemplazo de piezas"
+"Parts Replacement": "Reemplazo de piezas",
+"Mission Reference (*)": "Referencia de la misión (*)",
+"Mission Object (*)": "Objeto de la misión (*)",
+"Fuel Type (*)": "Tipo de combustible (*)",
+"Expenses (*)": "Gastos (*)",
+"Driver (*)": "Conductor (*)",
+"Accompaniment (*)": "Acompañante(s) (*)",
+"Itinerary (*)": "Itinerario (*)",
+"Trailer (*)": "Remolque (*)",
+"Aucune remorque disponible.": "No hay remolques disponibles.",
+"Departure Location (*)": "Lugar de salida (*)",
+"Departure Date/Time (*)": "Fecha/Hora de salida (*)",
+"Arrival Date/Time (*)": "Fecha/Hora de llegada (*)",
+"Mission Location (*)": "Lugar de la misión (*)",
+"Number of Nights (*)": "Número de noches (*)",
+"Immobilization (Days) (*)": "Inmovilización (días) (*)",
+"Duration (Days) (*)": "Duración (días) (*)",
+"Return Km (km) (*)": "Kilometraje de regreso (km) (*)",
+"Distance (km) (*)": "Distancia recorrida (km) (*)",
+"Amortization Period (*)": "Período de amortización (*)"
 
 }

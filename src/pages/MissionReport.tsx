@@ -574,7 +574,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
                           </Link>
                          
                           
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
+                          <a className="badge bg-danger mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
