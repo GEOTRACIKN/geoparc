@@ -11,6 +11,10 @@ interface Vehicle {
     id_vehicule: number;
     immatriculation_vehicule: string;
 }
+interface Trailer {
+  id_remorque?: number;       // Ajoutez si disponible
+  trailer_mission: string;   // Modifiez pour correspondre au champ retourné par l'API
+}
 
 interface MissionOrderInterface {
   id_mission?: number | null;
@@ -587,6 +591,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                   value={mission?.trailer_mission || ''}
                    onChange={(e) => handleChange(e.target.name, e.target.value)}
                   required
+                  disabled={trailer.length === 0} 
                 >
                   <option value="">Select Vehicle</option>
                   {trailer.length === 0 ? (
@@ -599,6 +604,13 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                     ))
                   )}
               </Form.Control>
+                {trailer.length === 0 && (
+                  <div style={{ color: 'red', marginTop: '5px' }}>
+                    ⚠️ {translate("Aucune remorque disponible.")}
+                  </div>
+                )}
+             
+              
             </Form.Group>
 
             <Form.Group className="form-group" controlId="formDriver">
@@ -665,13 +677,14 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 <i className="fas fa-calendar" style={{ color: 'orange' }}></i> {translate("Departure Date")} (*)
               </Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="dep_date_mission"
                 
                 placeholder="Enter departure date"
-                value={formatToDatetimeLocal(mission?.dep_date_mission || '')}
+                value={formatToDatetimeLocal(mission?.dep_date_mission)}
                 onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
+                isInvalid={!!dateError}
               />
             </Form.Group>
 
@@ -695,13 +708,14 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> {translate("Return Date")} (*)
               </Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="return_date_mission"
                 
                 placeholder="Enter return date"
                 value={formatToDatetimeLocal(mission?.return_date_mission)}
                 onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
+                isInvalid={!!dateError}
               />
             </Form.Group>
 

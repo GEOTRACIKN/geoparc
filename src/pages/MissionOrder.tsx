@@ -30,7 +30,7 @@ interface MissionOrder {
   driver_mission: string;
   accomp_mission: number;
   dep_loc_mission: string;
-  dep_date_mission: number;
+  dep_date_mission: string;
   dep_dest_mission: string;
   return_date_mission: number;
   itinerary_mission: string;
@@ -381,6 +381,14 @@ export function MissionOrder() {
       console.error("Error fetching PDF:", error);
     }
   };
+
+ function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
   
 
 
@@ -610,7 +618,7 @@ export function MissionOrder() {
                       {selectedColumns.id_mission && (<td>{missionOrder.id_mission}</td>)}
                       {selectedColumns.ref_mission && (<td>{missionOrder.ref_mission}</td>)}
                       {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
-                      {selectedColumns.dep_date_mission && (<td>{missionOrder.dep_date_mission}</td>)}
+                      {selectedColumns.dep_date_mission && (<td>{formatDatetimeLocal(missionOrder.dep_date_mission)}</td>)}
                       {selectedColumns.immatriculation_vehicule  && (<td>{missionOrder.immatriculation_vehicule }</td>)}
                       {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
 
