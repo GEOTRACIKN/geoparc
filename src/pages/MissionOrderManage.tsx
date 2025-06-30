@@ -87,6 +87,7 @@ const [trailer, setTrailer] = useState<{ trailer_mission: string }[]>([]);
 
 const [vehicles, setVehicles] = useState<Vehicle[]>([]);
 const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
+ const [dateError, setDateError] = useState<string | null>(null);
  
 
  useEffect(() => {
@@ -350,25 +351,63 @@ const createMission = async (mission: MissionOrderInterface) => {
     handleChange(name, value);  // Appel de la fonction de changement générique
   };
 
-     
 
- const validateDates = () => {
-  if (mission?.dep_date_mission && mission?.return_date_mission) {
-    const depDate = new Date(mission.dep_date_mission);
-    const returnDate = new Date(mission.return_date_mission);
+
+const formatToDatetimeLocal = (isoString: string | null | undefined): string => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
     
-    if (depDate > returnDate) {
-      toast.error(translate("Departure date cannot be after return date"), {
-        position: "bottom-right",
-        autoClose: 3000,
-        transition: Bounce,
-      });
-      return false;
-    }
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  } catch {
+    return '';
   }
-  return true;
 };
+
+const parseDatetimeLocal = (localString: string): string | null => {
+  if (!localString) return null;
+  try {
+    const [datePart, timePart] = localString.split('T');
+    return `${datePart}T${timePart || '00:00'}:00`;
+  } catch {
+    return null;
+  }
+};
+
+// Gestionnaire d'événements avec typage
+
+const validateDates = (departure: string | null, arrival: string | null): boolean => {
+  if (!departure || !arrival) return true; // Permettre si l'une des dates est vide
   
+  const depDate = new Date(departure);
+  const arrDate = new Date(arrival);
+  
+  return depDate <= arrDate;
+};
+
+  const handleDateTimeChange = (name: string, value: string) => {
+  if (!mission) return;
+
+  const isoValue = parseDatetimeLocal(value);
+  
+  const updatedMission: MissionOrderInterface = {
+    ...mission,
+    [name]: isoValue
+  };
+
+  setMission(updatedMission);
+
+  // Validation des dates
+  if (updatedMission.dep_date_mission && updatedMission.return_date_mission) {
+    const isValid = validateDates(updatedMission.dep_date_mission, updatedMission.return_date_mission);
+    setDateError(isValid ? null : "La date de départ doit être antérieure ou égale à la date de retour");
+  } else {
+    setDateError(null);
+  }
+};
+     
   // Fonction générique de gestion des changements dans les formulaires
   const handleChange = (name: string, value: string) => {
     if (mission) {
@@ -380,9 +419,7 @@ const createMission = async (mission: MissionOrderInterface) => {
       setMission(updatedMission);
       
       // Valider les dates après la mise à jour
-      if (name === "dep_date_mission" || name === "return_date_mission") {
-        validateDates();
-      }
+     
     }
   };
 
@@ -632,8 +669,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="dep_date_mission"
                 
                 placeholder="Enter departure date"
-                value={mission?.dep_date_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                value={formatToDatetimeLocal(mission?.dep_date_mission || '')}
+                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
               />
             </Form.Group>
@@ -662,8 +699,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="return_date_mission"
                 
                 placeholder="Enter return date"
-                value={mission?.return_date_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                value={formatToDatetimeLocal(mission?.return_date_mission)}
+                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
               />
             </Form.Group>
@@ -836,8 +873,7 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
-                
+              required        
               />
             </Form.Group>
 
@@ -863,11 +899,9 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              
                 required
               />
             </Form.Group>
-
             <Form.Group className="form-group" controlId="formFuelLevel">
               <Form.Label>
                 <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> {translate("Fuel Level")} (*)
@@ -889,11 +923,9 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
-                
+              required              
               />
             </Form.Group>
-
             <Form.Group className="form-group" controlId="formVoucher">
               <Form.Label>
                 <i className="fas fa-receipt" style={{ color: 'orange' }}></i> {translate("Voucher")} (*)
@@ -942,8 +974,6 @@ const createMission = async (mission: MissionOrderInterface) => {
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
   {isEditing ? "Edit" : "Add"}
 </Button>
-
-
         </div>
       </div>
     </>
