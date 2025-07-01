@@ -900,7 +900,7 @@ const handleDateTimeChange = (name: string, value: string) => {
   disabled={buttonClicked}
 >
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-  {isEditing ? "Modifier" : "Ajouter"}
+  {isEditing ? translate("Update") : translate("Add")}
 </Button>
 
 

@@ -477,7 +477,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="text"
                 name="ref_mission"
-                placeholder="Enter the mission reference"
+            
                 value={mission?.ref_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   
@@ -491,7 +491,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="text"
                 name="object_mission"
-                placeholder="Enter the mission object"
+                
                 value={mission?.object_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                  
@@ -506,7 +506,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="fuel_loading_mission"
-                placeholder="Enter fuel loading"
+                
                 value={mission?.fuel_loading_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   onKeyDown={(e) => {
@@ -531,7 +531,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="text"
                 name="fuel_type_mission"
-                placeholder="Enter fuel type"
+                
                 value={mission?.fuel_type_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                  
@@ -546,7 +546,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="expenses_mission"
-                placeholder="Enter expenses"
+               
                 value={mission?.expenses_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   onKeyDown={(e) => {
@@ -571,8 +571,6 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="tank_mission"
-                
-                placeholder="Enter tank"
                 value={mission?.tank_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   
@@ -648,7 +646,6 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="text"
                 name="accomp_mission"
               
-                placeholder="Enter accompanying persons"
                 value={mission?.accomp_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -662,8 +659,6 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="text"
                 name="dep_loc_mission"
-                
-                placeholder="Enter departure location"
                 value={mission?.dep_loc_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -680,7 +675,6 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="datetime-local"
                 name="dep_date_mission"
                 
-                placeholder="Enter departure date"
                 value={formatToDatetimeLocal(mission?.dep_date_mission)}
                 onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
@@ -696,7 +690,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="text"
                 name="dep_dest_mission"
                 
-                placeholder="Enter departure destination"
+                
                 value={mission?.dep_dest_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -711,7 +705,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="datetime-local"
                 name="return_date_mission"
                 
-                placeholder="Enter return date"
+            
                 value={formatToDatetimeLocal(mission?.return_date_mission)}
                 onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
@@ -727,7 +721,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="text"
                 name="itinerary_mission"
                 
-                placeholder="Enter itinerary"
+               
                 value={mission?.itinerary_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -873,7 +867,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="new_km_mission"                
-                placeholder="Enter new KM"
+            
                 value={mission?.new_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -898,8 +892,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="fuel_cost_mission"
-                
-                placeholder="Enter fuel cost"
+          
                 value={mission?.fuel_cost_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -923,7 +916,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
               <Form.Control
                 type="number"
                 name="fuel_level_mission"    
-                placeholder="Enter fuel level"
+               
                 value={mission?.fuel_level_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -948,7 +941,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
                 type="text"
                 name="voucher_mission"
                 
-                placeholder="Enter voucher number"
+              
                 value={mission?.voucher_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -986,7 +979,7 @@ const validateDates = (departure: string | null, arrival: string | null): boolea
   disabled={buttonClicked}
 >
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-  {isEditing ? "Edit" : "Add"}
+  {isEditing ? translate("Update") : translate("Add")}
 </Button>
         </div>
       </div>

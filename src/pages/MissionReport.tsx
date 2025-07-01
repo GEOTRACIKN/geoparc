@@ -272,7 +272,8 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
   const handledeleteMissionReport = async (id_misrap: number) => {
     try {
       console.log(id_misrap);
-      setModalStatus('Do you want to delete this MissionReport');
+            setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Report')}?`);
+
       setTitleStatus('Delete MissionReport');
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionReport(id_misrap);
