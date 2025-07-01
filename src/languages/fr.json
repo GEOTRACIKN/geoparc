@@ -825,11 +825,28 @@
 "Duration (Days)": "Durée (jours)",
 "Return Km (km)": "Kilométrage retour (km)",
 "Distance (km)": "Distance parcourue (km)",
-"Amortization Period": "Période d’amortissement"
+"Amortization Period": "Période d’amortissement",
+"Departure location": "Lieu de départ",
+
+"Fuel Loading": "Chargement de carburant",
+
+"Number Of vehicle kilometers": "Nombre de kilomètres du véhicule",
+"New Kilometers": "Nombre de kilomètres ajoutés",
+"Coupon Number": "Numéro de la quittance",
+"Departure Place": "Lieu de départ",
+"Return KM": "Kilométrage retour",
+"Nights": "Nuits",
+"Immobilization": "Immobilisation",
+"Amortization": "Amortissement",
+"Technical Details": "Détails techniques",
+"Mission Place": "Lieu de mission",
+"Download PDF": "Télécharger le PDF",
+"Mission Order Details": "Détails de l'ordre de mission",
+"Mission Order No": "N° de l'ordre de mission",
+"Mission Report Details": "Détails du rapport de mission",
+"Mission Report No": "N° du rapport de mission"
 
 
-
- 
 
 
 

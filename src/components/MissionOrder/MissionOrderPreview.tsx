@@ -56,7 +56,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
     // Configuration du document
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text(`${translate("Mission order No")} : ${String(selectedMissionOrder.id_mission)}`, 105, 20, { align: "center" });
+    doc.text(`${translate("Mission Order No")} : ${String(selectedMissionOrder.id_mission)}`, 105, 20, { align: "center" });
     
     doc.setFontSize(16);
     doc.text(`${translate("Subject")} : ${String(selectedMissionOrder.object_mission || '')}`, 105, 30, { align: "center" });
@@ -71,18 +71,18 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
     // Colonne gauche
     let yPosition = 50;
     doc.setFont("helvetica", "bold");
-    doc.text(`${translate("Mission reference")}:`, 20, yPosition);
+    doc.text(`${translate("Mission Reference")}:`, 20, yPosition);
     doc.text(`${translate("Fuel type")}:`, 20, yPosition + 10);
     doc.text(`${translate("Vehicle")}:`, 20, yPosition + 20);
     doc.text(`${translate("Trailer")}:`, 20, yPosition + 30);
     doc.text(`${translate("Driver")}:`, 20, yPosition + 40);
-    doc.text(`${translate("Departure location")}:`, 20, yPosition + 50);
+    doc.text(`${translate("Departure Location")}:`, 20, yPosition + 50);
     doc.text(`${translate("Destination")}:`, 20, yPosition + 60);
     doc.text(`${translate("Expenses")}:`, 20, yPosition + 70);
 
     // Colonne droite
-    doc.text(`${translate("Departure date")}:`, 110, yPosition);
-    doc.text(`${translate("Return date")}:`, 110, yPosition + 10);
+    doc.text(`${translate("Departure Date")}:`, 110, yPosition);
+    doc.text(`${translate("Return Date")}:`, 110, yPosition + 10);
     doc.text(`${translate("Fuel loading")}:`, 110, yPosition + 20);
     doc.text(`${translate("Accompaniment")}:`, 110, yPosition + 30);
     doc.text(`${translate("Itinerary")}:`, 110, yPosition + 40);
@@ -224,7 +224,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                   marginBottom: '5px',
                   color: '#2c3e50'
                 }}>
-                  {translate("Mission order No")} : {selectedMissionOrder.id_mission}
+                  {translate("Mission Order No")} : {selectedMissionOrder.id_mission}
                 </h3>
                 <p style={{
                   fontSize: '1.1rem',
@@ -253,7 +253,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Mission reference")}
+                      {translate("Mission Reference")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -272,7 +272,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Fuel type")}
+                      {translate("Fuel Type")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -348,7 +348,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Departure location")}
+                      {translate("Departure Location")}
                     </label>
                     <div style={{
                       padding: '8px',
