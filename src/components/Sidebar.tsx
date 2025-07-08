@@ -342,7 +342,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 42,
           label: "Card management",
           icon: "las fa-id-card",
-          to: "/card-management",
+          to: "/card_management",
           permissionId: 42,
         },
         {
