@@ -104,11 +104,11 @@ const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefin
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/fuelcard/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/fuelcards/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-            setTotal(result);
-            setPageCount(Math.ceil(result / limit));
+            setTotal(result.count);
+            setPageCount(Math.ceil(result.count / limit));
         } catch (error) {
             console.error(error);
         } finally {
@@ -119,7 +119,7 @@ const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefin
     const getFuelCards = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/fuelcard/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/fuelcards/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
             const data = await response.json();
             setFuelCards(data);
@@ -185,6 +185,7 @@ const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefin
         const date = new Date(dateString);
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
+ 
 
     const fuelTypeLabels: { [key: string]: string } = {
         diesel: translate("Diesel"),

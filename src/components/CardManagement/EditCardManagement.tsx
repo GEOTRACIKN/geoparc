@@ -77,13 +77,13 @@ const EditCardManagement: React.FC<EditCardManagementProps> = ({
                     const recordData = await recordResponse.json();
                     
                     // Format date for datetime-local input
-                    const formattedDate = recordData.date_fc 
+                    /*const formattedDate = recordData.date_fc 
                         ? new Date(recordData.date_fc).toISOString().slice(0, 16)
                         : "";
-                    
+                    */
                     setFormData({
                         ...recordData,
-                        date_fc: formattedDate
+                        //date_fc: formattedDate
                     });
                 }
             } catch (error) {
@@ -182,6 +182,17 @@ const EditCardManagement: React.FC<EditCardManagementProps> = ({
         }
     };
 
+    const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+    
+    const date = new Date(dateString);
+    // Compense le décalage du fuseau horaire
+    const timezoneOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - timezoneOffset);
+    
+    return localDate.toISOString().slice(0, 16);
+};
+
     return (
         <Modal show={show} onHide={handleClose} backdrop="static">
             <Modal.Header closeButton>
@@ -263,16 +274,16 @@ const EditCardManagement: React.FC<EditCardManagementProps> = ({
                                 />
                             </Form.Group>
 
-                            <Form.Group controlId="date_fc" className="mb-3">
-                                <Form.Label>{translate("Date")}{translate(" *")}</Form.Label>
-                                <Form.Control
-                                    type="datetime-local"
-                                    value={formData.date_fc}
-                                    min="2000-01-01T00:00"
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </Form.Group>
+                           <Form.Group controlId="date_fc" className="mb-3">
+                            <Form.Label>{translate("Date")}{translate(" *")}</Form.Label>
+                            <Form.Control
+                                type="datetime-local"
+                                value={formatDateForInput(formData.date_fc)}
+                                min="2000-01-01T00:00"
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
 
                             <Form.Group controlId="carb_fc" className="mb-3">
                                 <Form.Label>{translate("Fuel Type")}{translate(" *")}</Form.Label>
