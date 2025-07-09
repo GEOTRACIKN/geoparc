@@ -33,7 +33,7 @@ export function CardManagement() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID");
+    const [typeSearch, setTypeSearch] = useState("Vehicle");
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_fc");
     const [sort, setSort] = useState("desc");
@@ -138,9 +138,7 @@ const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefin
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
         switch (selectedValue) {
-            case translate("ID"):
-                setType(0);
-                break;
+           
             case translate("Vehicle"):
                 setType(1);
                 break;
