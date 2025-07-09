@@ -23,12 +23,12 @@ const DeleteCardManagement: React.FC<DeleteCardManagementProps> = ({
 }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const { translate } = useTranslate();
+    const geopuserID = localStorage.getItem("GeopUserID");
 
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            const response = await fetch(`${backendUrl}/api/geop/fuelcard/${recordId}`, {
-                method: "DELETE",
+        const response = await fetch(`${backendUrl}/api/geop/deletefuelcard/${recordId}/${geopuserID}`, {                method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
                     "Content-Type": "application/json"
