@@ -356,7 +356,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 32,
           label: "Cash management",
           icon: "las fa-money-bill-wave",
-          to: "/cash-management",
+          to: "/cash_management",
           permissionId: 42,
         },
       ],
