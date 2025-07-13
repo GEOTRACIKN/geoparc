@@ -193,7 +193,7 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Purchase Cost")} (DZD)</Form.Label>
+                <Form.Label>{translate("Cost (DZD)")}</Form.Label>
                 <Form.Control readOnly value={formData.cout_achat_ps} />
             </Form.Group>
         </div>

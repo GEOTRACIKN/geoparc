@@ -169,7 +169,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
     return (
 <Modal show={show} onHide={handleClose} size="lg" backdrop="static">
   <Modal.Header closeButton>
-    <Modal.Title>{translate("New Piece")}</Modal.Title>
+    <Modal.Title>{translate("New")}</Modal.Title>
   </Modal.Header>
 
   <Form onSubmit={handleSubmit}>
@@ -265,14 +265,17 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
           <Form.Group controlId="duree_piece" className="mb-3">
             <Form.Label>{translate("Duration")}</Form.Label>
             <Form.Control
-              type="text"
-              value={formData.duree_piece}
-              onChange={handleChange}
-              onKeyDown={(e) => {
-                const allowed = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
-              }}
-            />
+            type="text"
+            placeholder="Ex: 01:30"
+            value={formData.duree_piece}
+            onChange={handleChange}
+            onKeyDown={(e) => {
+              const allowed = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', ':'];
+              if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
+            }}
+          />
+          <Form.Text className="text-muted">Format : HH:MM (ex: 01:30)</Form.Text>
+
           </Form.Group>
         </div>
         <div className="col-md-6">
@@ -351,6 +354,7 @@ const ModalNewPiece: React.FC<ModalNewPieceProps> = ({ show, onHide, onSuccess }
         <Form.Control
           type="datetime-local"
           value={formData.date_piece}
+            min="2000-01-01T00:00"
           onChange={handleChange}
         />
       </Form.Group>

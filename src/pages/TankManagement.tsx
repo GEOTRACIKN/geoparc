@@ -3,54 +3,55 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import ModalNewPieceStock from "../components/PieceStock/NewPieceStock";
-import ModalShowPieceStock from "../components/PieceStock/ShowPieceStock";
+import { formatDateToTimestamp } from "../utilities/functions";
+import ModalNewTankManagement from "../components/TankManagement/NewTankManagement";
+import ModalShowTankManagement from "../components/TankManagement/ShowTankManagement";
 import { PropagateLoader } from "react-spinners";
-import ModalEditPieceStock from "../components/PieceStock/EditPieceStock";
-import ModalDeletePieceStock from "../components/PieceStock/DeletePieceStock";
+import ModalEditTankManagement from "../components/TankManagement/EditTankManagement";
+import ModalDeleteTankManagement from "../components/TankManagement/DeleteTankManagement";
 
-interface PieceStock {
-    id_piece_stock: number;
-    type_piece_ps: string;
-    reference_ps: string;
-    marque_ps: string;
-    modele_ps: string;
-    quantite_ps: number;
-    cout_achat_ps: number;
-    date_achat_ps: string;
+interface TankRecord {
+    id_ft: number;
+    immatriculation_vehicule: string;
+    carb_ft: string;
+    amort_ft: string;
+    citerne_ft: string;
+    total_ft: string;
+    qte_ft: string;
+    date_ft: string;
+    km_ft: string;
+    prix_ft: string;
+    new_km_ft: string;
 }
 
-export function PieceStock() {
+export function TankManagement() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const { translate } = useTranslate();
-    const [list_piece, setPieceStock] = useState<PieceStock[]>([]);
+    const [tankRecords, setTankRecords] = useState<TankRecord[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID");
+    const [typeSearch, setTypeSearch] = useState("Vehicle");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_piece_stock");
+    const [column, setSortColumn] = useState("id_ft");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [selectedPieceStockId, setSelectedPieceStockId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        "ID": true,
-        "Type": true,
-        "Reference": true,
-        "Brand": true,
-        "Model": true,
-        "Quantity": true,
-        "Cost": true,
-        "Purchase Date": true
+        Vehicle: true,
+        Date: true,
+        "Fuel Type": true,
+        Quantity: true,
+        "Price/L": true,
+        "Total Cost": true,
+        "Tank Capacity": true
     };
 
     const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumnsPiece");
+        const savedColumns = localStorage.getItem("selectedTankColumns");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
     };
     
@@ -62,108 +63,91 @@ export function PieceStock() {
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumnsPiece", JSON.stringify(updatedColumns));
+        localStorage.setItem("selectedTankColumns", JSON.stringify(updatedColumns));
     };
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getPieceStock();
+        getTankRecords();
     };
 
-    const [showNewPieceStockModal, setShowNewPieceStockModal] = useState(false);
-    const [showEditPieceStockModal, setShowEditPieceStockModal] = useState(false);
-    const [showShowPieceStockModal, setShowShowPieceStockModal] = useState(false);
-    const [showDeletePieceStockModal, setShowDeletePieceStockModal] = useState(false);
+    const [showNewModal, setShowNewModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showShowModal, setShowShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedRecordId, setSelectedRecordId] = useState<number | undefined>(undefined);
 
-    const handleShowNewPieceStockModal = () => setShowNewPieceStockModal(true);
-    const handleCloseNewPieceStockModal = () => setShowNewPieceStockModal(false);
+    const handleShowNewModal = () => setShowNewModal(true);
+    const handleCloseNewModal = () => setShowNewModal(false);
 
-    const handleDeletePieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowDeletePieceStockModal(true);
+    const handleDeleteModal = (id: number) => {
+        setSelectedRecordId(id);
+        setShowDeleteModal(true);
     };
-    const handleCloseDeletePieceStockModal = () => setShowDeletePieceStockModal(false);
+    const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-    const handleEditPieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowEditPieceStockModal(true);
+    const handleEditModal = (id: number) => {
+        setSelectedRecordId(id);
+        setShowEditModal(true);
     };
-    const handleCloseEditPieceStockModal = () => setShowEditPieceStockModal(false);
+    const handleCloseEditModal = () => setShowEditModal(false);
 
-    const handleShowShowPieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowShowPieceStockModal(true);
+    const handleShowModal = (id: number) => {
+        setSelectedRecordId(id);
+        setShowShowModal(true);
     };
-    const handleCloseShowPieceStockModal = () => setShowShowPieceStockModal(false);
+    const handleCloseShowModal = () => setShowShowModal(false);
 
-    const getCountPieceStock = async () => {
+    const getCountTankRecords = async () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/piece_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/tanks/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-            
-            if (result && typeof result.count === "number") {
-                setTotal(result.count);
-                setPageCount(Math.ceil(result.count / limit));
-            } else {
-                console.error("Unexpected count structure:", result);
-                setTotal(0);
-            }
+            setTotal(result.count);
+            setPageCount(Math.ceil(result.count / limit));
         } catch (error) {
             console.error(error);
-            setTotal(0);
         } finally {
             setLoading(false);
         }
     };
 
-    const getPieceStock = async () => {
+    const getTankRecords = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/piece_stock/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/tanks/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
             const data = await response.json();
-    
-            if (Array.isArray(data)) {
-                setPieceStock(data);
-            } else {
-                console.error("Unexpected API response:", data);
-                setPieceStock([]);
-            }
+            setTankRecords(data);
         } catch (error) {
             console.error(error);
-            setPieceStock([]);
         } finally {
             setLoading(false);
         }
     };
-    
 
     useEffect(() => {
-        getCountPieceStock();
-        getPieceStock();
+        getCountTankRecords();
+        getTankRecords();
     }, [currentPage, limit, search, type, column, sort]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
         switch (selectedValue) {
-            case translate("ID"):
-                setType(0);
-                break;
-            case translate("Reference"):
+            case translate("Vehicle"):
                 setType(1);
                 break;
-            case translate("Brand"):
+            case translate("Date"):
                 setType(2);
                 break;
-            case translate("Model"):
+            case translate("Fuel Type"):
                 setType(3);
                 break;
-            case translate("Type"):
+            case translate("Total Cost"):
                 setType(4);
                 break;
             default:
@@ -189,50 +173,33 @@ export function PieceStock() {
     };
 
     const refreshData = () => {
-        getCountPieceStock();
-        getPieceStock();
+        getCountTankRecords();
+        getTankRecords();
     };
-
-  
-const categories: { [key: string]: string } = {
-    freinage: translate("Braking"),
-    filtration: translate("Filtration"),
-    moteur: translate("Engine"),
-    suspension_direction: translate("Suspension/Steering"),
-    echappement: translate("Exhaust"),
-    electricite: translate("Electricity"),
-    chauffage_refroidissement: translate("Heating/Cooling"),
-    carrosserie: translate("Bodywork"),
-    accessoires: translate("Accessories"),
-    liquide_lubrifiant: translate("Fluids/Lubricants"),
-    autres: translate("OTHERS"),
-};
-
-// List of part types
-const typesPiece: { [key: string]: string } = {
-    origine: translate("Original part"),
-    apresmarket: translate("Aftermarket part"),
-    reconditionne: translate("Refurbished"),
-    occasion: translate("Used"),
-};
-
-
+    
     function formatDatetimeLocal(dateString: string): string {
         if (!dateString) return "";
         const date = new Date(dateString);
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
 
+    const fuelTypeLabels: { [key: string]: string } = {
+        diesel: translate("Diesel"),
+        essence: translate("Gasoline"),
+        gpl: translate("LPG"),
+        electrique: translate("Electric")
+    };
+
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Items")} ({total})</h4>
+                    <h4>{translate("Tank Management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewPieceStockModal} className="btn btn-primary mt-2 mr-1">
+                    <Button onClick={handleShowNewModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New")}
+                        {translate("New Record")}
                     </Button>
                 </div>
             </div>
@@ -246,10 +213,10 @@ const typesPiece: { [key: string]: string } = {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Brand")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Model")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Fuel Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Total Cost")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -315,46 +282,49 @@ const typesPiece: { [key: string]: string } = {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
-                                <th className="sorting" onClick={() => handleSortingColumn("id_piece_stock")}>
-                                    {translate("ID")}
+  
+                            {selectedColumns.Vehicle && (
+                                <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
+                                    {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.Type && (
-                                <th className="sorting" onClick={() => handleSortingColumn("type_piece_ps")}>
-                                    {translate("Type")}
+
+                            {selectedColumns.Date && (
+                                <th className="sorting" onClick={() => handleSortingColumn("date_ft")}>
+                                    {translate("Date")}
                                 </th>
                             )}
-                            {selectedColumns.Reference && (
-                                <th className="sorting" onClick={() => handleSortingColumn("reference_ps")}>
-                                    {translate("Reference")}
+
+                            {selectedColumns["Fuel Type"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("carb_ft")}>
+                                    {translate("Fuel Type")}
                                 </th>
                             )}
-                            {selectedColumns.Brand && (
-                                <th className="sorting" onClick={() => handleSortingColumn("marque_ps")}>
-                                    {translate("Brand")}
-                                </th>
-                            )}
-                            {selectedColumns.Model && (
-                                <th className="sorting" onClick={() => handleSortingColumn("modele_ps")}>
-                                    {translate("Model")}
-                                </th>
-                            )}
+
                             {selectedColumns.Quantity && (
-                                <th className="sorting" onClick={() => handleSortingColumn("quantite_ps")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("qte_ft")}>
                                     {translate("Quantity")}
                                 </th>
                             )}
-                            {selectedColumns["Cost"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("cout_achat_ps")}>
-                                    {translate("Cost")}
+
+                            {selectedColumns["Price/L"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("prix_ft")}>
+                                    {translate("Price/L")}
                                 </th>
                             )}
-                            {selectedColumns["Purchase Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_ps")}>
-                                    {translate("Purchase Date")}
+
+                            {selectedColumns["Total Cost"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("total_ft")}>
+                                    {translate("Total Cost")}
                                 </th>
                             )}
+
+                            {selectedColumns["Tank Capacity"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("citerne_ft")}>
+                                    {translate("Tank Capacity")}
+                                </th>
+                            )}
+                            
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
@@ -371,8 +341,8 @@ const typesPiece: { [key: string]: string } = {
                                     </p>
                                 </td>
                             </tr>
-                        ) : Array.isArray(list_piece) && list_piece.length !== 0 ? (
-                            list_piece.map((piece, index) => (
+                        ) : Array.isArray(tankRecords) && tankRecords.length !== 0 ? (
+                            tankRecords.map((record, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -382,34 +352,49 @@ const typesPiece: { [key: string]: string } = {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.ID && <td>{piece.id_piece_stock}</td>}
-                                    {selectedColumns.Type && <td>{typesPiece[piece.type_piece_ps]}</td>}
-                                    {selectedColumns.Reference && <td>{piece.reference_ps}</td>}
-                                    {selectedColumns.Brand && <td>{piece.marque_ps}</td>}
-                                    {selectedColumns.Model && <td>{piece.modele_ps}</td>}
-                                    {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
-                                    {selectedColumns["Cost"] && <td>{piece.cout_achat_ps}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(piece.date_achat_ps)}</td>}
+                                   
+                                    {selectedColumns.Vehicle && <td>{record.immatriculation_vehicule}</td>}
+                                    {selectedColumns.Date && <td>{formatDatetimeLocal(record.date_ft)}</td>}
+                                    {selectedColumns["Fuel Type"] && <td>{fuelTypeLabels[record.carb_ft] || record.carb_ft}</td>}
+                                    {selectedColumns.Quantity && <td>{record.qte_ft} L</td>}
+                                    {selectedColumns["Price/L"] && <td>{record.prix_ft} €/L</td>}
+                                    {selectedColumns["Total Cost"] && <td>{record.total_ft} €</td>}
+                                    {selectedColumns["Tank Capacity"] && <td>{record.citerne_ft || "-"} L</td>}
+                                    
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
+                                            {/* View Button */}
                                             <Link
                                                 to={``}
                                                 className="badge bg-primary mr-2"
-                                                onClick={() => handleShowShowPieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Details")}
+                                                onClick={() => handleShowModal(record.id_ft)}
                                             >
                                                 <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
+
+                                            {/* Edit Button */}
                                             <Link
                                                 to={``}
                                                 className="badge badge-success mr-2"
-                                                onClick={() => handleEditPieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Edit")}
+                                                onClick={() => handleEditModal(record.id_ft)}
                                             >
                                                 <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
+
+                                            {/* Delete Button */}
                                             <Link
                                                 to={``}
                                                 className="badge bg-danger mr-2"
-                                                onClick={() => handleDeletePieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Delete")}
+                                                onClick={() => handleDeleteModal(record.id_ft)}
                                             >
                                                 <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
@@ -419,7 +404,7 @@ const typesPiece: { [key: string]: string } = {
                             ))
                         ): (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={Object.keys(selectedColumns).length + 2}>
+                                <td colSpan={Object.keys(selectedColumns).filter(col => selectedColumns[col]).length + 2}>
                                     {translate("No data available")}
                                 </td>
                             </tr>
@@ -430,7 +415,7 @@ const typesPiece: { [key: string]: string } = {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>{translate("Displaying 1 to")} {limit} {translate("of")} {total} </span>
+                    <span>{translate("Showing")} 1 {translate("to")} {limit} {translate("of")} {total} </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -455,12 +440,31 @@ const typesPiece: { [key: string]: string } = {
                 </div>
             </div>
 
-           <ModalNewPieceStock show={showNewPieceStockModal} onHide={handleCloseNewPieceStockModal} onSuccess={refreshData} />
-            <ModalShowPieceStock show={showShowPieceStockModal} onHide={handleCloseShowPieceStockModal} id_piece_stock={selectedPieceStockId} />
-            <ModalEditPieceStock show={showEditPieceStockModal} onHide={handleCloseEditPieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
-            <ModalDeletePieceStock show={showDeletePieceStockModal} onHide={handleCloseDeletePieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
+            {/* Modals */}
+            <ModalNewTankManagement 
+                show={showNewModal} 
+                onHide={handleCloseNewModal} 
+                onSuccess={refreshData} 
+            />
+            <ModalEditTankManagement 
+                show={showEditModal} 
+                onHide={handleCloseEditModal} 
+                recordId={selectedRecordId} 
+                onSuccess={refreshData} 
+            />
+            <ModalDeleteTankManagement 
+                show={showDeleteModal} 
+                onHide={handleCloseDeleteModal} 
+                recordId={selectedRecordId} 
+                onSuccess={refreshData} 
+            />
+            <ModalShowTankManagement 
+                show={showShowModal} 
+                onHide={handleCloseShowModal} 
+                recordId={selectedRecordId} 
+            />
         </>
     );
 }
 
-export default PieceStock;
+export default TankManagement;

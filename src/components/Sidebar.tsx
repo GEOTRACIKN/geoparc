@@ -317,7 +317,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     },
     {
       id: 28,
-      label: "Items Change",
+      label: "Parts Replacement",
       icon: "las la-wrench", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
       to: "/piece",
       permissionId: 41,
@@ -342,21 +342,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 42,
           label: "Card management",
           icon: "las fa-id-card",
-          to: "/card-management",
+          to: "/card_management",
           permissionId: 42,
         },
         {
           id: 42,
           label: "Tank management",
           icon: "las fa-truck-moving",
-          to: "/tank-management",
+          to: "/tank_management",
           permissionId: 42,
         },
         {
           id: 32,
           label: "Cash management",
           icon: "las fa-money-bill-wave",
-          to: "/cash-management",
+          to: "/cash_management",
           permissionId: 42,
         },
       ],

@@ -4,39 +4,37 @@ import { Bounce, toast } from "react-toastify";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-interface MissionOrderModalProps {
+interface MissionReportModalProps {
   show: boolean;
   onHide: () => void;
   status: string | null;
   title?: string | null;
   IdUser: number;
-  IdMissionOrder: number;
-  selectedMissionOrder: any;
-  updateMissionOrderList: () => void | Promise<void>;
+  IdMissionReport: number;
+  selectedMissionReport: any;
+  updateMissionReportList: () => void | Promise<void>;
 }
 
-const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
+const MissionReportModal: React.FC<MissionReportModalProps> = ({
   show,
   onHide,
   status,
   title,
   IdUser,
-  IdMissionOrder,
-  selectedMissionOrder,
-  updateMissionOrderList,
+  IdMissionReport,
+  selectedMissionReport,
+  updateMissionReportList,
 }) => {
   const { translate } = useTranslate();
 
-  function formatDatetimeLocal(dateString: string | number): string {
+  function formatDatetimeLocal(dateString: string): string {
     if (!dateString) return "";
-    const date = typeof dateString === 'number' 
-      ? new Date(dateString * 1000) 
-      : new Date(dateString);
+    const date = new Date(dateString);
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   }
 
   const handleDownloadPreview = () => {
-    if (!selectedMissionOrder) {
+    if (!selectedMissionReport) {
       toast.warn(translate("No mission order selected"), {
         position: "bottom-right",
         autoClose: 2500,
@@ -56,10 +54,10 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
     // Configuration du document
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text(`${translate("Mission Order No")} : ${String(selectedMissionOrder.id_mission)}`, 105, 20, { align: "center" });
+    doc.text(`${translate("Mission Report No")} : ${String(selectedMissionReport.id_misrap)}`, 105, 20, { align: "center" });
     
     doc.setFontSize(16);
-    doc.text(`${translate("Subject")} : ${String(selectedMissionOrder.object_mission || '')}`, 105, 30, { align: "center" });
+    doc.text(`${translate("Subject")} : ${String(selectedMissionReport.objt_misrap || '')}`, 105, 30, { align: "center" });
 
     // Ligne de séparation
     doc.setDrawColor(0, 0, 0);
@@ -76,51 +74,49 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
     doc.text(`${translate("Vehicle")}:`, 20, yPosition + 20);
     doc.text(`${translate("Trailer")}:`, 20, yPosition + 30);
     doc.text(`${translate("Driver")}:`, 20, yPosition + 40);
-    doc.text(`${translate("Departure Location")}:`, 20, yPosition + 50);
-    doc.text(`${translate("Destination")}:`, 20, yPosition + 60);
-    doc.text(`${translate("Expenses")}:`, 20, yPosition + 70);
+    doc.text(`${translate("Departure Place")}:`, 20, yPosition + 50);
+    doc.text(`${translate("Mission Place")}:`, 20, yPosition + 60);
+    doc.text(`${translate("Amortization")}:`, 20, yPosition + 70);
 
     // Colonne droite
     doc.text(`${translate("Departure Date")}:`, 110, yPosition);
     doc.text(`${translate("Return Date")}:`, 110, yPosition + 10);
-    doc.text(`${translate("Fuel loading")}:`, 110, yPosition + 20);
+    doc.text(`${translate("Expenses")}:`, 110, yPosition + 20);
     doc.text(`${translate("Accompaniment")}:`, 110, yPosition + 30);
     doc.text(`${translate("Itinerary")}:`, 110, yPosition + 40);
-    doc.text(`${translate("Tank")}:`, 110, yPosition + 50);
 
     // Valeurs
     doc.setFont("helvetica", "normal");
-    doc.text(String(selectedMissionOrder?.ref_mission || "N/A"), 60, yPosition);
-    doc.text(String(selectedMissionOrder?.fuel_type_mission || "N/A"), 60, yPosition + 10);
-    doc.text(String(selectedMissionOrder?.immatriculation_vehicule || "N/A"), 60, yPosition + 20);
-    doc.text(String(selectedMissionOrder?.trailer_mission || "N/A"), 60, yPosition + 30);
-    doc.text(String(selectedMissionOrder?.driver_mission || "N/A"), 60, yPosition + 40);
-    doc.text(String(selectedMissionOrder?.dep_loc_mission || "N/A"), 60, yPosition + 50);
-    doc.text(String(selectedMissionOrder?.dep_dest_mission || "N/A"), 60, yPosition + 60);
-    doc.text(String(selectedMissionOrder?.expenses_mission || "N/A"), 60, yPosition + 70);
+    doc.text(String(selectedMissionReport?.ref_misrap || "N/A"), 60, yPosition);
+    doc.text(String(selectedMissionReport?.carb_misrap || "N/A"), 60, yPosition + 10);
+    doc.text(String(selectedMissionReport?.immatriculation_vehicule || "N/A"), 60, yPosition + 20);
+    doc.text(String(selectedMissionReport?.remorque_misrap || "N/A"), 60, yPosition + 30);
+    doc.text(String(selectedMissionReport?.cond_misrap || "N/A"), 60, yPosition + 40);
+    doc.text(String(selectedMissionReport?.dep_misrap || "N/A"), 60, yPosition + 50);
+    doc.text(String(selectedMissionReport?.lieu_misrap || "N/A"), 60, yPosition + 60);
+    doc.text(String(selectedMissionReport?.amort_misrap || "N/A"), 60, yPosition + 70);
 
-    doc.text(formatDatetimeLocal(selectedMissionOrder?.dep_date_mission) || "N/A", 150, yPosition);
-    doc.text(formatDatetimeLocal(selectedMissionOrder?.return_date_mission) || "N/A", 150, yPosition + 10);
-    doc.text(String(selectedMissionOrder?.fuel_loading_mission || "N/A"), 150, yPosition + 20);
-    doc.text(String(selectedMissionOrder?.accomp_mission || "N/A"), 150, yPosition + 30);
-    doc.text(String(selectedMissionOrder?.itinerary_mission || "N/A"), 150, yPosition + 40);
-    doc.text(String(selectedMissionOrder?.tank_mission || "N/A"), 150, yPosition + 50);
+    doc.text(formatDatetimeLocal(selectedMissionReport?.date_dep_misrap) || "N/A", 150, yPosition);
+    doc.text(formatDatetimeLocal(selectedMissionReport?.date_arr_misrap) || "N/A", 150, yPosition + 10);
+    doc.text(String(selectedMissionReport?.frais_misrap || "N/A"), 150, yPosition + 20);
+    doc.text(String(selectedMissionReport?.acc_misrap || "N/A"), 150, yPosition + 30);
+    doc.text(String(selectedMissionReport?.itnr_misrap || "N/A"), 150, yPosition + 40);
 
     // Table data
     const tableData = [
       [
-        translate("Vehicle KM"), 
-        translate("New KM"), 
-        translate("Fuel cost"), 
-        translate("Fuel level"), 
-        translate("Voucher")
+        translate("Return KM"), 
+        translate("Distance"), 
+        translate("Nights"), 
+        translate("Immobilization"), 
+        translate("Duration")
       ],
       [
-        String(selectedMissionOrder?.vehicle_km_mission || "N/A"),
-        String(selectedMissionOrder?.new_km_mission || "N/A"),
-        String(selectedMissionOrder?.fuel_cost_mission || "N/A"),
-        String(selectedMissionOrder?.fuel_level_mission || "N/A"),
-        String(selectedMissionOrder?.voucher_mission || "N/A")
+        String(selectedMissionReport?.km_ret_misrap || "N/A"),
+        String(selectedMissionReport?.dist_misrap || "N/A"),
+        String(selectedMissionReport?.nuit_misrap || "N/A"),
+        String(selectedMissionReport?.immob_misrap || "N/A"),
+        String(selectedMissionReport?.durr_misrap || "N/A")
       ]
     ];
 
@@ -137,7 +133,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
       margin: { left: 20 }
     });
 
-    doc.save(`${translate("Mission_order")}_${selectedMissionOrder.id_mission}.pdf`);
+    doc.save(`${translate("Mission_order")}_${selectedMissionReport.id_misrap}.pdf`);
 
     toast.success(translate("PDF generated successfully"), {
       position: "bottom-right",
@@ -214,7 +210,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
           overflowY: 'auto',
           maxHeight: 'calc(90vh - 130px)'
         }}>
-          {selectedMissionOrder ? (
+          {selectedMissionReport ? (
             <>
               {/* Main title */}
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -224,14 +220,14 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                   marginBottom: '5px',
                   color: '#2c3e50'
                 }}>
-                  {translate("Mission Order No")} : {selectedMissionOrder.id_mission}
+                  {translate("Mission Report No")} : {selectedMissionReport.id_misrap}
                 </h3>
                 <p style={{
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   color: '#7f8c8d'
                 }}>
-                  {translate("Subject")} : {selectedMissionOrder.object_mission}
+                  {translate("Subject")} : {selectedMissionReport.objt_misrap}
                 </p>
               </div>
 
@@ -261,7 +257,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.ref_mission}
+                      {selectedMissionReport.ref_misrap}
                     </div>
                   </div>
 
@@ -272,7 +268,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Fuel Type")}
+                      {translate("Fuel type")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -280,7 +276,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.fuel_type_mission}
+                      {selectedMissionReport.carb_misrap}
                     </div>
                   </div>
 
@@ -299,7 +295,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.immatriculation_vehicule}
+                      {selectedMissionReport.immatriculation_vehicule}
                     </div>
                   </div>
 
@@ -318,7 +314,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.trailer_mission || "-"}
+                      {selectedMissionReport.remorque_misrap || "-"}
                     </div>
                   </div>
 
@@ -337,7 +333,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.driver_mission}
+                      {selectedMissionReport.cond_misrap}
                     </div>
                   </div>
 
@@ -348,7 +344,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Departure Location")}
+                      {translate("Departure Place")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -356,45 +352,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.dep_loc_mission}
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: '15px' }}>
-                    <label style={{
-                      display: 'block',
-                      fontWeight: 'bold',
-                      marginBottom: '5px',
-                      color: '#34495e'
-                    }}>
-                      {translate("Destination")}
-                    </label>
-                    <div style={{
-                      padding: '8px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '4px',
-                      border: '1px solid #ddd'
-                    }}>
-                      {selectedMissionOrder.dep_dest_mission}
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: '15px' }}>
-                    <label style={{
-                      display: 'block',
-                      fontWeight: 'bold',
-                      marginBottom: '5px',
-                      color: '#34495e'
-                    }}>
-                      {translate("Expenses")}
-                    </label>
-                    <div style={{
-                      padding: '8px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '4px',
-                      border: '1px solid #ddd'
-                    }}>
-                      {selectedMissionOrder.expenses_mission || "-"}
+                      {selectedMissionReport.lieu_misrap}
                     </div>
                   </div>
                 </div>
@@ -416,7 +374,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {formatDatetimeLocal(selectedMissionOrder.dep_date_mission)}
+                      {formatDatetimeLocal(selectedMissionReport.date_dep_misrap)}
                     </div>
                   </div>
 
@@ -435,7 +393,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {formatDatetimeLocal(selectedMissionOrder.return_date_mission)}
+                      {formatDatetimeLocal(selectedMissionReport.date_arr_misrap)}
                     </div>
                   </div>
 
@@ -446,7 +404,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Fuel loading")}
+                      {translate("Expenses")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -454,7 +412,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.fuel_loading_mission || "-"}
+                      {selectedMissionReport.frais_misrap || "-"}
                     </div>
                   </div>
 
@@ -473,7 +431,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.accomp_mission || "-"}
+                      {selectedMissionReport.acc_misrap || "-"}
                     </div>
                   </div>
 
@@ -492,7 +450,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.itinerary_mission || "-"}
+                      {selectedMissionReport.itnr_misrap || "-"}
                     </div>
                   </div>
 
@@ -503,7 +461,7 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       marginBottom: '5px',
                       color: '#34495e'
                     }}>
-                      {translate("Tank")}
+                      {translate("Mission Place")}
                     </label>
                     <div style={{
                       padding: '8px',
@@ -511,7 +469,26 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                       borderRadius: '4px',
                       border: '1px solid #ddd'
                     }}>
-                      {selectedMissionOrder.tank_mission || "-"}
+                      {selectedMissionReport.lieu_misrap}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{
+                      display: 'block',
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      color: '#34495e'
+                    }}>
+                      {translate("Amortization")}
+                    </label>
+                    <div style={{
+                      padding: '8px',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      border: '1px solid #ddd'
+                    }}>
+                      {selectedMissionReport.amort_misrap}
                     </div>
                   </div>
                 </div>
@@ -547,35 +524,35 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {translate("Vehicle KM")}
+                          {translate("Return KM")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {translate("New KM")}
+                          {translate("Distance")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {translate("Fuel cost")}
+                          {translate("Nights")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {translate("Fuel level")}
+                          {translate("Immobilization")}
                         </th>
                         <th style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {translate("Voucher")}
+                          {translate("Duration")}
                         </th>
                       </tr>
                     </thead>
@@ -586,35 +563,35 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {selectedMissionOrder.vehicle_km_mission || "N/A"}
+                          {selectedMissionReport.km_ret_misrap || "N/A"}
                         </td>
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {selectedMissionOrder.new_km_mission || "N/A"}
+                          {selectedMissionReport.dist_misrap || "N/A"}
                         </td>
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {selectedMissionOrder.fuel_cost_mission || "N/A"}
+                          {selectedMissionReport.nuit_misrap || "N/A"}
                         </td>
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {selectedMissionOrder.fuel_level_mission || "N/A"}
+                          {selectedMissionReport.immob_misrap || "N/A"}
                         </td>
                         <td style={{
                           padding: '12px',
                           textAlign: 'center',
                           border: '1px solid #ddd'
                         }}>
-                          {selectedMissionOrder.voucher_mission || "N/A"}
+                          {selectedMissionReport.durr_misrap || "N/A"}
                         </td>
                       </tr>
                     </tbody>
@@ -692,4 +669,4 @@ const MissionOrderModal: React.FC<MissionOrderModalProps> = ({
   );
 };
 
-export default MissionOrderModal;
+export default MissionReportModal;

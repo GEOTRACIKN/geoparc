@@ -654,9 +654,9 @@
 "Driver's License": "Permis de conduire",
 "Edit a Driver": "Modifier un conducteur",
 "Add a Driver": "Ajouter un conducteur",
-"Driver's Last Name (*)": "Nom du conducteur (*)",
-"Driver's First Name (*)": "Prénom du conducteur (*)",
-"Identification Code (*)": "Code d'identification (*)",
+"Driver's Last Name": "Nom du conducteur",
+"Driver's First Name": "Prénom du conducteur",
+"Identification Code": "Code d'identification",
 "Driver's Role": "Fonction du conducteur",
 "Date of Birth": "Date de naissance",
 "Driver's Address": "Adresse du conducteur",
@@ -808,8 +808,45 @@
 "Technician": "Technicien",
 "Internal Stock Piece": "Pièce du stock interne",
 "Select Internal Stock Piece": "Sélectionner une pièce du stock interne",
-"Details": "Détails"
- 
+"Details": "Détails",
+"Cost (DZD)": "Coût (DZD)",
+"Operation": "Opération",
+"Parts Replacement": "Changement de pièce",
+
+
+"Mission Reference": "Référence de la mission",
+
+"Aucune remorque disponible.": "Aucune remorque disponible.",
+"Departure Date/Time": "Date/Heure de départ",
+"Arrival Date/Time": "Date/Heure d’arrivée",
+"Mission Location": "Lieu de mission",
+"Number of Nights": "Nombre de nuitées",
+"Immobilization (Days)": "Immobilisation (jours)",
+"Duration (Days)": "Durée (jours)",
+"Return Km (km)": "Kilométrage retour (km)",
+"Distance (km)": "Distance parcourue (km)",
+"Amortization Period": "Période d’amortissement",
+"Departure location": "Lieu de départ",
+
+"Fuel Loading": "Chargement de carburant",
+
+"Number Of vehicle kilometers": "Nombre de kilomètres du véhicule",
+"New Kilometers": "Nombre de kilomètres ajoutés",
+"Coupon Number": "Numéro de la quittance",
+"Departure Place": "Lieu de départ",
+"Return KM": "Kilométrage retour",
+"Nights": "Nuits",
+"Immobilization": "Immobilisation",
+"Amortization": "Amortissement",
+"Technical Details": "Détails techniques",
+"Mission Place": "Lieu de mission",
+"Download PDF": "Télécharger le PDF",
+"Mission Order Details": "Détails de l'ordre de mission",
+"Mission Order No": "N° de l'ordre de mission",
+"Mission Report Details": "Détails du rapport de mission",
+"Mission Report No": "N° du rapport de mission"
+
+
 
 
 

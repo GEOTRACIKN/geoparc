@@ -5,46 +5,52 @@ import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";
+import Select, { SingleValue } from "react-select";
+
+interface Vehicle {
+    id_vehicule: number;
+    immatriculation_vehicule: string;
+}
+interface Trailer {
+  id_remorque?: number;       // Ajoutez si disponible
+  trailer_mission: string;   // Modifiez pour correspondre au champ retourné par l'API
+}
 
 interface MissionOrderInterface {
   id_mission?: number | null;
-  ref_mission: number | null;
+  ref_mission: string | null; // Changé de number à string
   object_mission: string | null;
   fuel_loading_mission: number | null;
-  fuel_type_mission: number | null;
+  fuel_type_mission: string | null; // Changé de number à string
   expenses_mission: number | null;
   tank_mission: number | null;
   trailer_mission: string | null;
   driver_mission: string | null;
   accomp_mission: string | null;
   dep_loc_mission: string | null;
-  dep_date_mission: number | null;
+  dep_date_mission: string | null; // Changé de number à string
   dep_dest_mission: string | null;
-  return_date_mission: number | null;
+  return_date_mission: string | null; // Changé de number à string
   itinerary_mission: string | null;
   vehicle_km_mission: number | null;
   new_km_mission: number | null;
   fuel_cost_mission: number | null;
   fuel_level_mission: number | null;
   voucher_mission: number | null;
-  immatriculation_vehicule : string | null;
-  id_vehicule : number | null;
+  id_vehicule: number | null;
   id_user: string | null;
-
 }
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const id_user = localStorage.getItem("GeopUserID");
 
 
 export function MissionOrderManage() {
   const { id_mission } = useParams<{ id_mission?: string }>();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const isEditing = Boolean(id_mission);
   const navigate = useNavigate();
   const { translate } = useTranslate();
-  const id_user = localStorage.getItem("GeopUserID");
-  const [vehicles, setVehicles] = useState<{ immatriculation_vehicule: string }[]>([]);
-  const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
-  const [trailer, setTrailer] = useState<{ trailer_mission: string }[]>([]);
-
+  
+ 
 
 
   const [mission, setMission] = useState<MissionOrderInterface | null>({
@@ -68,11 +74,9 @@ export function MissionOrderManage() {
     fuel_cost_mission: null,
     fuel_level_mission: null,
     voucher_mission: null,
-    immatriculation_vehicule : null,
     id_vehicule : null,
     id_user: isEditing ? null : id_user,
   });
-
   const [loading, setLoading] = useState<boolean | null>(true);
   const [error, setError] = useState<string | null>(null);
   const [buttonClicked, setButtonClicked] = useState(false);
@@ -81,179 +85,173 @@ export function MissionOrderManage() {
   const cancelClicked = () => {
     navigate("/mission-order");
   };
+     
+  
+const [trailer, setTrailer] = useState<{ trailer_mission: string }[]>([]);
 
-  useEffect(() => {
-    const getMissionOrder = async () => {
-      try {
-        // Récupérer les informations de la mission (si on est en mode édition)
-        if (isEditing) {
-          const resMission = await fetch(
-            `${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`,
-            { mode: "cors" }
-          );
-  
-          if (!resMission.ok) {
-            console.error("Erreur lors de la récupération de la mission");
-            setError("Erreur lors de la récupération de la mission");
-            return;
-          }
-  
-          const data: MissionOrderInterface = await resMission.json();
-          setMission(data); // Mettre à jour les informations de la mission
-        }
-        
-        // Récupérer les immatriculations des véhicules pour l'utilisateur (à chaque fois)
-        const resVehicles = await fetch(
-          `${backendUrl}/api/geop/vehicles/${id_user}`, // Utilise l'id_user de l'état ou de la mission
-          { mode: "cors" }
-        );
-  
-        if (!resVehicles.ok) {
-          console.error("Erreur lors de la récupération des véhicules");
-          setError("Erreur lors de la récupération des véhicules");
-          return;
-        }
-  
-        const vehiclesData = await resVehicles.json();
-        setVehicles(vehiclesData); // Mettre à jour la liste des véhicules
+const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
+ const [dateError, setDateError] = useState<string | null>(null);
+ 
 
-
-        //driver
-        const resDriver = await fetch(
-          `${backendUrl}/api/geop/driver/${id_user}`, // Utilise l'id_user de l'état ou de la mission
-          { mode: "cors" }
-        );
-  
-        if (!resDriver.ok) {
-          console.error("Erreur lors de la récupération des véhicules");
-          setError("Erreur lors de la récupération des véhicules");
-          return;
-        }
-  
-        const driverData = await resDriver.json();
-        setDriver(driverData); // Mettre à jour la liste des véhicules
-
-        //trailer
-         const resTrailer = await fetch(
-          `${backendUrl}/api/geop/trailer/${id_user}`, // Utilise l'id_user de l'état ou de la mission
-          { mode: "cors" }
-        );
-  
-        if (!resTrailer.ok) {
-          console.error("Erreur lors de la récupération des véhicules");
-          setError("Erreur lors de la récupération des véhicules");
-          return;
-        }
-  
-        const trailerData = await resTrailer.json();
-        setTrailer(trailerData); // Mettre à jour la liste des véhicules
-
-
-
-      } catch (error) {
-        console.error("Erreur lors de la récupération des données", error);
-        setError("Erreur lors de la récupération des données");
-      } finally {
-        setLoading(false);
+ useEffect(() => {
+  const getMissionOrder = async () => {
+    try {
+      setLoading(true);
+      
+      if (!id_user) {
+        setError("Missing user ID");
+        return;
       }
 
-      
-    };
-  
-    getMissionOrder(); // Toujours appeler pour récupérer les véhicules
-  
-  }, [id_mission, id_user, isEditing]); // Déclenche ce useEffect lorsque id_mission, id_user ou isEditing change
-  
+      // Récupération parallèle des données
+      const responses = await Promise.all([
+        isEditing && id_mission 
+          ? fetch(`${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`) 
+          : Promise.resolve(null),
+        fetch(`${backendUrl}/api/geop/vehicule/${id_user}`),
+        fetch(`${backendUrl}/api/geop/driver/${id_user}`),
+        fetch(`${backendUrl}/api/geop/trailer/${id_user}`)
+      ]);
 
-  const updateMission = async (mission: MissionOrderInterface) => {
-    try {
-        // Prepare the mission data by filtering out null values
-        let missionOrderData = {
-            id_mission: mission.id_mission,
-            ref_mission: mission.ref_mission,
-            object_mission: mission.object_mission,
-            fuel_loading_mission: mission.fuel_loading_mission,
-            fuel_type_mission: mission.fuel_type_mission,
-            expenses_mission: mission.expenses_mission,
-            tank_mission: mission.tank_mission,
-            trailer_mission: mission.trailer_mission,
-            driver_mission: mission.driver_mission,
-            accomp_mission: mission.accomp_mission,
-            dep_loc_mission: mission.dep_loc_mission,
-            dep_date_mission: mission.dep_date_mission,
-            dep_dest_mission: mission.dep_dest_mission,
-            return_date_mission: mission.return_date_mission,
-            itinerary_mission: mission.itinerary_mission,
-            vehicle_km_mission: mission.vehicle_km_mission,
-            new_km_mission: mission.new_km_mission,
-            fuel_cost_mission: mission.fuel_cost_mission,
-            fuel_level_mission: mission.fuel_level_mission,
-            voucher_mission: mission.voucher_mission,
-            immatriculation_vehicule : mission.immatriculation_vehicule ,
-        };
+      // Traitement des réponses
+      const [missionRes, vehiclesRes, driverRes, trailerRes] = responses;
 
-        // Update the mission
-        const res = await fetch(`${backendUrl}/api/geop/missionOrderManage/update`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            mode: "cors",
-            body: JSON.stringify(missionOrderData),
-        });
+      // Véhicules - s'assurer que c'est un tableau
+      const vehiclesData = vehiclesRes?.ok 
+        ? await vehiclesRes.json()
+        : [];
+setVehicles(vehiclesData.vehicles || []);
+      // Mission (si édition)
+      if (isEditing && missionRes?.ok) {
+        const missionData: MissionOrderInterface = await missionRes.json();
+        setMission(missionData);
+      }
 
-        if (!res.ok) {
-            toast.warn("Can't update mission", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Bounce,
-            });
-            console.error("Error updating mission");
-            return;
-        }
+      // Chauffeurs - s'assurer que c'est un tableau
+      const driverData = driverRes?.ok 
+        ? await driverRes.json()
+        : [];
+      setDriver(Array.isArray(driverData) ? driverData : []);
 
-        toast.success("Mission updated successfully", {
-            position: "bottom-right",
-            autoClose: 2400,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-        });
+      // Remorques - s'assurer que c'est un tableau
+      const trailerData = trailerRes?.ok 
+        ? await trailerRes.json()
+        : [];
+      setTrailer(Array.isArray(trailerData) ? trailerData : []);
 
-        navigate("/mission-order");
     } catch (error) {
-        toast.warn("Can't update mission", {
-            position: "bottom-right",
-            autoClose: 2400,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-        });
+      console.error("Erreur récupération données", error);
+      setError("Erreur récupération données");
+      toast.error("Failed to load data", {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
     }
-};
+  };
 
+  getMissionOrder();
+}, [id_mission, id_user, isEditing]);
+  const fetchVehicleKm = async (id_vehicule: number) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+      if (!res.ok) throw new Error("Failed to get vehicle KM");
+      const data = await res.json();
+      return data.kilometrage_vehicule || 0;
+    } catch (error) {
+      console.error("Error fetching vehicle KM:", error);
+      toast.error("Error fetching vehicle mileage", {
+        position: "bottom-right",
+        autoClose: 2400,
+        transition: Bounce,
+      });
+      return 0;
+    }
+  };
+
+
+const updateMission = async (mission: MissionOrderInterface) => {
+  try {
+    // Vérifier que l'ID mission et l'ID utilisateur sont présents
+    if (!mission.id_mission || !id_user) {
+      toast.error("Mission ID or User ID is missing");
+      return;
+    }
+
+    // Préparer les données avec l'ID utilisateur
+    const missionOrderData = {
+      id_mission: mission.id_mission,
+      id_user: id_user, // Ajout crucial de l'ID utilisateur
+      ref_mission: mission.ref_mission,
+      object_mission: mission.object_mission,
+      fuel_loading_mission: mission.fuel_loading_mission,
+      fuel_type_mission: mission.fuel_type_mission,
+      expenses_mission: mission.expenses_mission,
+      tank_mission: mission.tank_mission,
+      trailer_mission: mission.trailer_mission,
+      driver_mission: mission.driver_mission,
+      accomp_mission: mission.accomp_mission,
+      dep_loc_mission: mission.dep_loc_mission,
+      dep_date_mission: mission.dep_date_mission,
+      dep_dest_mission: mission.dep_dest_mission,
+      return_date_mission: mission.return_date_mission,
+      itinerary_mission: mission.itinerary_mission,
+      vehicle_km_mission: mission.vehicle_km_mission,
+      new_km_mission: mission.new_km_mission,
+      fuel_cost_mission: mission.fuel_cost_mission,
+      fuel_level_mission: mission.fuel_level_mission,
+      voucher_mission: mission.voucher_mission,
+      id_vehicule: mission.id_vehicule,
+    };
+
+    // Envoyer la requête
+    const response = await fetch(`${backendUrl}/api/geop/missionOrderManage/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(missionOrderData),
+    });
+
+    // Gérer la réponse
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Échec de la mise à jour");
+    }
+
+    toast.success("Mission mise à jour avec succès", {
+      position: "bottom-right",
+      autoClose: 2400,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+
+    navigate("/mission-order");
+  } catch (error) {
+    console.error("Update error:", error);
+    toast.error("Erreur lors de la mise à jour", {
+      position: "bottom-right",
+      autoClose: 3000,
+      transition: Bounce,
+    });
+  }
+};
 
 const createMission = async (mission: MissionOrderInterface) => {
   try {
     let missionOrderData = Object.fromEntries(
       Object.entries(mission).filter(([_, value]) => value !== null)
     );
-
-    
+   
     const dateFields = ['dep_date_mission', 'return_date_mission'];
 
     missionOrderData = Object.fromEntries(
@@ -346,30 +344,90 @@ const createMission = async (mission: MissionOrderInterface) => {
     setButtonClicked(false);
   }
 };
+    const getVehicleKm = async (id_vehicule: string | number) => {
+        const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+        if (!res.ok) throw new Error("Erreur récupération km");
+        return res.json();
+    };
 
-
-
-
-
-  // Utilisez l'interface ChangeEvent pour le gestionnaire d'événements
-  const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleVehicleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     handleChange(name, value);  // Appel de la fonction de changement générique
   };
+
+
+
+const formatToDatetimeLocal = (isoString: string | null | undefined): string => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
+    
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  } catch {
+    return '';
+  }
+};
+
+const parseDatetimeLocal = (localString: string): string | null => {
+  if (!localString) return null;
+  try {
+    const [datePart, timePart] = localString.split('T');
+    return `${datePart}T${timePart || '00:00'}:00`;
+  } catch {
+    return null;
+  }
+};
+
+// Gestionnaire d'événements avec typage
+
+const validateDates = (departure: string | null, arrival: string | null): boolean => {
+  if (!departure || !arrival) return true; // Permettre si l'une des dates est vide
   
+  const depDate = new Date(departure);
+  const arrDate = new Date(arrival);
+  
+  return depDate <= arrDate;
+};
+
+  const handleDateTimeChange = (name: string, value: string) => {
+  if (!mission) return;
+
+  const isoValue = parseDatetimeLocal(value);
+  
+  const updatedMission: MissionOrderInterface = {
+    ...mission,
+    [name]: isoValue
+  };
+
+  setMission(updatedMission);
+
+  // Validation des dates
+  if (updatedMission.dep_date_mission && updatedMission.return_date_mission) {
+    const isValid = validateDates(updatedMission.dep_date_mission, updatedMission.return_date_mission);
+    setDateError(isValid ? null : "La date de départ doit être antérieure ou égale à la date de retour");
+  } else {
+    setDateError(null);
+  }
+};
+     
   // Fonction générique de gestion des changements dans les formulaires
   const handleChange = (name: string, value: string) => {
-    console.log("name: " + name);
-    console.log("value: " + value);
     if (mission) {
-      setMission({
+      const updatedMission = {
         ...mission,
         [name]: value,
-      });
+      };
+      
+      setMission(updatedMission);
+      
+      // Valider les dates après la mise à jour
+     
     }
-    console.log(mission);
   };
-  
+
+
 
 
   return (
@@ -419,7 +477,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="text"
                 name="ref_mission"
-                placeholder="Enter the mission reference"
+            
                 value={mission?.ref_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   
@@ -433,7 +491,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="text"
                 name="object_mission"
-                placeholder="Enter the mission object"
+                
                 value={mission?.object_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                  
@@ -448,7 +506,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="number"
                 name="fuel_loading_mission"
-                placeholder="Enter fuel loading"
+                
                 value={mission?.fuel_loading_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   onKeyDown={(e) => {
@@ -473,7 +531,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="text"
                 name="fuel_type_mission"
-                placeholder="Enter fuel type"
+                
                 value={mission?.fuel_type_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                  
@@ -488,7 +546,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="number"
                 name="expenses_mission"
-                placeholder="Enter expenses"
+               
                 value={mission?.expenses_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   onKeyDown={(e) => {
@@ -513,8 +571,6 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="number"
                 name="tank_mission"
-                
-                placeholder="Enter tank"
                 value={mission?.tank_mission || ''}
                  onChange={(e) => handleChange(e.target.name, e.target.value)}
                   
@@ -532,9 +588,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                   name="trailer_mission"
                   value={mission?.trailer_mission || ''}
                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                  
-                  
                   required
+                  disabled={trailer.length === 0} 
                 >
                   <option value="">Select Vehicle</option>
                   {trailer.length === 0 ? (
@@ -547,7 +602,13 @@ const createMission = async (mission: MissionOrderInterface) => {
                     ))
                   )}
               </Form.Control>
-
+                {trailer.length === 0 && (
+                  <div style={{ color: 'red', marginTop: '5px' }}>
+                    ⚠️ {translate("Aucune remorque disponible.")}
+                  </div>
+                )}
+             
+              
             </Form.Group>
 
             <Form.Group className="form-group" controlId="formDriver">
@@ -577,7 +638,6 @@ const createMission = async (mission: MissionOrderInterface) => {
 
             </Form.Group>
 
-
             <Form.Group className="form-group" controlId="formAccomp">
               <Form.Label>
                 <i className="fas fa-user-friends" style={{ color: 'orange' }}></i> {translate("Accompaniment")} (*)
@@ -586,7 +646,6 @@ const createMission = async (mission: MissionOrderInterface) => {
                 type="text"
                 name="accomp_mission"
               
-                placeholder="Enter accompanying persons"
                 value={mission?.accomp_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -600,8 +659,6 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="text"
                 name="dep_loc_mission"
-                
-                placeholder="Enter departure location"
                 value={mission?.dep_loc_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -610,20 +667,18 @@ const createMission = async (mission: MissionOrderInterface) => {
           </div>
 
           <div className="col-md-6">
-            
-
             <Form.Group className="form-group" controlId="formDepDate">
               <Form.Label>
                 <i className="fas fa-calendar" style={{ color: 'orange' }}></i> {translate("Departure Date")} (*)
               </Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="dep_date_mission"
                 
-                placeholder="Enter departure date"
-                value={mission?.dep_date_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                value={formatToDatetimeLocal(mission?.dep_date_mission)}
+                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
+                isInvalid={!!dateError}
               />
             </Form.Group>
 
@@ -635,7 +690,7 @@ const createMission = async (mission: MissionOrderInterface) => {
                 type="text"
                 name="dep_dest_mission"
                 
-                placeholder="Enter departure destination"
+                
                 value={mission?.dep_dest_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
@@ -647,13 +702,14 @@ const createMission = async (mission: MissionOrderInterface) => {
                 <i className="fas fa-calendar-alt" style={{ color: 'orange' }}></i> {translate("Return Date")} (*)
               </Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 name="return_date_mission"
                 
-                placeholder="Enter return date"
-                value={mission?.return_date_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+            
+                value={formatToDatetimeLocal(mission?.return_date_mission)}
+                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
                 required
+                isInvalid={!!dateError}
               />
             </Form.Group>
 
@@ -665,22 +721,128 @@ const createMission = async (mission: MissionOrderInterface) => {
                 type="text"
                 name="itinerary_mission"
                 
-                placeholder="Enter itinerary"
+               
                 value={mission?.itinerary_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
               />
             </Form.Group>
-
+<Form.Group controlId="id_vehicule">
+  <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+  <Select
+    options={vehicles.map(vehicle => ({
+      value: vehicle.id_vehicule,
+      label: vehicle.immatriculation_vehicule
+    }))}
+    placeholder={translate("Select Vehicle")}
+    isLoading={vehicles.length === 0}
+    noOptionsMessage={() => translate("No vehicles available")}
+    isSearchable
+    value={
+      vehicles
+        .map(vehicle => ({
+          value: vehicle.id_vehicule,
+          label: vehicle.immatriculation_vehicule
+        }))
+        .find(option => option.value === mission?.id_vehicule) || null
+    }
+    onChange={async (selectedOption) => {
+      const id = selectedOption ? selectedOption.value : null;
+      
+      if (id) {
+        try {
+          const vehicleData = await getVehicleKm(id);
+          
+          setMission(prev => {
+            if (prev === null) {
+              // Crée un nouvel objet mission si l'état était null
+              return {
+                id_mission: null,
+                ref_mission: null,
+                object_mission: null,
+                fuel_loading_mission: null,
+                fuel_type_mission: null,
+                expenses_mission: null,
+                tank_mission: null,
+                trailer_mission: "0",
+                driver_mission: null,
+                accomp_mission: null,
+                dep_loc_mission: null,
+                dep_date_mission: null,
+                dep_dest_mission: null,
+                return_date_mission: null,
+                itinerary_mission: null,
+                vehicle_km_mission: vehicleData.kilometrage_vehicule || null,
+                new_km_mission: null,
+                fuel_cost_mission: null,
+                fuel_level_mission: null,
+                voucher_mission: null,
+                id_vehicule: id,
+                id_user: id_user
+              };
+            }
+            // Met à jour l'état existant
+            return {
+              ...prev,
+              id_vehicule: id,
+              vehicle_km_mission: vehicleData.kilometrage_vehicule || null
+            };
+          });
+        } catch (error) {
+          console.error("Erreur récupération kilométrage:", error);
+          toast.error(translate("Erreur récupération kilométrage"), {
+            position: "bottom-right",
+            autoClose: 2400,
+            transition: Bounce,
+          });
+        }
+      } else {
+        setMission(prev => {
+          if (prev === null) {
+            // Retourne un nouvel objet avec les valeurs par défaut
+            return {
+              id_mission: null,
+              ref_mission: null,
+              object_mission: null,
+              fuel_loading_mission: null,
+              fuel_type_mission: null,
+              expenses_mission: null,
+              tank_mission: null,
+              trailer_mission: "0",
+              driver_mission: null,
+              accomp_mission: null,
+              dep_loc_mission: null,
+              dep_date_mission: null,
+              dep_dest_mission: null,
+              return_date_mission: null,
+              itinerary_mission: null,
+              vehicle_km_mission: null,
+              new_km_mission: null,
+              fuel_cost_mission: null,
+              fuel_level_mission: null,
+              voucher_mission: null,
+              id_vehicule: null,
+              id_user: id_user
+            };
+          }
+          // Met à jour l'état existant
+          return {
+            ...prev,
+            id_vehicule: null,
+            vehicle_km_mission: null
+          };
+        });
+      }
+    }}
+  />
+</Form.Group>
             <Form.Group className="form-group" controlId="formVehicleKm">
               <Form.Label>
                 <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle KM")} (*)
               </Form.Label>
               <Form.Control
-                type="number"
-                name="vehicle_km_mission"
-                
-                placeholder="Enter vehicle KM"
+                type="text"
+                name="vehicle_km_mission"               
                 value={mission?.vehicle_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -694,7 +856,7 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
+              readOnly
               />
             </Form.Group>
 
@@ -704,9 +866,8 @@ const createMission = async (mission: MissionOrderInterface) => {
               </Form.Label>
               <Form.Control
                 type="number"
-                name="new_km_mission"
-                
-                placeholder="Enter new KM"
+                name="new_km_mission"                
+            
                 value={mission?.new_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -720,8 +881,7 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
-                
+              required        
               />
             </Form.Group>
 
@@ -732,8 +892,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="number"
                 name="fuel_cost_mission"
-                
-                placeholder="Enter fuel cost"
+          
                 value={mission?.fuel_cost_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -747,20 +906,17 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              
                 required
               />
             </Form.Group>
-
             <Form.Group className="form-group" controlId="formFuelLevel">
               <Form.Label>
                 <i className="fas fa-gas-pump" style={{ color: 'orange' }}></i> {translate("Fuel Level")} (*)
               </Form.Label>
               <Form.Control
                 type="number"
-                name="fuel_level_mission"
-                
-                placeholder="Enter fuel level"
+                name="fuel_level_mission"    
+               
                 value={mission?.fuel_level_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 onKeyDown={(e) => {
@@ -774,11 +930,9 @@ const createMission = async (mission: MissionOrderInterface) => {
                   }
                 }}
                 min="0"
-              required
-                
+              required              
               />
             </Form.Group>
-
             <Form.Group className="form-group" controlId="formVoucher">
               <Form.Label>
                 <i className="fas fa-receipt" style={{ color: 'orange' }}></i> {translate("Voucher")} (*)
@@ -787,43 +941,12 @@ const createMission = async (mission: MissionOrderInterface) => {
                 type="text"
                 name="voucher_mission"
                 
-                placeholder="Enter voucher number"
+              
                 value={mission?.voucher_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 required
               />
             </Form.Group>
-            <Form.Group className="form-group" controlId="formVehicle">
-              <Form.Label>
-                <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle")} (*)
-              </Form.Label>
-              
-              <Form.Control
-                as="select"
-                name="immatriculation_vehicule"
-                value={mission?.immatriculation_vehicule || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
-              >
-                <option value="">Select Vehicle</option>
-                {vehicles.length === 0 ? (
-                  <option disabled>No vehicles available</option>
-                ) : (
-                  vehicles.map((vehicle, index) => (
-                    <option key={index} value={vehicle.immatriculation_vehicule}>
-                      {vehicle.immatriculation_vehicule}
-                    </option>
-                  ))
-                )}
-              </Form.Control>
-            </Form.Group>
-
-
-
-
-
-
-             
             </div>
           </div>
         </div>
@@ -856,10 +979,8 @@ const createMission = async (mission: MissionOrderInterface) => {
   disabled={buttonClicked}
 >
   {isEditing ? <i className="fas fa-edit"></i> : <i className="fas fa-plus"></i>}
-  {isEditing ? "Edit" : "Add"}
+  {isEditing ? translate("Update") : translate("Add")}
 </Button>
-
-
         </div>
       </div>
     </>

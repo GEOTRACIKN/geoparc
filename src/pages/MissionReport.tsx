@@ -10,31 +10,33 @@ import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
 
 import MissionReportDeleteModal from "../components/MissionReport/MissionReportDeleteModal";
+import MissionReportPreview from "../components/MissionReport/MissionReportPreview";
 
 
 
 interface MissionReport {
-  id_misrap: number;               // Primary key with AUTO_INCREMENT
-  ref_misrap: string;               // Reference, varchar(20)
-  objt_misrap: string;              // Object of the mission, varchar(20)
-  carb_misrap: string;              // Type of fuel, varchar(20)
-  frais_misrap: number;             // Expenses, int(11)
-  vehicule_misrap: string;         // Vehicle registration, varchar(20)
-  remorque_misrap: string;         // Trailer, varchar(20)
-  cond_misrap: string;             // Driver, varchar(20)
-  acc_misrap: string;              // Accomplice, varchar(20)
-  itnr_misrap: string;             // Itinerary, varchar(20)
-  amort_misrap: number;            // Amortization, int(11)
-  dep_misrap: string;              // Departure location, varchar(20)
-  date_dep_misrap: string;         // Departure date, varchar(20)
-  lieu_misrap: string;             // Place, varchar(20)
-  date_arr_misrap: string;         // Arrival date, varchar(20)
-  km_dep_misrap: number;           // Departure km, int(11)
-  nuit_misrap: number;             // Night, int(11)
-  immob_misrap: number;            // Immobilization, int(11)
-  durr_misrap: number;             // Duration, int(11)
-  km_ret_misrap: number;           // Return km, int(11)
-  dist_misrap: number;            // Distance, int(11)
+  id_misrap: number;            
+  ref_misrap: string;            
+  objt_misrap: string;         
+  carb_misrap: string;            
+  frais_misrap: number; 
+  immatriculation_vehicule : string;       
+  remorque_misrap: string;     
+  cond_misrap: string;         
+  acc_misrap: string;          
+  itnr_misrap: string;         
+  amort_misrap: number;        
+  dep_misrap: string;             
+  date_dep_misrap: string;        
+  lieu_misrap: string;         
+  date_arr_misrap: string;        
+  km_dep_misrap: number;          
+  nuit_misrap: number;         
+  immob_misrap: number;        
+  durr_misrap: number;         
+  km_ret_misrap: number;          
+  dist_misrap: number;
+ id_vehicule : number;
   id_user: string;
 
 
@@ -48,11 +50,13 @@ export function MissionReport() {
   let [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const id_user = localStorage.getItem("GeopUserID");
+   const [selectedMissionReport, setSelectedMissionReport] = useState<any | null>(null);
  
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
 
   const [IdUser, setIdUser] = useState<number>(0);
+   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Modal pour aperçu
  
 
   const [loading, setLoading] = useState(true); // Add loading state
@@ -82,70 +86,70 @@ export function MissionReport() {
 
   
 
-  //
-  const getMissionReport = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string) => {
-    try {
-      setLoading(true);
+const getMissionReport = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string): Promise<MissionReport[]> => {
+  try {
+    setLoading(true);
+        const allowedSortColumns = {
+      id_misrap: "mr.id_misrap",
+      objt_misrap: "mr.objt_misrap",
+      ref_misrap: "mr.ref_misrap",
+      date_dep_misrap: "mr.date_dep_misrap",
+  immatriculation_vehicule: "v.immatriculation_vehicule",
+   // Nom complet de colonne SQL
+    };
+        const validatedColumn = searchColum[colum] || "id_misrap";
+    const validatedSortOrder = ["ASC", "DESC"].includes(sort.toUpperCase()) 
+      ? sort.toUpperCase() 
+      : "ASC";
+      const validatedSortColumn = allowedSortColumns[colum as keyof typeof allowedSortColumns] || "mr.id_misrap";
 
-      // Preparing the data to send
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum: searchColum[colum],
-        sort
-      });
+     const bodyData = JSON.stringify({
+      limitValue,
+      currentPage,
+      search,
+      type,
+      id_user,
+      colum,  // Envoyez directement le nom de la colonne
+      sort    // 'ASC' ou 'DESC'
+    });
+  
 
-      // Retrieve the total number of pages
-      const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/totalpage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
+    // Récupération du total
+    const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/totalpage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+      mode: 'cors',
+    });
 
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      settotal(total);
+    const totalPagesJson = await totalPagesResponse.json();
+    const total = totalPagesJson.total || totalPagesJson.count;
+    settotal(total);
 
-      // Retrieve driver data
-      const MissionReportResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyData,
-        mode: 'cors',
-      });
-      //setDrivers et data et dDreiversResponse
-      // DriversReesponse et serDrivers 
+    // Récupération des données
+    const MissionReportResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+      mode: 'cors',
+    });
 
-
-      //partie mission
-      
-
-      const data = await MissionReportResponse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue)
-      setMissionReport(data);
-      return data;
-    } catch (error) {
-      console.error(error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
-
-
+    const data = await MissionReportResponse.json();
+    
+    setPageCount(Math.ceil(total / limitValue));
+    setMissionReport(data);
+    return data; // Ajout du return explicite
+  } catch (error) {
+    console.error("Error fetching mission reports:", error);
+    return []; // Retourner un tableau vide en cas d'erreur
+  } finally {
+    setLoading(false);
+  }
+};
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
     await getMissionReport(limit, currentPage, search, type, colum, sort);
@@ -156,7 +160,6 @@ export function MissionReport() {
     getMissionReport(limit, currentPage, search, type, colum, sort);
   }, []);
 
- 
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -175,7 +178,7 @@ export function MissionReport() {
     objt_misrap: true,
     carb_misrap: true,
     frais_misrap: true,
-    vehicule_misrap: true,
+    immatriculation_vehicule : true,
     remorque_misrap: true,
     cond_misrap: true,
     acc_misrap: true,
@@ -208,7 +211,7 @@ export function MissionReport() {
     objt_misrap: 1,
     ref_misrap: 2,
     date_dep_misrap: 3,
-    vehicule_misrap: 4,
+    immatriculation_vehicule : 4,
     cond_misrap: 5
   };
 
@@ -259,18 +262,18 @@ export function MissionReport() {
   };
 
 
-  const handleSortingColum = (curentColum: string) => {
-
-    setSortColum(curentColum)
-    sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getMissionReport(limit, currentPage, search, type, colum, sort);
-  };
-
+  const handleSortingColum = (currentColumn: string) => {
+  setSortColum(currentColumn);
+  const newSortOrder = sort === "ASC" ? "DESC" : "ASC";
+  setSort(newSortOrder);
+  getMissionReport(limit, currentPage, search, type, currentColumn, newSortOrder);
+};
 
   const handledeleteMissionReport = async (id_misrap: number) => {
     try {
       console.log(id_misrap);
-      setModalStatus('Do you want to delete this MissionReport');
+            setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Report')}?`);
+
       setTitleStatus('Delete MissionReport');
       setIdUser(parseInt(id_user || '0', 0));
       setIdMissionReport(id_misrap);
@@ -307,24 +310,27 @@ export function MissionReport() {
     translate("Driver")
    ];
 
+    function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
   return (
     <>
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate("Missions Report")} <span>{total}</span>
-          </h4>
+  {translate("Missions Report")} <span>{total < 10 ? `0${total}` : total}</span>          </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-
 
           <NavLink to="/mission-report-manage/add" className="btn btn-primary mt-2 mr-1">
             <i className="las la-plus mr-3"></i>
             {translate("New")} {translate("Missions Report")}
           </NavLink>
-
-        
 
         </div>
       </div>
@@ -478,8 +484,8 @@ export function MissionReport() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.vehicule_misrap }
-                  onChange={() => handleColumnChange("vehicule_misrap ")}
+                  checked={selectedColumns.immatriculation_vehicule  }
+                  onChange={() => handleColumnChange("immatriculation_vehicule  ")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
@@ -501,10 +507,10 @@ export function MissionReport() {
                 </div>
               </th>
               {selectedColumns.id_misrap && (<th className="sorting" onClick={() => handleSortingColum("id_misrap")}>{translate("ID")}</th>)}
-              {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrapon")}>{translate("Reference")}</th>)}
+              {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrap")}>{translate("Reference")}</th>)}
               {selectedColumns.objt_misrap && (<th className="sorting" onClick={() => handleSortingColum("objt_misrap")}>{translate("Object")}</th>)}
               {selectedColumns.date_dep_misrap && (<th className="sorting" onClick={() => handleSortingColum("date_dep_misrap")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.vehicule_misrap  && (<th className="sorting" onClick={() => handleSortingColum("vehicule_misrap ")}>{translate("Vehicle")}</th>)}  
+              {selectedColumns.immatriculation_vehicule   && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule  ")}>{translate("Vehicle")}</th>)}  
               {selectedColumns.cond_misrap && (<th className="sorting" onClick={() => handleSortingColum("cond_misrap")}>{translate("Driver")}</th>)}
 
 
@@ -535,8 +541,8 @@ export function MissionReport() {
                       {selectedColumns.id_misrap && (<td>{missionReport.id_misrap}</td>)}
                       {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
                       {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
-                      {selectedColumns.date_dep_misrap && (<td>{missionReport.date_dep_misrap}</td>)}
-                      {selectedColumns.vehicule_misrap  && (<td>{missionReport.vehicule_misrap }</td>)}
+                      {selectedColumns.date_dep_misrap && (<td>{formatDatetimeLocal(missionReport.date_dep_misrap)}</td>)}
+                      {selectedColumns.immatriculation_vehicule   && (<td>{missionReport.immatriculation_vehicule  }</td>)}
                       {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
 
 
@@ -544,6 +550,17 @@ export function MissionReport() {
 
                       <td>
                         <div className="d-flex align-items-center list-action">
+                           <a
+                          className="badge bg-primary mr-2"
+                          onClick={() => {
+                            console.log("Selected Mission:", missionReport);
+                            setSelectedMissionReport(missionReport); // Set the mission
+                            setIsPreviewModalOpen(true); // Open the modal
+                          }}
+                          title={translate("Preview") + " " + translate("Mission Order")}
+                        >
+                          <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
+                        </a>
                           <Link
                             to={`/mission-report-manage/edit/${missionReport.id_misrap}`}
                             className="badge badge-success mr-2"
@@ -558,7 +575,7 @@ export function MissionReport() {
                           </Link>
                          
                           
-                          <a className="badge bg-primary mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
+                          <a className="badge bg-danger mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
                             <i
                               className="las la-trash"
                               style={{ fontSize: "1.2em" }}
@@ -615,6 +632,20 @@ export function MissionReport() {
           IdMissionReport={IdMissionReport}
           updateMissionReportList={handleUpdateMissionReportList}
         />
+
+        <MissionReportPreview
+            show={isPreviewModalOpen} // Contrôle si le modal est ouvert
+            onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
+            status={modalStatus} // Statut de la mission (peut être null)
+            title={titleStatus} // Titre du modal
+            IdUser={IdUser} // Id de l'utilisateur
+            IdMissionReport={IdMissionReport} // Id de la mission
+            selectedMissionReport={selectedMissionReport} // Mission sélectionnée
+            updateMissionReportList={handleUpdateMissionReportList} // Fonction pour mettre à jour la liste
+          />
+
+
+        
 
       
       </div>

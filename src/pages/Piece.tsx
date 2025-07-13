@@ -4,9 +4,11 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewPiece from "../components/Piece/NewPiece";
+import ModalEditPiece from "../components/Piece/EditPiece";
+
 import { Link } from "react-router-dom";
-// import ModalShowPiece from "../components/Piece/ShowPiece";
-// import ModalDeletePiece from "../components/Piece/DeletePiece";
+import ModalShowPiece from "../components/Piece/ShowPiece";
+import ModalDeletePiece from "../components/Piece/DeletePiece";
 
 interface Piece {
     id_piece: number;
@@ -47,7 +49,6 @@ export function Piece() {
         Operation: true,
         Vehicle: true,
         Source: true,
-        Cost: true,
         Date: true,
         Position: true,
     };
@@ -110,51 +111,39 @@ export function Piece() {
     const handleCloseShowPieceModal = () => setShowShowPieceModal(false);
 
     // Récupération des données
-    const getCountPiece = useCallback(async () => {
-  try {
-    const response = await fetch(
-      `${backendUrl}/api/geop/piece/count/${id_user}?searchTerm=${search}&searchType=${type}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch count");
-    const result = await response.json();
-    // Correction ici ↓
-    setTotal(result.count); // Extrait la valeur numérique de l'objet
-  } catch (error) {
-    console.error(error);
-    setError(translate("Failed to load data count"));
-  }
-}, [id_user, search, type, backendUrl, translate]);
+   const getCountPiece = async () => {
+    try {
+        setLoading(true);
+        const response = await fetch(
+            `${backendUrl}/api/geop/piece/count/${id_user}?searchTerm=${search}&searchType=${type}`
+        );
+        const result = await response.json();
+        setTotal(result.count);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+};
 
-    const getPiece = useCallback(async () => {
+    const getPiece = async () => {
         try {
             const response = await fetch(
                 `${backendUrl}/api/geop/piece/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
-            if (!response.ok) throw new Error("Failed to fetch pieces");
             const data = await response.json();
             setPiece(data);
         } catch (error) {
             console.error(error);
-            setError(translate("Failed to load pieces data"));
+        } finally {
+            setLoading(false);
         }
-    }, [id_user, currentPage, limit, search, type, column, sort, backendUrl, translate]);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                await Promise.all([getCountPiece(), getPiece()]);
-            } catch (error) {
-                console.error(error);
-                setError(translate("Failed to load data"));
-            } finally {
-                setLoading(false);
-            }
-        };
-        
-        fetchData();
-    }, [getCountPiece, getPiece, translate]);
+        getCountPiece();
+        getPiece();
+    }, [currentPage, limit, search, type, column, sort]);
 
     // Handlers UI
     const handleTypeSearch = (selectedValue: string) => {
@@ -171,9 +160,7 @@ export function Piece() {
             case translate("Source"):
                 setType(3);
                 break;
-            case translate("Cost"):
-                setType(4);
-                break;
+           
             default:
                 setType(0);
                 break;
@@ -210,6 +197,13 @@ export function Piece() {
         }
     };
 
+     function formatDatetimeLocal(dateString: string): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+
     // Libellés spéciaux
     const operationLabels: Record<string, string> = {
         installation: translate("Installation"),
@@ -217,11 +211,29 @@ export function Piece() {
         repair: translate("Repair"),
     };
 
+      const translateOperationType = (type: string) => {
+        switch (type) {
+            case "add": return translate("Add");
+            case "replace": return translate("Replace");
+            default: return type;
+        }
+    };
+    const translateSourceType = (source: string) => {
+    switch (source) {
+        case "internal":
+            return translate("Internal");
+        case "external":
+            return translate("External");
+        default:
+            return source;
+    }
+};
+
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Parts Management")} ({total})</h4>
+                    <h4>{translate("Parts Replacement")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button 
@@ -229,7 +241,7 @@ export function Piece() {
                         className="btn btn-primary mt-2 mr-1"
                     >
                         <i className="las la-plus mr-3"></i>
-                        {translate("New Part")}
+                        {translate("New")}
                     </Button>
                 </div>
             </div>
@@ -255,9 +267,7 @@ export function Piece() {
                                 <Dropdown.Item onClick={() => handleTypeSearch(translate("Source"))}>
                                     {translate("Source")}
                                 </Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleTypeSearch(translate("Cost"))}>
-                                    {translate("Cost")}
-                                </Dropdown.Item>
+                               
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -350,11 +360,7 @@ export function Piece() {
                         {translate("Source")}
                     </th>
                 )}
-                {selectedColumns.Cost && (
-                    <th className="sorting" onClick={() => handleSortingColumn("cout_piece")}>
-                        {translate("Cost")}
-                    </th>
-                )}
+           
                 {selectedColumns.Date && (
                     <th className="sorting" onClick={() => handleSortingColumn("date_piece")}>
                         {translate("Date")}
@@ -371,31 +377,44 @@ export function Piece() {
 
         <tbody className="light-body">
             {loading ? (
-                <tr style={{ textAlign: "center" }}>
-                    <td colSpan={visibleColumnsCount + 2}>
-                        <PropagateLoader color={"#123abc"} loading={loading} size={20} />
-                    </td>
-                </tr>
-            ) : list_piece.length > 0 ? (
-                list_piece.map((piece) => (
-                    <tr key={piece.id_piece}>
-                        <td className="text-center">
-                            <input type="checkbox" className="form-check-input" />
-                        </td>
+                <td 
+  className="text-center" 
+  colSpan={visibleColumnsCount + 2}
+  style={{ width: "100%" }}
+>
+  <div className="d-flex justify-content-center">
+    <PropagateLoader 
+      color={"#123abc"} 
+      loading={loading} 
+      size={20} 
+    />
+  </div>
+</td>
+            ) : Array.isArray(list_piece) && list_piece.length !== 0 ? (
+                            list_piece.map((piece, index) => (
+                                <tr key={index}>
+                                    <td className="text-center">
+                                        <div className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                            />
+                                        </div>
+                                    </td>
 
                         {selectedColumns.Operation && (
-                            <td>{operationLabels[piece.type_operation_piece] || piece.type_operation_piece}</td>
-                        )}
+                        <td>{translateOperationType(piece.type_operation_piece)}</td>
+                    )}
+
                         {selectedColumns.Vehicle && <td>{piece.id_vehicule_piece}</td>}
-                        {selectedColumns.Source && <td>{piece.source_piece}</td>}
-                        {selectedColumns.Cost && <td>{piece.cout_piece}</td>}
-                        {selectedColumns.Date && <td>{formatDate(piece.date_piece)}</td>}
+                        {selectedColumns.Source && <td>{translateSourceType(piece.source_piece)}</td>}
+                        {selectedColumns.Date && <td>{formatDatetimeLocal(piece.date_piece)}</td>}
                         {selectedColumns.Position && <td>{piece.position_piece}</td>}
 
                         <td className="text-center">
                             <div className="d-flex justify-content-center align-items-center list-action">
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge bg-primary mr-2"
                                     title="View"
                                     onClick={() => handleShowPieceModal(piece.id_piece)}
@@ -403,7 +422,7 @@ export function Piece() {
                                     <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                                 </Link>
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge badge-success mr-2"
                                     title="Edit"
                                     onClick={() => handleEditPieceModal(piece.id_piece)}
@@ -411,7 +430,7 @@ export function Piece() {
                                     <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
                                 </Link>
                                 <Link
-                                    to=""
+                                    to={""}
                                     className="badge bg-danger mr-2"
                                     title="Delete"
                                     onClick={() => handleDeletePieceModal(piece.id_piece)}
@@ -470,24 +489,27 @@ export function Piece() {
                 onHide={handleCloseNewPieceModal} 
                 onSuccess={refreshData} 
             />
-            
-            {/* Modal Edit Piece */}
-            {/* Ajouter ici ModalEditPiece si nécessaire */}
-            
-            {/* 
+            <ModalEditPiece 
+            show={showEditPieceModal} 
+            onHide={handleCloseEditPieceModal} 
+            id_piece={selectedPieceId} 
+            onSuccess={refreshData} />
+          
+           
             <ModalDeletePiece 
                 show={showDeletePieceModal} 
                 onHide={handleCloseDeletePieceModal} 
                 id_piece={selectedPieceId} 
                 onSuccess={refreshData} 
             />
+         
             
             <ModalShowPiece 
                 show={showShowPieceModal} 
                 onHide={handleCloseShowPieceModal} 
                 id_piece={selectedPieceId} 
             />
-            */}
+           
         </>
     );
 }

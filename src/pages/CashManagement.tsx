@@ -3,54 +3,57 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import ModalNewPieceStock from "../components/PieceStock/NewPieceStock";
-import ModalShowPieceStock from "../components/PieceStock/ShowPieceStock";
+import { formatDateToTimestamp } from "../utilities/functions";
+import ModalNewCashManagement from "../components/CashManagement/NewCashManagement";
+import ModalShowCashManagement from "../components/CashManagement/ShowCashManagement";
 import { PropagateLoader } from "react-spinners";
-import ModalEditPieceStock from "../components/PieceStock/EditPieceStock";
-import ModalDeletePieceStock from "../components/PieceStock/DeletePieceStock";
+import ModalEditCashManagement from "../components/CashManagement/EditCashManagement";
+import ModalDeleteCashManagement from "../components/CashManagement/DeleteCashManagement";
 
-interface PieceStock {
-    id_piece_stock: number;
-    type_piece_ps: string;
-    reference_ps: string;
-    marque_ps: string;
-    modele_ps: string;
-    quantite_ps: number;
-    cout_achat_ps: number;
-    date_achat_ps: string;
+interface CashPayment {
+    id_fb: number;
+    num_fact_fb: string;
+    immatriculation_vehicule: string;
+    conducteur_fb: string;
+    km_fb: string;
+    new_km_fb: string;
+    km_amort_fb: string;
+    duree_amort_fb: string;
+    qte_fb: string;
+    cout_fb: string;
+    paytype_fb: string;
+    date_fb: string;
+    station_fb: string;
 }
 
-export function PieceStock() {
+export function CashManagement() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const { translate } = useTranslate();
-    const [list_piece, setPieceStock] = useState<PieceStock[]>([]);
+    const [cashPayments, setCashPayments] = useState<CashPayment[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("ID");
+    const [typeSearch, setTypeSearch] = useState("Vehicle");
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id_piece_stock");
+    const [column, setSortColumn] = useState("id_fb");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [selectedPieceStockId, setSelectedPieceStockId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        "ID": true,
-        "Type": true,
-        "Reference": true,
-        "Brand": true,
-        "Model": true,
-        "Quantity": true,
-        "Cost": true,
-        "Purchase Date": true
+        Vehicle: true,
+        Date: true,
+        "Payment Type": true,
+        Quantity: true,
+        Cost: true,
+        "Invoice Number": true,
+        Driver: true
     };
 
     const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumnsPiece");
+        const savedColumns = localStorage.getItem("selectedCashPaymentColumns");
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
     };
     
@@ -62,109 +65,95 @@ export function PieceStock() {
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumnsPiece", JSON.stringify(updatedColumns));
+        localStorage.setItem("selectedCashPaymentColumns", JSON.stringify(updatedColumns));
     };
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getPieceStock();
+        getCashPayments();
     };
 
-    const [showNewPieceStockModal, setShowNewPieceStockModal] = useState(false);
-    const [showEditPieceStockModal, setShowEditPieceStockModal] = useState(false);
-    const [showShowPieceStockModal, setShowShowPieceStockModal] = useState(false);
-    const [showDeletePieceStockModal, setShowDeletePieceStockModal] = useState(false);
+    const [showNewModal, setShowNewModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showShowModal, setShowShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedPaymentId, setSelectedPaymentId] = useState<number | undefined>(undefined);
 
-    const handleShowNewPieceStockModal = () => setShowNewPieceStockModal(true);
-    const handleCloseNewPieceStockModal = () => setShowNewPieceStockModal(false);
+    const handleShowNewModal = () => setShowNewModal(true);
+    const handleCloseNewModal = () => setShowNewModal(false);
 
-    const handleDeletePieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowDeletePieceStockModal(true);
+    const handleDeleteModal = (id: number) => {
+        setSelectedPaymentId(id);
+        setShowDeleteModal(true);
     };
-    const handleCloseDeletePieceStockModal = () => setShowDeletePieceStockModal(false);
+    const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-    const handleEditPieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowEditPieceStockModal(true);
+    const handleEditModal = (id: number) => {
+        setSelectedPaymentId(id);
+        setShowEditModal(true);
     };
-    const handleCloseEditPieceStockModal = () => setShowEditPieceStockModal(false);
+    const handleCloseEditModal = () => setShowEditModal(false);
 
-    const handleShowShowPieceStockModal = (id: number) => {
-        setSelectedPieceStockId(id);
-        setShowShowPieceStockModal(true);
+    const handleShowModal = (id: number) => {
+        setSelectedPaymentId(id);
+        setShowShowModal(true);
     };
-    const handleCloseShowPieceStockModal = () => setShowShowPieceStockModal(false);
+    const handleCloseShowModal = () => setShowShowModal(false);
 
-    const getCountPieceStock = async () => {
+    const getCountCashPayments = async () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `${backendUrl}/api/geop/piece_stock/count/${id_user}?searchTerm=${search}&searchType=${type}`
+                `${backendUrl}/api/geop/cashpayments/count/${id_user}?searchTerm=${search}&searchType=${type}`
             );
             const result = await response.json();
-            
-            if (result && typeof result.count === "number") {
-                setTotal(result.count);
-                setPageCount(Math.ceil(result.count / limit));
-            } else {
-                console.error("Unexpected count structure:", result);
-                setTotal(0);
-            }
+            setTotal(result.count);
+            setPageCount(Math.ceil(result.count / limit));
         } catch (error) {
             console.error(error);
-            setTotal(0);
         } finally {
             setLoading(false);
         }
     };
 
-    const getPieceStock = async () => {
+    const getCashPayments = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/piece_stock/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+                `${backendUrl}/api/geop/cashpayments/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
             );
             const data = await response.json();
-    
-            if (Array.isArray(data)) {
-                setPieceStock(data);
-            } else {
-                console.error("Unexpected API response:", data);
-                setPieceStock([]);
-            }
+            setCashPayments(data);
         } catch (error) {
             console.error(error);
-            setPieceStock([]);
         } finally {
             setLoading(false);
         }
     };
-    
 
     useEffect(() => {
-        getCountPieceStock();
-        getPieceStock();
+        getCountCashPayments();
+        getCashPayments();
     }, [currentPage, limit, search, type, column, sort]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
         switch (selectedValue) {
-            case translate("ID"):
-                setType(0);
-                break;
-            case translate("Reference"):
+            case translate("Vehicle"):
                 setType(1);
                 break;
-            case translate("Brand"):
+            case translate("Date"):
                 setType(2);
                 break;
-            case translate("Model"):
+            case translate("Payment Type"):
                 setType(3);
                 break;
-            case translate("Type"):
+            case translate("Invoice Number"):
                 setType(4);
+                break;
+            case translate("Driver"):
+                setType(5);
                 break;
             default:
                 console.log("Unknown selection");
@@ -189,50 +178,33 @@ export function PieceStock() {
     };
 
     const refreshData = () => {
-        getCountPieceStock();
-        getPieceStock();
+        getCountCashPayments();
+        getCashPayments();
     };
-
-  
-const categories: { [key: string]: string } = {
-    freinage: translate("Braking"),
-    filtration: translate("Filtration"),
-    moteur: translate("Engine"),
-    suspension_direction: translate("Suspension/Steering"),
-    echappement: translate("Exhaust"),
-    electricite: translate("Electricity"),
-    chauffage_refroidissement: translate("Heating/Cooling"),
-    carrosserie: translate("Bodywork"),
-    accessoires: translate("Accessories"),
-    liquide_lubrifiant: translate("Fluids/Lubricants"),
-    autres: translate("OTHERS"),
-};
-
-// List of part types
-const typesPiece: { [key: string]: string } = {
-    origine: translate("Original part"),
-    apresmarket: translate("Aftermarket part"),
-    reconditionne: translate("Refurbished"),
-    occasion: translate("Used"),
-};
-
-
+    
     function formatDatetimeLocal(dateString: string): string {
         if (!dateString) return "";
         const date = new Date(dateString);
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
 
+    const paymentTypeLabels: { [key: string]: string } = {
+        cash: translate("Cash"),
+        card: translate("Card"),
+        check: translate("Check"),
+        transfer: translate("Transfer")
+    };
+
     return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Items")} ({total})</h4>
+                    <h4>{translate("Cash Payment Management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    <Button onClick={handleShowNewPieceStockModal} className="btn btn-primary mt-2 mr-1">
+                    <Button onClick={handleShowNewModal} className="btn btn-primary mt-2 mr-1">
                         <i className="las la-plus mr-3"></i>
-                        {translate("New")}
+                        {translate("New Record")}
                     </Button>
                 </div>
             </div>
@@ -246,10 +218,11 @@ const typesPiece: { [key: string]: string } = {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Brand")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Model")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Date")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Payment Type")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Invoice Number")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Driver")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <input
@@ -315,46 +288,49 @@ const typesPiece: { [key: string]: string } = {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
-                                <th className="sorting" onClick={() => handleSortingColumn("id_piece_stock")}>
-                                    {translate("ID")}
+  
+                            {selectedColumns.Vehicle && (
+                                <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
+                                    {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.Type && (
-                                <th className="sorting" onClick={() => handleSortingColumn("type_piece_ps")}>
-                                    {translate("Type")}
+
+                            {selectedColumns.Date && (
+                                <th className="sorting" onClick={() => handleSortingColumn("date_fb")}>
+                                    {translate("Date")}
                                 </th>
                             )}
-                            {selectedColumns.Reference && (
-                                <th className="sorting" onClick={() => handleSortingColumn("reference_ps")}>
-                                    {translate("Reference")}
+
+                            {selectedColumns["Payment Type"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("paytype_fb")}>
+                                    {translate("Payment Type")}
                                 </th>
                             )}
-                            {selectedColumns.Brand && (
-                                <th className="sorting" onClick={() => handleSortingColumn("marque_ps")}>
-                                    {translate("Brand")}
-                                </th>
-                            )}
-                            {selectedColumns.Model && (
-                                <th className="sorting" onClick={() => handleSortingColumn("modele_ps")}>
-                                    {translate("Model")}
-                                </th>
-                            )}
+
                             {selectedColumns.Quantity && (
-                                <th className="sorting" onClick={() => handleSortingColumn("quantite_ps")}>
+                                <th className="sorting" onClick={() => handleSortingColumn("qte_fb")}>
                                     {translate("Quantity")}
                                 </th>
                             )}
-                            {selectedColumns["Cost"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("cout_achat_ps")}>
+
+                            {selectedColumns.Cost && (
+                                <th className="sorting" onClick={() => handleSortingColumn("cout_fb")}>
                                     {translate("Cost")}
                                 </th>
                             )}
-                            {selectedColumns["Purchase Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date_achat_ps")}>
-                                    {translate("Purchase Date")}
+
+                            {selectedColumns["Invoice Number"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("num_fact_fb")}>
+                                    {translate("Invoice Number")}
                                 </th>
                             )}
+
+                            {selectedColumns.Driver && (
+                                <th className="sorting" onClick={() => handleSortingColumn("conducteur_fb")}>
+                                    {translate("Driver")}
+                                </th>
+                            )}
+                            
                             <th>{translate("Actions")}</th>
                         </tr>
                     </thead>
@@ -371,8 +347,8 @@ const typesPiece: { [key: string]: string } = {
                                     </p>
                                 </td>
                             </tr>
-                        ) : Array.isArray(list_piece) && list_piece.length !== 0 ? (
-                            list_piece.map((piece, index) => (
+                        ) : Array.isArray(cashPayments) && cashPayments.length !== 0 ? (
+                            cashPayments.map((payment, index) => (
                                 <tr key={index}>
                                     <td className="text-center">
                                         <div className="form-check form-check-inline">
@@ -382,34 +358,49 @@ const typesPiece: { [key: string]: string } = {
                                             />
                                         </div>
                                     </td>
-                                    {selectedColumns.ID && <td>{piece.id_piece_stock}</td>}
-                                    {selectedColumns.Type && <td>{typesPiece[piece.type_piece_ps]}</td>}
-                                    {selectedColumns.Reference && <td>{piece.reference_ps}</td>}
-                                    {selectedColumns.Brand && <td>{piece.marque_ps}</td>}
-                                    {selectedColumns.Model && <td>{piece.modele_ps}</td>}
-                                    {selectedColumns.Quantity && <td>{piece.quantite_ps}</td>}
-                                    {selectedColumns["Cost"] && <td>{piece.cout_achat_ps}</td>}
-                                    {selectedColumns["Purchase Date"] && <td>{formatDatetimeLocal(piece.date_achat_ps)}</td>}
+                                   
+                                    {selectedColumns.Vehicle && <td>{payment.immatriculation_vehicule}</td>}
+                                    {selectedColumns.Date && <td>{formatDatetimeLocal(payment.date_fb)}</td>}
+                                    {selectedColumns["Payment Type"] && <td>{paymentTypeLabels[payment.paytype_fb] || payment.paytype_fb}</td>}
+                                    {selectedColumns.Quantity && <td>{payment.qte_fb} L</td>}
+                                    {selectedColumns.Cost && <td>{payment.cout_fb} €</td>}
+                                    {selectedColumns["Invoice Number"] && <td>{payment.num_fact_fb || "-"}</td>}
+                                    {selectedColumns.Driver && <td>{payment.conducteur_fb || "-"}</td>}
+                                    
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
+                                            {/* View Button */}
                                             <Link
                                                 to={``}
                                                 className="badge bg-primary mr-2"
-                                                onClick={() => handleShowShowPieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Details")}
+                                                onClick={() => handleShowModal(payment.id_fb)}
                                             >
                                                 <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
+
+                                            {/* Edit Button */}
                                             <Link
                                                 to={``}
                                                 className="badge badge-success mr-2"
-                                                onClick={() => handleEditPieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Edit")}
+                                                onClick={() => handleEditModal(payment.id_fb)}
                                             >
                                                 <i className="las la-edit" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
+
+                                            {/* Delete Button */}
                                             <Link
                                                 to={``}
                                                 className="badge bg-danger mr-2"
-                                                onClick={() => handleDeletePieceStockModal(piece.id_piece_stock)}
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                title={translate("Delete")}
+                                                onClick={() => handleDeleteModal(payment.id_fb)}
                                             >
                                                 <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
                                             </Link>
@@ -419,7 +410,7 @@ const typesPiece: { [key: string]: string } = {
                             ))
                         ): (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={Object.keys(selectedColumns).length + 2}>
+                                <td colSpan={Object.keys(selectedColumns).filter(col => selectedColumns[col]).length + 2}>
                                     {translate("No data available")}
                                 </td>
                             </tr>
@@ -430,7 +421,7 @@ const typesPiece: { [key: string]: string } = {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>{translate("Displaying 1 to")} {limit} {translate("of")} {total} </span>
+                    <span>{translate("Showing")} 1 {translate("to")} {limit} {translate("of")} {total} </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -455,12 +446,31 @@ const typesPiece: { [key: string]: string } = {
                 </div>
             </div>
 
-           <ModalNewPieceStock show={showNewPieceStockModal} onHide={handleCloseNewPieceStockModal} onSuccess={refreshData} />
-            <ModalShowPieceStock show={showShowPieceStockModal} onHide={handleCloseShowPieceStockModal} id_piece_stock={selectedPieceStockId} />
-            <ModalEditPieceStock show={showEditPieceStockModal} onHide={handleCloseEditPieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
-            <ModalDeletePieceStock show={showDeletePieceStockModal} onHide={handleCloseDeletePieceStockModal} id_piece_stock={selectedPieceStockId} onSuccess={refreshData} />
+            {/* Modals */}
+            <ModalNewCashManagement 
+                show={showNewModal} 
+                onHide={handleCloseNewModal} 
+                onSuccess={refreshData} 
+            />
+            <ModalEditCashManagement 
+                show={showEditModal} 
+                onHide={handleCloseEditModal} 
+                recordId={selectedPaymentId} 
+                onSuccess={refreshData} 
+            />
+            <ModalDeleteCashManagement 
+                show={showDeleteModal} 
+                onHide={handleCloseDeleteModal} 
+                recordId={selectedPaymentId} 
+                onSuccess={refreshData} 
+            />
+            <ModalShowCashManagement 
+                show={showShowModal} 
+                onHide={handleCloseShowModal} 
+                recordId={selectedPaymentId} 
+            />
         </>
     );
 }
 
-export default PieceStock;
+export default CashManagement;
