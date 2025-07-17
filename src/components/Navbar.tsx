@@ -11,6 +11,7 @@ import Cookies from 'universal-cookie';
 import Logout from './Logout';
 import { useTheme } from '../hooks/ThemeContext';
 import { Bounce, toast } from 'react-toastify';
+import axios from 'axios';
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -72,6 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
   const theme = localStorage.getItem("theme_mode");
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   const strLang = {
     en: translate('English'),
@@ -93,18 +95,26 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   ];
 
 
-
-
-
   const { isDarkMode, toggleTheme } = useTheme();
-  // Utilisation du hook
-  const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Remove the token from localStorage
-    localStorage.removeItem("userID"); // Remove the token from localStorage
-    const cookies = new Cookies();
-    // cookies.remove('jwtToken');
-    navigate("/login"); // Redirect the user to the Login page
+
+  const handleLogout = async () => {
+    try {
+      // 🔐 Call the backend to clear the httpOnly JWT cookie
+      await axios.post(`${backendUrl}/api/logoutgeop`, {}, {
+        withCredentials: true, // ✅ Required to include the cookie in the request
+      });
+
+      // 🧹 Clear localStorage (optional, depends on what you store locally)
+      localStorage.removeItem("user");
+      localStorage.clear(); // Optional: clears all keys from localStorage
+
+      // 🔁 Redirect the user to the login page
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
+
 
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
@@ -641,17 +651,17 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                       headers: {
                                         "Content-Type": "application/json",
                                       },
-                                      body: JSON.stringify({ id_notification: notification.id_notification}), // 1 = non lues
+                                      body: JSON.stringify({ id_notification: notification.id_notification }), // 1 = non lues
                                     })
                                       .then((response) => response.json())
                                       .then((data) => {
-                                     if(userID)   getAlarms(userID, 1);
+                                        if (userID) getAlarms(userID, 1);
                                         console.log("Notifications mises à jour :", data);
                                       })
                                       .catch((error) => {
                                         console.error("Erreur lors de la mise à jour :", error);
                                       });
-                                  
+
                                     setTimeout(() => setDropdownOpenNotification(false), 100);
                                   }}
                                 >
@@ -661,7 +671,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                     </div>
                                     <div className="media-body ml-3">
                                       <div className="d-flex align-items-center justify-content-between">
-                                        <h6 className="mb-0">{notificationType[Number(notification.id_type-1)]}</h6>
+                                        <h6 className="mb-0">{notificationType[Number(notification.id_type - 1)]}</h6>
                                         <small className="">
                                           <b>{new Date(notification.timestamp).toLocaleTimeString()}</b>
                                         </small>
