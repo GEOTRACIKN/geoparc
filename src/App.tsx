@@ -39,6 +39,8 @@ import { Piece } from "./pages/Piece";
 import { CardManagement } from "./pages/CardManagement";
 import { TankManagement } from "./pages/TankManagement";
 import { CashManagement } from "./pages/CashManagement";
+import { FuelManagement } from "./pages/FuelManagement";
+
 
 
 
@@ -179,6 +181,7 @@ function App() {
           <Route path="/card_management" element={<DashboardLayout>{<CardManagement />}</DashboardLayout>} />
           <Route path="/tank_management" element={<DashboardLayout>{<TankManagement />}</DashboardLayout>} />
           <Route path="/cash_management" element={<DashboardLayout>{<CashManagement />}</DashboardLayout>} />
+          <Route path="/fuel_management" element={<DashboardLayout>{<FuelManagement />}</DashboardLayout>} />
 
 
           <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />

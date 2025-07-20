@@ -40,7 +40,9 @@ export function CardManagement() {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefined);
 
+  
     const initialColumns = {
         Vehicle: true,
         Date: true,
@@ -78,7 +80,6 @@ export function CardManagement() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showShowModal, setShowShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefined);
     const handleShowNewModal = () => setShowNewModal(true);
     const handleCloseNewModal = () => setShowNewModal(false);
 
@@ -460,11 +461,11 @@ const [selectedCardId, setSelectedCardId] = useState<number | undefined>(undefin
                 recordId={selectedCardId} 
                 onSuccess={refreshData} 
             />
-            <ModalShowCardManagement 
-                show={showShowModal} 
-                onHide={handleCloseShowModal} 
-                recordId={selectedCardId} 
-            />
+               <ModalShowCardManagement
+        show={showShowModal}
+        onHide={handleCloseShowModal}
+        recordId={selectedCardId}
+    />
         </>
     );
 }

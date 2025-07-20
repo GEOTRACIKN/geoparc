@@ -335,7 +335,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 29,
           label: "Fuel consumption",
           icon: "las la-gas-pump",
-          to: "/fuel-consumption",
+          to: "/fuel_management",
           permissionId: 42,
         },
         {

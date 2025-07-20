@@ -7,8 +7,8 @@ import { Bounce, toast } from "react-toastify";
 interface ShowCardManagementProps {
     show: boolean;
     onHide: () => void;
-    recordId?: number;
-}
+    recordId?: number;  // Modification ici pour accepter null
+    }
 
 interface FuelCardRecord {
     id_fc: number;
@@ -34,6 +34,9 @@ const ShowCardManagement: React.FC<ShowCardManagementProps> = ({
 }) => {
     const [record, setRecord] = useState<FuelCardRecord | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    
+const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
+
     const { translate } = useTranslate();
 
     useEffect(() => {
@@ -42,6 +45,10 @@ const ShowCardManagement: React.FC<ShowCardManagementProps> = ({
             try {
                 const response = await fetch(`${backendUrl}/api/geop/fuelcard/${recordId}`);
                 if (!response.ok) throw new Error("Failed to fetch record");
+                 if (recordId == null) { // Couvre null ET undefined
+            console.debug('No record selected');
+            return;
+        }
                 
                 const data = await response.json();
                 setRecord(data);
