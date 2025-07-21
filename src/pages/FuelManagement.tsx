@@ -14,13 +14,11 @@ interface FuelRecord {
     id_user: number;
     id_vehicule: number;
     date: string;
-    fuel_type: string | null;
     quantity: number;
     cost: number | null;
     km: number | null;
     new_km: number | null;
     invoice: string | null;
-    station: string | null;
     amortization: number | null;
     driver: string | null;
     tank: number | null;
@@ -52,11 +50,11 @@ export function FuelManagement() {
     const initialColumns = {
         "Source": true,
         "Immatriculation": true,
-        "Type de carburant": true,
+        "KM": true,
         "Date": true,
         "Coût": true,
         "Quantité (L)": true,
-        "Station": true
+        "New KM": true
     };
 
     const loadSelectedColumns = () => {
@@ -149,7 +147,7 @@ export function FuelManagement() {
         switch (selectedValue) {
             case translate("Immatriculation"): setType(1); break;
             case translate("Date"): setType(2); break;
-            case translate("Type de carburant"): setType(3); break;
+            case translate("KM"): setType(3); break;
             case translate("Source"): setType(4); break;
             default: console.log("Unknown selection");
         }
@@ -198,7 +196,7 @@ export function FuelManagement() {
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("Immatriculation")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Type de carburant")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("KM")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Source")}</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
@@ -279,9 +277,9 @@ export function FuelManagement() {
                                 </th>
                             )}
                             
-                            {selectedColumns["Type de carburant"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("fuel_type")}>
-                                    {translate("Type carburant")}
+                            {selectedColumns["KM"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("km")}>
+                                    {translate("KM")}
                                 </th>
                             )}
                             
@@ -303,9 +301,9 @@ export function FuelManagement() {
                                 </th>
                             )}
                             
-                            {selectedColumns["Station"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("station")}>
-                                    {translate("Station")}
+                            {selectedColumns["New KM"] && (
+                                <th className="sorting" onClick={() => handleSortingColumn("new_km")}>
+                                    {translate("New KM")}
                                 </th>
                             )}
                             
@@ -333,11 +331,11 @@ export function FuelManagement() {
                                     
                                     {selectedColumns["Source"] && <td>{sourceLabels[record.source]}</td>}
                                     {selectedColumns["Immatriculation"] && <td>{record.immatriculation_vehicule}</td>}
-                                    {selectedColumns["Type de carburant"] && <td>{record.fuel_type || '-'}</td>}
+                                    {selectedColumns["KM"] && <td>{record.km || '-'}</td>}
                                     {selectedColumns["Date"] && <td>{formatDatetimeLocal(record.date)}</td>}
                                     {selectedColumns["Coût"] && <td>{record.cost ? `${record.cost} €` : '-'}</td>}
                                     {selectedColumns["Quantité (L)"] && <td>{record.quantity} L</td>}
-                                    {selectedColumns["Station"] && <td>{record.station || '-'}</td>}
+                                    {selectedColumns["New KM"] && <td>{record.new_km || '-'}</td>}
                                     
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
