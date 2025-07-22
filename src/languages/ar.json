@@ -863,8 +863,40 @@
   "Total Quantity": "إجمالي الكمية",
   "Total Cost": "إجمالي التكلفة",
  
-  "Quantity (L)": "الكمية (لتر)"
-  
+  "Quantity (L)": "الكمية (لتر)",
+    "Fuel Card Management": "إدارة بطاقات الوقود",
+ 
+  "Card Number": "رقم البطاقة",
+  "Fuel Card Record Details": "تفاصيل بطاقة الوقود",
+  "Confirm Deletion": "تأكيد الحذف",
+  "Are you sure you want to delete this fuel card record?": "هل أنت متأكد أنك تريد حذف سجل بطاقة الوقود هذا؟",
+  "This action cannot be undone.": "هذا الإجراء لا يمكن التراجع عنه.",
+  "Gasoline": "بنزين",
+  "Current Km": "عدد الكيلومترات الحالي",
+  "New Km": "عدد الكيلومترات الجديدة",
+  "Gas Station": "محطة الوقود",
+
+    "Edit Fuel Card Record": "تعديل بطاقة الوقود",
+  "New Fuel Card Record": "بطاقة وقود جديدة",
+  "New Tank Record": "تسجيل خزان جديد",
+
+  "Price per Liter": "السعر لكل لتر",
+  "Tank Capacity": "سعة الخزان",
+  "Amortization (days)": "الإهلاك (أيام)",
+  "Tank Management": "إدارة الخزانات",
+  "Price/L": "السعر/لتر",
+  "Tank Record Details": "تفاصيل سجل الخزان",
+  "Edit Tank Record": "تعديل سجل الخزان",
+  "Are you sure you want to delete this tank record?": "هل أنت متأكد أنك تريد حذف هذا السجل الخاص بالخزان؟",
+
+   "Edit Cash Payment Record": "تعديل سجل الدفع نقدًا",
+  "Payment Type": "نوع الدفع",
+ 
+  "Amortization Km": "الإهلاك (كم)",
+  "Amortization Duration": "مدة الإهلاك",
+  "Cash Payment Management": "إدارة المدفوعات النقدية",
+  "Are you sure you want to delete this cash payment record?": "هل أنت متأكد أنك تريد حذف هذا السجل الخاص بالدفع نقدًا؟"
+
 
 
 }

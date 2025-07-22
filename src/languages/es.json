@@ -850,6 +850,40 @@
   "Global Totals": "Totales globales",
   "Total Quantity": "Cantidad total",
   "Total Cost": "Costo total",
-  "Quantity (L)": "Cantidad (L)"
+  "Quantity (L)": "Cantidad (L)",
+  "Fuel Card Management": "Gestión de tarjetas de combustible",
+  
+  "Card Number": "Número de tarjeta",
+  "Fuel Card Record Details": "Detalles de la tarjeta de combustible",
+  "Confirm Deletion": "Confirmar eliminación",
+  "Are you sure you want to delete this fuel card record?": "¿Estás seguro de que deseas eliminar este registro de tarjeta de combustible?",
+  "This action cannot be undone.": "Esta acción no se puede deshacer.",
+  "Gasoline": "Gasolina",
+  "Current Km": "Kilometraje actual",
+  "New Km": "Nuevo kilometraje",
+  "Gas Station": "Gasolinera",
+
+
+   "Edit Fuel Card Record": "Editar registro de tarjeta de combustible",
+  "New Fuel Card Record": "Nueva tarjeta de combustible",
+  "New Tank Record": "Nuevo registro de tanque",
+  "Price per Liter": "Precio por litro",
+  "Tank Capacity": "Capacidad del tanque",
+  "Amortization (days)": "Amortización (días)",
+  "Tank Management": "Gestión de tanques",
+  "Price/L": "Precio/L",
+  "Tank Record Details": "Detalles del registro del tanque",
+  "Edit Tank Record": "Editar registro del tanque",
+  "Are you sure you want to delete this tank record?": "¿Estás seguro de que deseas eliminar este registro de tanque?",
+
+   "Edit Cash Payment Record": "Editar pago en efectivo",
+  "Payment Type": "Tipo de pago",
+ 
+  "Amortization Km": "Amortización (km)",
+  "Amortization Duration": "Duración de la amortización",
+  "Cash Payment Management": "Gestión de pagos en efectivo",
+  "Are you sure you want to delete this cash payment record?": "¿Estás seguro de que deseas eliminar este pago en efectivo?"
+
+
 
 }

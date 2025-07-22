@@ -849,7 +849,41 @@
   "Global Totals": "Totaux globaux",
   "Total Quantity": "Quantité totale",
   "Total Cost": "Coût total",
-  "Quantity (L)": "Quantité (L)"
+  "Quantity (L)": "Quantité (L)",
+
+  "Fuel Card Management": "Gestion des cartes carburant",
+ 
+  "Card Number": "Numéro de carte",
+  "Fuel Card Record Details": "Détails de la carte carburant",
+  "Confirm Deletion": "Confirmer la suppression",
+  "Are you sure you want to delete this fuel card record?": "Êtes-vous sûr de vouloir supprimer cette fiche carburant ?",
+  "This action cannot be undone.": "Cette action est irréversible.",
+  "Gasoline": "Essence",
+  "Current Km": "Kilométrage actuel",
+  "New Km": "Nouveau kilométrage",
+  "Gas Station": "Station-service",
+
+
+   "Edit Fuel Card Record": "Modifier la carte carburant",
+  "New Fuel Card Record": "Nouvelle carte carburant",
+  "New Tank Record": "Nouveau réservoir",
+  "Price per Liter": "Prix par litre",
+  "Tank Capacity": "Capacité du réservoir",
+  "Amortization (days)": "Amortissement (jours)",
+  "Tank Management": "Gestion des réservoirs",
+  "Price/L": "Prix/L",
+  "Tank Record Details": "Détails du réservoir",
+  "Edit Tank Record": "Modifier le réservoir",
+  "Are you sure you want to delete this tank record?": "Êtes-vous sûr de vouloir supprimer ce réservoir ?",
+
+  "Edit Cash Payment Record": "Modifier le paiement en espèces",
+  "Payment Type": "Type de paiement",
+  
+  "Amortization Km": "Amortissement (km)",
+  "Amortization Duration": "Durée d'amortissement",
+  "Cash Payment Management": "Gestion des paiements en espèces",
+  "Are you sure you want to delete this cash payment record?": "Êtes-vous sûr de vouloir supprimer ce paiement en espèces ?"
+
 
 
 
