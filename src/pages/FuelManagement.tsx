@@ -7,6 +7,7 @@ import { PropagateLoader } from "react-spinners";
 import ModalShowCardManagement from "../components/CardManagement/ShowCardManagement";
 import ModalShowCashManagement from "../components/CashManagement/ShowCashManagement";
 import ModalShowTankManagement from "../components/TankManagement/ShowTankManagement";
+
 interface FuelTotals {
     card: {
         quantity: number;
@@ -25,6 +26,7 @@ interface FuelTotals {
         cost: number;
     };
 }
+
 interface FuelRecord {
     id: number;
     source: 'card' | 'cash' | 'tank';
@@ -50,7 +52,7 @@ export function FuelManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
-    const [typeSearch, setTypeSearch] = useState("Immatriculation");
+    const [typeSearch, setTypeSearch] = useState(translate("Vehicle"));
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id");
     const [sort, setSort] = useState("desc");
@@ -58,13 +60,13 @@ export function FuelManagement() {
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
     const [fuelTotals, setFuelTotals] = useState<FuelTotals>({
-    card: { quantity: 0, cost: 0 },
-    cash: { quantity: 0, cost: 0 },
-    tank: { quantity: 0, cost: 0 },
-    global: { quantity: 0, cost: 0 }
-});
+        card: { quantity: 0, cost: 0 },
+        cash: { quantity: 0, cost: 0 },
+        tank: { quantity: 0, cost: 0 },
+        global: { quantity: 0, cost: 0 }
+    });
 
-    // Gestion des modals
+    // Modal management
     const [activeModal, setActiveModal] = useState<{
         type: 'card' | 'cash' | 'tank' | null;
         recordId: number | null;
@@ -72,11 +74,11 @@ export function FuelManagement() {
 
     const initialColumns = {
         "Source": true,
-        "Immatriculation": true,
+        "Vehicle": true,
         "KM": true,
         "Date": true,
-        "Coût": true,
-        "Quantité (L)": true,
+        "Cost": true,
+        "Quantity (L)": true,
         "New KM": true
     };
 
@@ -88,9 +90,9 @@ export function FuelManagement() {
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
 
     const sourceLabels = {
-        card: translate("Carte carburant"),
-        cash: translate("Paiement cash"),
-        tank: translate("Citerne")
+        card: translate("Fuel card"),
+        cash: translate("Cash payment"),
+        tank: translate("Tank")
     };
 
     const modalComponents = {
@@ -105,13 +107,14 @@ export function FuelManagement() {
         setActiveModal({ type: source, recordId: id });
     };
 
-const handleCloseModal = () => {
-    setActiveModal({ type: null, recordId: null });
-    // Rafraîchir les données après fermeture du modal
-    getCountFuelRecords();
-    getFuelRecords();
-    fetchFuelTotals();
-};
+    const handleCloseModal = () => {
+        setActiveModal({ type: null, recordId: null });
+        // Refresh data after modal closes
+        getCountFuelRecords();
+        getFuelRecords();
+        fetchFuelTotals();
+    };
+
     const getCountFuelRecords = async () => {
         try {
             setLoading(true);
@@ -146,45 +149,46 @@ const handleCloseModal = () => {
             setLoading(false);
         }
     };
-  const fetchFuelTotals = async () => {
-    try {
-        const response = await fetch(
-            `${backendUrl}/api/geop/consumptions/global-totals/${id_user}`
-        );
-        const data = await response.json();
-        
-        // Vérification et normalisation des données
-        const normalizedData = {
-            card: {
-                quantity: Number(data.card?.quantity) || 0,
-                cost: Number(data.card?.cost) || 0
-            },
-            cash: {
-                quantity: Number(data.cash?.quantity) || 0,
-                cost: Number(data.cash?.cost) || 0
-            },
-            tank: {
-                quantity: Number(data.tank?.quantity) || 0,
-                cost: Number(data.tank?.cost) || 0
-            },
-            global: {
-                quantity: Number(data.global?.quantity) || 0,
-                cost: Number(data.global?.cost) || 0
-            }
-        };
-        
-        setFuelTotals(normalizedData);
-    } catch (error) {
-        console.error("Error fetching fuel totals:", error);
-        // Réinitialiser en cas d'erreur
-        setFuelTotals({
-            card: { quantity: 0, cost: 0 },
-            cash: { quantity: 0, cost: 0 },
-            tank: { quantity: 0, cost: 0 },
-            global: { quantity: 0, cost: 0 }
-        });
-    }
-};
+
+    const fetchFuelTotals = async () => {
+        try {
+            const response = await fetch(
+                `${backendUrl}/api/geop/consumptions/global-totals/${id_user}`
+            );
+            const data = await response.json();
+            
+            // Data verification and normalization
+            const normalizedData = {
+                card: {
+                    quantity: Number(data.card?.quantity) || 0,
+                    cost: Number(data.card?.cost) || 0
+                },
+                cash: {
+                    quantity: Number(data.cash?.quantity) || 0,
+                    cost: Number(data.cash?.cost) || 0
+                },
+                tank: {
+                    quantity: Number(data.tank?.quantity) || 0,
+                    cost: Number(data.tank?.cost) || 0
+                },
+                global: {
+                    quantity: Number(data.global?.quantity) || 0,
+                    cost: Number(data.global?.cost) || 0
+                }
+            };
+            
+            setFuelTotals(normalizedData);
+        } catch (error) {
+            console.error("Error fetching fuel totals:", error);
+            // Reset on error
+            setFuelTotals({
+                card: { quantity: 0, cost: 0 },
+                cash: { quantity: 0, cost: 0 },
+                tank: { quantity: 0, cost: 0 },
+                global: { quantity: 0, cost: 0 }
+            });
+        }
+    };
 
     useEffect(() => {
         getCountFuelRecords();
@@ -211,7 +215,7 @@ const handleCloseModal = () => {
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
         switch (selectedValue) {
-            case translate("Immatriculation"): setType(1); break;
+            case translate("Vehicle"): setType(1); break;
             case translate("Date"): setType(2); break;
             case translate("KM"): setType(3); break;
             case translate("Source"): setType(4); break;
@@ -240,46 +244,44 @@ const handleCloseModal = () => {
         return date.toLocaleDateString();
     };
 
-   
-        return (
+    return (
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Gestion des carburants")} ({total})</h4>
+                    <h4>{translate("Fuel Management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
-                    {/* Vous pouvez ajouter un bouton "Nouvel enregistrement" ici si nécessaire */}
+                    {/* You can add a "New record" button here if needed */}
                 </div>
             </div>
-            {/* Section des totaux */}
-<div className="row mb-4">
-    {/* Total Global */}
-    <div className="col-md-12 mb-3">
-        <div className="card bg-light">
-            <div className="card-body">
-                <h4 className="card-title text-center">
-                    {translate("Totaux Globaux")}
-                </h4>
-                <div className="d-flex justify-content-around align-items-center">
-                    <div className="text-center">
-                        <h5>{translate("Quantité Totale")}</h5>
-                        <h3 className="text-primary">
-                            {fuelTotals.global.quantity.toFixed(2)} L
-                        </h3>
-                    </div>
-                    <div className="text-center">
-                        <h5>{translate("Coût Total")}</h5>
-                        <h3 className="text-primary">
-                            {fuelTotals.global.cost.toFixed(2)} €
-                        </h3>
+            
+            {/* Totals section */}
+            <div className="row mb-4">
+                {/* Global Total */}
+                <div className="col-md-12 mb-3">
+                    <div className="card bg-light">
+                        <div className="card-body">
+                            <h4 className="card-title text-center">
+                                {translate("Global Totals")}
+                            </h4>
+                            <div className="d-flex justify-content-around align-items-center">
+                                <div className="text-center">
+                                    <h5>{translate("Total Quantity")}</h5>
+                                    <h3 className="text-primary">
+                                        {fuelTotals.global.quantity.toFixed(2)} L
+                                    </h3>
+                                </div>
+                                <div className="text-center">
+                                    <h5>{translate("Total Cost")}</h5>
+                                    <h3 className="text-primary">
+                                        {fuelTotals.global.cost.toFixed(2)} €
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-   
-</div>
 
             <div className="row">
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
@@ -289,7 +291,7 @@ const handleCloseModal = () => {
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
-                                <Dropdown.Item>{translate("Immatriculation")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Date")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("KM")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Source")}</Dropdown.Item>
@@ -297,7 +299,7 @@ const handleCloseModal = () => {
                         </Dropdown>
                         <input
                             type="text"
-                            placeholder={`${translate("Rechercher par")} ${translate(typeSearch)}`}
+                            placeholder={`${translate("Search by")} ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -306,7 +308,7 @@ const handleCloseModal = () => {
                 <div className="col-md-8 d-flex justify-content-end align-items-center">
                     <div className="dataTables_length">
                         <label style={{ marginBottom: "0" }}>
-                            {translate("Afficher")}
+                            {translate("Show")}
                             <select
                                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                                 style={{ width: "66px" }}
@@ -366,9 +368,9 @@ const handleCloseModal = () => {
                                 </th>
                             )}
                             
-                            {selectedColumns["Immatriculation"] && (
+                            {selectedColumns["Vehicle"] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
-                                    {translate("Immatriculation")}
+                                    {translate("Vehicle")}
                                 </th>
                             )}
                             
@@ -384,15 +386,15 @@ const handleCloseModal = () => {
                                 </th>
                             )}
                             
-                            {selectedColumns["Coût"] && (
+                            {selectedColumns["Cost"] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("cost")}>
-                                    {translate("Coût")}
+                                    {translate("Cost")}
                                 </th>
                             )}
                             
-                            {selectedColumns["Quantité (L)"] && (
+                            {selectedColumns["Quantity (L)"] && (
                                 <th className="sorting" onClick={() => handleSortingColumn("quantity")}>
-                                    {translate("Quantité (L)")}
+                                    {translate("Quantity (L)")}
                                 </th>
                             )}
                             
@@ -425,11 +427,11 @@ const handleCloseModal = () => {
                                     </td>
                                     
                                     {selectedColumns["Source"] && <td>{sourceLabels[record.source]}</td>}
-                                    {selectedColumns["Immatriculation"] && <td>{record.immatriculation_vehicule}</td>}
+                                    {selectedColumns["Vehicle"] && <td>{record.immatriculation_vehicule}</td>}
                                     {selectedColumns["KM"] && <td>{record.km || '-'}</td>}
                                     {selectedColumns["Date"] && <td>{formatDatetimeLocal(record.date)}</td>}
-                                    {selectedColumns["Coût"] && <td>{record.cost ? `${record.cost} €` : '-'}</td>}
-                                    {selectedColumns["Quantité (L)"] && <td>{record.quantity} L</td>}
+                                    {selectedColumns["Cost"] && <td>{record.cost ? `${record.cost} €` : '-'}</td>}
+                                    {selectedColumns["Quantity (L)"] && <td>{record.quantity} L</td>}
                                     {selectedColumns["New KM"] && <td>{record.new_km || '-'}</td>}
                                     
                                     <td className="text-center">
@@ -439,7 +441,7 @@ const handleCloseModal = () => {
                                                 className="badge bg-primary mr-2"
                                                 data-toggle="tooltip"
                                                 data-placement="top"
-                                                title={translate("Voir")}
+                                                title={translate("View")}
                                                 onClick={() => handleShowModal(record.id, record.source)}
                                             >
                                                 <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
@@ -451,7 +453,7 @@ const handleCloseModal = () => {
                         ) : (
                             <tr style={{ textAlign: "center" }}>
                                 <td colSpan={Object.keys(selectedColumns).filter(col => selectedColumns[col]).length + 2}>
-                                    {translate("Aucune donnée disponible")}
+                                    {translate("No data available")}
                                 </td>
                             </tr>
                         )}
@@ -461,12 +463,12 @@ const handleCloseModal = () => {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>{translate("Affichage")} {((currentPage - 1) * limit) + 1} {translate("à")} {Math.min(currentPage * limit, total)} {translate("sur")} {total}</span>
+                    <span>{translate("Displaying")} {((currentPage - 1) * limit) + 1} {translate("to")} {Math.min(currentPage * limit, total)} {translate("of")} {total}</span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
-                        previousLabel={translate("Précédent")}
-                        nextLabel={translate("Suivant")}
+                        previousLabel={translate("Previous")}
+                        nextLabel={translate("Next")}
                         breakLabel={"..."}
                         pageCount={pageCount}
                         marginPagesDisplayed={2}
@@ -495,7 +497,7 @@ const handleCloseModal = () => {
                 />
             )}
         </>
-        );
+    );
 }
 
 export default FuelManagement;

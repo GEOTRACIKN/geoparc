@@ -844,7 +844,13 @@
 "Mission Order Details": "Détails de l'ordre de mission",
 "Mission Order No": "N° de l'ordre de mission",
 "Mission Report Details": "Détails du rapport de mission",
-"Mission Report No": "N° du rapport de mission"
+"Mission Report No": "N° du rapport de mission",
+"Fuel Management": "Gestion du carburant",
+  "Global Totals": "Totaux globaux",
+  "Total Quantity": "Quantité totale",
+  "Total Cost": "Coût total",
+  "Quantity (L)": "Quantité (L)"
+
 
 
 

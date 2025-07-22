@@ -833,6 +833,11 @@
 "Mission Order Details": "Mission Order Details",
 "Mission Order No": "Mission Order No",
 "Mission Report Details": "Mission Report Details",
-"Mission Report No": "Mission Report No"
+"Mission Report No": "Mission Report No",
+"Fuel Management": "Fuel Management",
+  "Global Totals": "Global Totals",
+  "Total Quantity": "Total Quantity",
+  "Total Cost": "Total Cost",
+  "Quantity (L)": "Quantity (L)"
 
 }

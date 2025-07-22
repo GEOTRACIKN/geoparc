@@ -857,7 +857,14 @@
 "Mission Order No": "رقم أمر المهمة",
 "Mission Report Details": "تفاصيل تقرير المهمة",
 "Mission Report No": "رقم تقرير المهمة",
-"Mission Report": "تقرير المهمة"
+"Mission Report": "تقرير المهمة",
+"Fuel Management": "إدارة الوقود",
+  "Global Totals": "الإجماليات العامة",
+  "Total Quantity": "إجمالي الكمية",
+  "Total Cost": "إجمالي التكلفة",
+ 
+  "Quantity (L)": "الكمية (لتر)"
+  
 
 
 }
