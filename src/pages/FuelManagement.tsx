@@ -7,7 +7,24 @@ import { PropagateLoader } from "react-spinners";
 import ModalShowCardManagement from "../components/CardManagement/ShowCardManagement";
 import ModalShowCashManagement from "../components/CashManagement/ShowCashManagement";
 import ModalShowTankManagement from "../components/TankManagement/ShowTankManagement";
-
+interface FuelTotals {
+    card: {
+        quantity: number;
+        cost: number;
+    };
+    cash: {
+        quantity: number;
+        cost: number;
+    };
+    tank: {
+        quantity: number;
+        cost: number;
+    };
+    global: {
+        quantity: number;
+        cost: number;
+    };
+}
 interface FuelRecord {
     id: number;
     source: 'card' | 'cash' | 'tank';
@@ -40,6 +57,12 @@ export function FuelManagement() {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const [fuelTotals, setFuelTotals] = useState<FuelTotals>({
+    card: { quantity: 0, cost: 0 },
+    cash: { quantity: 0, cost: 0 },
+    tank: { quantity: 0, cost: 0 },
+    global: { quantity: 0, cost: 0 }
+});
 
     // Gestion des modals
     const [activeModal, setActiveModal] = useState<{
@@ -82,10 +105,13 @@ export function FuelManagement() {
         setActiveModal({ type: source, recordId: id });
     };
 
-    const handleCloseModal = () => {
-        setActiveModal({ type: null, recordId: null });
-    };
-
+const handleCloseModal = () => {
+    setActiveModal({ type: null, recordId: null });
+    // Rafraîchir les données après fermeture du modal
+    getCountFuelRecords();
+    getFuelRecords();
+    fetchFuelTotals();
+};
     const getCountFuelRecords = async () => {
         try {
             setLoading(true);
@@ -120,10 +146,50 @@ export function FuelManagement() {
             setLoading(false);
         }
     };
+  const fetchFuelTotals = async () => {
+    try {
+        const response = await fetch(
+            `${backendUrl}/api/geop/consumptions/global-totals/${id_user}`
+        );
+        const data = await response.json();
+        
+        // Vérification et normalisation des données
+        const normalizedData = {
+            card: {
+                quantity: Number(data.card?.quantity) || 0,
+                cost: Number(data.card?.cost) || 0
+            },
+            cash: {
+                quantity: Number(data.cash?.quantity) || 0,
+                cost: Number(data.cash?.cost) || 0
+            },
+            tank: {
+                quantity: Number(data.tank?.quantity) || 0,
+                cost: Number(data.tank?.cost) || 0
+            },
+            global: {
+                quantity: Number(data.global?.quantity) || 0,
+                cost: Number(data.global?.cost) || 0
+            }
+        };
+        
+        setFuelTotals(normalizedData);
+    } catch (error) {
+        console.error("Error fetching fuel totals:", error);
+        // Réinitialiser en cas d'erreur
+        setFuelTotals({
+            card: { quantity: 0, cost: 0 },
+            cash: { quantity: 0, cost: 0 },
+            tank: { quantity: 0, cost: 0 },
+            global: { quantity: 0, cost: 0 }
+        });
+    }
+};
 
     useEffect(() => {
         getCountFuelRecords();
         getFuelRecords();
+        fetchFuelTotals(); 
     }, [currentPage, limit, search, type, column, sort]);
 
     const handleColumnChange = (column: string) => {
@@ -185,6 +251,35 @@ export function FuelManagement() {
                     {/* Vous pouvez ajouter un bouton "Nouvel enregistrement" ici si nécessaire */}
                 </div>
             </div>
+            {/* Section des totaux */}
+<div className="row mb-4">
+    {/* Total Global */}
+    <div className="col-md-12 mb-3">
+        <div className="card bg-light">
+            <div className="card-body">
+                <h4 className="card-title text-center">
+                    {translate("Totaux Globaux")}
+                </h4>
+                <div className="d-flex justify-content-around align-items-center">
+                    <div className="text-center">
+                        <h5>{translate("Quantité Totale")}</h5>
+                        <h3 className="text-primary">
+                            {fuelTotals.global.quantity.toFixed(2)} L
+                        </h3>
+                    </div>
+                    <div className="text-center">
+                        <h5>{translate("Coût Total")}</h5>
+                        <h3 className="text-primary">
+                            {fuelTotals.global.cost.toFixed(2)} €
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</div>
 
             <div className="row">
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
