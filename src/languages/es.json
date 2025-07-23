@@ -882,7 +882,13 @@
   "Amortization Km": "Amortización (km)",
   "Amortization Duration": "Duración de la amortización",
   "Cash Payment Management": "Gestión de pagos en efectivo",
-  "Are you sure you want to delete this cash payment record?": "¿Estás seguro de que deseas eliminar este pago en efectivo?"
+  "Are you sure you want to delete this cash payment record?": "¿Estás seguro de que deseas eliminar este pago en efectivo?",
+
+   "Card management": "Gestión de tarjetas",
+  "Tank management": "Gestión de tanques",
+  "Cash management": "Gestión de efectivo",
+  "Stock": "Inventario",
+  "Tire": "Neumático"
 
 
 

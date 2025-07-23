@@ -895,8 +895,12 @@
   "Amortization Km": "الإهلاك (كم)",
   "Amortization Duration": "مدة الإهلاك",
   "Cash Payment Management": "إدارة المدفوعات النقدية",
-  "Are you sure you want to delete this cash payment record?": "هل أنت متأكد أنك تريد حذف هذا السجل الخاص بالدفع نقدًا؟"
+  "Are you sure you want to delete this cash payment record?": "هل أنت متأكد أنك تريد حذف هذا السجل الخاص بالدفع نقدًا؟",
 
-
-
+  "Card management": "إدارة البطاقات",
+  "Tank management": "إدارة الخزانات",
+  "Cash management": "إدارة الدفع النقدي",
+ "Stock": "المخزون",
+  "Tire": "الإطارات",
+  "Available-OS": "متاح - خارج الخدمة"
 }

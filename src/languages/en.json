@@ -869,8 +869,13 @@
   "Amortization Km": "Amortization Km",
   "Amortization Duration": "Amortization Duration",
   "Cash Payment Management": "Cash Payment Management",
-  "Are you sure you want to delete this cash payment record?": "Are you sure you want to delete this cash payment record?"
+  "Are you sure you want to delete this cash payment record?": "Are you sure you want to delete this cash payment record?",
 
+   "Card management": "Card management",
+  "Tank management": "Tank management",
+  "Cash management": "Cash management",
+  "Stock": "Stock",
+  "Tire": "Tire"
 
 
 }
