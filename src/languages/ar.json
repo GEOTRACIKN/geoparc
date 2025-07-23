@@ -902,5 +902,8 @@
   "Cash management": "إدارة الدفع النقدي",
  "Stock": "المخزون",
   "Tire": "الإطارات",
-  "Available-OS": "متاح - خارج الخدمة"
+  "Available-OS": "متاح - خارج الخدمة",
+   "Fuel card": "بطاقة الوقود",
+  "Cash payment": "دفع نقدي",
+  "Cash Payment Record Details": "تفاصيل سجل الدفع النقدي"
 }

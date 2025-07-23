@@ -875,7 +875,10 @@
   "Tank management": "Tank management",
   "Cash management": "Cash management",
   "Stock": "Stock",
-  "Tire": "Tire"
+  "Tire": "Tire",
+   "Fuel card": "Fuel card",
+  "Cash payment": "Cash payment",
+  "Cash Payment Record Details": "Cash Payment Record Details"
 
 
 }

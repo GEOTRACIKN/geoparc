@@ -887,7 +887,10 @@
   "Card management": "Gestion des cartes",
   "Tank management": "Gestion des réservoirs",
   "Cash management": "Gestion de la trésorerie",
-  "Stock": "Stock"
+  "Stock": "Stock",
+   "Fuel card": "Carte carburant",
+  "Cash payment": "Paiement en espèces",
+  "Cash Payment Record Details": "Détails de l’enregistrement du paiement en espèces"
 
 
 
