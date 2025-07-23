@@ -110,9 +110,9 @@ export function FuelManagement() {
     const handleCloseModal = () => {
         setActiveModal({ type: null, recordId: null });
         // Refresh data after modal closes
-        getCountFuelRecords();
-        getFuelRecords();
-        fetchFuelTotals();
+        //getCountFuelRecords();
+        //getFuelRecords();
+        //fetchFuelTotals();
     };
 
     const getCountFuelRecords = async () => {
