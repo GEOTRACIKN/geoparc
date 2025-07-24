@@ -133,7 +133,7 @@ export function FuelManagement() {
         }
     };
 
-    const getFuelRecords = async () => {
+    /*const getFuelRecords = async () => {
         try {
             setLoading(true);
             if (!id_user) throw new Error("User ID is missing");
@@ -148,7 +148,7 @@ export function FuelManagement() {
         } finally {
             setLoading(false);
         }
-    };
+    };*/
 
     const fetchFuelTotals = async () => {
         try {
@@ -191,6 +191,14 @@ export function FuelManagement() {
     };
 
     useEffect(() => {
+          console.log("Fetching data with params:", {
+        currentPage,
+        limit,
+        search,
+        type,
+        column,
+        sort
+    });
         getCountFuelRecords();
         getFuelRecords();
         fetchFuelTotals(); 
@@ -205,12 +213,54 @@ export function FuelManagement() {
         localStorage.setItem("selectedFuelColumns", JSON.stringify(updatedColumns));
     };
 
-    const handleSortingColumn = (currentColumn: string) => {
-        const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
-        setSortColumn(currentColumn);
-        setSort(newSortOrder);
-        getFuelRecords();
+  // Modifiez handleSortingColumn comme ceci :
+const handleSortingColumn = (currentColumn: string) => {
+    const columnMapping: Record<string, string> = {
+        "Source": "source",
+        "Vehicle": "immatriculation_vehicule",
+        "KM": "km",
+        "Date": "date",
+        "Cost": "cost",
+        "Quantity (L)": "quantity",
+        "New KM": "new_km"
     };
+
+    const backendColumn = columnMapping[currentColumn];
+    
+    if (!backendColumn) {
+        console.error(`No mapping found for column: ${currentColumn}`);
+        return;
+    }
+
+    // Determine new sort order
+    let newSortOrder = "desc";
+    if (column === backendColumn) {
+        newSortOrder = sort === "desc" ? "asc" : "desc";
+    }
+
+    // Update state
+    setSortColumn(backendColumn);
+    setSort(newSortOrder);
+    setCurrentPage(1); // Reset to first page when sorting
+};
+// Modifiez l'URL de fetch pour utiliser sortOrder en minuscules :
+const getFuelRecords = async () => {
+    try {
+        setLoading(true);
+        if (!id_user) throw new Error("User ID is missing");
+        
+        const response = await fetch(
+            `${backendUrl}/api/geop/consumptions/${id_user}/${currentPage}/${limit}?` + 
+            `searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort.toLowerCase()}`
+        );
+        const data = await response.json();
+        setFuelRecords(data);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
