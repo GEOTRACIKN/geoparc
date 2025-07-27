@@ -54,7 +54,7 @@ export function FuelManagement() {
     const [type, setType] = useState(0);
     const [typeSearch, setTypeSearch] = useState(translate("Vehicle"));
     const [search, setSearch] = useState("");
-    const [column, setSortColumn] = useState("id");
+    const [column, setSortColumn] = useState("date");
     const [sort, setSort] = useState("desc");
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -109,10 +109,6 @@ export function FuelManagement() {
 
     const handleCloseModal = () => {
         setActiveModal({ type: null, recordId: null });
-        // Refresh data after modal closes
-        //getCountFuelRecords();
-        //getFuelRecords();
-        //fetchFuelTotals();
     };
 
     const getCountFuelRecords = async () => {
@@ -133,23 +129,6 @@ export function FuelManagement() {
         }
     };
 
-    /*const getFuelRecords = async () => {
-        try {
-            setLoading(true);
-            if (!id_user) throw new Error("User ID is missing");
-            
-            const response = await fetch(
-                `${backendUrl}/api/geop/consumptions/${id_user}/${currentPage}/${limit}?searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
-            );
-            const data = await response.json();
-            setFuelRecords(data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };*/
-
     const fetchFuelTotals = async () => {
         try {
             const response = await fetch(
@@ -157,7 +136,6 @@ export function FuelManagement() {
             );
             const data = await response.json();
             
-            // Data verification and normalization
             const normalizedData = {
                 card: {
                     quantity: Number(data.card?.quantity) || 0,
@@ -180,7 +158,6 @@ export function FuelManagement() {
             setFuelTotals(normalizedData);
         } catch (error) {
             console.error("Error fetching fuel totals:", error);
-            // Reset on error
             setFuelTotals({
                 card: { quantity: 0, cost: 0 },
                 cash: { quantity: 0, cost: 0 },
@@ -190,18 +167,47 @@ export function FuelManagement() {
         }
     };
 
+    const getFuelRecords = async () => {
+        try {
+            setLoading(true);
+            if (!id_user) throw new Error("User ID is missing");
+            
+            const response = await fetch(
+                `${backendUrl}/api/geop/consumptions/${id_user}/${currentPage}/${limit}?` + 
+                `searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort}`
+            );
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            setFuelRecords(data);
+        } catch (error) {
+            console.error("Error fetching fuel records:", error);
+            setFuelRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-          console.log("Fetching data with params:", {
-        currentPage,
-        limit,
-        search,
-        type,
-        column,
-        sort
-    });
-        getCountFuelRecords();
-        getFuelRecords();
-        fetchFuelTotals(); 
+        console.log("Fetching data with params:", {
+            currentPage,
+            limit,
+            search,
+            type,
+            column,
+            sort
+        });
+        
+        const fetchData = async () => {
+            await getCountFuelRecords();
+            await getFuelRecords();
+            await fetchFuelTotals();
+        };
+        
+        fetchData();
     }, [currentPage, limit, search, type, column, sort]);
 
     const handleColumnChange = (column: string) => {
@@ -213,54 +219,19 @@ export function FuelManagement() {
         localStorage.setItem("selectedFuelColumns", JSON.stringify(updatedColumns));
     };
 
-  // Modifiez handleSortingColumn comme ceci :
-const handleSortingColumn = (currentColumn: string) => {
-    const columnMapping: Record<string, string> = {
-        "Source": "source",
-        "Vehicle": "immatriculation_vehicule",
-        "KM": "km",
-        "Date": "date",
-        "Cost": "cost",
-        "Quantity (L)": "quantity",
-        "New KM": "new_km"
-    };
-
-    const backendColumn = columnMapping[currentColumn];
-    
-    if (!backendColumn) {
-        console.error(`No mapping found for column: ${currentColumn}`);
-        return;
-    }
-
-    // Determine new sort order
-    let newSortOrder = "desc";
-    if (column === backendColumn) {
-        newSortOrder = sort === "desc" ? "asc" : "desc";
-    }
-
-    // Update state
-    setSortColumn(backendColumn);
-    setSort(newSortOrder);
-    setCurrentPage(1); // Reset to first page when sorting
-};
-// Modifiez l'URL de fetch pour utiliser sortOrder en minuscules :
-const getFuelRecords = async () => {
-    try {
-        setLoading(true);
-        if (!id_user) throw new Error("User ID is missing");
+    const handleSortingColumn = (columnName: string) => {
+        // Determine the new sort order
+        const newSortOrder = column === columnName ? 
+                           (sort === "desc" ? "asc" : "desc") : 
+                           "desc";
         
-        const response = await fetch(
-            `${backendUrl}/api/geop/consumptions/${id_user}/${currentPage}/${limit}?` + 
-            `searchTerm=${search}&searchType=${type}&sortColumn=${column}&sortOrder=${sort.toLowerCase()}`
-        );
-        const data = await response.json();
-        setFuelRecords(data);
-    } catch (error) {
-        console.error(error);
-    } finally {
-        setLoading(false);
-    }
-};
+        console.log(`Sorting by ${columnName} in ${newSortOrder} order`);
+        
+        // Update state
+        setSortColumn(columnName);
+        setSort(newSortOrder);
+        setCurrentPage(1); // Reset to first page when changing sort
+    };
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -294,6 +265,17 @@ const getFuelRecords = async () => {
         return date.toLocaleDateString();
     };
 
+    // Column mapping for sorting
+    const columnMapping: Record<string, string> = {
+        "Source": "source",
+        "Vehicle": "immatriculation_vehicule",
+        "KM": "km",
+        "Date": "date",
+        "Cost": "cost",
+        "Quantity (L)": "quantity",
+        "New KM": "new_km"
+    };
+
     return (
         <>
             <div className="row">
@@ -307,7 +289,6 @@ const getFuelRecords = async () => {
             
             {/* Totals section */}
             <div className="row mb-4">
-                {/* Global Total */}
                 <div className="col-md-12 mb-3">
                     <div className="card bg-light">
                         <div className="card-body">
@@ -413,44 +394,107 @@ const getFuelRecords = async () => {
                             </th>
                             
                             {selectedColumns["Source"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("source")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("source")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("Source")}
+                                    {column === "source" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["Vehicle"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("Vehicle")}
+                                    {column === "immatriculation_vehicule" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["KM"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("km")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("km")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("KM")}
+                                    {column === "km" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["Date"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("date")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("date")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("Date")}
+                                    {column === "date" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["Cost"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("cost")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("cost")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("Cost")}
+                                    {column === "cost" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["Quantity (L)"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("quantity")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("quantity")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("Quantity (L)")}
+                                    {column === "quantity" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
                             {selectedColumns["New KM"] && (
-                                <th className="sorting" onClick={() => handleSortingColumn("new_km")}>
+                                <th 
+                                    className="sorting" 
+                                    onClick={() => handleSortingColumn("new_km")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     {translate("New KM")}
+                                    {column === "new_km" && (
+                                        <span style={{ marginLeft: "5px" }}>
+                                            {sort === "asc" ? "↑" : "↓"}
+                                        </span>
+                                    )}
                                 </th>
                             )}
                             
