@@ -878,7 +878,18 @@
   "Tire": "Tire",
    "Fuel card": "Fuel card",
   "Cash payment": "Cash payment",
-  "Cash Payment Record Details": "Cash Payment Record Details"
+  "Cash Payment Record Details": "Cash Payment Record Details",
+   "Expiration Settings": "Expiration Settings",
+  "Expiration Type": "Expiration Type",
+  "Kilometer Limit": "Kilometer Limit",
+  "Delete Stock Entry": "Delete Stock Entry",
+  "Are you sure you want to delete this stock entry?": "Are you sure you want to delete this stock entry?",
+  "Nouvelle pièce en stock": "New Stock Part",
+  "Select": "Select",
+  "No Expiration": "No Expiration",
+  "By Date Only": "By Date Only",
+  "By Kilometer Only": "By Kilometer Only",
+  "By Date and Kilometer": "By Date and Kilometer"
 
 
 }

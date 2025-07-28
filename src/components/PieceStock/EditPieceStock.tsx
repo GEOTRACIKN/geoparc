@@ -21,23 +21,26 @@ export default function EditPieceStockModal({ show, onHide, id_piece_stock, onSu
     const [fournisseurs, setFournisseurs] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const [formData, setFormData] = useState({
-        num_facture_ps: '',
-        date_achat_ps: '',
-        constructeur_ps: '',
-        modele_ps: '',
-        marque_ps: '',
-        categorie_ps: '',
-        type_piece_ps: '',
-        duree_amort_ps: 0,
-        km_amort_ps: 0,
-        designation_ps: '',
-        reference_ps: '',
-        fournisseur_ps: '',
-        cout_achat_ps: 0,
-        quantite_ps: 0,
-        stock_min_ps: 0
-    });
+ const [formData, setFormData] = useState({
+    num_facture_ps: '',
+    date_achat_ps: '',
+    constructeur_ps: '',
+    modele_ps: '',
+    marque_ps: '',
+    categorie_ps: '',
+    type_piece_ps: '',
+    duree_amort_ps: 0,
+    km_amort_ps: 0,
+    designation_ps: '',
+    reference_ps: '',
+    fournisseur_ps: '',
+    cout_achat_ps: 0,
+    quantite_ps: 0,
+    stock_min_ps: 0,
+    exp_type_ps: '',              
+    exp_date_ps: '',             
+    exp_km_ps: ''                
+});
 
 const categories: { [key: string]: string } = {
     freinage: translate("Braking"),
@@ -74,10 +77,19 @@ const typesPiece: { [key: string]: string } = {
                     const localDate = new Date(date.getTime() - offset * 60 * 1000);
                     return localDate.toISOString().slice(0, 16);
                 };
+                  const formatDate = (value: string) => {
+                if (!value) return '';
+                const date = new Date(value);
+                const offset = date.getTimezoneOffset();
+                const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                return localDate.toISOString().slice(0, 10);
+            };
+
 
                 setFormData({
                     ...data,
-                    date_achat_ps: formatDatetimeLocal(data.date_achat_ps)
+                    date_achat_ps: formatDatetimeLocal(data.date_achat_ps),
+                                    exp_date_ps: formatDate(data.exp_date_ps) 
                 });
 
                 // Charger les listes
@@ -134,25 +146,28 @@ const typesPiece: { [key: string]: string } = {
     };
 
     const handleClose = () => {
-        setFormData({
-            num_facture_ps: '',
-            date_achat_ps: '',
-            constructeur_ps: '',
-            modele_ps: '',
-            marque_ps: '',
-            categorie_ps: '',
-            type_piece_ps: '',
-            duree_amort_ps: 0,
-            km_amort_ps: 0,
-            designation_ps: '',
-            reference_ps: '',
-            fournisseur_ps: '',
-            cout_achat_ps: 0,
-            quantite_ps: 0,
-            stock_min_ps: 0
-        });
-        onHide();
-    };
+    setFormData({
+        num_facture_ps: '',
+        date_achat_ps: '',
+        constructeur_ps: '',
+        modele_ps: '',
+        marque_ps: '',
+        categorie_ps: '',
+        type_piece_ps: '',
+        duree_amort_ps: 0,
+        km_amort_ps: 0,
+        designation_ps: '',
+        reference_ps: '',
+        fournisseur_ps: '',
+        cout_achat_ps: 0,
+        quantite_ps: 0,
+        stock_min_ps: 0,
+        exp_type_ps: '',              
+        exp_date_ps: '',             
+        exp_km_ps: ''
+    });
+    onHide();
+};
 
     return (
         <Modal show={show} onHide={handleClose} size="lg">
@@ -167,7 +182,7 @@ const typesPiece: { [key: string]: string } = {
                         </div>
                     </div>
                 ) : (
-                   <Form>
+             <Form>
     {/* 1 - Purchase Date & Invoice Number */}
     <div className="row">
         <div className="col-md-6">
@@ -185,13 +200,13 @@ const typesPiece: { [key: string]: string } = {
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Purchase Date")}</Form.Label>
-                  <Form.Control
-            type="datetime-local"
-            name="date_achat_ps"
-            value={formData.date_achat_ps || ""}
-            onChange={handleChange}
-            required
-        />
+                <Form.Control
+                    type="datetime-local"
+                    name="date_achat_ps"
+                    value={formData.date_achat_ps || ""}
+                    onChange={handleChange}
+                    required
+                />
             </Form.Group>
         </div>
     </div>
@@ -238,8 +253,6 @@ const typesPiece: { [key: string]: string } = {
                 />
             </Form.Group>
         </div>
-
-
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Category")}</Form.Label>
@@ -324,19 +337,19 @@ const typesPiece: { [key: string]: string } = {
     <div className="row">
         <div className="col-md-4">
             <Form.Group className="mb-3">
-                <Form.Label>{translate("Cost (DZD)")} </Form.Label>
+                <Form.Label>{translate("Cost (DZD)")}</Form.Label>
                 <Form.Control
                     type="text"
                     name="cout_achat_ps"
                     value={formData.cout_achat_ps}
                     onChange={handleChange}
                     min="0"
-                     onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
+                    onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                 />
             </Form.Group>
         </div>
@@ -350,11 +363,11 @@ const typesPiece: { [key: string]: string } = {
                     onChange={handleChange}
                     min="0"
                     onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                 />
             </Form.Group>
         </div>
@@ -367,12 +380,12 @@ const typesPiece: { [key: string]: string } = {
                     value={formData.stock_min_ps}
                     onChange={handleChange}
                     min="0"
-                     onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
+                    onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                 />
             </Form.Group>
         </div>
@@ -389,12 +402,12 @@ const typesPiece: { [key: string]: string } = {
                     value={formData.duree_amort_ps}
                     onChange={handleChange}
                     min="0"
-                     onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
+                    onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                 />
             </Form.Group>
         </div>
@@ -407,26 +420,87 @@ const typesPiece: { [key: string]: string } = {
                     value={formData.km_amort_ps}
                     onChange={handleChange}
                     min="0"
-                     onKeyDown={(e) => {
-                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                                if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-                                    e.preventDefault();
-                                }
-                            }}
+                    onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                 />
             </Form.Group>
         </div>
+    </div>
+
+    {/* 8 - Expiration (nouvelle section séparée) */}
+    <div className="row mt-4">
+        <div className="col-md-12">
+            <h5 className="mb-3">{translate("Expiration Settings")}</h5>
+        </div>
+        
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Expiration Type")}</Form.Label>
+                <Form.Control
+                    as="select"
+                    name="exp_type_ps"
+                    value={formData.exp_type_ps}
+                    onChange={handleChange}
+                >
+                    <option value="">{translate("No Expiration")}</option>
+                    <option value="date">{translate("By Date Only")}</option>
+                    <option value="km">{translate("By Kilometer Only")}</option>
+                    <option value="both">{translate("By Date and Kilometer")}</option>
+                </Form.Control>
+            </Form.Group>
+        </div>
+
+        {(formData.exp_type_ps === "date" || formData.exp_type_ps === "both") && (
+            <div className="col-md-6">
+                <Form.Group className="mb-3">
+                    <Form.Label>{translate("Expiration Date")}</Form.Label>
+                    <Form.Control
+                        type="date"
+                        name="exp_date_ps"
+                        value={formData.exp_date_ps || ""}
+                        onChange={handleChange}
+                        required={formData.exp_type_ps === "date" || formData.exp_type_ps === "both"}
+                    />
+                </Form.Group>
+            </div>
+        )}
+
+        {(formData.exp_type_ps === "km" || formData.exp_type_ps === "both") && (
+            <div className="col-md-6">
+                <Form.Group className="mb-3">
+                    <Form.Label>{translate("Kilometer Limit")}</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="exp_km_ps"
+                        value={formData.exp_km_ps}
+                        onChange={handleChange}
+                        min="0"
+                        required={formData.exp_type_ps === "km" || formData.exp_type_ps === "both"}
+                        onKeyDown={(e) => {
+                            const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                            if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                                e.preventDefault();
+                            }
+                        }}
+                    />
+                </Form.Group>
+            </div>
+        )}
     </div>
 </Form>
 
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    {translate("Annuler")}
+                <Button variant="secondary" onClick={onHide}>
+                    {translate("Close")}
                 </Button>
                 <Button variant="primary" onClick={handleSubmit}>
-                    {translate("Enregistrer les modifications")}
+                    {translate("Save")}
                 </Button>
             </Modal.Footer>
         </Modal>

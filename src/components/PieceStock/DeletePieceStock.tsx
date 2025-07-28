@@ -82,7 +82,7 @@ const ModalDeletePieceStock: React.FC<ModalDeletePieceStockProps> = ({
                     {translate("Cancel")}
                 </Button>
                 <Button variant="danger" onClick={handleDelete}>
-                    {translate("Confirm Delete")}
+                    {translate("Confirm")}
                 </Button>
             </Modal.Footer>
         </Modal>

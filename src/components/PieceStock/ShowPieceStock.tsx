@@ -19,28 +19,27 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
     const [formData, setFormData] = useState<any>(null);
 
     // Liste des catégories (identique à l'édition)
-    const categories : { [key: string]: string } = {
-        freinage: translate("Freinage"),
-        filtration: translate("Filtration"),
-        moteur: translate("Moteur"),
-        suspension_direction: translate("Suspension/Direction"),
-        echappement: translate("Échappement"),
-        electricite: translate("Électricité"),
-        chauffage_refroidissement: translate("Chauffage/Refroidissement"),
-        carrosserie: translate("Carrosserie"),
-        accessoires: translate("Accessoires"),
-        liquide_lubrifiant: translate("Liquide/Lubrifiant"),
-        autres: translate("AUTRES"),
-    };
+   const categories: { [key: string]: string } = {
+    freinage: translate("Braking"),
+    filtration: translate("Filtration"),
+    moteur: translate("Engine"),
+    suspension_direction: translate("Suspension/Steering"),
+    echappement: translate("Exhaust"),
+    electricite: translate("Electricity"),
+    chauffage_refroidissement: translate("Heating/Cooling"),
+    carrosserie: translate("Bodywork"),
+    accessoires: translate("Accessories"),
+    liquide_lubrifiant: translate("Fluids/Lubricants"),
+    autres: translate("OTHERS"),
+};
 
-    // Liste des types de pièces (identique à l'édition)
-    const typesPiece : { [key: string]: string } = {
-        origine: translate("Pièce d'origine"),
-        apresmarket: translate("Pièce après-vente"),
-        reconditionne: translate("Reconditionné"),
-        occasion: translate("Occasion")
-    };
-
+// List of part types
+const typesPiece: { [key: string]: string } = {
+    origine: translate("Original part"),
+    apresmarket: translate("Aftermarket part"),
+    reconditionne: translate("Refurbished"),
+    occasion: translate("Used"),
+};
     
 
     useEffect(() => {
@@ -74,7 +73,7 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
     return (
         <Modal show={show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{translate("Détails de la pièce")}</Modal.Title>
+                <Modal.Title>{translate("Details")}</Modal.Title>
             </Modal.Header>
             
             <Modal.Body>
@@ -84,7 +83,7 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
                     </div>
                 ) : (
                     formData && (
-                       <Form>
+                     <Form>
     {/* Line 1 - Invoice Number & Purchase Date */}
     <div className="row">
         <div className="col-md-6">
@@ -97,13 +96,13 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Purchase Date")}</Form.Label>
                 <Form.Control readOnly 
-                value={
-                formData.date_achat_ps
-                    ? moment(formData.date_achat_ps).format('YYYY-MM-DD hh:mm A')
-
-                    : ""
-            } />
-                </Form.Group>
+                    value={
+                        formData.date_achat_ps
+                            ? moment(formData.date_achat_ps).format('YYYY-MM-DD hh:mm A')
+                            : ""
+                    } 
+                />
+            </Form.Group>
         </div>
     </div>
 
@@ -222,9 +221,57 @@ export default function ShowPieceStockModal({ show, onHide, id_piece_stock }: Sh
         <div className="col-md-6">
             <Form.Group className="mb-3">
                 <Form.Label>{translate("Depreciation KM")}</Form.Label>
-                <Form.Control readOnly value={`${formData.km_amort_ps || '0'} km`} />
+                <Form.Control readOnly value={`${formData.km_amort_ps || '0'} `} />
             </Form.Group>
         </div>
+    </div>
+
+    {/* Line 8 - Expiration (nouvelle section séparée) */}
+    <div className="row mt-3">
+        
+        
+        <div className="col-md-6">
+            <Form.Group className="mb-3">
+                <Form.Label>{translate("Expiration Type")}</Form.Label>
+                <Form.Control 
+                    readOnly
+                    value={
+                        formData.exp_type_ps === "date" ? translate("By Date Only") :
+                        formData.exp_type_ps === "km" ? translate("By Kilometer Only") :
+                        formData.exp_type_ps === "both" ? translate("By Date and Kilometer") :
+                        translate("No Expiration")
+                    }
+                />
+            </Form.Group>
+        </div>
+
+        {formData.exp_type_ps === "date" || formData.exp_type_ps === "both" ? (
+            <div className="col-md-6">
+                <Form.Group className="mb-3">
+                    <Form.Label>{translate("Expiration Date")}</Form.Label>
+                    <Form.Control
+                        readOnly
+                        value={formData.exp_date_ps 
+                            ? moment(formData.exp_date_ps).format('YYYY-MM-DD')
+                            : '-'}
+                    />
+                </Form.Group>
+            </div>
+        ) : null}
+
+        {formData.exp_type_ps === "km" || formData.exp_type_ps === "both" ? (
+            <div className="col-md-6">
+                <Form.Group className="mb-3">
+                    <Form.Label>{translate("Kilometer Limit")}</Form.Label>
+                    <Form.Control
+                        readOnly
+                        value={formData.exp_km_ps 
+                            ? `${formData.exp_km_ps} `
+                            : '-'}
+                    />
+                </Form.Group>
+            </div>
+        ) : null}
     </div>
 </Form>
 

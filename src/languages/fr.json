@@ -890,7 +890,18 @@
   "Stock": "Stock",
    "Fuel card": "Carte carburant",
   "Cash payment": "Paiement en espèces",
-  "Cash Payment Record Details": "Détails de l’enregistrement du paiement en espèces"
+  "Cash Payment Record Details": "Détails de l’enregistrement du paiement en espèces",
+  "Expiration Settings": "Paramètres d’expiration",
+  "Expiration Type": "Type d’expiration",
+  "Kilometer Limit": "Limite en kilomètres",
+  "Delete Stock Entry": "Supprimer l’entrée de stock",
+  "Are you sure you want to delete this stock entry?": "Êtes-vous sûr de vouloir supprimer cette entrée de stock ?",
+  "Nouvelle pièce en stock": "Nouvelle pièce en stock",
+  "Select": "Sélectionner",
+  "No Expiration": "Pas d’expiration",
+  "By Date Only": "Par date seulement",
+  "By Kilometer Only": "Par kilométrage seulement",
+  "By Date and Kilometer": "Par date et kilométrage"
 
 
 

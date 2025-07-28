@@ -905,5 +905,16 @@
   "Available-OS": "متاح - خارج الخدمة",
    "Fuel card": "بطاقة الوقود",
   "Cash payment": "دفع نقدي",
-  "Cash Payment Record Details": "تفاصيل سجل الدفع النقدي"
+  "Cash Payment Record Details": "تفاصيل سجل الدفع النقدي",
+    "Expiration Settings": "إعدادات انتهاء الصلاحية",
+  "Expiration Type": "نوع انتهاء الصلاحية",
+  "Kilometer Limit": "حد الكيلومترات",
+  "Delete Stock Entry": "حذف إدخال المخزون",
+  "Are you sure you want to delete this stock entry?": "هل أنت متأكد أنك تريد حذف إدخال المخزون هذا؟",
+  "Nouvelle pièce en stock": "قطعة جديدة في المخزون",
+  "Select": "تحديد",
+   "No Expiration": "بدون انتهاء",
+  "By Date Only": "حسب التاريخ فقط",
+  "By Kilometer Only": "حسب الكيلومترات فقط",
+  "By Date and Kilometer": "حسب التاريخ والكيلومترات"
 }

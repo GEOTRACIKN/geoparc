@@ -891,7 +891,18 @@
   "Tire": "Neumático",
    "Fuel card": "Tarjeta de combustible",
   "Cash payment": "Pago en efectivo",
-  "Cash Payment Record Details": "Detalles del registro de pago en efectivo"
+  "Cash Payment Record Details": "Detalles del registro de pago en efectivo",
+   "Expiration Settings": "Configuración de vencimiento",
+  "Expiration Type": "Tipo de vencimiento",
+  "Kilometer Limit": "Límite de kilómetros",
+  "Delete Stock Entry": "Eliminar entrada de inventario",
+  "Are you sure you want to delete this stock entry?": "¿Estás seguro de que deseas eliminar esta entrada de inventario?",
+  "Nouvelle pièce en stock": "Nueva pieza en stock",
+  "Select": "Seleccionar",
+  "No Expiration": "Sin vencimiento",
+  "By Date Only": "Solo por fecha",
+  "By Kilometer Only": "Solo por kilómetros",
+  "By Date and Kilometer": "Por fecha y kilómetros"
 
 
 
