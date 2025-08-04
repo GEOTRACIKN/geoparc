@@ -391,6 +391,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       to: "/notifications",
       permissionId: 52, 
     },
+     {
+      id: 38,
+      label: "Reference",
+      icon: "las la-check-circle",
+      to: "/reference",
+      permissionId: 38, // ID de permission à ajuster
+    },
     {
       id: 33,
       label: "Settings",
