@@ -305,7 +305,7 @@ export function FuelManagement() {
                                 <div className="text-center">
                                     <h5>{translate("Total Cost")}</h5>
                                     <h3 className="text-primary">
-                                        {fuelTotals.global.cost.toFixed(2)} €
+                                        {fuelTotals.global.cost.toFixed(2)} DZD
                                     </h3>
                                 </div>
                             </div>
@@ -524,7 +524,7 @@ export function FuelManagement() {
                                     {selectedColumns["Vehicle"] && <td>{record.immatriculation_vehicule}</td>}
                                     {selectedColumns["KM"] && <td>{record.km || '-'}</td>}
                                     {selectedColumns["Date"] && <td>{formatDatetimeLocal(record.date)}</td>}
-                                    {selectedColumns["Cost"] && <td>{record.cost ? `${record.cost} €` : '-'}</td>}
+                                    {selectedColumns["Cost"] && <td>{record.cost ? `${record.cost} DZD` : '-'}</td>}
                                     {selectedColumns["Quantity (L)"] && <td>{record.quantity} L</td>}
                                     {selectedColumns["New KM"] && <td>{record.new_km || '-'}</td>}
                                     

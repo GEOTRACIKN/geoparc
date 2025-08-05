@@ -135,12 +135,12 @@ const ShowTankManagement: React.FC<ShowTankManagementProps> = ({
 
                             <div className="mb-3">
                                 <h6>{translate("Price per Liter")}</h6>
-                                <p>{record.prix_ft} €/L</p>
+                                <p>{record.prix_ft} DZD/L</p>
                             </div>
 
                             <div className="mb-3">
                                 <h6>{translate("Total Cost")}</h6>
-                                <p>{record.total_ft} €</p>
+                                <p>{record.total_ft} DZD</p>
                             </div>
 
                             <div className="mb-3">

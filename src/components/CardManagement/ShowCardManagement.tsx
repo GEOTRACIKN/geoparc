@@ -140,7 +140,7 @@ const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
 
                             <div className="mb-3">
                                 <h6>{translate("Cost")}</h6>
-                                <p>{record.cout_fc} €</p>
+                                <p>{record.cout_fc} DZD</p>
                             </div>
 
                             <div className="mb-3">

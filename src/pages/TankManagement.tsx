@@ -357,8 +357,8 @@ export function TankManagement() {
                                     {selectedColumns.Date && <td>{formatDatetimeLocal(record.date_ft)}</td>}
                                     {selectedColumns["Fuel Type"] && <td>{fuelTypeLabels[record.carb_ft] || record.carb_ft}</td>}
                                     {selectedColumns.Quantity && <td>{record.qte_ft} L</td>}
-                                    {selectedColumns["Price/L"] && <td>{record.prix_ft} €/L</td>}
-                                    {selectedColumns["Total Cost"] && <td>{record.total_ft} €</td>}
+                                    {selectedColumns["Price/L"] && <td>{record.prix_ft} DZD/L</td>}
+                                    {selectedColumns["Total Cost"] && <td>{record.total_ft} DZD</td>}
                                     {selectedColumns["Tank Capacity"] && <td>{record.citerne_ft || "-"} L</td>}
                                     
                                     <td className="text-center">

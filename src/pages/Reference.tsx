@@ -4,6 +4,8 @@ import Taxe from '../components/Reference/Taxe';
 import Fuel from '../components/Reference/Fuel';
 import Data from '../components/Reference/Data';
 import Driver from '../components/Reference/Driver';
+import Mission from '../components/Reference/Mission';
+
 
 export function Reference() {
 
@@ -27,6 +29,9 @@ export function Reference() {
         <Nav.Item>
           <Nav.Link eventKey="driver">Driver</Nav.Link>
         </Nav.Item>
+         <Nav.Item>
+          <Nav.Link eventKey="mission">Mission</Nav.Link>
+        </Nav.Item>
         
         {/* Ajouter d'autres onglets ici */}
       </Nav>
@@ -37,6 +42,7 @@ export function Reference() {
          {activeTab === 'fuel' && <Fuel />}
           {activeTab === 'data' && <Data />}
             {activeTab === 'driver' && <Driver />}
+             {activeTab === 'mission' && <Mission />}
         {/* Ajouter d'autres onglets ici */}
       </div>
     </div>

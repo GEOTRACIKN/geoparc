@@ -139,7 +139,7 @@ const ShowCashManagement: React.FC<ShowCashManagementProps> = ({
 
                             <div className="mb-3">
                                 <h6>{translate("Cost")}</h6>
-                                <p>{record.cout_fb} €</p>
+                                <p>{record.cout_fb} DZD</p>
                             </div>
 
                             <div className="mb-3">

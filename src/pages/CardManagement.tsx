@@ -360,7 +360,7 @@ export function CardManagement() {
                                     {selectedColumns.Date && <td>{formatDatetimeLocal(card.date_fc)}</td>}
                                     {selectedColumns["Fuel Type"] && <td>{fuelTypeLabels[card.carb_fc] || card.carb_fc}</td>}
                                     {selectedColumns.Quantity && <td>{card.qte_fc} L</td>}
-                                    {selectedColumns.Cost && <td>{card.cout_fc} €</td>}
+                                    {selectedColumns.Cost && <td>{card.cout_fc} DZD</td>}
                                     {selectedColumns["Invoice Number"] && <td>{card.facture_fc || "-"}</td>}
                                     {selectedColumns["Card Number"] && <td>{card.carte_fc || "-"}</td>}
                                     

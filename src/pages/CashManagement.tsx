@@ -363,7 +363,7 @@ export function CashManagement() {
                                     {selectedColumns.Date && <td>{formatDatetimeLocal(payment.date_fb)}</td>}
                                     {selectedColumns["Payment Type"] && <td>{paymentTypeLabels[payment.paytype_fb] || payment.paytype_fb}</td>}
                                     {selectedColumns.Quantity && <td>{payment.qte_fb} L</td>}
-                                    {selectedColumns.Cost && <td>{payment.cout_fb} €</td>}
+                                    {selectedColumns.Cost && <td>{payment.cout_fb} DZD</td>}
                                     {selectedColumns["Invoice Number"] && <td>{payment.num_fact_fb || "-"}</td>}
                                     {selectedColumns.Driver && <td>{payment.conducteur_fb || "-"}</td>}
                                     
