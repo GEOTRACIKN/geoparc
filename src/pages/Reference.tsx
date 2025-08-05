@@ -5,6 +5,8 @@ import Fuel from '../components/Reference/Fuel';
 import Data from '../components/Reference/Data';
 import Driver from '../components/Reference/Driver';
 import Mission from '../components/Reference/Mission';
+import Supplier from '../components/Reference/Supplier';
+
 
 
 export function Reference() {
@@ -29,8 +31,11 @@ export function Reference() {
         <Nav.Item>
           <Nav.Link eventKey="driver">Driver</Nav.Link>
         </Nav.Item>
-         <Nav.Item>
+        <Nav.Item>
           <Nav.Link eventKey="mission">Mission</Nav.Link>
+        </Nav.Item>
+         <Nav.Item>
+          <Nav.Link eventKey="supplier">Supplier</Nav.Link>
         </Nav.Item>
         
         {/* Ajouter d'autres onglets ici */}
@@ -39,10 +44,12 @@ export function Reference() {
       {/* Contenu des onglets */}
       <div className="mt-3 border border-top-0 p-3">
         {activeTab === 'taxe' && <Taxe />}
-         {activeTab === 'fuel' && <Fuel />}
-          {activeTab === 'data' && <Data />}
-            {activeTab === 'driver' && <Driver />}
-             {activeTab === 'mission' && <Mission />}
+        {activeTab === 'fuel' && <Fuel />}
+        {activeTab === 'data' && <Data />}
+        {activeTab === 'driver' && <Driver />}
+        {activeTab === 'mission' && <Mission />}
+        {activeTab === 'supplier' && <Supplier />}
+
         {/* Ajouter d'autres onglets ici */}
       </div>
     </div>
