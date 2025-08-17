@@ -639,7 +639,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                             {notifications && notifications.length > 0 ? (
                               notifications.slice(0, 7).map((notification) => (
                                 <Link
-                                  to={`/deadline/${notification.id_alarm}/0`}
+                                  to={`/deadline/${notification.id_alarm}/0?notif=${notification.id_notification}&t=${Date.now()}`}
                                   className="iq-sub-card"
                                   data-toggle="tooltip"
                                   data-placement="top"
@@ -651,7 +651,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                       headers: {
                                         "Content-Type": "application/json",
                                       },
-                                      body: JSON.stringify({ id_notification: notification.id_notification }), // 1 = non lues
+                                      body: JSON.stringify({ id_notification: notification.id_notification }),
                                     })
                                       .then((response) => response.json())
                                       .then((data) => {
@@ -662,7 +662,11 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                         console.error("Erreur lors de la mise à jour :", error);
                                       });
 
-                                    setTimeout(() => setDropdownOpenNotification(false), 100);
+                                    setTimeout(() => {
+                                      setDropdownOpenNotification(false);
+                                      // 🔑 recharge complète de la page
+                                      window.location.reload();
+                                    }, 10);
                                   }}
                                 >
                                   <div className="media align-items-center custom-card py-3 border-bottom" style={{ paddingBottom: "0.5rem !important" }}>
@@ -672,15 +676,15 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                                     <div className="media-body ml-3">
                                       <div className="d-flex align-items-center justify-content-between">
                                         <h6 className="mb-0">{notificationType[Number(notification.id_type - 1)]}</h6>
-                                        <small className="">
+                                        <small>
                                           <b>{new Date(notification.timestamp).toLocaleTimeString()}</b>
                                         </small>
                                       </div>
                                       <small className="mb-0">{generateDescription(notification)}</small>
                                     </div>
                                   </div>
-
                                 </Link>
+
                               ))
                             ) : (
                               <p className="text-center p-2">{translate("No notifications available.")}</p>
