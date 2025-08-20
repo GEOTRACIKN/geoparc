@@ -31,6 +31,7 @@ const FieldDateInput: React.FC<{
             <Form.Control
               as="select"
               name={field.id}
+              id={field.id}
               value={value || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
             >
@@ -58,6 +59,8 @@ const FieldDateInput: React.FC<{
           </Col>
           <Col sm="8">
             <DatePicker
+             name={field.id}
+              id={field.id}
               selected={value ? new Date(value) : null}
               onChange={(date) => onChange(field.id, date)}
               dateFormat="dd/MM/yyyy"

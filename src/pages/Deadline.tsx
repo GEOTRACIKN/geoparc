@@ -185,6 +185,12 @@ export function Deadline() {
     }));
   };
 
+  const refreshDeadline = () => {
+    getDeadlines(limit, currentPage, search, type, column, "ASC");
+
+  };
+
+
   const handleSortingColumn = (currentColumn: string) => {
     setSortColumn(currentColumn);
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
@@ -1057,12 +1063,13 @@ export function Deadline() {
         id_deadline={selectedDeadlineId}
         onSuccess={refreshData}
       />
-      <ModalDeleteDeadline
+    */}
+       <ModalDeleteDeadline
         show={showDeleteDeadlineModal}
         onHide={handleCloseDeleteDeadlineModal}
         id_deadline={selectedDeadlineId}
-        onSuccess={refreshData}
-      /> */}
+        onSuccess={refreshDeadline}
+      />
       <ModalShowDeadline
         show={showShowDeadlineModal}
         onHide={handleCloseShowDeadlineModal}

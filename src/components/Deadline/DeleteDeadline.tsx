@@ -26,7 +26,7 @@ const ModalDeleteDeadline: React.FC<ModalDeleteDeadlineProps> = ({
     const handleDelete = async () => {
         try {
             const response = await fetch(
-                `${backendUrl}/api/geop/deleteDeadline/${id_deadline}/${geopuserID}`,
+                `${backendUrl}/api/geop/deadline/delete/${id_deadline}/${geopuserID}`,
                 {
                     method: "DELETE",
                 }

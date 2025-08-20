@@ -87,7 +87,7 @@ export interface VehicleInterface {
   nom_conducteur?: string | null;
   nom_parc?: string | null;
   date_dernier_vidange?: string;
-  dernier_vidange_vehicule?: number;
+  dernier_vidange_vehicule?: number | null;
   kilometrage_prochain_entretien?: number;
   nom_marque?: string | null;
   reference_ctr_tech_vehicule?: string | null;
