@@ -595,7 +595,9 @@ export function Vehicle() {
     tab_2: translate("Technical characteristics"),
     tab_3: translate("Insurance"),
     tab_4: translate("Technical control"),
-    tab_5: translate("Vehicle sticker")
+    tab_5: translate("Vehicle sticker"),
+    tab_6: translate("Draining & Maintenance")
+
   };
 
   const fieldsTab1: Field[] = [
@@ -660,6 +662,17 @@ export function Vehicle() {
   ];
 
 
+  const fieldsTab6: Field[] = [
+    { id: "km_dernier_vidange", label: "Dernier Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tachometer-alt", required: true },
+    { id: "km_prochain_vidange", label: "Prochain Vidange (Km) *", type: "number", placeholder: "Entrez le kilométrage estimé", icon: "fas fa-tachometer-alt", required: true },
+    { id: "date_dernier_vidange", label: "Date du Dernier Vidange *", type: "date", placeholder: "Sélectionnez la date", icon: "fas fa-calendar", required: true },
+
+    { id: "km_prochain_entretien", label: "Prochain Entretien *", type: "number", placeholder: "Entrez le kilométrage", icon: "fas fa-tools", required: true },
+];
+
+
+
+
   const tab1Fields: Field[] = [
     { id: "fournisseur", label: "Fournisseur", type: "text", placeholder: "Fournisseur", tooltip: "Nom du fournisseur", icon: "fas fa-building", required: false },
     { id: "numContrat", label: "N° du contrat", type: "text", placeholder: "N° du contrat", tooltip: "Numéro du contrat", icon: "fas fa-file-contract", required: false },
@@ -697,7 +710,7 @@ export function Vehicle() {
     tab_3: fieldsTab3,
     tab_4: fieldsTab4,
     tab_5: fieldsTab5,
-    tab_6: fieldsTab5,
+    tab_6: fieldsTab6,
     //  tab_6: navTabsCustom
   };
 
