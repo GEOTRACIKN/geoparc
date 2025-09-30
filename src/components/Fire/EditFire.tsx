@@ -8,7 +8,6 @@ import Select from "react-select";
 
 import dayjs from "dayjs"; 
 import moment from "moment";
-const geopuserID = localStorage.getItem("GeopUserID");
 
 interface EditFireModalProps {
     show: boolean;
@@ -40,6 +39,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         type_fire: "",
         id_vehicule: "",
     });
+const geopuserID = localStorage.getItem("GeopUserID");
 
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);

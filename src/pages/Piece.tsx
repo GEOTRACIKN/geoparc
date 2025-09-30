@@ -13,7 +13,7 @@ import ModalDeletePiece from "../components/Piece/DeletePiece";
 interface Piece {
     id_piece: number;
     type_operation_piece: string;
-    id_vehicule_piece: string;
+    immatriculation_vehicule: string;
     source_piece: string;
     piece_id_piece: string;
     position_piece: string;
@@ -351,7 +351,7 @@ export function Piece() {
                     </th>
                 )}
                 {selectedColumns.Vehicle && (
-                    <th className="sorting" onClick={() => handleSortingColumn("id_vehicule_piece")}>
+                    <th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>
                         {translate("Vehicle")}
                     </th>
                 )}
@@ -406,7 +406,7 @@ export function Piece() {
                         <td>{translateOperationType(piece.type_operation_piece)}</td>
                     )}
 
-                        {selectedColumns.Vehicle && <td>{piece.id_vehicule_piece}</td>}
+                        {selectedColumns.Vehicle && <td>{piece.immatriculation_vehicule}</td>}
                         {selectedColumns.Source && <td>{translateSourceType(piece.source_piece)}</td>}
                         {selectedColumns.Date && <td>{formatDatetimeLocal(piece.date_piece)}</td>}
                         {selectedColumns.Position && <td>{piece.position_piece}</td>}
