@@ -59,30 +59,50 @@ const EditPneuModal: React.FC<EditPneuModalProps> = ({ show, onHide, id_pneu, on
     const { translate } = useTranslate();
 
     useEffect(() => {
-        if (!id_pneu || !show) return;
-    
-        const fetchPneu = async () => {
-            setIsLoading(true);
-            try {
-                const response = await axios.get(`${backendUrl}/api/geop/showpneu/${id_pneu}`);
-                const data = response.data;
-                if (!data || !data.id_pneu) {
-                    toast.error(translate("Tire data not found."));
-                    return;
-                }
-                setFormData((prev) => ({ ...prev, ...data }));
-            } catch (error: unknown) {
-                console.error("Error fetching tire data:", error);
-                if (error instanceof AxiosError) {
-                    console.error("Server response:", error.response?.data);
-                }
-            } finally {
-                setIsLoading(false);
+    if (!id_pneu || !show) return;
+
+    const fetchPneu = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${backendUrl}/api/geop/showpneu/${id_pneu}`);
+            const data = response.data;
+            if (!data || !data.id_pneu) {
+                toast.error(translate("Tire data not found."));
+                return;
             }
-        };
-    
-        fetchPneu();
-    }, [id_pneu, show]); // <-- ajout de show ici
+            
+            // NETTOYAGE CORRECT des données reçues
+            const cleanValue = (value: any) => {
+                if (value === null || value === undefined || value === '') return '';
+                if (typeof value === 'string') {
+                    const trimmed = value.trim();
+                    return trimmed === '' ? '' : trimmed;
+                }
+                return value;
+            };
+
+            const cleanedData = {
+                ...data,
+                km_pneu: cleanValue(data.km_pneu),
+                cout_pneu: cleanValue(data.cout_pneu),
+                temps_amort: cleanValue(data.temps_amort),
+            };
+            
+            console.log('Data after cleaning:', cleanedData);
+            
+            setFormData((prev) => ({ ...prev, ...cleanedData }));
+        } catch (error: unknown) {
+            console.error("Error fetching tire data:", error);
+            if (error instanceof AxiosError) {
+                console.error("Server response:", error.response?.data);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchPneu();
+}, [id_pneu, show]);
     
 
     useEffect(() => {

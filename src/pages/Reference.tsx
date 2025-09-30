@@ -7,6 +7,8 @@ import Driver from '../components/Reference/Driver';
 import Mission from '../components/Reference/Mission';
 import Supplier from '../components/Reference/Supplier';
 import Warehouse from '../components/Reference/Warehouse';
+import Administration from '../components/Reference/Administration';
+
 
 
 
@@ -42,6 +44,9 @@ export function Reference() {
         <Nav.Item>
           <Nav.Link eventKey="warehouse">Warehouse</Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="administration">Administration</Nav.Link>
+        </Nav.Item>
         
         {/* Ajouter d'autres onglets ici */}
       </Nav>
@@ -55,6 +60,7 @@ export function Reference() {
         {activeTab === 'mission' && <Mission />}
         {activeTab === 'supplier' && <Supplier />}
         {activeTab === 'warehouse' && <Warehouse/>}
+        {activeTab === 'administration' && <Administration/>}
 
         {/* Ajouter d'autres onglets ici */}
       </div>
