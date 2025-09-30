@@ -299,7 +299,7 @@ const createMission = async (mission: MissionOrderInterface) => {
       const errorBody = await res.json(); // Get the response body
       console.error("Error response:", errorBody); // Log the error for more details
     
-      toast.warn("Can't create ines Mission", {
+      toast.warn("Can't create Mission", {
         position: "bottom-right",
         autoClose: 2400,
         hideProgressBar: false,
