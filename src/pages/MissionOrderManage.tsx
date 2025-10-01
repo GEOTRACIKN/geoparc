@@ -421,7 +421,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="ref_mission"
                 placeholder="Enter the mission reference"
                 value={mission?.ref_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  
                 required
               />
             </Form.Group>
@@ -434,7 +435,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="object_mission"
                 placeholder="Enter the mission object"
                 value={mission?.object_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 
                 required
               />
             </Form.Group>
@@ -448,7 +450,18 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="fuel_loading_mission"
                 placeholder="Enter fuel loading"
                 value={mission?.fuel_loading_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  onKeyDown={(e) => {
+                    // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                    if (
+                      !/[0-9]/.test(e.key) &&
+                      !allowedKeys.includes(e.key)
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
+                  min="0"
                 required
               />
             </Form.Group>
@@ -462,7 +475,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="fuel_type_mission"
                 placeholder="Enter fuel type"
                 value={mission?.fuel_type_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 
                 required
               />
             </Form.Group>
@@ -476,7 +490,18 @@ const createMission = async (mission: MissionOrderInterface) => {
                 name="expenses_mission"
                 placeholder="Enter expenses"
                 value={mission?.expenses_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  onKeyDown={(e) => {
+                    // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                    if (
+                      !/[0-9]/.test(e.key) &&
+                      !allowedKeys.includes(e.key)
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
+                  min="0"
                 required
               />
             </Form.Group>
@@ -491,7 +516,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                 
                 placeholder="Enter tank"
                 value={mission?.tank_mission || ''}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  
                 required
               />
             </Form.Group>
@@ -505,7 +531,9 @@ const createMission = async (mission: MissionOrderInterface) => {
                   as="select"
                   name="trailer_mission"
                   value={mission?.trailer_mission || ''}
-                  onChange={(e) => handleChange(e.target.name, e.target.value)}
+                   onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  
+                  
                   required
                 >
                   <option value="">Select Vehicle</option>
@@ -531,7 +559,8 @@ const createMission = async (mission: MissionOrderInterface) => {
                   as="select"
                   name="driver_mission"
                   value={mission?.driver_mission || ''}
-                  onChange={(e) => handleChange(e.target.name, e.target.value)}
+                   onChange={(e) => handleChange(e.target.name, e.target.value)}
+                  
                   required
                 >
                 <option value="">Select Driver</option>
@@ -556,7 +585,7 @@ const createMission = async (mission: MissionOrderInterface) => {
               <Form.Control
                 type="text"
                 name="accomp_mission"
-                
+              
                 placeholder="Enter accompanying persons"
                 value={mission?.accomp_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
@@ -654,7 +683,18 @@ const createMission = async (mission: MissionOrderInterface) => {
                 placeholder="Enter vehicle KM"
                 value={mission?.vehicle_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
+              required
               />
             </Form.Group>
 
@@ -669,7 +709,19 @@ const createMission = async (mission: MissionOrderInterface) => {
                 placeholder="Enter new KM"
                 value={mission?.new_km_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
+              required
+                
               />
             </Form.Group>
 
@@ -684,6 +736,18 @@ const createMission = async (mission: MissionOrderInterface) => {
                 placeholder="Enter fuel cost"
                 value={mission?.fuel_cost_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
+              
                 required
               />
             </Form.Group>
@@ -699,7 +763,19 @@ const createMission = async (mission: MissionOrderInterface) => {
                 placeholder="Enter fuel level"
                 value={mission?.fuel_level_mission || ''}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                required
+                onKeyDown={(e) => {
+                  // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                  const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !allowedKeys.includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                min="0"
+              required
+                
               />
             </Form.Group>
 

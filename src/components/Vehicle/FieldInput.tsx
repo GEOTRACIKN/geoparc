@@ -31,6 +31,7 @@ const FieldInput: React.FC<{
             <Form.Control
               as="select"
               name={field.id}
+              id={field.id}
               value={value || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
             >

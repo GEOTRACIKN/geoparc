@@ -50,7 +50,7 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
                 
                 setFormData({
                     id_conducteur: data.id_conducteur,
-                    date_violation: date_violation.isValid() ? date_violation.format('DD/MM/YYYY') : 'Invalid Date',
+                    date_violation: date_violation.isValid() ? date_violation.format('DD/MM/YYYY') : '',
                     type_violation: data.type_violation,
                     immatriculation_vehicule: data.immatriculation_vehicule,
                     cost: data.cost,
@@ -74,7 +74,7 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
     }, [show, fetchViolation]);
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>
@@ -115,13 +115,13 @@ const ModalShowViolation: React.FC<ModalShowViolationnProps> = ({
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="cost">
+                   { /*<Form.Group controlId="cost">
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
                             value={formData.cost}
                             readOnly
                         />
-                    </Form.Group>
+                    </Form.Group>*/}
 
                     <Form.Group controlId="description">
                         <Form.Label>{translate("Description")}</Form.Label>

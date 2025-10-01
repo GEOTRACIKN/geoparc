@@ -39,7 +39,7 @@ export function Pharmacy() {
     const [pageCount, setPageCount] = useState(0);
 
     const initialColumns = {
-        ID: true,
+        //ID: true,
         Product: true,
         Type: true,
         Vehicle: true,
@@ -215,7 +215,7 @@ export function Pharmacy() {
                         <input
                             type="text"
                             //placeholder={` By ${typeSearch}`}
-                            placeholder={`by ${translate(typeSearch)}`}
+                            placeholder={`${translate("By")} ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -281,7 +281,7 @@ export function Pharmacy() {
                                     />
                                 </div>
                             </th>
-                            {selectedColumns.ID && (
+                            {selectedColumns.ID && id_user == "1" &&  (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("id_pharmacy")}
@@ -297,23 +297,7 @@ export function Pharmacy() {
                                     {translate("Product")}
                                 </th>
                             )}
-                             {selectedColumns.Cost && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("cost_pharmacy")}
-                                >
-                                    {translate("Cost")}
-                                </th>
-                            )}
-                            {selectedColumns.Type && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("type_pharmacy")}
-                                >
-                                    {translate("Type")}
-                                </th>
-                            )}
-                            {selectedColumns.Vehicle && (
+                              {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("immatriculation_vehicule")}
@@ -337,6 +321,23 @@ export function Pharmacy() {
                                     {translate("Expiration Date")}
                                 </th>
                             )}
+                             {selectedColumns.Cost && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("cost_pharmacy")}
+                                >
+                                    {translate("Cost")}
+                                </th>
+                            )}
+                            {selectedColumns.Type && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("type_pharmacy")}
+                                >
+                                    {translate("Type")}
+                                </th>
+                            )}
+                          
                             <th>{translate("Action")}</th>
                         </tr>
                     </thead>
@@ -365,21 +366,14 @@ export function Pharmacy() {
                                         </div>
                                     </td>
                                     
-                                            {selectedColumns.ID && (
+                                            {selectedColumns.ID && id_user == "1" && (
                                                 <td>{Pharmacy.id_pharmacy}</td>
                                             )}
                                           
                                             {selectedColumns.Product && (
                                                 <td>{Pharmacy.product_pharmacy}</td>
                                             )}
-                                          
-                                            {selectedColumns.Cost && (
-                                                <td>{Pharmacy.cost_pharmacy}</td>
-                                            )}
-                                            {selectedColumns.Type && (
-                                                <td>{Pharmacy.type_pharmacy}</td>
-                                            )}
-                                               {selectedColumns.Vehicle && (
+                                            {selectedColumns.Vehicle && (
                                                 <td>{Pharmacy.immatriculation_vehicule}</td>
                                             )}
                                               {selectedColumns["Purchase Date"] && (
@@ -389,6 +383,14 @@ export function Pharmacy() {
                                              {selectedColumns["Expiration Date"] && (
                                                 <td>{Pharmacy.exp_date_pharmacy}</td>
                                             )}
+                                          
+                                            {selectedColumns.Cost && (
+                                                <td>{Pharmacy.cost_pharmacy}</td>
+                                            )}
+                                            {selectedColumns.Type && (
+                                                <td>{Pharmacy.type_pharmacy}</td>
+                                            )}
+                                               
                                           
                                             
                                            

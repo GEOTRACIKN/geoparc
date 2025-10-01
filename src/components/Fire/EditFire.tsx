@@ -4,8 +4,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
+import Select from "react-select";
+
 import dayjs from "dayjs"; 
 import moment from "moment";
+const geopuserID = localStorage.getItem("GeopUserID");
 
 interface EditFireModalProps {
     show: boolean;
@@ -16,13 +19,11 @@ interface EditFireModalProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
-
 const EditFireModal: React.FC<EditFireModalProps> = ({
     show,
     onHide,
@@ -31,8 +32,8 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 }) => {
     const [formData, setFormData] = useState({
         id_fire: "",
+        ref_fire: "",
         volume_fire: "",
-        location_fire: "",
         purch_date_fire: "",
         exp_date_fire: "",
         cost_fire: "",
@@ -40,8 +41,10 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         id_vehicule: "",
     });
 
+
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
+
    
 
     // Charger les données de la pharmacie existante
@@ -65,7 +68,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 console.log("Données reçues : ", JSON.stringify(data, null, 2));
     
                 if (!data || !data.id_fire) {
-                    toast.error("Fire data not found.");
                     return;
                 }
     
@@ -117,7 +119,6 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching fire data.");
             }
         };
     
@@ -127,12 +128,14 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     
     useEffect(() => {
         const fetchVehicles = async () => {
-            try {
-                if (!geopuserID) {
-                    console.warn("No user ID provided");
-                    return;
-                }
+            if (!geopuserID) {
+                console.warn("No user ID provided");
+                return;
+            }
     
+            console.log("Fetching vehicles for user ID:", geopuserID); // Ajout du log pour voir si l'ID est correct
+    
+            try {
                 const response = await fetch(
                     `${backendUrl}/api/geop/vehicule/${geopuserID}`
                 );
@@ -142,7 +145,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                 }
     
                 const data = await response.json();
-                console.log("API response for vehicles:", data); // Log pour déboguer les véhicules
+                console.log("API response for vehicles:", data); // Debug: voir la structure de data
     
                 setVehicles(data.vehicles || []);
             } catch (error) {
@@ -161,7 +164,8 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         };
     
         fetchVehicles();
-    }, [geopuserID, backendUrl]); // Ajout de `backendUrl` comme dépendance
+    }, [geopuserID, backendUrl]); // Déclenchement à chaque changement de `geopuserID`
+    
     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -171,18 +175,52 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             [id]: value,
         }));
     };
+    const fireOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+      const handleFireTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+
+      const handleClose = () => {
+        setFormData({
+            id_fire: "",
+            ref_fire: "",
+            volume_fire: "",
+            purch_date_fire: "",
+            exp_date_fire: "",
+            cost_fire: "",
+            type_fire: "",
+            id_vehicule: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
+      
 
     const validateForm = () => {
         if (
-            !formData.volume_fire ||
-            !formData.location_fire ||
-            !formData.purch_date_fire ||
+            
             !formData.exp_date_fire ||
-            !formData.cost_fire ||
+          
             !formData.type_fire ||
             !formData.id_vehicule
         ) {
-            toast.error("Please fill out all fields.", {
+           toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -200,16 +238,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         );
 
         if (!selectedVehicle) {
-            toast.error("Please select a valid vehicle.", {
-                position: "bottom-right",
-                autoClose: 2400,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "light",
-                transition: Bounce,
-            });
+           
             return false;
         }
 
@@ -241,7 +270,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Fire updated successfully!", {
+            toast.success(translate("Updated successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -259,7 +288,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating fire:", error);
-            toast.error("Error updating fire. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -273,29 +302,59 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="volume_fire">
-                        <Form.Label>{translate("Volume")}</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={formData.volume_fire}
-                            onChange={handleChange}
+                      {/* Type */}
+                      <Form.Group controlId="type_fire">
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
+                        <Select
+                        options={fireOptions}
+                        onChange={handleFireTypeChange}
+                        name="type_fire"
+                        value={fireOptions.find(
+                        (option) => option.value === formData.type_fire) || null} 
+                        isClearable
                         />
+
                     </Form.Group>
-                    <Form.Group controlId="location_fire">
-                        <Form.Label>{translate("Location")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.location_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="purch_date_fire">
+
+                    <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
+
+                     {/* Purchase Date */}
+                     <Form.Group controlId="purch_date_fire">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
                         <Form.Control
                             type="date"
@@ -303,48 +362,68 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
+
+                    {/* Expiry Date */}
                     <Form.Group controlId="exp_date_fire">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_fire}
                             onChange={handleChange}
                         />
                     </Form.Group>
+                <Form.Group controlId="ref_fire">
+                        <Form.Label>{translate("Reference")}</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={formData.ref_fire}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    {/* Volume */}
+                    <Form.Group controlId="volume_fire">
+                        <Form.Label>{translate("Volume")}</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={formData.volume_fire}
+                            onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
+                        />
+                    </Form.Group>
+
+                    {/* Cost */}
                     <Form.Group controlId="cost_fire">
                         <Form.Label>{translate("Cost")}</Form.Label>
                         <Form.Control
                             type="number"
                             value={formData.cost_fire}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
-                    </Form.Group>
-                    <Form.Group controlId="type_fire">
-                        <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_fire}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle) => (
-                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                    {vehicle.immatriculation_vehicule}
-                                </option>
-                            ))}
-                        </Form.Control>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

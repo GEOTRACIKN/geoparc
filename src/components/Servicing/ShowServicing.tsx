@@ -27,7 +27,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
     const [formData, setFormData] = useState({
         invoice_no_servicing: "",
         type_servicing: "",
-        type_vehicule: "",
+        immatriculation_vehicule: "",
         date_servicing: "",
         place_servicing: "",
         cost_servicing: "",
@@ -77,7 +77,7 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                 setFormData({
                     invoice_no_servicing: servicing.invoice_no_servicing || "",
                     type_servicing: servicing.type_servicing ? servicing.type_servicing.toString() : "",
-                    type_vehicule: servicing.type_vehicule || "",
+                    immatriculation_vehicule: servicing.immatriculation_vehicule || "",
                     date_servicing: servicing.date_servicing ? formatDateToTimestamp(servicing.date_servicing) : "",
                     place_servicing: servicing.place_servicing || "",
                     cost_servicing: servicing.cost_servicing || "",
@@ -117,14 +117,14 @@ const ModalShowServicing: React.FC<ModalShowServicingnProps> = ({
                 <Modal.Body
                     style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}
                 >
-                      <Form.Group controlId="type_vehicule">
+                      <Form.Group controlId="vehicle">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
                         <Form.Control
                             type="text"
                             readOnly={!isEditable}
 
                             //placeholder="Entrez le véhicule"
-                            value={formData.type_vehicule}
+                            value={formData.immatriculation_vehicule}
                             onChange={handleChange}
                         />
                     </Form.Group>

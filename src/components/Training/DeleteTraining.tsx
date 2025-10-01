@@ -12,7 +12,6 @@ interface ModalDeleteTrainingProps {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const ModalDeleteTraining: React.FC<ModalDeleteTrainingProps> = ({
     show,
@@ -22,6 +21,8 @@ const ModalDeleteTraining: React.FC<ModalDeleteTrainingProps> = ({
 }) => {
     // Move the useTranslate hook inside the component
     const { translate } = useTranslate();
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const handleDelete = async () => {
         try {
@@ -39,7 +40,7 @@ const ModalDeleteTraining: React.FC<ModalDeleteTrainingProps> = ({
             const result = await response.json();
             console.log(result);
 
-            toast.success(translate("Training deleted successfully!"), {
+            toast.success(translate("Deleted successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -57,7 +58,7 @@ const ModalDeleteTraining: React.FC<ModalDeleteTrainingProps> = ({
             onHide();
         } catch (error) {
             console.error(error);
-            toast.error(translate("Error deleting training. Please try again."), {
+            toast.error(translate("Error deleting. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -71,7 +72,7 @@ const ModalDeleteTraining: React.FC<ModalDeleteTrainingProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Delete")}</Modal.Title>
             </Modal.Header>

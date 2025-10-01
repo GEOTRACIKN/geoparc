@@ -25,6 +25,7 @@ interface Drivers {
   telephone_conducteur: string;
   id_parc: number;
   nom_parc: string;
+  service_conducteur: string;
 }
 
 
@@ -62,7 +63,7 @@ export function Drivers() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
-  const [showDownloadModal, setShowDownloadModal] = useState(false); 
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const [selectedDrivers, setSelectedDrivers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -74,11 +75,12 @@ export function Drivers() {
     translate("Date of birth"),
     translate("Phone"),
     translate("Email"),
-    translate("Park")
+    translate("Park"),
+    translate("Assigned service")
   ];
 
 
-  
+
   const downloadVehicleExcel = () => {
 
     const selectedData = list_Drivers.filter((driver) =>
@@ -86,7 +88,7 @@ export function Drivers() {
     ).map((driver) => [
       driver.id_conducteur,
       driver.code_conducteur,
-      driver.nom_conducteur+' '+ driver.prenom_conducteur,
+      driver.nom_conducteur + ' ' + driver.prenom_conducteur,
       toTimestamp(driver.date_naissance_conducteur),
       driver.telephone_conducteur,
       driver.email_conducteur,
@@ -103,12 +105,12 @@ export function Drivers() {
       selectedDrivers.includes(driver.id_conducteur.toString())
     ).map((driver) => [
       driver.id_conducteur,
-    driver.code_conducteur,
-    driver.nom_conducteur+' '+ driver.prenom_conducteur,
-    toTimestamp(driver.date_naissance_conducteur),
-    driver.telephone_conducteur,
-    driver.email_conducteur,
-    driver.nom_parc,
+      driver.code_conducteur,
+      driver.nom_conducteur + ' ' + driver.prenom_conducteur,
+      toTimestamp(driver.date_naissance_conducteur),
+      driver.telephone_conducteur,
+      driver.email_conducteur,
+      driver.nom_parc,
     ]);
     generatePDFFile(translate("List") + ' ' + translate("Vehicles"), driverHeaders, selectedData);
   };
@@ -158,7 +160,7 @@ export function Drivers() {
 
 
   useEffect(() => {
-   // If the list of selected POIs is empty, disable general selection
+    // If the list of selected POIs is empty, disable general selection
     if (setSelectedDrivers.length === 0 && selectAll) {
       setSelectAll(false);
     }
@@ -193,7 +195,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        column: searchcolumn[column],
+        column: searchColumn[column],
         sort
       });
 
@@ -251,15 +253,15 @@ export function Drivers() {
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
-    setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
+    setCurrentPage(1); 
     setLimit(newValue);
-    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); // Ajouter await ici
+    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); 
     setDrivers(commentsFormServer);
     window.scrollTo(0, 0);
   };
 
 
-  const [selectedColumnns, setSelectedColumnns] = useState({
+  const [selectedColumns, setSelectedColumns] = useState({
     id_conducteur: true,
     code_conducteur: true,
     nom_conducteur: true,
@@ -267,25 +269,27 @@ export function Drivers() {
     date_naissance_conducteur: true,
     email_conducteur: true,
     telephone_conducteur: true,
-    id_parc: true
+    id_parc: true,
+    service_conducteur: true,
   });
 
-  const handlecolumnnChange = (columnn: string) => {
-    setSelectedColumnns((prevState: any) => ({
+  const handleColumnChange = (column: string) => {
+    setSelectedColumns((prevState: any) => ({
       ...prevState,
-      [columnn]: !prevState[columnn],
+      [column]: !prevState[column],
     }));
   };
 
 
-  const searchcolumn: { [key: string]: number } = {
+  const searchColumn: { [key: string]: number } = {
     id_conducteur: 0,
     code_conducteur: 1,
     nom_conducteur: 2,
     date_naissance_conducteur: 3,
     email_conducteur: 4,
     telephone_conducteur: 5,
-    id_sousParc: 6
+    id_sousParc: 6,
+    service_conducteur:7
   };
 
 
@@ -322,6 +326,10 @@ export function Drivers() {
         console.log(6)
         setType(6);
         break;
+      case translate("Assigned service"):
+        console.log(7)
+        setType(7);
+        break;
       default:
         console.log('Unknown selection');
         console.log(selectedValue)
@@ -339,9 +347,9 @@ export function Drivers() {
   };
 
 
-  const handleSortingcolumn = (curentcolumn: string) => {
+  const handleSortingcolumn = (curentColumn: string) => {
 
-    setSortcolumn(curentcolumn)
+    setSortcolumn(curentColumn)
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getDrivers(limit, currentPage, search, type, column, sort);
   };
@@ -455,44 +463,6 @@ export function Drivers() {
     await getDrivers(limit, currentPage, search, type, column, sort)
   };
 
-  interface TrainingEvent {
-    title: string;
-    start: Date;
-    end: Date;
-  }
-
-  const trainingData: TrainingEvent[] = [
-    {
-      title: "Formation React",
-      start: new Date('2024-12-23T10:00:00'),
-      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
-    },
-    {
-      title: "Formation TypeScript",
-      start: new Date('2024-12-23T10:00:00'),
-      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
-    }
-    ,
-    {
-      title: "Formation TypeScript",
-      start: new Date('2024-12-23T10:00:00'),
-      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
-    }
-    ,
-    {
-      title: "Formation TypeScript",
-      start: new Date('2024-12-23T10:00:00'),
-      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
-    }
-    ,
-    {
-      title: "Formation TypeScript",
-      start: new Date('2024-12-23T10:00:00'),
-      end: new Date('2024-12-23T12:00:00') // La date de fin doit être après la date de début
-    }
-    
-  ];
-  
 
   const menuItems = [
     translate("ID"),
@@ -501,7 +471,8 @@ export function Drivers() {
     translate("Date of birth"),
     translate("Email"),
     translate("Phone"),
-    translate("Park")
+    translate("Park"),
+    translate("Assigned service")
   ];
 
   return (
@@ -595,7 +566,7 @@ export function Drivers() {
             <Dropdown.Toggle
               variant=""
               id="dropdown-basic"
-              title={translate("Display columnns")}
+              title={translate("Display columns")}
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
@@ -607,8 +578,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.id_conducteur}
-                  onChange={() => handlecolumnnChange("id_conducteur")}
+                  checked={selectedColumns.id_conducteur}
+                  onChange={() => handleColumnChange("id_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("ID")}
@@ -621,8 +592,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.code_conducteur}
-                  onChange={() => handlecolumnnChange("code_conducteur")}
+                  checked={selectedColumns.code_conducteur}
+                  onChange={() => handleColumnChange("code_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Code")}
@@ -635,8 +606,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.nom_conducteur}
-                  onChange={() => handlecolumnnChange("nom_conducteur")}
+                  checked={selectedColumns.nom_conducteur}
+                  onChange={() => handleColumnChange("nom_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Last and first name")}
@@ -649,8 +620,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.date_naissance_conducteur}
-                  onChange={() => handlecolumnnChange("date_naissance_conducteur")}
+                  checked={selectedColumns.date_naissance_conducteur}
+                  onChange={() => handleColumnChange("date_naissance_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Date of birth")}
@@ -663,8 +634,8 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.telephone_conducteur}
-                  onChange={() => handlecolumnnChange("telephone_conducteur")}
+                  checked={selectedColumns.telephone_conducteur}
+                  onChange={() => handleColumnChange("telephone_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Phone")}
@@ -678,11 +649,26 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumnns.email_conducteur}
-                  onChange={() => handlecolumnnChange("email_conducteur")}
+                  checked={selectedColumns.email_conducteur}
+                  onChange={() => handleColumnChange("email_conducteur")}
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Email")}
+                </span>
+              </Dropdown.Item>
+
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.service_conducteur}
+                  onChange={() => handleColumnChange("service_conducteur")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Assigned service")}
                 </span>
               </Dropdown.Item>
             </Dropdown.Menu>
@@ -695,23 +681,25 @@ export function Drivers() {
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={(e) => handleSelectAllDrivers(e.target.checked)}
-                      />
-                      <label className="form-check-label"></label>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={(e) => handleSelectAllDrivers(e.target.checked)}
+                  />
+                  <label className="form-check-label"></label>
                 </div>
               </th>
 
-              {selectedColumnns.id_conducteur && <th className="sorting" onClick={() => handleSortingcolumn("id_conducteur")}>{translate("Id")}</th>}
-              {selectedColumnns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumnns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("nom_conducteur")}>{translate("Last and first name")}</th>)}
-              {selectedColumnns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
-              {selectedColumnns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumnns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumnns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.id_conducteur && id_user=="1" && <th className="sorting" onClick={() => handleSortingcolumn("id_conducteur")}>{translate("Id")}</th>}
+              {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("nom_conducteur")}>{translate("Last and first name")}</th>)}
+              {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
+              {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
+              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
+              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
+              {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.service_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("service_conducteur")}>{translate("Assigned service")}</th>)}
+            
               {<th>{translate("Action")}</th>}
             </tr>
           </thead>
@@ -733,7 +721,7 @@ export function Drivers() {
                     <tr key={driver.id_conducteur}>
                       <td>
                         <div className="form-check form-check-inline">
-                        <input
+                          <input
                             type="checkbox"
                             className="form-check-input"
                             id={`checkbox-${driver.id_conducteur}`}
@@ -743,13 +731,14 @@ export function Drivers() {
                           <label htmlFor={`checkbox-${driver.id_conducteur}`} className="mb-0"></label>
                         </div>
                       </td>
-                      {selectedColumnns.id_conducteur && <td>{driver.id_conducteur}</td>}
-                      {selectedColumnns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
-                      {selectedColumnns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
-                      {selectedColumnns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
-                      {selectedColumnns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
-                      {selectedColumnns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                      {selectedColumnns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumns.id_conducteur && id_user=="1" && <td>{driver.id_conducteur}</td>}
+                      {selectedColumns.nom_conducteur && (<td>{driver.nom_conducteur + " " + driver.prenom_conducteur}</td>)}
+                      {selectedColumns.date_naissance_conducteur && <td>{driver.date_naissance_conducteur != null ? driver.date_naissance_conducteur.split('T')[0] + ' ' + driver.date_naissance_conducteur.split('T')[1].split('.000Z')[0] : translate("None")}</td>}
+                      {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
+                      {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
+                      {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
+                      {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumns.service_conducteur && (<td>{driver.service_conducteur}</td>)}
 
                       <td>
                         <div className="d-flex align-items-center list-action">
@@ -771,8 +760,8 @@ export function Drivers() {
                               style={{ fontSize: "1.2em" }}
                             ></i>
                           </a>
-                          <a className="badge bg-warning mr-2" 
-                          onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
+                          <a className="badge bg-warning mr-2"
+                            onClick={() => handleDriverAssignmentDriver(driver.id_conducteur, driver.id_parc, driver.nom_parc, id_user)}
                             data-toggle="tooltip"
                             data-placement="top"
                             title={translate("Update park")}
@@ -812,24 +801,24 @@ export function Drivers() {
         </div>
         <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
-           previousLabel={translate("previous")}
-           nextLabel={translate("next")}
-           breakLabel={"..."}
-           pageCount={pageCount}
-           marginPagesDisplayed={2}
-           pageRangeDisplayed={3}
-           onPageChange={handlePageClick}
-           containerClassName={"pagination justify-content-end"}
-           pageClassName={"page-item"}
-           pageLinkClassName={"page-link"}
-           previousClassName={"page-item"}
-           previousLinkClassName={"page-link"}
-           nextClassName={"page-item"}
-           nextLinkClassName={"page-link"}
-           breakClassName={"page-item"}
-           breakLinkClassName={"page-link"}
-           activeClassName={"active"}
-           forcePage={currentPage - 1}
+            previousLabel={translate("previous")}
+            nextLabel={translate("next")}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-end"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
+            forcePage={currentPage - 1}
           />
         </div>
         <DriverDeleteModal
@@ -841,7 +830,7 @@ export function Drivers() {
           IdDriver={IdDriver}
           updateDriverList={handleUpdateDriverList}
         />
-        
+
         <DriverDetailsModal
           show={modalStatusDetail !== null}
           onHide={closeDetailModal}

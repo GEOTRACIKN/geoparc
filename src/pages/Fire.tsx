@@ -11,11 +11,12 @@ import ModalEditFire from "../components/Fire/EditFire";
 import ModalDeleteFire from "../components/Fire/DeleteFire";
 
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface Fire {
     id_fire: number;
+    ref_fire: string;
     volume_fire: number;
-    location_fire: string;
     product_fire: number;
     purch_date_fire: string;
     exp_date_fire: string;
@@ -27,7 +28,6 @@ interface Fire {
 
 
 export function Fire() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_fire, setFire] = useState<Fire[]>([]);
@@ -52,14 +52,28 @@ export function Fire() {
 
     const initialColumns = {
         ID: true,
+        Reference: true,
         Volume: true,
         Type: true,
         Vehicle: true,
        "Purchase Date": true, 
        "Expiration Date": true,
         Cost: true,
-        Location: true,
     
+    };
+
+    const trainingOptions = [
+        { value: "A", label: translate("Class A fires: dry materials (wood, paper)") }, 
+        { value: "B", label: translate("Class B fires: flammable liquids") },
+        { value: "C", label: translate("Class C fires: flammable gases") },
+        { value: "D", label: translate("Class D fires: combustible metals") },
+        { value: "E", label: translate("Class E fires: electrical equipment") },
+        { value: "F", label: translate("Class F fires: oils and fats") },
+    ];
+    
+    const mapFireType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
     };
     
     
@@ -179,9 +193,6 @@ export function Fire() {
             case translate("Volume"):
                 setType(1);
                     break;
-            case translate("Location"):
-                setType(2);
-                    break;
        
             case translate("Vehicle"):
                 setType(3);
@@ -192,15 +203,14 @@ export function Fire() {
             case translate("Cost"):
                 setType(5);
                 break;
-         
             case translate("Type"):
                 setType(6);
                 break;
-
-
-            case translate("Volume"):
-                    setType(7);
+          
+            case translate("Reference"):
+                setType(8);
                 break;
+
                        
             default:
                 console.log("Unknown selection");
@@ -234,7 +244,7 @@ export function Fire() {
         <>
             <div className="row">
                 <div className="col-md-6 col-sm-12">
-                    <h4>{translate("Fire")} ({total})</h4>
+                    <h4>{translate("Fire extinguisher management")} ({total})</h4>
                 </div>
                 <div className="col-md-6 col-sm-12 text-right">
                     <Button onClick={handleShowNewFireModal} className="btn btn-primary mt-2 mr-1">
@@ -259,8 +269,9 @@ export function Fire() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>
                                 <Dropdown.Item>{translate("ID")}</Dropdown.Item>
+                                <Dropdown.Item>{translate("Reference")}</Dropdown.Item>
+
                                 <Dropdown.Item>{translate("Volume")}</Dropdown.Item>
-                                <Dropdown.Item>{translate("Location")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Type")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Vehicle")}</Dropdown.Item>
                                 <Dropdown.Item>{translate("Purchase Date")}</Dropdown.Item>
@@ -270,7 +281,7 @@ export function Fire() {
                         <input
                             type="text"
                             //placeholder={` By ${typeSearch}`}
-                            placeholder={`by ${translate(typeSearch)}`}
+                            placeholder={`${translate("By")} ${translate(typeSearch)}`}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -345,31 +356,6 @@ export function Fire() {
                                     {translate("ID")}
                                 </th>
                             )}
-                            
-                             {selectedColumns.Volume && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("volume_fire")}
-                                >
-                                    {translate("Volume")}
-                                </th>
-                            )}
-                             {selectedColumns.Location && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("location_fire")}
-                                >
-                                    {translate("Location")}
-                                </th>
-                            )}
-                             {selectedColumns.Cost && (
-                                <th
-                                    className="sorting "
-                                    onClick={() => handleSortingColumn("cost_fire")}
-                                >
-                                    {translate("Cost")}
-                                </th>
-                            )} 
                             {selectedColumns.Type && (
                                 <th
                                     className="sorting "
@@ -402,6 +388,33 @@ export function Fire() {
                                     {translate("Expiration Date")}
                                 </th>
                             )}
+                             {selectedColumns.Reference && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("ref_fire")}
+                                >
+                                    {translate("Reference")}
+                                </th>
+                            )}
+                            
+                             {selectedColumns.Volume && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("volume_fire")}
+                                >
+                                    {translate("Volume")}
+                                </th>
+                            )}
+                            
+                             {selectedColumns.Cost && (
+                                <th
+                                    className="sorting "
+                                    onClick={() => handleSortingColumn("cost_fire")}
+                                >
+                                    {translate("Cost")}
+                                </th>
+                            )} 
+                            
                             
                             <th>{translate("Action")}</th>
                         </tr>
@@ -435,20 +448,8 @@ export function Fire() {
                                             {selectedColumns.ID && (
                                                 <td>{Fire.id_fire}</td>
                                             )}
-                                         
-                                              {selectedColumns.Volume && (
-                                                <td>{Fire.volume_fire}</td>
-                                            )}
-
-                                            {selectedColumns.Location && (
-                                                <td>{Fire.location_fire}</td>
-                                            )}  
-                                          
-                                            {selectedColumns.Cost && (
-                                                <td>{Fire.cost_fire}</td>
-                                            )}
-                                            {selectedColumns.Type && (
-                                                <td>{Fire.type_fire}</td>
+                                              {selectedColumns.Type && (
+                                                <td>{mapFireType(Fire.type_fire)}</td>
                                             )}
                                                {selectedColumns.Vehicle && (
                                                 <td>{Fire.immatriculation_vehicule}</td>
@@ -461,6 +462,19 @@ export function Fire() {
                                              {selectedColumns["Expiration Date"] && (
                                                 <td>{Fire.exp_date_fire}</td>
                                             )}
+                                             {selectedColumns.Reference && (
+                                                <td>{Fire.ref_fire}</td>
+                                            )}
+                                         
+                                              {selectedColumns.Volume && (
+                                                <td>{Fire.volume_fire}</td>
+                                            )}
+
+                                         
+                                            {selectedColumns.Cost && (
+                                                <td>{Fire.cost_fire}</td>
+                                            )}
+                                          
                                             
                                           
                                           <td className="text-center">

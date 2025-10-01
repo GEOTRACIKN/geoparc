@@ -7,14 +7,15 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
+import { Bounce, toast } from "react-toastify";
+
 
 
 interface Servicing {
     id_servicing: number;
     invoice_no_servicing: number;
     type_servicing: number;
-    id_vehicule: number;
-    type_vehicule: string;
+    immatriculation_vehicule: string;
     date_servicing: string;
     place_servicing: string;
     cost_servicing: number;
@@ -23,14 +24,14 @@ interface Servicing {
     next_oil_change_servicing: number;
     
 }
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const id_user = localStorage.getItem("GeopUserID");
 
 
 export function Servicing() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
-    const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -232,6 +233,75 @@ export function Servicing() {
         getServicing();
     };
 
+     const handleUpdateState = async () => {
+            if (selectedServicingId) {
+                try {
+                    // Effectuer la mise à jour de l'état de l'entretien via l'API
+                    const response = await fetch(`${backendUrl}/api/geop/Servicing/updatestate/${selectedServicingId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            statut: "Cloturé", // Le statut que vous souhaitez mettre à jour
+                        }),
+                    });
+    
+                    // Vérifier si la requête a réussi
+                    if (response.ok) {
+                        // Afficher une notification de succès
+                        toast.success("Statut de l'entretien mis à jour avec succès!", {
+                            position: "bottom-right",
+                            autoClose: 3000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+    
+                        });
+    
+                        refreshData(); // Rafraîchir les données après la mise à jour
+                    } else {
+                        // Afficher une notification d'erreur si la requête a échoué
+                        toast.error("Erreur lors de la mise à jour du statut de l'entretien.", {
+                            position: "bottom-right",
+                            autoClose: 3000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "light",
+                            transition: Bounce,
+    
+                        });
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la clôture de l'entretien:", error);
+    
+                    // Afficher une notification d'erreur en cas d'exception
+                    toast.error("Une erreur s'est produite. Veuillez réessayer.", {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+    
+                    });
+                } finally {
+                    setShowConfirmModal(false); // Fermer la modal après l'opération
+                }
+            }
+        };
+    
+
 
     return (
         <>
@@ -354,12 +424,12 @@ export function Servicing() {
                             {selectedColumns.Vehicle && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("type_vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                             {selectedColumns.Km && (
+                             {selectedColumns.KM && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("km_servicing")}
@@ -445,7 +515,7 @@ export function Servicing() {
 
                                             )}
                                              {selectedColumns.Vehicle && (
-                                                <td>{Servicing.type_vehicule}</td>
+                                                <td>{Servicing.immatriculation_vehicule}</td>
                                             )}
                                              {selectedColumns.Km && (
                                                 <td>{Servicing.km_servicing}</td>
@@ -576,7 +646,7 @@ export function Servicing() {
                     <Button variant="secondary" onClick={handleCloseConfirmModal}>
                         {translate("No")}
                     </Button>
-                    <Button variant="primary" onClick={handleCloseConfirmModal}>
+                    <Button variant="primary" onClick={handleUpdateState}>
                         {translate("Yes")}
                     </Button>
                     </Modal.Footer>

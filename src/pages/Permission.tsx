@@ -124,7 +124,7 @@ export function Permission() {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item>N</Dropdown.Item>
-              <Dropdown.Item>{translate('Creation Date')}</Dropdown.Item>
+              <Dropdown.Item>{translate('Creation date')}</Dropdown.Item>
               <Dropdown.Item>{translate('Verifier')}</Dropdown.Item>
               <Dropdown.Item>{translate('Outgoing Driver')}</Dropdown.Item>
               <Dropdown.Item>{translate('Incoming Driver')}</Dropdown.Item>
@@ -146,7 +146,7 @@ export function Permission() {
                 </div>
               </th>
               <th>N°</th>
-              <th>{translate('Creation Date')}</th>
+              <th>{translate('Creation date')}</th>
               <th>{translate('Verifier')}</th>
               <th>{translate('Outgoing Driver')}</th>
               <th>{translate('Incoming Driver')}</th>

@@ -63,6 +63,8 @@ import NotFound from "./pages/NotFound";
 import { Parks } from "./pages/parks";
 import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
+import { Deadline } from "./pages/Deadline";
+import { Notifications } from "./pages/Notification";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -83,43 +85,46 @@ function App() {
 
   const apiKey = getApiKeyFromURL();
 
+const handleLogin = async () => {
+  try {
+    const response = await axios.get(
+      `https://geotrackin.com/api/logingeop?apiKey=${apiKey}`,
+      {
+        withCredentials: true, // Important pour envoyer et recevoir les cookies
+      }
+    );
 
-  const handleLogin = async () => {
-    try {
-      
-      const response = await axios.get(`https://geotrackin.com/api/logingeop?apiKey=${apiKey}`, {
+    const data = response.data;
 
-      });
-      console.log(response)
-      localStorage.setItem("authToken", response.data.token);
-      const GeoploginTime = new Date().getTime(); // Store current time
-      localStorage.setItem("GeoploginTime", GeoploginTime.toString());
-      localStorage.setItem("GeopUserID", response.data.id_user);
-      localStorage.setItem("Geopusername", response.data.username);
-      localStorage.setItem("api_key", response.data.api_key); 
-      localStorage.setItem("id_role", response.data.id_role); 
-      localStorage.setItem("theme_mode", response.data.profile_settings.theme_mode);
-      localStorage.setItem("language", response.data.profile_settings.language);
-      localStorage.setItem("timezone", response.data.profile_settings.timezone);
+    // Pas besoin de stocker le token dans localStorage s'il est en cookie HTTPOnly
 
+    const GeoploginTime = new Date().getTime();
+    localStorage.setItem("GeoploginTime", GeoploginTime.toString());
+    localStorage.setItem("GeopUserID", data.id_user);
+    localStorage.setItem("Geopusername", data.username);
+    localStorage.setItem("api_key", data.api_key);
+    localStorage.setItem("id_role", data.id_role);
+    localStorage.setItem("theme_mode", data.profile_settings.theme_mode);
+    localStorage.setItem("language", data.profile_settings.language);
+    localStorage.setItem("timezone", data.profile_settings.timezone);
 
-      // Fetch permissions for the user
-      const permissionsResponse = await axios.get(
-        `${backendUrl}/api/geop/permission/all/${response.data.id_role}`
-      );
-      localStorage.setItem(
-        "userPermissions",
-        JSON.stringify(permissionsResponse.data)
-      );
+    // Fetch des permissions utilisateur
+    const permissionsResponse = await axios.get(
+      `${backendUrl}/api/geop/permission/all/${data.id_role}`,
+      { withCredentials: true }
+    );
+    localStorage.setItem(
+      "userPermissions",
+      JSON.stringify(permissionsResponse.data)
+    );
 
-      //navigate("/");
-    } catch (error) {
-      console.error("Login error", error);
-    } finally {
+    // Redirection après login si nécessaire
+    // navigate("/");
 
-      // Set loading to false on login completion (success or failure)
-    }
-  };
+  } catch (error) {
+    console.error("Login error", error);
+  }
+};
 
   // handleLogin()   
 
@@ -147,6 +152,9 @@ function App() {
           <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
           <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
           <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
+          <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+          <Route path="/deadline/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+          <Route path="/deadline/:id_alarm/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
           <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
           <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
           <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
@@ -172,6 +180,7 @@ function App() {
           <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
           <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
           <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+          <Route path="/notifications" element={ <DashboardLayout>{< Notifications />}</DashboardLayout>} /> 
           <Route path="*" element={<NotFound />} />  
           <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
           <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />

@@ -386,7 +386,7 @@ function Role() {
                       />
                     </div>
                   </th>
-                  {selectedColumns.id_role && (<th className="sorting" onClick={() => handleSortingColum("id_role")}> {translate("Id")}</th>)}
+                  {selectedColumns.id_role && id_user=="1" && (<th className="sorting" onClick={() => handleSortingColum("id_role")}> {translate("Id")}</th>)}
                   {selectedColumns.nom_role && (<th className="sorting" onClick={() => handleSortingColum("nom_role")}> {translate("Name")} </th>)}
                   {selectedColumns.username_user && (<th className="sorting" onClick={() => handleSortingColum("username_user")}> {translate("User")}</th>)}
                   {selectedColumns.date_creation_role && (<th className="sorting" onClick={() => handleSortingColum("date_creation_role")}> {translate("Creation date")}</th>)}
@@ -417,7 +417,7 @@ function Role() {
                           />
                         </div>
                       </td>
-                      {selectedColumns.id_role && <td>{role.id_role}</td>}
+                      {selectedColumns.id_role && id_user=="1" && <td>{role.id_role}</td>}
                       {selectedColumns.nom_role && <td>{role.nom_role}</td>}
                       {selectedColumns.username_user && <td>{role.username_user}</td>}
                       {selectedColumns.date_creation_role && (<td>{toTimestamp(role.date_creation_role)}</td>)}

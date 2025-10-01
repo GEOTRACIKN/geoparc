@@ -404,7 +404,7 @@ export function Vehicleschecks() {
                   checked={selectedColumns.creation_date}
                   onChange={() => handleColumnChange("creation_date")}
                 />
-                <span style={{ marginLeft: '10px' }}>{translate("creation Date")}</span>
+                <span style={{ marginLeft: '10px' }}>{translate("Creation date")}</span>
               </Dropdown.Item>
               <Dropdown.Item as="button" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
@@ -480,7 +480,7 @@ export function Vehicleschecks() {
                 </div>
               </th>
               {selectedColumns.id_verif && <th>Id</th>}
-              {selectedColumns.creation_date && <th>{translate("creation Date")}</th>}
+              {selectedColumns.creation_date && <th>{translate("Creation date")}</th>}
               {selectedColumns.Checker && <th>{translate("Checker")}</th>}
               {selectedColumns.Driver_out && <th>{translate("Outgoing Driver")}</th>}
               {selectedColumns.Driver_in && <th>{translate("Incoming Driver")}</th>}

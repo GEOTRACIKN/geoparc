@@ -54,7 +54,7 @@ const ModalShowPharmacy: React.FC<ModalShowPharmacynProps> = ({
                 setFormData({
                     id_pharmacy: data.id_pharmacy,
                     product_pharmacy: data.product_pharmacy,
-                    purch_date_pharmacy: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : 'Invalid Date',
+                    purch_date_pharmacy: purchDate.isValid() ? purchDate.format('DD/MM/YYYY') : '',
                     exp_date_pharmacy: expDate.isValid() ? expDate.format('DD/MM/YYYY') : 'Invalid Date',
                     cost_pharmacy: data.cost_pharmacy,
                     type_pharmacy: data.type_pharmacy,
@@ -78,7 +78,7 @@ const ModalShowPharmacy: React.FC<ModalShowPharmacynProps> = ({
     
 
     return (
-        <Modal show={show} onHide={onHide} responsive>
+        <Modal show={show} onHide={onHide} backdrop="static" responsive>
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Show")}</Modal.Title>
             </Modal.Header>

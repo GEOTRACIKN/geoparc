@@ -1,24 +1,41 @@
-import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import HighchartsMore from 'highcharts/highcharts-more';
-import SolidGauge from 'highcharts/modules/solid-gauge';
+import React from "react";
+import { Modal, Button } from "react-bootstrap";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+import HighchartsMore from "highcharts/highcharts-more";
+import SolidGauge from "highcharts/modules/solid-gauge";
+import { useNavigate } from "react-router-dom";
 
 // Initialize Highcharts modules
 HighchartsMore(Highcharts);
 SolidGauge(Highcharts);
 
 type AlertCounterProps = {
+    id: string;
     value: number;
     max: number; // Used for calculation
     color: string;
     label: string;
     modalId: string;
-    height:number;
+    height: number;
 };
 
-const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, modalId,height }) => {
+const AlertCounter: React.FC<AlertCounterProps> = ({
+    value,
+    id,
+    max,
+    color,
+    label,
+    modalId,
+    height,
+}) => {
+
+    
+    const navigate = useNavigate();
+    const handleNavigate = () => {
+        navigate(`/deadline/${id}`);
+    };
+
     const [showModal, setShowModal] = React.useState(false);
 
     const handleShow = () => setShowModal(true);
@@ -26,17 +43,17 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
 
     const options: Highcharts.Options = {
         chart: {
-            type: 'solidgauge',
+            type: "solidgauge",
             height: height,
-            backgroundColor: 'transparent',
+            backgroundColor: "transparent",
             events: {
-                click: handleShow,
+                click: handleNavigate,
             },
         },
         title: undefined, // Use undefined instead of null
         pane: {
-            center: ['50%', '50%'],
-            size: '100%',
+            center: ["50%", "50%"],
+            size: "100%",
             startAngle: -90,
             endAngle: 90,
             background: undefined,
@@ -46,10 +63,10 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
         },
         yAxis: {
             min: 0, // Required for calculations
-            max: max, 
+            max: max,
             stops: [
                 [1, color], // Couleur de la jauge au point maximum
-            ],// Used for the scale of the gauge
+            ], // Used for the scale of the gauge
             lineWidth: 0,
             tickWidth: 0,
             title: {
@@ -77,14 +94,13 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
                     // },
                 },
             },
-            
         },
         series: [
             {
-                type: 'solidgauge', // Ensure you include the type
+                type: "solidgauge", // Ensure you include the type
                 name: label,
                 data: [value],
-                color: color,// Apply the color
+                color: color, // Apply the color
                 dataLabels: {
                     style: {
                         color: "#000", // Assure la couleur du label
@@ -99,23 +115,10 @@ const AlertCounter: React.FC<AlertCounterProps> = ({ value, max, color, label, m
 
     return (
         <div className="text-center">
-           <div  onClick={handleShow} style={{cursor:"pointer"}}> <HighchartsReact highcharts={Highcharts} options={options}/></div>
-          
-           <Modal show={showModal} onHide={handleClose} id={modalId}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{label}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {/* Contenu de la modal */}
-                    Détails pour {label}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Fermer
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+        <div onClick={handleNavigate} style={{ cursor: "pointer" }}>
+            <HighchartsReact highcharts={Highcharts} options={options} />
         </div>
+    </div>
     );
 };
 

@@ -6,6 +6,7 @@ import { Bounce, toast } from "react-toastify";
 import axios from 'axios';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ModalDeleteTraining from "./DeleteTraining";  // Import your delete modal component
+import Select from "react-select";
 
 interface CalendarTrainingModalProps {
     show: boolean;
@@ -43,6 +44,16 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
     const geopuserID = localStorage.getItem("GeopUserID");
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test") },
+    ];
+    
+    const mapTrainingType = (type: string) => {
+        const found = trainingOptions.find(option => option.value === type);
+        return found ? found.label : type; // Retourne le label ou la valeur brute si non trouvée
+    };
+
+
 
     useEffect(() => {
         if (show) {
@@ -108,12 +119,45 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                 }));
             } catch (error: unknown) {
                 console.error("Error fetching training data:", error);
-                toast.error("Error fetching training data.");
             }
         };
 
         fetchTraining();
     }, [id_training, backendUrl]);
+
+
+     useEffect(() => {
+                  if (formData.date_start_training) {
+                    const startDate = new Date(formData.date_start_training);
+                    if (!isNaN(startDate.getTime())) {
+                      const endDate = new Date(startDate);
+                      endDate.setFullYear(endDate.getFullYear() + 3);
+                      // On utilise toISOString pour obtenir le format YYYY-MM-DD
+                      const formattedEndDate = endDate.toISOString().split("T")[0];
+                      setFormData(prev => ({
+                        ...prev,
+                        date_end_training: formattedEndDate,
+                      }));
+                    } else {
+                      setFormData(prev => ({
+                        ...prev,
+                        date_end_training: "",
+                      }));
+                    }
+                  } else {
+                    setFormData(prev => ({
+                      ...prev,
+                      date_end_training: "",
+                    }));
+                  }
+                }, [formData.date_start_training]);
+              
+                // Mise à jour de la date de début via onChange
+                const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const { value } = e.target;
+                  setFormData(prev => ({ ...prev, date_start_training: value }));
+                };
+          
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -122,6 +166,17 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             [id]: value,
         }));
     };
+        const handleReset = () => {
+        setFormData({
+        id_training: "",
+        id_conducteur: "",
+        date_start_training: "",
+        date_end_training: "",
+        type_training: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
 
     const validateForm = () => {
         if (
@@ -130,7 +185,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             !formData.date_end_training ||
             !formData.type_training
         ) {
-            toast.error("Please fill out all fields.", {
+            toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -147,7 +202,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
         const endDate = new Date(formData.date_end_training);
 
         if (startDate > endDate) {
-            toast.error("Start date must be earlier than end date.", {
+            toast.error(translate("Start date must be earlier than end date"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -188,7 +243,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training updated successfully!", {
+            toast.success(translate("Updated successfully!"), {                
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -206,7 +261,7 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating training:", error);
-            toast.error("Error updating training. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -230,51 +285,66 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
 
     return (
         <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-    <div className="d-flex justify-content-between align-items-center w-100">
-        <Modal.Title>{isEditable ? translate("Edit Training") : translate("View Training")}</Modal.Title>
+        <Modal.Header>
+        <div className="d-flex justify-content-between align-items-center w-100">
+    <Modal.Title>{isEditable ? translate("Edit Training") : translate("View Training")}</Modal.Title>
+    <div className="d-flex gap-1">
         {!isEditable && (
-            <>
-                <Button variant="outline-primary" onClick={() => setIsEditable(true)} className="mx-1">
-                    <FaEdit />
-                </Button>
-                <Button variant="outline-danger" onClick={() => setShowDeleteModal(true)} className="mx-1">
-                    <FaTrash />
-                </Button>
-            </>
+            <Button variant="outline-primary" onClick={() => setIsEditable(true)}>
+                <FaEdit />
+            </Button>
         )}
+        <Button variant="outline-danger" onClick={() => setShowDeleteModal(true)}>
+            <FaTrash />
+        </Button>
     </div>
+</div>
+
 </Modal.Header>
 
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <Form.Group controlId="id_conducteur">
-                        <Form.Label>{translate("Driver")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_conducteur}
-                            onChange={handleChange}
-                            disabled={!isEditable}
-                        >
-                            <option value="">{translate("Select Driver")}</option>
-                            {drivers.length === 0 ? (
-                                <option value="">{translate("No drivers available")}</option>
-                            ) : (
-                                drivers.map((driver) => (
-                                    <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                        {`${driver.nom_conducteur} ${driver.prenom_conducteur}`}
-                                    </option>
-                                ))
-                            )}
-                        </Form.Control>
-                    </Form.Group>
+                <Form.Group controlId="id_conducteur">
+    <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+    <Select
+        options={drivers.map((driver) => ({
+            value: driver.id_conducteur,
+            label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+        }))}
+
+        placeholder={translate("Select Driver")}
+        isLoading={drivers.length === 0} // Loader si les données ne sont pas chargées
+        noOptionsMessage={() => translate("No drivers available")}
+        isSearchable // 🔥 Active la recherche
+
+        value={drivers
+            .map((driver) => ({
+                value: driver.id_conducteur,
+                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`,
+            }))
+            .find((option) => String(option.value) === String(formData.id_conducteur)) || null
+        }
+
+        onChange={(selectedOption) => {
+            setFormData((prev) => ({
+                ...prev,
+                id_conducteur: selectedOption ? String(selectedOption.value) : "",
+            }));
+        }}
+
+        isDisabled={!isEditable} // Désactivation si non éditable
+    />
+</Form.Group>
+
+
+
 
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
-                            onChange={handleChange}
+                            onChange={handleStartDateChange}
                             disabled={!isEditable}
                         />
                     </Form.Group>
@@ -284,30 +354,51 @@ const CalendarTrainingModal: React.FC<CalendarTrainingModalProps> = ({
                         <Form.Control
                             type="date"
                             value={formData.date_end_training}
-                            onChange={handleChange}
-                            disabled={!isEditable}
+                            readOnly
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Training Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_training}
-                            onChange={handleChange}
-                            disabled={!isEditable}
-                        />
-                    </Form.Group>
+                        <Form.Group controlId="type_training">
+                            <Form.Label>{translate("Training Type")}{translate(" *")}</Form.Label>
+                            {isEditable ? (
+                                <Select
+                                options={trainingOptions}
+                                // Ici, on cherche l'option dont la valeur correspond à formData.type_training
+                                value={trainingOptions.find(option => option.value === formData.type_training) || null}
+                                onChange={(selectedOption) =>
+                                    setFormData(prev => ({
+                                    ...prev,
+                                    type_training: selectedOption ? selectedOption.value : ""
+                                    }))
+                                }
+                                placeholder={translate("Select Training Type")}
+                                isSearchable
+                                />
+                            ) : (
+                                // En mode lecture, on affiche le label complet grâce à mapTrainingType
+                                <Form.Control 
+                                type="text" 
+                                value={mapTrainingType(formData.type_training)} 
+                                readOnly 
+                                />
+                            )}
+                            </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    {isEditable ? (
-                        <Button type="submit">{translate("Save")}</Button>
-                    ) : (
-                        <Button variant="secondary" onClick={handleClose}>
-                            {translate("Close")}
-                        </Button>
-                    )}
-                </Modal.Footer>
+    {isEditable ? (
+        <>
+            <Button type="submit">{translate("Save")}</Button>
+            <Button variant="secondary" onClick={handleReset}>
+                {translate("Close")}
+            </Button>
+        </>
+    ) : (
+        <Button variant="secondary" onClick={handleReset}>
+            {translate("Close")}
+        </Button>
+    )}
+</Modal.Footer>
+
             </Form>
 
             <ModalDeleteTraining

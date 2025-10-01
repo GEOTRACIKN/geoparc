@@ -5,6 +5,7 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
 import dayjs from "dayjs"; 
+import Select from "react-select";
 
 interface EditPharmacyModalProps {
     show: boolean;
@@ -15,12 +16,11 @@ interface EditPharmacyModalProps {
 
 // Définir le type pour un véhicule
 interface Vehicle {
-    id_vehicule: string;
+    id_vehicule: number;
     immatriculation_vehicule: string;
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     show,
@@ -39,6 +39,8 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     });
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const geopuserID = localStorage.getItem("GeopUserID");
+
     const { translate } = useTranslate();
     const formatDate = (date: string) => {
         const parsedDate = new Date(date);
@@ -125,7 +127,6 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching pharmacy data.");
             }
         };
     
@@ -179,17 +180,30 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_pharmacy: "",
+        product_pharmacy: "",
+        purch_date_pharmacy: "",
+        exp_date_pharmacy: "",
+        cost_pharmacy: "",
+        type_pharmacy: "",
+        id_vehicule: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+
 
     const validateForm = () => {
         if (
             !formData.product_pharmacy ||
-            !formData.purch_date_pharmacy ||
+            
             !formData.exp_date_pharmacy ||
-            !formData.cost_pharmacy ||
-            !formData.type_pharmacy ||
+           
+            
             !formData.id_vehicule
         ) {
-            toast.error("Please fill out all fields.", {
+            toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -248,7 +262,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Pharmacy updated successfully!", {
+            toast.success(translate("Updated successfully!"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -266,7 +280,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating pharmacy:", error);
-            toast.error("Error updating pharmacy. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -280,19 +294,49 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     <Form.Group controlId="product_pharmacy">
-                        <Form.Label>{translate("Product")}</Form.Label>
+                        <Form.Label>{translate("Product")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="text"
                             value={formData.product_pharmacy}
                             onChange={handleChange}
                         />
+                        <Form.Group controlId="id_vehicule">
+                    <Form.Label>{translate("Vehicle")}{translate(" *")}</Form.Label>
+                    <Select
+                        options={vehicles.map(vehicle => ({
+                                                value: vehicle.id_vehicule, // ID du véhicule
+                                                label: vehicle.immatriculation_vehicule // Immatriculation
+                                            })) as unknown as { value: number; label: string }[]} // 🔥 Correction du typage
+
+                        placeholder={translate("Select Vehicle")}
+                        isLoading={vehicles.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                        noOptionsMessage={() => translate("No vehicles available")}
+                        isSearchable // Active la recherche
+
+                        // 🔥 Correction de la sélection automatique avec conversion en string
+                        value={vehicles
+                            .map(vehicle => ({
+                                value: vehicle.id_vehicule,
+                                label: vehicle.immatriculation_vehicule
+                            }))
+                            .find(option => String(option.value) === String(formData.id_vehicule)) || null
+                        }
+
+                        onChange={(selectedOption) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                id_vehicule: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                            }));
+                        }}
+                    />
+                </Form.Group>
                     </Form.Group>
                     <Form.Group controlId="purch_date_pharmacy">
                         <Form.Label>{translate("Purchase Date")}</Form.Label>
@@ -303,7 +347,7 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                         />
                     </Form.Group>
                     <Form.Group controlId="exp_date_pharmacy">
-                        <Form.Label>{translate("Expiration Date")}</Form.Label>
+                        <Form.Label>{translate("Expiration Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.exp_date_pharmacy}
@@ -316,6 +360,17 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                             type="number"
                             value={formData.cost_pharmacy}
                             onChange={handleChange}
+                            onKeyDown={(e) => {
+                                // Autorise seulement les touches numériques, suppr, backspace, tab, fleches
+                                const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+                                if (
+                                  !/[0-9]/.test(e.key) &&
+                                  !allowedKeys.includes(e.key)
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              min="0"
                         />
                     </Form.Group>
                     <Form.Group controlId="type_pharmacy">
@@ -326,24 +381,10 @@ const EditPharmacyModal: React.FC<EditPharmacyModalProps> = ({
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="id_vehicule">
-                        <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={formData.id_vehicule}
-                            onChange={handleChange}
-                        >
-                            <option value="">{translate("Select Vehicle")}</option>
-                            {vehicles.map((vehicle) => (
-                                <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                                    {vehicle.immatriculation_vehicule}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
+                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

@@ -8,6 +8,8 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const id_user = localStorage.getItem("GeopUserID");
 
 
 interface Intervention {
@@ -15,7 +17,7 @@ interface Intervention {
     date_intervention: string;
     priority: string;
     statut: string;
-    vehicule: string;
+    immatriculation_vehicule: string;
     km: number;
     subject: string;
     client: string;
@@ -26,11 +28,9 @@ interface Intervention {
 
 
 export function Reception() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
     const [list_intervention, setintervention] = useState<Intervention[]>([]);
-    const id_user = localStorage.getItem("GeopUserID");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -49,11 +49,11 @@ export function Reception() {
     const initialColumns = {
         ID: true,
         Date: true,
-        priority: true,
-        statut: true,
-        vehicule: true,
-        km: true,
-        client: true,
+        Priority: true,
+        Statut: true,
+        Vehicule: true,
+        Km: true,
+        Client: true,
     };
 
     // Load selected columns from localStorage or use initial state
@@ -297,7 +297,7 @@ export function Reception() {
                             {selectedColumns.ID && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("ID")}
+                                    onClick={() => handleSortingColumn("id_intervention")}
                                 >
                                     {translate("ID")}
                                 </th>
@@ -305,38 +305,38 @@ export function Reception() {
                             {selectedColumns.Date && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("Date")}
+                                    onClick={() => handleSortingColumn("date_intervention")}
                                 >
                                     {translate("Date")}
                                 </th>
                             )}
 
 
-                            {selectedColumns.vehicule && (
+                            {selectedColumns.Vehicule && (
                                 <th
                                     className="sorting "
-                                    onClick={() => handleSortingColumn("vehicule")}
+                                    onClick={() => handleSortingColumn("immatriculation_vehicule")}
                                 >
                                     {translate("Vehicle")}
                                 </th>
                             )}
-                            {selectedColumns.km && (
+                            {selectedColumns.Km && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("km")}
                                 >
-                                    {translate("km")}
+                                    {translate("Km")}
                                 </th>
                             )}
-                            {selectedColumns.client && (
+                            {selectedColumns.Client && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("client")}
                                 >
-                                    {translate("client")}
+                                    {translate("Client")}
                                 </th>
                             )}
-                            {selectedColumns.priority && (
+                            {selectedColumns.Priority && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("priority")}
@@ -344,7 +344,7 @@ export function Reception() {
                                     {translate("Priority")}
                                 </th>
                             )}
-                            {selectedColumns.statut && (
+                            {selectedColumns.Statut && (
                                 <th
                                     className="sorting "
                                     onClick={() => handleSortingColumn("statut")}
@@ -395,27 +395,27 @@ export function Reception() {
                                     )}
 
 
-                                    {selectedColumns.vehicule && (
+                                    {selectedColumns.Vehicule && (
                                         <td>
-                                            {Intervention.vehicule}
+                                            {Intervention.immatriculation_vehicule}
                                         </td>
                                     )}
-                                    {selectedColumns.km && (
+                                    {selectedColumns.Km && (
                                         <td>
                                             {Intervention.km}
                                         </td>
                                     )}
-                                    {selectedColumns.client && (
+                                    {selectedColumns.Client && (
                                         <td>
                                             {Intervention.client}
                                         </td>
                                     )}
-                                    {selectedColumns.priority && (
+                                    {selectedColumns.Priority && (
                                         <td>
                                             {Intervention.priority}
                                         </td>
                                     )}
-                                    { selectedColumns.statut && (
+                                    { selectedColumns.Statut && (
                                     <td
                                         style={{
                                             display: "flex",

@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import axios, { AxiosError } from 'axios';
+import Select from "react-select";
+
 
 
 interface EditTrainingModalProps {
@@ -18,7 +20,6 @@ interface Driver {
     nom_conducteur: string;
     prenom_conducteur: string;
 }
-const geopuserID = localStorage.getItem("GeopUserID");
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
@@ -38,45 +39,47 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
     const { translate } = useTranslate();
     const [drivers, setDrivers] = useState<Driver[]>([]);
+    const geopuserID = localStorage.getItem("GeopUserID");
 
-       useEffect(() => {
-            if (show) {
-              const fetchDrivers = async () => {
+
+    useEffect(() => {
+        console.log("useEffect triggered - show:", show, "geopuserID:", geopuserID);
+    
+        if (show && geopuserID) { // Vérifie si geopuserID est défini avant d'exécuter la requête
+            const fetchDrivers = async () => {
                 try {
-                  const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
-          
-                  if (!response.ok) {
-                    throw new Error("Failed to fetch drivers");
-                  }
-          
-                  const data = await response.json();
-                  console.log("Drivers data received from API:", data);
-          
-                  const drivers = Array.isArray(data.vehicles)
-                    ? data.vehicles
-                        .filter(
-                          (driver: any) =>
-                            driver.nom_conducteur?.trim() !== "" &&
-                            driver.prenom_conducteur?.trim() !== ""
-                        )
-                        .map((driver: any) => ({
-                          id_conducteur: driver.id_conducteur,
-                          nom_conducteur: driver.nom_conducteur,
-                          prenom_conducteur: driver.prenom_conducteur,
-                        }))
-                    : [];
-          
-                  setDrivers(drivers);
+                    console.log("Fetching drivers for geopuserID:", geopuserID);
+                    const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
+    
+                    if (!response.ok) throw new Error("Failed to fetch drivers");
+    
+                    const data = await response.json();
+                    console.log("Drivers data received from API:", data);
+    
+                    const drivers = Array.isArray(data.vehicles)
+                        ? data.vehicles
+                            .filter((driver: any) =>
+                                driver.nom_conducteur?.trim() !== "" && driver.prenom_conducteur?.trim() !== ""
+                            )
+                            .map((driver: any) => ({
+                                id_conducteur: driver.id_conducteur,
+                                nom_conducteur: driver.nom_conducteur,
+                                prenom_conducteur: driver.prenom_conducteur,
+                            }))
+                        : [];
+    
+                    console.log("Filtered drivers:", drivers);
+                    setDrivers(drivers);
                 } catch (error) {
-                  console.error("Error fetching drivers:", error);
-                  setDrivers([]);
+                    console.error("Error fetching drivers:", error);
+                    setDrivers([]);
                 }
-              };
-          
-              fetchDrivers();
-            }
-          }, [show, backendUrl, geopuserID]);
-   
+            };
+    
+            setTimeout(fetchDrivers, 500); // Ajoute un délai pour laisser le temps aux données de se charger
+        }
+    }, [show, backendUrl, geopuserID]);
+    
     useEffect(() => {
         // Vérifie si l'id_training est valide avant de faire l'appel API
         if (!id_training) {
@@ -145,7 +148,6 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                     console.error("Erreur inconnue:", error);
                 }
     
-                toast.error("Error fetching training data.");
             }
         };
     
@@ -153,13 +155,15 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     }, [id_training, backendUrl]);
 
     useEffect(() => {
-        if (show) {
+        console.log("Valeur de geopuserID:", geopuserID); // Vérifier ce qui est stocké
+      
+        if (show && geopuserID) { // Vérification supplémentaire
           const fetchDrivers = async () => {
             try {
               const response = await fetch(`${backendUrl}/api/geop/drivers/${geopuserID}`);
       
               if (!response.ok) {
-                throw new Error("Failed to fetch drivers");
+                throw new Error(`Failed to fetch drivers: ${response.status}`);
               }
       
               const data = await response.json();
@@ -189,6 +193,39 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
           fetchDrivers();
         }
       }, [show, backendUrl, geopuserID]);
+      
+       useEffect(() => {
+              if (formData.date_start_training) {
+                const startDate = new Date(formData.date_start_training);
+                if (!isNaN(startDate.getTime())) {
+                  const endDate = new Date(startDate);
+                  endDate.setFullYear(endDate.getFullYear() + 3);
+                  // On utilise toISOString pour obtenir le format YYYY-MM-DD
+                  const formattedEndDate = endDate.toISOString().split("T")[0];
+                  setFormData(prev => ({
+                    ...prev,
+                    date_end_training: formattedEndDate,
+                  }));
+                } else {
+                  setFormData(prev => ({
+                    ...prev,
+                    date_end_training: "",
+                  }));
+                }
+              } else {
+                setFormData(prev => ({
+                  ...prev,
+                  date_end_training: "",
+                }));
+              }
+            }, [formData.date_start_training]);
+          
+            // Mise à jour de la date de début via onChange
+            const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+              const { value } = e.target;
+              setFormData(prev => ({ ...prev, date_start_training: value }));
+            };
+      
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -197,6 +234,17 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             [id]: value,
         }));
     };
+    const handleClose = () => {
+        setFormData({
+            id_training:"",
+            id_conducteur: "",
+            date_start_training: "",
+            date_end_training: "",
+            type_training: "",
+        });
+        onHide(); // Fermer le modal après la réinitialisation
+    };
+    
 
     const validateForm = () => {
         // Vérifier si tous les champs sont remplis
@@ -206,7 +254,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             !formData.date_end_training ||
             !formData.type_training
         ) {
-            toast.error("Please fill out all fields.", {
+            toast.error(translate("Please fill out all fields"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -224,7 +272,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
         const endDate = new Date(formData.date_end_training); // Convertir en objet Date
     
         if (startDate > endDate) {
-            toast.error("Start date must be earlier than end date.", {
+            toast.error(translate("Start date must be earlier than end date"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -239,6 +287,24 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     
         return true;
     };
+
+    const trainingOptions = [
+        { value: "DT", label: translate("Driving Test")}, 
+      ];
+    
+      const handletrainingTypeChange = (selectedOption: any, actionMeta: any) => {
+        const { name } = actionMeta;
+        const value = selectedOption ? selectedOption.value : "";
+    
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        console.log(formData); 
+    
+      };
+    
+    
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -265,7 +331,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
 
             const result = await response.json();
 
-            toast.success("Training updated successfully!", {
+            toast.success(translate("Updated successfully!"), {                
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -283,7 +349,7 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
             onHide();
         } catch (error) {
             console.error("Error updating training:", error);
-            toast.error("Error updating training. Please try again.", {
+            toast.error(translate("Error updating. Please try again"), {
                 position: "bottom-right",
                 autoClose: 2400,
                 hideProgressBar: false,
@@ -297,40 +363,50 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onHide} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{translate("Edit")}</Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     
-                    <Form.Group controlId="id_conducteur">
-                     <Form.Label>{translate("Driver")}</Form.Label>
-                     <Form.Control
-                         as="select"
-                         value={formData.id_conducteur}
-                         onChange={handleChange}
-                     >
-                         <option value="">{translate("Select Driver")}</option>
-                         {drivers.length === 0 ? (
-                             <option value="">{translate("No drivers available")}</option>
-                         ) : (
-                             drivers.map((driver) => (
-                                 <option key={driver.id_conducteur} value={driver.id_conducteur}>
-                                     {`${driver.nom_conducteur} ${driver.prenom_conducteur} `}
-                                 </option>
-                             ))
-                         )}
-                     </Form.Control>
-                 </Form.Group>
-                   
+                <Form.Group controlId="id_conducteur">
+                        <Form.Label>{translate("Driver")}{translate(" *")}</Form.Label>
+                        <Select
+                            options={drivers.map(driver => ({
+                                value: driver.id_conducteur, // Numéro du conducteur
+                                label: `${driver.nom_conducteur} ${driver.prenom_conducteur}` // Nom complet
+                            })) as { value: number; label: string }[]} // 🔥 Correction du typage
 
+                            placeholder={translate("Select Driver")}
+                            isLoading={drivers.length === 0} // Affiche un loader si les données ne sont pas encore chargées
+                            noOptionsMessage={() => translate("No drivers available")}
+                            isSearchable // Active la recherche
+
+                            // 🔥 Correction de la sélection automatique avec conversion en string
+                            value={drivers
+                                .map(driver => ({
+                                    value: driver.id_conducteur,
+                                    label: `${driver.nom_conducteur} ${driver.prenom_conducteur}`
+                                }))
+                                .find(option => String(option.value) === String(formData.id_conducteur)) || null
+                            }
+
+                            onChange={(selectedOption) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    id_conducteur: selectedOption ? String(selectedOption.value) : "" // 🔥 Correction de l'affectation
+                                }));
+                            }}
+                        />
+                    </Form.Group>
+                   
                     <Form.Group controlId="date_start_training">
-                        <Form.Label>{translate("Start Date")}</Form.Label>
+                        <Form.Label>{translate("Start Date")}{translate(" *")}</Form.Label>
                         <Form.Control
                             type="date"
                             value={formData.date_start_training}
-                            onChange={handleChange}
+                            onChange={handleStartDateChange}
                         />
                     </Form.Group>
 
@@ -340,22 +416,26 @@ const EditTrainingModal: React.FC<EditTrainingModalProps> = ({
                         <Form.Control
                             type="date"
                             value={formData.date_end_training}
-                            onChange={handleChange}
+                            readOnly
                         />
                     </Form.Group>
                     
                     <Form.Group controlId="type_training">
-                        <Form.Label>{translate("Type")}</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formData.type_training}
-                            onChange={handleChange}
-                        />
+                        <Form.Label>{translate("Type")}{translate(" *")}</Form.Label>
+                        <Select
+              options={trainingOptions}
+              onChange={handletrainingTypeChange}
+              name="type_training"
+              value={trainingOptions.find(
+                (option) => option.value === formData.type_training
+              )}
+              isClearable
+            />
                     </Form.Group>
                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide}>
+                    <Button variant="secondary" onClick={handleClose}>
                         {translate("Close")}
                     </Button>
                     <Button variant="primary" type="submit">

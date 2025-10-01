@@ -20,12 +20,11 @@ const VehicleModal: React.FC<VehicleModalProps> = ({ show, onHide, status, title
   
   const { translate } = useTranslate();
 
-
   const deleteVehicle = async (id_vehicule: number, id_user: number) => {
 
 
     try { 
-      const res = await fetch(`${backendUrl}/api/geop/vehicle/delete/${IdVehicle}/${id_user}`, {
+      const res = await fetch(`${backendUrl}/api/geop/vehicle/delete/${id_vehicule}/${id_user}`, {
         method: "DELETE",
         mode: "cors",
       });

@@ -22,7 +22,7 @@ const ModalEditPlanninginterviews: React.FC<
         date_planification: "",
         vehicle: "",
         km: "",
-        date_dentretien: "",
+        date_entretien: "",
         type_entretien: "",
     });
 
@@ -43,7 +43,7 @@ const ModalEditPlanninginterviews: React.FC<
                     ),
                     vehicle: planninginterview.vehicule,
                     km: planninginterview.km,
-                    date_dentretien: formatDateToTimestamp(planninginterview.date_dentretien),
+                    date_entretien: formatDateToTimestamp(planninginterview.date_entretien),
                     type_entretien: planninginterview.type_entretien,
                 });
             } else {
@@ -103,12 +103,12 @@ const ModalEditPlanninginterviews: React.FC<
     const handleUpdate = async () => {
         try {
             // Formater la date avant de l'envoyer
-            const formattedDate = formatDateToTimestamp(formData.date_dentretien);
+            const formattedDate = formatDateToTimestamp(formData.date_entretien);
 
             // Mettre à jour formData avec la date formatée
             const updatedFormData = {
                 ...formData,
-                date_dentretien: formattedDate,
+                date_entretien: formattedDate,
             };
             const url = `${backendUrl}/api/geop/updateplanninginterview/${id_planning}`;
             const response = await fetch(url, {
@@ -200,11 +200,11 @@ const ModalEditPlanninginterviews: React.FC<
                             readOnly
                         />
                     </Form.Group>
-                    <Form.Group controlId="date_dentretien">
+                    <Form.Group controlId="date_entretien">
                         <Form.Label>{translate("Interview date")}</Form.Label>
                         <Form.Control
                             type="datetime-local"
-                            value={formData.date_dentretien}
+                            value={formData.date_entretien}
                             onChange={handleChange}
                         />
                     </Form.Group>
