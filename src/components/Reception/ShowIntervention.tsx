@@ -37,7 +37,7 @@ const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
 
     const { translate } = useTranslate();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-    
+
     const serviceMapping: { [key: number]: string } = {
         1: "Garage",
         2: "Planification d'entretien",
@@ -49,11 +49,9 @@ const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
     useEffect(() => {
         const fetchVehicles = async () => {
             if (!geopuserID) return;
-            
+
             try {
-                const response = await fetch(
-                    `${backendUrl}/api/geop/vehicule/${geopuserID}`
-                );
+                const response = await fetch(`${backendUrl}/api/geop/vehicule/${geopuserID}`);
                 const data = await response.json();
                 setVehicles(data.vehicles || []);
             } catch (error) {
@@ -68,13 +66,13 @@ const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
             const url = `${backendUrl}/api/geop/showintervention/${id_intervention}`;
             const response = await fetch(url);
             const data = await response.json();
-            
+
             if (data.length > 0) {
                 const intervention = data[0];
                 setFormData({
                     date: formatDateToTimestamp(intervention.date_intervention),
                     priority: intervention.priority,
-                    id_vehicule: intervention.id_vehicule,
+                    id_vehicule: String(intervention.id_vehicule),
                     km: intervention.km,
                     subject: intervention.subject,
                     client: intervention.client,
@@ -92,8 +90,9 @@ const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
         if (show) fetchIntervention();
     }, [show]);
 
-    // Trouver l'immatriculation du véhicule
-    const vehicleLabel = vehicles.find(v => v.id_vehicule === Number(formData.id_vehicule))?.immatriculation_vehicule || "";
+    const vehicleLabel = vehicles.find(
+        v => String(v.id_vehicule) === String(formData.id_vehicule)
+    )?.immatriculation_vehicule || "";
 
     return (
         <Modal show={show} onHide={onHide} responsive>
@@ -102,93 +101,43 @@ const ModalViewIntervention: React.FC<ModalViewInterventionProps> = ({
             </Modal.Header>
             <Form>
                 <Modal.Body style={{ maxHeight: "calc(80vh - 200px)", overflowY: "auto" }}>
-                    {/* Date */}
-                    <Form.Group controlId="date" >
+                    <Form.Group controlId="date">
                         <Form.Label>{translate("Request Date")}</Form.Label>
-                        <Form.Control
-                            value={formData.date}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.date} readOnly />
                     </Form.Group>
-
-                    {/* Priorité */}
-                    <Form.Group controlId="priority" >
+                    <Form.Group controlId="priority">
                         <Form.Label>{translate("Priority")}</Form.Label>
-                        <Form.Control 
-                            value={translate(formData.priority)}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={translate(formData.priority)} readOnly />
                     </Form.Group>
-
-                    {/* Véhicule */}
-                    <Form.Group controlId="vehicle" >
+                    <Form.Group controlId="vehicle">
                         <Form.Label>{translate("Vehicle")}</Form.Label>
-                        <Form.Control
-                            value={vehicleLabel}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={vehicleLabel} readOnly />
                     </Form.Group>
-
-                    {/* Kilométrage */}
-                    <Form.Group controlId="km" >
+                    <Form.Group controlId="km">
                         <Form.Label>{translate("Km")}</Form.Label>
-                        <Form.Control
-                            value={formData.km}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.km} readOnly />
                     </Form.Group>
-
-                    {/* Sujet */}
-                    <Form.Group controlId="subject" >
+                    <Form.Group controlId="subject">
                         <Form.Label>{translate("Subject")}</Form.Label>
-                        <Form.Control
-                            value={formData.subject}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.subject} readOnly />
                     </Form.Group>
-
-                    {/* Client */}
-                    <Form.Group controlId="client" >
+                    <Form.Group controlId="client">
                         <Form.Label>{translate("Client")}</Form.Label>
-                        <Form.Control
-                            value={formData.client}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.client} readOnly />
                     </Form.Group>
-
-                    {/* Téléphone client */}
-                    <Form.Group controlId="clientPhone" >
+                    <Form.Group controlId="clientPhone">
                         <Form.Label>{translate("Client Phone")}</Form.Label>
-                        <Form.Control
-                            value={formData.clientPhone}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.clientPhone} readOnly />
                     </Form.Group>
-
-                    {/* Réceptionniste */}
-                    <Form.Group controlId="receptionistName" >
+                    <Form.Group controlId="receptionistName">
                         <Form.Label>{translate("Receptionist's Name")}</Form.Label>
-                        <Form.Control
-                            value={formData.receptionistName}
-                            readOnly
-                            
-                        />
+                        <Form.Control value={formData.receptionistName} readOnly />
                     </Form.Group>
-
-                    {/* Service */}
-                    <Form.Group controlId="service" >
+                    <Form.Group controlId="service">
                         <Form.Label>{translate("Service")}</Form.Label>
                         <Form.Control
-                            value={serviceMapping[Number(formData.service)]}
+                            value={serviceMapping[Number(formData.service)] || ""}
                             readOnly
-                            
                         />
                     </Form.Group>
                 </Modal.Body>

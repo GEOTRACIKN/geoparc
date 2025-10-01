@@ -16,12 +16,8 @@ interface MissionReportModalProps {
 }
 
 const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, status, title,IdUser, IdMissionReport, updateMissionReportList  }) => {
-  
   const { translate } = useTranslate();
-
-
   const deletemissionReport = async (id_mission: number, id_user: number) => {
-
 
     try { 
       const res = await fetch(`${backendUrl}/api/geop/missionReportManage/delete/${IdMissionReport}/${id_user}`, {
@@ -30,8 +26,6 @@ const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, s
       });
       onHide();
       if (!res.ok) {
-       
-  
         console.error("Error deleting Mission Report");
         status=null;
         toast.warn("Can't delete Mission Report", {
@@ -69,11 +63,8 @@ const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, s
         return;
       }
 
-
     } catch (error) {
       console.error("Error deleting mission Report", error);
-
-
       toast.warn("Can't deleting Mission Report", {
         position: "bottom-right",
         autoClose: 2500, 
@@ -88,8 +79,6 @@ const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, s
       
     } 
   };
-
- 
  
   return ( 
     <Modal  show={show} onHide={onHide} centered>
@@ -110,11 +99,5 @@ const MissionReportModal: React.FC<MissionReportModalProps> = ({ show, onHide, s
     </Modal>
   );
 };
-
-
-
-
-
-
 
 export default MissionReportModal;

@@ -9,7 +9,6 @@ import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
 
 
 interface Intervention {
@@ -28,6 +27,8 @@ interface Intervention {
 
 
 export function Reception() {
+    const id_user = localStorage.getItem("GeopUserID");
+
 
     const { translate } = useTranslate();
     const [list_intervention, setintervention] = useState<Intervention[]>([]);
@@ -117,7 +118,7 @@ export function Reception() {
             setLoading(false);
         }
     };
-
+//
 
     const getIntervention = async () => {
         try {

@@ -8,7 +8,6 @@ import Select from "react-select";
 
 import dayjs from "dayjs"; 
 import moment from "moment";
-const geopuserID = localStorage.getItem("GeopUserID");
 
 interface EditFireModalProps {
     show: boolean;
@@ -40,90 +39,77 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
         type_fire: "",
         id_vehicule: "",
     });
+const geopuserID = localStorage.getItem("GeopUserID");
 
-
+const [isLoadingVehicles, setIsLoadingVehicles] = useState(true); // ← État séparé pour les véhicules
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const { translate } = useTranslate();
-
+const [isLoading, setIsLoading] = useState(true); // ← Ajoutez cet état
    
 
     // Charger les données de la pharmacie existante
 
     useEffect(() => {
-        // Vérifie si l'id_fire est valide avant de faire l'appel API
-        if (!id_fire) {
-            console.error("id_fire is invalid");
-            return;
-        }
-    
-        const fetchFire = async () => {
-            try {
-                // Logge l'URL de l'API pour vérifier qu'elle est correcte
-                console.log("URL de l'API :", `${backendUrl}/api/geop/showfire/${id_fire}`);
-    
-                const response = await axios.get(`${backendUrl}/api/geop/showfire/${id_fire}`);
-                const data = response.data;
-    
-                // Logge les données reçues pour s'assurer que tout est bien là
-                console.log("Données reçues : ", JSON.stringify(data, null, 2));
-    
-                if (!data || !data.id_fire) {
-                    return;
-                }
-    
-                const toDateInputFormat = (date: string) => {
-                    const [day, month, year] = date.split('/');
-                    return `${year}-${month}-${day}`;
-                };
-                
-                const fromDateInputFormat = (date: string) => {
-                    const [year, month, day] = date.split('-');
-                    return `${day}/${month}/${year}`;
-                };
-                
-                // Lors de la récupération des données
-                const formattedData = {
-                    ...data,
-                    purch_date_fire: toDateInputFormat(data.purch_date_fire),
-                    exp_date_fire: toDateInputFormat(data.exp_date_fire),
-                };
-                
-                // Lors de l’envoi des données au backend
-                const payload = {
-                    ...formData,
-                    purch_date_fire: fromDateInputFormat(formData.purch_date_fire),
-                    exp_date_fire: fromDateInputFormat(formData.exp_date_fire),
-                };
-                
-                console.log("Données formatées :", formattedData);
-                
-                // Mettre à jour le state avec les dates formatées
-                setFormData((prev) => ({
-                    ...prev,
-                    ...formattedData,
-                }));
-                
-                
-                
-                
-            } catch (error: unknown) {  // Typage explicite de l'erreur ici
-                console.error("Error fetching fire data:", error);
-    
-                // Vérifie et log l'erreur en cas de problème
-                if (error instanceof AxiosError) {
-                    console.error("Réponse du serveur:", error.response?.data);
-                    console.error("Statut:", error.response?.status);
-                } else if (error instanceof Error) {
-                    console.error("Erreur de requête:", error.message);
-                } else {
-                    console.error("Erreur inconnue:", error);
-                }
-    
+    // Vérifie si l'id_fire est valide avant de faire l'appel API
+    if (!id_fire) {
+        console.error("id_fire is invalid");
+        setIsLoading(false); // ← Arrête le loading si pas d'ID
+        return;
+    }
+
+    const fetchFire = async () => {
+        setIsLoading(true); // ← Démarre le loading
+        try {
+            console.log("URL de l'API :", `${backendUrl}/api/geop/showfire/${id_fire}`);
+
+            const response = await axios.get(`${backendUrl}/api/geop/showfire/${id_fire}`);
+            const data = response.data;
+
+            console.log("Données reçues : ", JSON.stringify(data, null, 2));
+
+            if (!data || !data.id_fire) {
+                toast.error(translate("Fire data not found."));
+                return;
             }
-        };
-    
-        fetchFire();
-    }, [id_fire, backendUrl]);
+
+            const toDateInputFormat = (date: string) => {
+                if (!date) return "";
+                const [day, month, year] = date.split('/');
+                return `${year}-${month}-${day}`;
+            };
+
+            // Lors de la récupération des données
+            const formattedData = {
+                ...data,
+                purch_date_fire: toDateInputFormat(data.purch_date_fire),
+                exp_date_fire: toDateInputFormat(data.exp_date_fire),
+            };
+
+            console.log("Données formatées :", formattedData);
+
+            // Mettre à jour le state avec les dates formatées
+            setFormData((prev) => ({
+                ...prev,
+                ...formattedData,
+            }));
+
+        } catch (error: unknown) {
+            console.error("Error fetching fire data:", error);
+            if (error instanceof AxiosError) {
+                console.error("Réponse du serveur:", error.response?.data);
+                console.error("Statut:", error.response?.status);
+            } else if (error instanceof Error) {
+                console.error("Erreur de requête:", error.message);
+            } else {
+                console.error("Erreur inconnue:", error);
+            }
+        } finally {
+            setIsLoading(false); // ← Arrête le loading dans tous les cas
+        }
+    };
+
+    fetchFire();
+}, [id_fire, backendUrl]);
     
     
     useEffect(() => {
@@ -197,16 +183,7 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
       };
 
       const handleClose = () => {
-        setFormData({
-            id_fire: "",
-            ref_fire: "",
-            volume_fire: "",
-            purch_date_fire: "",
-            exp_date_fire: "",
-            cost_fire: "",
-            type_fire: "",
-            id_vehicule: "",
-        });
+       
         onHide(); // Fermer le modal après la réinitialisation
     };
 
@@ -284,6 +261,16 @@ const EditFireModal: React.FC<EditFireModalProps> = ({
             if (onSuccess) {
                 onSuccess();
             }
+            setFormData({
+            id_fire: "",
+            ref_fire: "",
+            volume_fire: "",
+            purch_date_fire: "",
+            exp_date_fire: "",
+            cost_fire: "",
+            type_fire: "",
+            id_vehicule: "",
+        });
 
             onHide();
         } catch (error) {

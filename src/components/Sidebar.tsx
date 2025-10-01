@@ -275,41 +275,56 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
+  id: 41,
+  label: "GMAO",
+  icon: "las la-cogs",
+  permissionId: 41,
+  subItems: [
+    {
       id: 41,
-      label: "GMAO",
-      icon: "las la-cogs",
-      permissionId: 41, // ID de permission à ajuster
-      subItems: [
-        {
-          id: 41,
-          label: "Reception",
-          icon: "",
-          to: "/reception",
-          permissionId: 41,
-        },
-        {
-          id: 25,
-          label: "Garage",
-          icon: "",
-          to: "/garage",
-          permissionId: 41,
-        },
-        {
-          id: 26,
-          label: "Planned interviews",
-          icon: "",
-          to: "/planning-interviews",
-          permissionId: 41,
-        },
-        {
-          id: 27,
-          label: "Servicing",
-          icon: "",
-          to: "/servicing",
-          permissionId: 41,
-        },
-      ],
+      label: "Reception",
+      icon: "las la-clipboard-check", // Réception / vérification
+      to: "/reception",
+      permissionId: 41,
     },
+    {
+      id: 25,
+      label: "Garage",
+      icon: "las la-warehouse", // Représente un garage ou entrepôt
+      to: "/garage",
+      permissionId: 41,
+    },
+    {
+      id: 26,
+      label: "Planned interviews",
+      icon: "las la-calendar-alt", // Pour la planification
+      to: "/planning-interviews",
+      permissionId: 41,
+    },
+    {
+      id: 27,
+      label: "Servicing",
+      icon: "las la-tools", // Outils d’entretien
+      to: "/servicing",
+      permissionId: 41,
+    },
+    {
+      id: 28,
+      label: "Tire Change",
+      icon: "las la-car", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+      to: "/pneu",
+      permissionId: 41,
+    },
+    {
+      id: 28,
+      label: "Parts Replacement",
+      icon: "las la-wrench", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+      to: "/piece",
+      permissionId: 41,
+    },
+  ],
+},
+  
     {
       id: 42,
       label: "Fuel",
@@ -320,29 +335,52 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           id: 29,
           label: "Fuel consumption",
           icon: "las la-gas-pump",
-          to: "/fuel-consumption",
+          to: "/fuel_management",
           permissionId: 42,
         },
         {
           id: 42,
           label: "Card management",
           icon: "las fa-id-card",
-          to: "/card-management",
+          to: "/card_management",
           permissionId: 42,
         },
         {
           id: 42,
           label: "Tank management",
           icon: "las fa-truck-moving",
-          to: "/tank-management",
+          to: "/tank_management",
           permissionId: 42,
         },
         {
           id: 32,
           label: "Cash management",
           icon: "las fa-money-bill-wave",
-          to: "/cash-management",
+          to: "/cash_management",
           permissionId: 42,
+        },
+      ],
+    },
+
+    {
+      id: 42, // ID principal du menu Store
+      label: "Stock",
+      icon: "las la-store",
+      permissionId: 42, // Doit exister dans ta table des permissions
+      subItems: [
+        {
+          id: 42,
+          label: "Tire",
+          icon: "las la-boxes",
+          to: "/pneu_stock",
+          permissionId: 42, // Permission spécifique à la vue "Stock"
+        },
+        {
+          id: 42,
+          label: "Items",
+          icon: "las la-cogs",
+          to: "/piece_stock",
+          permissionId: 42, 
         },
       ],
     },
@@ -352,6 +390,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       icon: "las la-bell",
       to: "/notifications",
       permissionId: 52, 
+    },
+     {
+      id: 38,
+      label: "Reference",
+      icon: "las la-check-circle",
+      to: "/reference",
+      permissionId: 38, // ID de permission à ajuster
     },
     {
       id: 33,

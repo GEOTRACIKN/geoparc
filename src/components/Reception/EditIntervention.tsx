@@ -7,7 +7,6 @@ import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
 interface ModalEditInterventionProps {
     show: boolean;
@@ -39,6 +38,8 @@ const ModalEditIntervention: React.FC<ModalEditInterventionProps> = ({
         receptionistName: "",
         service: "",
     });
+    const geopuserID = localStorage.getItem("GeopUserID");
+
 
     const { translate } = useTranslate();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);

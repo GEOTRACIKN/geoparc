@@ -23,9 +23,6 @@ import { Permissions } from "./pages/Permissions";
 import { Drivers } from "./pages/Drivers";
 import { Contrat } from "./pages/Contrat";
 import { Training } from "./pages/Training";
-
-
-
 import { Warnings } from "./pages/Warnings";
 import { Violation} from "./pages/Violation";
 import { Fuel_consumption } from "./pages/Fuel_consumption";
@@ -36,6 +33,24 @@ import { DetailVehicleCheck } from "./pages/Detail_vehicle_check";
 import { Reception } from "./pages/Reception";
 import { Garage } from "./pages/Garage";
 import { Servicing } from "./pages/Servicing";
+import { Pneu } from "./pages/Pneu";
+import { Piece } from "./pages/Piece";
+
+import { CardManagement } from "./pages/CardManagement";
+import { TankManagement } from "./pages/TankManagement";
+import { CashManagement } from "./pages/CashManagement";
+import { FuelManagement } from "./pages/FuelManagement";
+
+
+
+
+import { PneuStock } from "./pages/PneuStock";
+import { PieceStock } from "./pages/PieceStock";
+
+
+import {Reference} from "./pages/Reference";
+
+
 
 
 import { InterviewSchedule } from "./pages/Planning_interviews";
@@ -65,6 +80,7 @@ import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
+//import Reference from "./pages/Reference";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -165,10 +181,24 @@ const handleLogin = async () => {
           <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
           <Route path="/fire-ext" element={<DashboardLayout>{<Fire/>}</DashboardLayout>} />
           <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
+          <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
+          <Route path="/piece" element={<DashboardLayout>{<Piece />}</DashboardLayout>} />
+          <Route path="/card_management" element={<DashboardLayout>{<CardManagement />}</DashboardLayout>} />
+          <Route path="/tank_management" element={<DashboardLayout>{<TankManagement />}</DashboardLayout>} />
+          <Route path="/cash_management" element={<DashboardLayout>{<CashManagement />}</DashboardLayout>} />
+          <Route path="/fuel_management" element={<DashboardLayout>{<FuelManagement />}</DashboardLayout>} />
+
+
+          <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
+          <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
+
+          <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
+
+
           <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
           <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
           <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} /> 
-          <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} /> 
           <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
           <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
           <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />

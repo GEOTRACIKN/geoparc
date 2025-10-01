@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import Select from "react-select";
+    const geopuserID = localStorage.getItem("GeopUserID");
 
 // Définir les types pour les props
 interface ModalNewFireProps {
@@ -35,7 +36,6 @@ const ModalNewFire: React.FC<ModalNewFireProps> = ({
         type_fire: "",
         id_vehicule: "", // Store vehicle ID
     });
-    const geopuserID = localStorage.getItem("GeopUserID");
 
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]); // Liste des véhicules
