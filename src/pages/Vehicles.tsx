@@ -664,10 +664,12 @@ export function Vehicles() {
               <ButtonCustomHover
                 text={translate("Assurance")}
                 icon={<FaShieldAlt />}
+                onClick={() => navigate("/administratif/insurance")}
               />
               <ButtonCustomHover
                 text={translate("Vignette")}
                 icon={<FaStickyNote />}
+                onClick={() => navigate("/administratif/vignette")}
               />
               <ButtonCustomHover
                 text={translate("Mileage")}
@@ -676,6 +678,8 @@ export function Vehicles() {
               <ButtonCustomHover
                 text={translate("Control Technic")}
                 icon={<FaWrench />}
+                onClick={() => navigate("/administratif/technical-control")}
+
               />
             </div>
           </div>
