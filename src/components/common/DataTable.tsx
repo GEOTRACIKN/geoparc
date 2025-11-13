@@ -11,35 +11,31 @@ interface Column {
 interface DataTableProps {
   fetchUrl: string;
   columns: Column[];
+  title?: string; // optional title like "Insurance List"
+  iconClass?: string; // optional icon like "las la-car"
 }
 
-export default function DataTable({ fetchUrl, columns }: DataTableProps) {
-  const [rows, setRows] = useState<any[]>([]); 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+export default function DataTable({ fetchUrl, columns, title, iconClass }: DataTableProps) {
+  const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [limit, setLimit] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
 
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(
-    () =>
-      columns.reduce(
-        (acc, col) => ({ ...acc, [col.key]: true }),
-        {} as Record<string, boolean>
-      )
+    () => columns.reduce((acc, col) => ({ ...acc, [col.key]: true }), {} as Record<string, boolean>)
   );
-
 
   useEffect(() => {
     setLoading(true);
     fetch(fetchUrl)
       .then((res) => res.json())
       .then((data) => {
-        console.log("DataTable fetched:", data);
-        // 👇 Ensure we always store an array
-        setRows(Array.isArray(data) ? data : []);
-        setPageCount(Math.ceil((Array.isArray(data) ? data.length : 0) / limit));
+        const validData = Array.isArray(data) ? data : [];
+        setRows(validData);
+        setPageCount(Math.ceil(validData.length / limit));
         setLoading(false);
       })
       .catch((err) => {
@@ -49,11 +45,7 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
       });
   }, [fetchUrl, limit]);
 
-  //Pagination logic
-  const paginatedRows = rows.slice(
-    (currentPage - 1) * limit,
-    currentPage * limit
-  );
+  const paginatedRows = rows.slice((currentPage - 1) * limit, currentPage * limit);
 
   const handlePageClick = (selected: { selected: number }) =>
     setCurrentPage(selected.selected + 1);
@@ -74,9 +66,9 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
       setSelectedRows(selectedRows.filter((r) => r !== id));
       setSelectAll(false);
     } else {
-      const newSelected = [...selectedRows, id];
-      setSelectedRows(newSelected);
-      if (newSelected.length === paginatedRows.length) setSelectAll(true);
+      const updated = [...selectedRows, id];
+      setSelectedRows(updated);
+      if (updated.length === paginatedRows.length) setSelectAll(true);
     }
   };
 
@@ -84,34 +76,49 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
     setSelectedColumns((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <div></div>
+    <div id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer">
+      {/* ---------- HEADER / TOOLBAR ---------- */}
+      <div className="row mb-2">
+        <div className="col-sm-12 col-md-6 dataTables_length">
+          {title && (
+            <h4 className="mb-3 text-nowrap">
+              {iconClass && <i className={`${iconClass} mr-2`}></i>}
+              {title} ({rows.length})
+            </h4>
+          )}
+        </div>
 
-        <div className="d-flex align-items-center">
-          <label className="mr-2">Show</label>
-          <select
-            className="custom-select"
-            value={limit}
-            onChange={handleLimitChange}
-            style={{ width: "80px", marginRight: "10px" }}
-          >
-            {[10, 20, 50, 100, 200, 500].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+        <div className="col-sm-12 col-md-6 d-flex justify-content-end align-items-center">
+
+            <label className="mr-2"></label>
+              Show
+              <select
+                value={limit}
+                onChange={handleLimitChange}
+                className="custom-select custom-select-sm form-control form-control-sm ml-2"
+                style={{ width: "66px" }}
+              >
+                {[10, 20, 50, 100, 200, 500].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            
+  
 
           <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-columns">
+            <Dropdown.Toggle variant="" id="dropdown-basic" title="Display columns">
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end">
               {columns.map((col) => (
-                <Dropdown.Item key={col.key} as="button">
+                <Dropdown.Item
+                  as="button"
+                  key={col.key}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
                   <input
                     type="checkbox"
                     className="form-check-input"
@@ -126,15 +133,16 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
         </div>
       </div>
 
-      <div className="table-responsive">
+      {/* ---------- TABLE ---------- */}
+      <div className="row m-1 table-responsive">
         <Table className="dataTable">
           <thead className="bg-white text-uppercase">
-            <tr>
+            <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
                   <input
-                    type="checkbox"
                     className="form-check-input"
+                    type="checkbox"
                     checked={selectAll}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
@@ -156,7 +164,7 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
               </tr>
             ) : paginatedRows.length > 0 ? (
               paginatedRows.map((row: any) => (
-                <tr key={row.id_vehicule}>
+                <tr key={row.id_vehicule || JSON.stringify(row)}>
                   <td>
                     <div className="form-check form-check-inline">
                       <input
@@ -186,25 +194,35 @@ export default function DataTable({ fetchUrl, columns }: DataTableProps) {
         </Table>
       </div>
 
-      <div className="d-flex justify-content-end mt-2">
-        <ReactPaginate
-          previousLabel={"previous"}
-          nextLabel={"next"}
-          breakLabel={"..."}
-          pageCount={pageCount}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          pageClassName={"page-item"}
-          pageLinkClassName={"page-link"}
-          previousClassName={"page-item"}
-          previousLinkClassName={"page-link"}
-          nextClassName={"page-item"}
-          nextLinkClassName={"page-link"}
-          breakClassName={"page-item"}
-          breakLinkClassName={"page-link"}
-          activeClassName={"active"}
-          forcePage={currentPage - 1}
-        />
+      {/* ---------- FOOTER / PAGINATION ---------- */}
+      <div className="row mt-2">
+        <div className="col-md-6 d-flex align-items-center">
+          <span>
+            Displaying {paginatedRows.length} on {rows.length}
+          </span>
+        </div>
+        <div className="col-md-6 d-flex justify-content-end">
+          <ReactPaginate
+            previousLabel={"previous"}
+            nextLabel={"next"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination justify-content-end"}
+            pageClassName={"page-item"}
+            pageLinkClassName={"page-link"}
+            previousClassName={"page-item"}
+            previousLinkClassName={"page-link"}
+            nextClassName={"page-item"}
+            nextLinkClassName={"page-link"}
+            breakClassName={"page-item"}
+            breakLinkClassName={"page-link"}
+            activeClassName={"active"}
+            forcePage={currentPage - 1}
+          />
+        </div>
       </div>
     </div>
   );
