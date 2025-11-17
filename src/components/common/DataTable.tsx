@@ -9,15 +9,31 @@ interface Column {
 }
 
 interface DataTableProps {
-  fetchUrl: string;
+  fetchUrl?: string;
   columns: Column[];
-  title?: string; // optional title like "Insurance List"
-  iconClass?: string; // optional icon like "las la-car"
+  title?: string;
+  iconClass?: string;
+  data?: any[];           
+  loading?: boolean;      
 }
 
-export default function DataTable({ fetchUrl, columns, title, iconClass }: DataTableProps) {
+export default function DataTable({
+  fetchUrl,
+  columns,
+  title,
+  iconClass,
+  data,
+  loading: loadingProp,
+}: DataTableProps) {
   const [rows, setRows] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  //Internal loading state when parent doesn't control loading
+  const [internalLoading, setInternalLoading] = useState(false);
+
+  const effectiveLoading =
+    typeof loadingProp !== "undefined" ? loadingProp : internalLoading;
+
+  //Paging + UI state
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
@@ -28,23 +44,48 @@ export default function DataTable({ fetchUrl, columns, title, iconClass }: DataT
     () => columns.reduce((acc, col) => ({ ...acc, [col.key]: true }), {} as Record<string, boolean>)
   );
 
+  //If parent provides data, update rows when it changes
   useEffect(() => {
-    setLoading(true);
-    fetch(fetchUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        const validData = Array.isArray(data) ? data : [];
+    if (data && Array.isArray(data)) {
+      setRows(data);
+      setPageCount(Math.ceil(data.length / limit));
+      setCurrentPage(1);
+    }
+  }, [data, limit]);
+
+  //If parent doesn't provide data but fetchUrl is given, fetch here (internal fetch mode)
+  useEffect(() => {
+    if (!fetchUrl) return;
+    if (data) return; //parent driven data, don't fetch
+
+    let canceled = false;
+    const fetchData = async () => {
+      try {
+        setInternalLoading(true);
+        const res = await fetch(fetchUrl);
+        const json = await res.json();
+        if (canceled) return;
+        const validData = Array.isArray(json) ? json : [];
         setRows(validData);
         setPageCount(Math.ceil(validData.length / limit));
-        setLoading(false);
-      })
-      .catch((err) => {
+        setCurrentPage(1);
+      } catch (err) {
         console.error("Error fetching data:", err);
         setRows([]);
-        setLoading(false);
-      });
-  }, [fetchUrl, limit]);
+        setPageCount(0);
+      } finally {
+        if (!canceled) setInternalLoading(false);
+      }
+    };
 
+    fetchData();
+
+    return () => {
+      canceled = true;
+    };
+  }, [fetchUrl, limit, data]);
+
+  //Pagination slice
   const paginatedRows = rows.slice((currentPage - 1) * limit, currentPage * limit);
 
   const handlePageClick = (selected: { selected: number }) =>
@@ -90,23 +131,20 @@ export default function DataTable({ fetchUrl, columns, title, iconClass }: DataT
         </div>
 
         <div className="col-sm-12 col-md-6 d-flex justify-content-end align-items-center">
-
-            <label className="mr-2"></label>
-              Show
-              <select
-                value={limit}
-                onChange={handleLimitChange}
-                className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: "66px" }}
-              >
-                {[10, 20, 50, 100, 200, 500].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            
-  
+          <label className="mr-2"></label>
+          <span className="mr-2">Show</span>
+          <select
+            value={limit}
+            onChange={handleLimitChange}
+            className="custom-select custom-select-sm form-control form-control-sm ml-2"
+            style={{ width: "66px" }}
+          >
+            {[10, 20, 50, 100, 200, 500].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
 
           <Dropdown>
             <Dropdown.Toggle variant="" id="dropdown-basic" title="Display columns">
@@ -156,15 +194,15 @@ export default function DataTable({ fetchUrl, columns, title, iconClass }: DataT
           </thead>
 
           <tbody className="ligth-body">
-            {loading ? (
+            {effectiveLoading ? (
               <tr>
                 <td colSpan={columns.length + 1} className="text-center">
-                  <PropagateLoader color={"#123abc"} loading={loading} size={15} />
+                  <PropagateLoader color={"#123abc"} loading={true} size={15} />
                 </td>
               </tr>
             ) : paginatedRows.length > 0 ? (
               paginatedRows.map((row: any) => (
-                <tr key={row.id_vehicule || JSON.stringify(row)}>
+                <tr key={row.id_vehicule ?? JSON.stringify(row)}>
                   <td>
                     <div className="form-check form-check-inline">
                       <input

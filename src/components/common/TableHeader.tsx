@@ -3,41 +3,35 @@ import { FaPlus, FaShieldAlt, FaStickyNote, FaWrench } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-interface SearchOption {
-  label: string;
-  value: string | number;
-}
 
 interface TableHeaderProps {
   title: string;
   totalCount?: number;
-  searchPlaceholder?: string;
-  searchOptions?: SearchOption[]; // e.g. [{ label: "Plate", value: 1 }]
-  onSearchChange?: (value: string, searchType: string | number) => void;
+  onSearchChange?: (value: string) => void;
   onResetSearch?: () => void;
+  searchOptions?: { label: string; value: string }[]; 
+  onSearchTypeChange?: (value: string) => void;
+  searchValue?: string;
 }
 
 export default function TableHeader({
   title,
   totalCount = 0,
-  searchPlaceholder = "Search...",
   searchOptions = [],
   onSearchChange,
   onResetSearch,
+  onSearchTypeChange,
+  searchValue,
 }: TableHeaderProps) {
   const navigate = useNavigate();
-  const [selectedOption, setSelectedOption] = useState<SearchOption>(
-    searchOptions[0] || { label: "All", value: "" }
+
+  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedLabel, setSelectedLabel] = useState(
+    searchOptions?.[0]?.label || "Search"
   );
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (onSearchChange) onSearchChange(val, selectedOption.value);
-  };
 
-  const handleSearchOptionSelect = (option: SearchOption) => {
-    setSelectedOption(option);
-  };
+
 
   return (
     <div
@@ -100,15 +94,19 @@ export default function TableHeader({
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
                 <i className="fas fa-chevron-down" style={{ fontSize: "20" }}></i>
-                <span className="ml-2">{selectedOption.label}</span>
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {searchOptions.map((option) => (
                   <Dropdown.Item
                     as="button"
                     key={option.value}
-                    active={selectedOption.value === option.value}
-                    onClick={() => handleSearchOptionSelect(option)}
+                    active={selectedType === option.value} 
+                    className={selectedType === option.value ? "select-active" : ""}
+                    onClick={() => {
+                      setSelectedType(option.value);
+                      setSelectedLabel(option.label); 
+                      onSearchTypeChange?.(option.value);
+                    }}
                   >
                     {option.label}
                   </Dropdown.Item>
@@ -119,8 +117,9 @@ export default function TableHeader({
             {/* Input field */}
             <input
               type="text"
-              placeholder={` ${searchPlaceholder}`}
-              onChange={handleSearchChange}
+              placeholder={`by ${selectedLabel || "Plate"}`}
+              value={searchValue}
+              onChange={(e) => onSearchChange?.(e.target.value)}
               className="form-control"
             />
 

@@ -18,8 +18,11 @@ export default function InsuranceList() {
   ];
 
   const searchOptions = [
-    { label: "Plate", value: "immatriculation_vehicule" },
-    { label: "Company", value: "companie_assurance_vehicule" },
+    { label: "Plate", value: "plate", column: "v.immatriculation_vehicule" },
+    { label: "Company", value: "company", column: "i.companie_assurance_vehicule" },
+    { label: "Start Date", value: "start", column: "i.date_debut_assurance_vehicule" },
+    { label: "End Date", value: "end", column: "i.date_expir_assurance_vehicule" },
+    { label: "Cost", value: "cost" }, 
   ];
 
   // ===== Fetch data once =====
@@ -41,9 +44,14 @@ export default function InsuranceList() {
   }, []);
 
   // ===== Search =====
-const handleSearchChange = async (value: string, type: string | number) => {
-  setSearchValue(value);
-  setSearchType(type);
+const handleSearchChange = async (value: string) => {
+    setSearchValue(value);
+    setLoading(true); 
+    if (!value.trim()) {
+      setFilteredRows(rows);
+      setLoading(false);
+      return;
+    }
 
   const res = await fetch("http://localhost:5000/api/geop/insurance/search", {
     method: "POST",
@@ -52,8 +60,8 @@ const handleSearchChange = async (value: string, type: string | number) => {
       limitValue: 50,
       currentPage: 1,
       search: value,
-      type: type || "",
-      column: "immatriculation_vehicule",
+      type: searchType,
+      column: searchType || "immatriculation_vehicule",
       sort: "ASC",
     }),
   });
@@ -62,30 +70,40 @@ const handleSearchChange = async (value: string, type: string | number) => {
     const data = await res.json();
     setFilteredRows(data);
   }
+  setLoading(false);
 };
 
 
   const handleResetSearch = () => {
     setSearchValue("");
+    setSearchType("");
     setFilteredRows(rows);
   };
 
+  const handleSearchTypeChange = (type: string) => {
+  setSearchType(type);
+  setSearchValue(""); 
+  setFilteredRows(rows);
+};
+
   return (
     <div className="p-3">
-      {/* ✅ Reusable Header */}
+      {/* Reusable Header */}
       <TableHeader
-        title="Insurance List"
-        totalCount={filteredRows.length}
-        searchPlaceholder="Search by Plate or Company"
-        searchOptions={searchOptions}
-        onSearchChange={handleSearchChange}
-        onResetSearch={handleResetSearch}
-      />
+      title="Insurance List"
+      totalCount={filteredRows.length}
+      searchValue={searchValue}
+      searchOptions={searchOptions}
+      onSearchChange={handleSearchChange}
+      onSearchTypeChange={handleSearchTypeChange}
+      onResetSearch={handleResetSearch}
+    />
 
-      {/* ✅ Shared DataTable */}
+      {/* Shared DataTable */}
       <DataTable
-        fetchUrl="http://localhost:5000/api/geop/insurance/list"
+        data={filteredRows} 
         columns={columns}
+        loading={loading}
       />
     </div>
   );
