@@ -8,6 +8,8 @@ export default function InsuranceList() {
   const [searchValue, setSearchValue] = useState("");
   const [searchType, setSearchType] = useState<string | number>("");
   const [loading, setLoading] = useState(true);
+  const [sortColumn, setSortColumn] = useState<string>("id_vehicule");
+  const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
 
   const columns = [
     { key: "immatriculation_vehicule", label: "Plate" },
@@ -61,8 +63,8 @@ const handleSearchChange = async (value: string) => {
       currentPage: 1,
       search: value,
       type: searchType,
-      column: searchType || "immatriculation_vehicule",
-      sort: "ASC",
+      column: sortColumn,
+      sort: sortDirection,
     }),
   });
 
@@ -79,6 +81,32 @@ const handleSearchChange = async (value: string) => {
     setSearchType("");
     setFilteredRows(rows);
   };
+const handleSort = (columnKey: string) => {
+  //toggle ASC/DESC
+  const newDirection = sortDirection === "ASC" ? "DESC" : "ASC";
+
+  setSortColumn(columnKey);
+  setSortDirection(newDirection);
+  setLoading(true); 
+  //refetch sorted results
+  fetch("http://localhost:5000/api/geop/insurance/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      limitValue: 50,
+      currentPage: 1,
+      search: searchValue,
+      type: searchType,
+      column: columnKey,         
+      sort: newDirection,        
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => setFilteredRows(data))
+    .catch(() => setFilteredRows([]))
+    .finally(() => setLoading(false));
+};
+
 
   const handleSearchTypeChange = (type: string) => {
   setSearchType(type);
@@ -104,6 +132,9 @@ const handleSearchChange = async (value: string) => {
         data={filteredRows} 
         columns={columns}
         loading={loading}
+        sortColumn={sortColumn}            
+        sortDirection={sortDirection}        
+        onSortChange={handleSort}  
       />
     </div>
   );

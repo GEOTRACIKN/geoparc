@@ -3,6 +3,15 @@ import { Table, Dropdown } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { PropagateLoader } from "react-spinners";
 
+//render ASC/DESC arrows
+const SortIcon = ({ active, direction }: { active: boolean; direction: string }) => {
+  if (!active) return <i className="las la-sort"></i>; 
+  return direction === "ASC"
+    ? <i className="las la-sort-up"></i>                
+    : <i className="las la-sort-down"></i>;             
+};
+
+
 interface Column {
   key: string;
   label: string;
@@ -14,7 +23,10 @@ interface DataTableProps {
   title?: string;
   iconClass?: string;
   data?: any[];           
-  loading?: boolean;      
+  loading?: boolean;
+  sortColumn?: string;
+  sortDirection?: "ASC" | "DESC";
+  onSortChange?: (columnKey: string) => void;      
 }
 
 export default function DataTable({
@@ -24,6 +36,9 @@ export default function DataTable({
   iconClass,
   data,
   loading: loadingProp,
+  sortColumn,
+  sortDirection,
+  onSortChange,
 }: DataTableProps) {
   const [rows, setRows] = useState<any[]>([]);
 
@@ -188,7 +203,18 @@ export default function DataTable({
               </th>
               {columns.map(
                 (col) =>
-                  selectedColumns[col.key] && <th key={col.key}>{col.label}</th>
+                  selectedColumns[col.key] && 
+                  <th 
+                  key={col.key}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => onSortChange?.(col.key)}
+                  >
+                    <span className="mr-1">{col.label}</span>
+                    <SortIcon
+                    active={sortColumn ===col.key}
+                    direction={sortDirection || "ASC"}
+                    />
+                  </th>
               )}
             </tr>
           </thead>
