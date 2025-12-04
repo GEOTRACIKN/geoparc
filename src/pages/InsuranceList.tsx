@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 
+
+//TEMPORARY Geoparc has no authentication yet.
+//role & user ID come from localStorage (not secure).
+//replace with real session based auth when implemented.
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+const userRole = localStorage.getItem("GeopUserRole") || "user";
+const isAdmin = userRole === "admin";
 
 export default function InsuranceList() {
   //UI/data state
@@ -15,11 +22,12 @@ export default function InsuranceList() {
 
   //search/sort state
   const [searchValue, setSearchValue] = useState("");
-  const [searchType, setSearchType] = useState<string>("");
+  const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
 
   const columns = [
+    ...(isAdmin ? [{ key: "id_vehicule", label: "ID" }] : []),
     { key: "immatriculation_vehicule", label: "Plate" },
     { key: "companie_assurance_vehicule", label: "Company" },
     { key: "date_debut_assurance_vehicule", label: "Start" },
@@ -28,6 +36,7 @@ export default function InsuranceList() {
   ];
 
   const searchOptions = [
+    ...(isAdmin ? [{ label: "Vehicle ID", value: "id", column: "id_vehicule" }] : []),
     { label: "Plate", value: "plate", column: "immatriculation_vehicule" },
     { label: "Company", value: "company", column: "companie_assurance_vehicule" },
     { label: "Start Date", value: "start", column: "date_debut_assurance_vehicule" },
@@ -44,7 +53,8 @@ export default function InsuranceList() {
     column = sortColumn,
     sort = sortDirection,
   ) => {
-    const id_user = localStorage.getItem("userid") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const role = localStorage.getItem("GeopUserRole") || "user";
     setLoading(true);
     try {
       const body = JSON.stringify({
@@ -55,6 +65,7 @@ export default function InsuranceList() {
         column,
         sort,
         id_user,
+        role,
       });
 
       const res = await fetch(`${backendUrl}/api/geop/insurance/search`, {
@@ -81,16 +92,18 @@ export default function InsuranceList() {
 
   // ===== Fetch total count so FE can compute pages =====
   const fetchInsuranceTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("userid") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const role = localStorage.getItem("GeopUserRole") || "user";
     try {
       const res = await fetch(`${backendUrl}/api/geop/insurance/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id_user,
+          role,
           search,
           type,
-         }), // id_user from auth if available
+         }), // id_user from auth when available
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch total");
@@ -137,7 +150,7 @@ export default function InsuranceList() {
   // Reset search
   const handleResetSearch = async() => {
     setSearchValue("");
-    setSearchType("");
+    setSearchType(isAdmin ? "id" : "plate");
     setCurrentPage(1);
     await fetchInsuranceTotal( "", "", limit);
     await fetchInsurancePage(limit, 1, "", "", sortColumn, sortDirection);
