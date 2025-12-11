@@ -82,7 +82,7 @@ import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
 import InsuranceList from "./pages/InsuranceList";
 import TechnicalControlList from "./pages/TechnicalControlList";
-import VignetteList from "./pages/VignetteList";
+import VignetteList from "./pages/VehicleStickerList";
 //import Reference from "./pages/Reference";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;

@@ -2,51 +2,49 @@ import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/AdministratifHeader";
 
-// TEMPORARY ,Geoparc has no authentication.
-// LocalStorage role/id is only a placeholder.
+// temp: Geoparc uses no real auth.
+// localStorage id/role is only a placeholder.
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 const userRole = localStorage.getItem("GeopUserRole") || "user";
 const isAdmin = userRole === "admin";
 
-export default function TechnicalControlList() {
-  // === table state ===
+export default function VignetteList() {
+  // ===== STATE =====
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [limit, setLimit] = useState<number>(10);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
-  const [pageCount, setPageCount] = useState<number>(0);
+  const [limit, setLimit] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
 
-  // === search/sort state ===
   const [searchValue, setSearchValue] = useState("");
-  const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "plate");
+  const [searchType, setSearchType] = useState(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
 
-  // === columns ===
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // ===== COLUMNS =====
   const columns = [
     ...(isAdmin ? [{ key: "id_vehicule", label: "ID" }] : []),
     { key: "immatriculation_vehicule", label: "Plate" },
-    { key: "etat_ctr_tech_vehicule", label: "Status" },
-    { key: "date_debut_ctr_tech_vehicule", label: "Start" },
-    { key: "date_fin_ctr_tech_vehicule", label: "End" },
-    { key: "cout_ctr_tech_vehicule", label: "Cost" },
+    { key: "num_vignette_vehicule", label: "Number" },
+    { key: "date_vignette_vehicule", label: "Date" },
+    { key: "cout_vignette_vehicule", label: "Cost" },
   ];
 
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-  // === search dropdown ===
+  // ===== SEARCH OPTIONS =====
   const searchOptions = [
     ...(isAdmin ? [{ label: "Vehicle ID", value: "id", column: "id_vehicule" }] : []),
     { label: "Plate", value: "plate", column: "immatriculation_vehicule" },
-    { label: "Status", value: "status", column: "etat_ctr_tech_vehicule" },
-    { label: "Start Date", value: "start", column: "date_debut_ctr_tech_vehicule" },
-    { label: "End Date", value: "end", column: "date_fin_ctr_tech_vehicule" },
-    { label: "Cost", value: "cost", column: "cout_ctr_tech_vehicule" },
+    { label: "Number", value: "number", column: "num_vignette_vehicule" },
+    { label: "Date", value: "date", column: "date_vignette_vehicule" },
+    { label: "Cost", value: "cost", column: "cout_vignette_vehicule" },
   ];
 
-  // ============================================
+  // ====================================================
   // FETCH PAGE
-  // ============================================
+  // ====================================================
   const fetchPage = async (
     limitValue = limit,
     page = currentPage,
@@ -59,8 +57,9 @@ export default function TechnicalControlList() {
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     setLoading(true);
+
     try {
-      const res = await fetch(`${backendUrl}/api/geop/technical-control/search`, {
+      const res = await fetch(`${backendUrl}/api/geop/vignette/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -78,32 +77,26 @@ export default function TechnicalControlList() {
 
       const data = await res.json();
       setRows(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching CT page:", err);
+    } catch {
       setRows([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================
-  // FETCH TOTAL COUNT
-  // ============================================
+  // ====================================================
+  // FETCH TOTAL
+  // ====================================================
   const fetchTotal = async (search = "", type = "", limitValue = limit) => {
     const id_user = localStorage.getItem("GeopUserID") || "1";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     try {
-      const res = await fetch(`${backendUrl}/api/geop/technical-control/totalpage`, {
+      const res = await fetch(`${backendUrl}/api/geop/vignette/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          id_user,
-          role,
-          search,
-          type,
-        }),
+        body: JSON.stringify({ id_user, role, search, type }),
       });
 
       const json = await res.json();
@@ -118,16 +111,15 @@ export default function TechnicalControlList() {
     }
   };
 
-  // initial load
+  // INITIAL LOAD
   useEffect(() => {
     fetchTotal("", "", limit);
     fetchPage(limit, 1, "", "", sortColumn, sortDirection);
-    // eslint-disable-next-line
   }, []);
 
-  // ============================================
-  // Search input
-  // ============================================
+  // ====================================================
+  // SEARCH LOGIC
+  // ====================================================
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
@@ -152,13 +144,14 @@ export default function TechnicalControlList() {
   const handleResetSearch = async () => {
     setSearchValue("");
     setCurrentPage(1);
+
     await fetchTotal("", searchType);
     await fetchPage(limit, 1, "", searchType, sortColumn, sortDirection);
   };
 
-  // ============================================
-  // Pagination
-  // ============================================
+  // ====================================================
+  // PAGINATION
+  // ====================================================
   const handlePageClick = async (data: any) => {
     const newPage = data.selected + 1;
     setCurrentPage(newPage);
@@ -168,21 +161,21 @@ export default function TechnicalControlList() {
   const handleLimitChange = async (newLimit: number) => {
     setLimit(newLimit);
     setCurrentPage(1);
+
     await fetchTotal(searchValue, searchType, newLimit);
     await fetchPage(newLimit, 1, searchValue, searchType, sortColumn, sortDirection);
   };
 
-  // ============================================
-  // Sorting
-  // ============================================
+  // ====================================================
+  // SORTING
+  // ====================================================
   const handleSort = async (columnKey: string) => {
     const map: Record<string, string> = {
       id_vehicule: "id_vehicule",
       immatriculation_vehicule: "immatriculation_vehicule",
-      etat_ctr_tech_vehicule: "etat_ctr_tech_vehicule",
-      date_debut_ctr_tech_vehicule: "date_debut_ctr_tech_vehicule",
-      date_fin_ctr_tech_vehicule: "date_fin_ctr_tech_vehicule",
-      cout_ctr_tech_vehicule: "cout_ctr_tech_vehicule",
+      num_vignette_vehicule: "num_vignette_vehicule",
+      date_vignette_vehicule: "date_vignette_vehicule",
+      cout_vignette_vehicule: "cout_vignette_vehicule",
     };
 
     const backendColumn = map[columnKey] || columnKey;
@@ -196,13 +189,13 @@ export default function TechnicalControlList() {
     await fetchPage(limit, 1, searchValue, searchType, backendColumn, nextSort);
   };
 
-  // ============================================
+  // ====================================================
   // RENDER
-  // ============================================
+  // ====================================================
   return (
     <div className="p-3">
       <TableHeader
-        title="Technical Control List"
+        title="Vehicle Sticker List"
         totalCount={total}
         searchValue={searchValue}
         searchOptions={searchOptions}

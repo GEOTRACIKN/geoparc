@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Table, Dropdown } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { PropagateLoader } from "react-spinners";
+import { useTranslate } from "../../hooks/LanguageProvider";
+import {useClipboard} from "../../utilities/functions";
 
 // render ASC/DESC arrows
 const SortIcon = ({ active, direction }: { active: boolean; direction: string }) => {
@@ -59,6 +61,11 @@ export default function DataTable({
 }: DataTableProps) {
   const [rows, setRows] = useState<any[]>([]);
 
+  const { translate } = useTranslate();
+  const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
+
+
+
   // Internal loading state when parent doesn't control loading
   const [internalLoading, setInternalLoading] = useState(false);
 
@@ -112,7 +119,7 @@ export default function DataTable({
     <div id="DataTables_Table_0_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer">
 
       {/* ---------- HEADER / TOOLBAR ---------- */}
-      <div className="row mb-2">
+      <div className="row mb-1">
         <div className="col-sm-12 col-md-6 dataTables_length">
           {title && (
             <h4 className="mb-3 text-nowrap">
@@ -123,7 +130,7 @@ export default function DataTable({
         </div>
 
         <div className="col-sm-12 col-md-6 d-flex justify-content-end align-items-center">
-          <span className="mr-2">Show</span>
+          <span className="mr-2">{translate("Show")}</span>
           <select
             value={limit}
             onChange={(e) => onLimitChange?.(parseInt(e.target.value))}
@@ -138,7 +145,7 @@ export default function DataTable({
           </select>
 
           <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic" title="Display columns">
+            <Dropdown.Toggle variant="" id="dropdown-basic" title={translate("Display columns")}>
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
 
@@ -183,10 +190,10 @@ export default function DataTable({
                   selectedColumns[col.key] && (
                     <th
                       key={col.key}
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: "pointer"}}
                       onClick={() => onSortChange?.(col.key)}
                     >
-                      <span className="mr-1">{col.label}</span>
+                      <span className="mr-1" style={{ color: "#110a57" }}>{translate(col.label)}</span>
 
                       <SortIcon
                         active={sortColumn === col.key}
@@ -201,9 +208,11 @@ export default function DataTable({
           <tbody className="ligth-body">
             {/* Loading */}
             {effectiveLoading ? (
-              <tr>
-                <td colSpan={columns.length + 1} className="text-center">
-                  <PropagateLoader color={"#123abc"} loading={true} size={15} />
+              <tr style={{ textAlign: "center" }}>
+                <td className="text-center" colSpan={10} >
+                  <p>  
+                   <PropagateLoader color={"#123abc"} loading={true} size={15} />
+                  </p>
                 </td>
               </tr>
             ) : rows.length > 0 ? (
@@ -222,10 +231,59 @@ export default function DataTable({
 
                   {columns.map(
                     (col) =>
-                      selectedColumns[col.key] && (
-                        <td key={col.key}>{row[col.key] ?? ""}</td>
-                      )
-                  )}
+                      selectedColumns[col.key] && (col.key === "immatriculation_vehicule" ? (
+                      // COPY TO CLIPBOARD LOGIC
+                      <td
+                        key={col.key}
+                        id={`plate-${getRowId(row)}`}
+                        style={{
+                          cursor: "pointer",
+                          position: "relative",
+                          color: copiedId === getRowId(row)?.toString() ? "#28a745" : "#007bff"
+                        }}
+                        title={translate("Click to copy the plate number")}
+                        onClick={() => {
+                          if (row[col.key] && getRowId(row)) {
+                            copyToClipboard(row[col.key], getRowId(row).toString());
+                          }
+                        }}
+                      >
+                        <>
+                          <span
+                            style={{
+                              color:
+                                copiedId === getRowId(row)?.toString()
+                                  ? "#28a745"
+                                  : "#007bff"
+                            }}
+                          >
+                            {row[col.key]}
+                          </span>
+
+                          {copiedId === getRowId(row)?.toString() && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: "-20px",
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                backgroundColor: "#28a745",
+                                color: "#fff",
+                                padding: "2px 5px",
+                                borderRadius: "4px",
+                                fontSize: "12px"
+                              }}
+                            >
+                              {translate("Plate Number Copied")}
+                            </span>
+                          )}
+                        </>
+                      </td>
+                    ) : (
+                      <td key={col.key}>{row[col.key] ?? ""}</td>
+                    )
+                  )
+                )}
                 </tr>
               ))
             ) : (
@@ -242,13 +300,13 @@ export default function DataTable({
       {/* ---------- FOOTER / PAGINATION ---------- */}
       <div className="row mt-2">
         <div className="col-md-6 d-flex align-items-center">
-          <span>Displaying {rows.length} of {totalCount}</span>
+          <span>{translate("Displaying")} {rows.length} of {totalCount}</span>
         </div>
 
         <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
-            previousLabel={"previous"}
-            nextLabel={"next"}
+            previousLabel={translate("previous")}
+            nextLabel={translate("next")}
             breakLabel={"..."}
             pageCount={pageCount ?? 0}
             marginPagesDisplayed={2}

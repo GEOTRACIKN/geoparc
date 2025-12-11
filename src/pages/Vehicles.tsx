@@ -671,10 +671,10 @@ export function Vehicles() {
                 icon={<FaStickyNote />}
                 onClick={() => navigate("/administratif/vignette")}
               />
-              <ButtonCustomHover
+              {/*<ButtonCustomHover
                 text={translate("Mileage")}
                 icon={<FaTachometerAlt />}
-              />
+              />*/}
               <ButtonCustomHover
                 text={translate("Control Technic")}
                 icon={<FaWrench />}

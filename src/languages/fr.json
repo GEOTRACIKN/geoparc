@@ -901,7 +901,19 @@
   "No Expiration": "Pas d’expiration",
   "By Date Only": "Par date seulement",
   "By Kilometer Only": "Par kilométrage seulement",
-  "By Date and Kilometer": "Par date et kilométrage"
+  "By Date and Kilometer": "Par date et kilométrage",
+
+  "Insurance": "Assurance",
+  "Vehicle Sticker": "Vignette",
+  "Technical Control": "Contrôle technique",
+  "Insurance List": "Liste d'assurances",
+  "Vehicle Sticker List": "Liste des vignettes",
+  "Technical Control List": "Liste de Contrôle Technique",
+  "Add Vehicle": "Ajouter véhicule",
+  "Vehicle ID": "ID Véhicule",
+  "Plate": "Immatriculation",
+  "Number": "Numéro"
+
 
 
 

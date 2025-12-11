@@ -902,7 +902,18 @@
   "No Expiration": "Sin vencimiento",
   "By Date Only": "Solo por fecha",
   "By Kilometer Only": "Solo por kilómetros",
-  "By Date and Kilometer": "Por fecha y kilómetros"
+  "By Date and Kilometer": "Por fecha y kilómetros",
+  
+  "Insurance": "Seguro",
+  "Vehicle Sticker": "Pegatina del vehículo",
+  "Technical Control": "Control técnico",
+  "Insurance List": "Lista de seguros",
+  "Vehicle Sticker List": "Lista de pegatinas del vehículo",
+  "Technical Control List": "Lista de controles técnicos",
+  "Add Vehicle": "Agregar vehículo",
+  "Vehicle ID": "ID del vehículo",
+  "Plate": "Matrícula",
+  "Number": "Número"
 
 
 
