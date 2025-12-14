@@ -81,6 +81,7 @@ import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
 //import Reference from "./pages/Reference";
+import DemandePiece from "./pages/DemandePiece";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -192,7 +193,7 @@ const handleLogin = async () => {
 
           <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
           <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
-
+          <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
           <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
 
 
