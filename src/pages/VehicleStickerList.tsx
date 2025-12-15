@@ -115,6 +115,7 @@ export default function VignetteList() {
   useEffect(() => {
     fetchTotal("", "", limit);
     fetchPage(limit, 1, "", "", sortColumn, sortDirection);
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ====================================================

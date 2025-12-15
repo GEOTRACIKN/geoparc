@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/AdministratifHeader";
 
@@ -25,6 +25,7 @@ export default function InsuranceList() {
   const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const columns = [
     ...(isAdmin ? [{ key: "id_vehicule", label: "ID" }] : []),
@@ -127,16 +128,20 @@ export default function InsuranceList() {
   }, []);
 
   // handle typing (debounced)
-  const handleSearchChange =  async (value: string) => {
+  const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
 
-    // small debounce
-    setTimeout(async() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(async () => {
       await fetchInsuranceTotal(value, searchType, limit);
       await fetchInsurancePage(limit, 1, value, searchType, sortColumn, sortDirection);
     }, 300);
-  };
+};
+
 
   const handleSearchTypeChange = async (typeVal: string) => {
     setSearchType(typeVal);

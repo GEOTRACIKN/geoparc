@@ -19,7 +19,6 @@ interface Column {
 }
 
 interface DataTableProps {
-  fetchUrl?: string;
   columns: Column[];
   title?: string;
   iconClass?: string;
@@ -40,7 +39,6 @@ interface DataTableProps {
 }
 
 export default function DataTable({
-  fetchUrl,
   columns,
   title,
   iconClass,
@@ -65,16 +63,11 @@ export default function DataTable({
   const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
 
-
-  // Internal loading state when parent doesn't control loading
-  const [internalLoading, setInternalLoading] = useState(false);
-
-  const effectiveLoading =
-    typeof loadingProp !== "undefined" ? loadingProp : internalLoading;
+  const effectiveLoading = loadingProp ?? false;
 
 
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
+  //const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  //const [selectAll, setSelectAll] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>(
     () => columns.reduce((acc, col) => ({ ...acc, [col.key]: true }), {} as Record<string, boolean>)
   );
@@ -84,23 +77,23 @@ export default function DataTable({
     if (data && Array.isArray(data)) {
       setRows(data);
     }
-  }, [data, limit]);
+  }, [data]);
 
   // selection uses row[rowIdKey]
   const getRowId = (row: any) => row[rowIdKey];
 
   // Select all
-  const handleSelectAll = (checked: boolean) => {
+  /*const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
       setSelectedRows(rows.map((r) => getRowId(r)));
     } else {
       setSelectedRows([]);
     }
-  };
+  };*/
 
   // Toggle row selection
-  const handleRowSelect = (id: any) => {
+  /*const handleRowSelect = (id: any) => {
     if (selectedRows.includes(id)) {
       setSelectedRows(selectedRows.filter((r) => r !== id));
       setSelectAll(false);
@@ -109,7 +102,7 @@ export default function DataTable({
       setSelectedRows(updated);
       if (updated.length === rows.length) setSelectAll(true);
     }
-  };
+  };*/
 
   const handleColumnChange = (key: string) => {
     setSelectedColumns((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -174,14 +167,14 @@ export default function DataTable({
 
               {/* Checkbox column */}
               <th>
-                <div className="form-check form-check-inline">
+                {/*<div className="form-check form-check-inline">
                   <input
                     className="form-check-input"
                     type="checkbox"
                     checked={selectAll}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
-                </div>
+                </div>*/}
               </th>
 
               {/* Data columns */}
@@ -220,12 +213,12 @@ export default function DataTable({
                 <tr key={getRowId(row) ?? JSON.stringify(row)}>
                   <td>
                     <div className="form-check form-check-inline">
-                      <input
+                      {/*<input
                         type="checkbox"
                         className="form-check-input"
                         checked={selectedRows.includes(getRowId(row))}
                         onChange={() => handleRowSelect(getRowId(row))}
-                      />
+                      />*/}
                     </div>
                   </td>
 
@@ -289,7 +282,7 @@ export default function DataTable({
             ) : (
               <tr>
                 <td colSpan={columns.length + 1} className="text-center">
-                  No records found
+                  {translate("No records found")}
                 </td>
               </tr>
             )}
@@ -300,7 +293,7 @@ export default function DataTable({
       {/* ---------- FOOTER / PAGINATION ---------- */}
       <div className="row mt-2">
         <div className="col-md-6 d-flex align-items-center">
-          <span>{translate("Displaying")} {rows.length} of {totalCount}</span>
+          <span>{translate("Displaying")} {rows.length} {translate("of")} {totalCount ?? rows.length}</span>
         </div>
 
         <div className="col-md-6 d-flex justify-content-end">
