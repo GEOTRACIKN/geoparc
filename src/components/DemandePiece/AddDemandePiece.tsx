@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import { toast, Bounce } from "react-toastify";
 import { FiUser, FiHash, FiLayers, FiPackage, FiDollarSign, FiMessageCircle } from "react-icons/fi";
-import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
