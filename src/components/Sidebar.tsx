@@ -371,16 +371,23 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         {
           id: 42,
           label: "Tire",
-          icon: "las la-boxes",
+          icon: "las la-cogs",
           to: "/pneu_stock",
           permissionId: 42, // Permission spécifique à la vue "Stock"
         },
         {
           id: 42,
           label: "Items",
-          icon: "las la-cogs",
+          icon: "las la-boxes",
           to: "/piece_stock",
           permissionId: 42, 
+        },
+        {
+          id: 42,
+          label: "Demande pièces",
+          icon: "las la-box-open",
+          to: "/Demandes-pieces",
+          permissionId: 42,
         },
       ],
     },
