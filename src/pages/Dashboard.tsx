@@ -241,7 +241,7 @@ export function Dashboard() {
             // { id: "11", value: counts["11"], max: 10, color: "#264e70", label: "Agrément Sanitaire", modalId: "detaiAgrement" },
             // { id: "12", value: counts["12"], max: 10, color: "#edb1f1", label: "Récépissé", modalId: "detailRecepisse" },
           ]);
-          console.log(setTotalDrivingLicense)
+         
 
 
         } else {

@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-close");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   //const [pathImg, setPathImg] = useState<string | undefined>(undefined);
-  const id_user = localStorage.getItem("userid");
+  const id_user = localStorage.getItem("GeopUserID");
   const { pathImg } = useUser();
 
   const navigate = useNavigate();
@@ -38,25 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(
     window.matchMedia("(max-width: 1299px)").matches
   );
-  /*const fetchImage = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/profile/${id_user}`);
-      const data = await response.json();
 
-      if (data[0]?.img_exists) {
-        setPathImg(`${data[0].img}?${new Date().getTime()}`); 
-      } else {
-        setPathImg(`${backendUrl}/${data[0].img}?${new Date().getTime()}`);
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement de l'image :", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchImage();
-  }, []);
-  */
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1299px)");
@@ -603,92 +585,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
               )}
             </ul>
 
-            <ul id="iq-sidebar-toggle" className="iq-menu">
-              <li className="divider" style={{ margin: "0 0 5px" }}></li>
-              {menuItems.map((menuItem) =>
-                checkPermission(menuItem.permissionId) ? (
-                  menuItem.divider ? (
-                    <li key={menuItem.id} className=""></li>
-                  ) : (
-                    <li key={menuItem.id}>
-                      {menuItem.to ? (
-                        <Nav.Link
-                          to={menuItem.to}
-                          className="svg-icon"
-                          as={NavLink}
-                           onClick={() => {
-                            setOpenSubmenus([]); // ferme tous les autres
-                            handleSetIsOpen();
-                            onToggleSidebar();
-                          }}
-                        >
-                          <i className={menuItem.icon} />
-                          <span className={`ml-3 ${activeMenuText}`}>
-                            {translate(menuItem.label)}
-                          </span>
-                        </Nav.Link>
-                      ) : (
-                        <Nav.Link
-                          onClick={() => handleSubmenuClick(menuItem.label)}
-                        >
-                          <i className={menuItem.icon} />
-                          <span className={`ml-3 ${activeMenuText}`}>
-                            {translate(menuItem.label)}
-                          </span>
-                          <svg
-                            style={{ minWidth: "fit-content" }}
-                            className="svg-icon iq-arrow-right arrow-active"
-                            width="20"
-                            height="20"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            {" "}
-                            <polyline points="10 15 15 20 20 15"></polyline>{" "}
-                            <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>{" "}
-                          </svg>
-                        </Nav.Link>
-                      )}
+       
 
-                      {menuItem.subItems && (
-                        <ul
-                          className={`iq-submenu ${openSubmenus.includes(menuItem.label)
-                              ? "submenu-enter-active"
-                              : "submenu-enter"
-                            }`}
-                          onClick={() => {
-                            handleSetIsOpen();
-                            onToggleSidebar();
-                          }}
-                        >
-                          {menuItem.subItems.map(
-                            (subItem) =>
-                              checkPermission(subItem.permissionId) && (
-                                <Nav.Link
-                                  key={subItem.id}
-                                  to={subItem.to || "/"}
-                                  className="svg-icon"
-                                  as={NavLink}
-                                >
-                                  <i className={subItem.icon} />
-                                  <span>{translate(subItem.label)}</span>
-                                </Nav.Link>
-                              )
-                          )}
-                        </ul>
-                      )}
-                    </li>
-                  )
-                ) : null
-              )}
-            </ul>
-
-         
+        
           
           </nav>
 

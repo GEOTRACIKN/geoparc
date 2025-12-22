@@ -18,7 +18,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [pathImg, setPathImg] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   
-  const getCurrentUserId = () => localStorage.getItem("userid");
+  const getCurrentUserId = () => localStorage.getItem("GeopUserID");
 
   const refreshImage = async () => {
     try {

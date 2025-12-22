@@ -110,7 +110,7 @@ function App() {
   const handleLogin = async () => {
     try {
       const response = await axios.get(
-        `https://geotrackin.com/api/logingeop?apiKey=${apiKey}`,
+        `${backendUrl}/api/logingeop?apiKey=${apiKey}`,
         {
           withCredentials: true, // Important pour envoyer et recevoir les cookies
         }

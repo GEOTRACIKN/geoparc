@@ -32,7 +32,7 @@ interface RoleProps {
 
 const RoleModal: React.FC<RoleModalProps> = ({ show, onHide, refreshRoles, idRole }) => {
 
-  const userID = parseInt(localStorage.getItem("userID") ?? "0");
+  const userID = parseInt(localStorage.getItem("GeopUserID") ?? "0");
   const [loading, setLoading] = useState<boolean>(false);
   const { translate } = useTranslate();
 
