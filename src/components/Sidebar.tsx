@@ -361,7 +361,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       id: 53,
       label: "Administrative",
       icon: "las la-bell",
-      to: "/administratif/insurance",
+      to: "/administratif",
       permissionId: 53,
     },
     {

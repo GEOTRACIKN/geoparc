@@ -62,6 +62,12 @@ export default function DataTable({
   const { translate } = useTranslate();
   const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
+  const safePageCount = Math.max(pageCount ?? 0, 1);
+  const safeForcePage = Math.min(
+    (currentPage ?? 1) - 1,
+    safePageCount - 1
+  );
+
 
   const effectiveLoading = loadingProp ?? false;
 
@@ -301,7 +307,7 @@ export default function DataTable({
             previousLabel={translate("previous")}
             nextLabel={translate("next")}
             breakLabel={"..."}
-            pageCount={pageCount ?? 0}
+            pageCount={safePageCount}
             marginPagesDisplayed={2}
             pageRangeDisplayed={3}
             onPageChange={(data) => onPageChange?.(data.selected + 1)}
@@ -315,7 +321,7 @@ export default function DataTable({
             breakClassName={"page-item"}
             breakLinkClassName={"page-link"}
             activeClassName={"active"}
-            forcePage={(currentPage ?? 1) - 1}
+            forcePage={safeForcePage}
           />
         </div>
       </div>
