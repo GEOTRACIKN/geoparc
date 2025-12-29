@@ -80,9 +80,7 @@ import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
-import InsuranceList from "./pages/InsuranceList";
-import TechnicalControlList from "./pages/TechnicalControlList";
-import VignetteList from "./pages/VehicleStickerList";
+import AdministratifPage from "./pages/AdministratifPage";
 //import Reference from "./pages/Reference";
 import DemandePiece from "./pages/DemandePiece";
 import { AuthProvider } from "./context/AuthContext";
@@ -223,9 +221,7 @@ function App() {
               <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
               <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
               <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
-              <Route path="/administratif/insurance" element={<DashboardLayout><InsuranceList /></DashboardLayout>} />
-              <Route path="/administratif/technical-control" element={<DashboardLayout>{<TechnicalControlList />}</DashboardLayout>} />
-              <Route path="/administratif/vignette" element={<DashboardLayout>{<VignetteList />}</DashboardLayout>} />
+              <Route path="/administratif" element={<DashboardLayout><AdministratifPage /></DashboardLayout>}/>
             </Routes>
           </div>
           <ToastContainer
