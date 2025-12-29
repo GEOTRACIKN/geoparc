@@ -1047,7 +1047,7 @@ export function Vehicles() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={10}>No vehicles available</td>
+                  <td colSpan={10}>{translate("No vehicles available")}</td>
                 </tr>
               )}
             </tbody>

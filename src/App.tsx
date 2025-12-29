@@ -80,6 +80,7 @@ import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
+import AdministratifPage from "./pages/AdministratifPage";
 //import Reference from "./pages/Reference";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -215,6 +216,8 @@ const handleLogin = async () => {
           <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
           <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
           <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+          <Route path="/administratif" element={<DashboardLayout><AdministratifPage /></DashboardLayout>}/>
+
         </Routes>
       </div>
       <ToastContainer

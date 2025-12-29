@@ -16,12 +16,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const { translate } = useTranslate();
-
   const [activeCollapsed, setactiveCollapsed] = useState("collapsed");
-
   const [menuBtsidebar, setMenuBtsidebar] = useState("iq-menu-bt-sidebar-show");
-
-
   const [isOpen, setIsOpen] = useState("");
   const [activeLogo, setActiveLogo] = useState("header-logo-hide");
   const [activeMenuText, setActiveMenuText] = useState("iq-menu-span-hide");
@@ -29,8 +25,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   const [sidebar, setSidebar] = useState("sidebar-close");
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const navigate = useNavigate();
-
-
 
 
   // useEffect(() => {
@@ -203,33 +197,33 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
-      id: 	39,
+      id: 39,
       label: "Missions",
       icon: "las la-map-marked-alt",
-      permissionId:39, // ID de permission à ajuster
+      permissionId: 39, // ID de permission à ajuster
       subItems: [
         {
-          id:39,
+          id: 39,
           label: "Mission Order",
           icon: "las la-tasks",
           to: "/mission-order",
-          permissionId:39,
+          permissionId: 39,
         },
         {
           id: 16,
           label: "Mission Report",
           icon: "las la-file-alt",
           to: "/mission-report",
-          permissionId:39,
+          permissionId: 39,
         },
       ],
     },
     {
-      id:51,
+      id: 51,
       label: "Deadline",
       icon: "lar la-life-ring",
       to: "/deadline",
-      permissionId:51, 
+      permissionId: 51,
     },
     {
       id: 40,
@@ -275,56 +269,58 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       ],
     },
     {
-  id: 41,
-  label: "GMAO",
-  icon: "las la-cogs",
-  permissionId: 41,
-  subItems: [
-    {
       id: 41,
-      label: "Reception",
-      icon: "las la-clipboard-check", // Réception / vérification
-      to: "/reception",
+      label: "GMAO",
+      icon: "las la-cogs",
       permissionId: 41,
+      subItems: [
+        {
+          id: 41,
+          label: "Reception",
+          icon: "las la-clipboard-check", // Réception / vérification
+          to: "/reception",
+          permissionId: 41,
+        },
+        {
+          id: 25,
+          label: "Garage",
+          icon: "las la-warehouse", // Représente un garage ou entrepôt
+          to: "/garage",
+          permissionId: 41,
+        },
+        {
+          id: 26,
+          label: "Planned interviews",
+          icon: "las la-calendar-alt", // Pour la planification
+          to: "/planning-interviews",
+          permissionId: 41,
+        },
+        {
+          id: 27,
+          label: "Servicing",
+          icon: "las la-tools", // Outils d’entretien
+          to: "/servicing",
+          permissionId: 41,
+        },
+        {
+          id: 28,
+          label: "Tire Change",
+          icon: "las la-car", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+          to: "/pneu",
+          permissionId: 41,
+        },
+        {
+          id: 28,
+          label: "Parts Replacement",
+          icon: "las la-suitcase", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
+          to: "/piece",
+          permissionId: 41,
+        },
+      ],
     },
-    {
-      id: 25,
-      label: "Garage",
-      icon: "las la-warehouse", // Représente un garage ou entrepôt
-      to: "/garage",
-      permissionId: 41,
-    },
-    {
-      id: 26,
-      label: "Planned interviews",
-      icon: "las la-calendar-alt", // Pour la planification
-      to: "/planning-interviews",
-      permissionId: 41,
-    },
-    {
-      id: 27,
-      label: "Servicing",
-      icon: "las la-tools", // Outils d’entretien
-      to: "/servicing",
-      permissionId: 41,
-    },
-    {
-      id: 28,
-      label: "Tire Change",
-      icon: "las la-car", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
-      to: "/pneu",
-      permissionId: 41,
-    },
-    {
-      id: 28,
-      label: "Parts Replacement",
-      icon: "las la-wrench", // Peut représenter un changement de pneu (alternatif : "las la-tire" s'il existe dans ton set)
-      to: "/piece",
-      permissionId: 41,
-    },
-  ],
-},
-  
+
+
+
     {
       id: 42,
       label: "Fuel",
@@ -361,7 +357,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
         },
       ],
     },
-
+    {
+      id: 53,
+      label: "Administrative",
+      icon: "las la-bell",
+      to: "/administratif",
+      permissionId: 53,
+    },
     {
       id: 42, // ID principal du menu Store
       label: "Stock",
@@ -380,7 +382,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
           label: "Items",
           icon: "las la-cogs",
           to: "/piece_stock",
-          permissionId: 42, 
+          permissionId: 42,
         },
       ],
     },
@@ -389,9 +391,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       label: "Notifications",
       icon: "las la-bell",
       to: "/notifications",
-      permissionId: 52, 
+      permissionId: 52,
     },
-     {
+    {
       id: 38,
       label: "Reference",
       icon: "las la-check-circle",
@@ -403,14 +405,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       label: "Settings",
       icon: "las la-cog",
       to: "/Settings",
-      permissionId: 10, 
+      permissionId: 10,
     },
     {
       id: 34,
       label: "Help",
       icon: "lar la-life-ring",
       to: "/Help",
-      permissionId: 11, 
+      permissionId: 11,
     },
   ];
 
@@ -441,7 +443,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     setActiveMenuText("");  // Afficher le texte du menu
     setMenuButtonSidebar("iq-menu-bt-sidebar-show");
   };
-  
+
   const handleMouseLeave = () => {
     setIsOpen("");
     setSidebar("sidebar-close");
@@ -451,11 +453,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
   };
 
   return (
-    <div 
-    style={{ zIndex: 10015 }} 
-    className={`iq-sidebar  sidebar-default  ${sidebar}`}
-    onMouseEnter={handleMouseEnter}
-    onMouseLeave={handleMouseLeave}
+    <div
+      style={{ zIndex: 10015 }}
+      className={`iq-sidebar  sidebar-default  ${sidebar}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <Nav.Link to="/" className={`header-logo ${activeLogo}`} as={NavLink}>
