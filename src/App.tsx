@@ -150,7 +150,7 @@ function App() {
 
   useEffect(() => {
     console.log()
-    handleLogin()
+  //  handleLogin()
   }, []);
 
   return (
