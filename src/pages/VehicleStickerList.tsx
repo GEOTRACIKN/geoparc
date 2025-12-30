@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
-import TableHeader from "../components/common/AdministratifHeader";
+import TableHeader from "../components/common/TableHeader";
 
 // temp: Geoparc uses no real auth.
 // localStorage id/role is only a placeholder.
