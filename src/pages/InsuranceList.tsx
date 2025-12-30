@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
-import TableHeader from "../components/common/TableHeader";
+import TableHeader from "../components/common/AdministratifHeader";
 
 
 //TEMPORARY Geoparc has no authentication yet.
@@ -155,6 +155,7 @@ export default function InsuranceList() {
   // Reset search
   const handleResetSearch = async() => {
     setSearchValue("");
+    setSearchType(isAdmin ? "id" : "plate");
     setCurrentPage(1);
     await fetchInsuranceTotal( "", "", limit);
     await fetchInsurancePage(limit, 1, "", "", sortColumn, sortDirection);

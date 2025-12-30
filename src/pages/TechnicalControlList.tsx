@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
-import TableHeader from "../components/common/TableHeader";
+import TableHeader from "../components/common/AdministratifHeader";
 
 // TEMPORARY ,Geoparc has no authentication.
 // LocalStorage role/id is only a placeholder.
