@@ -1,222 +1,241 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Table,
+  Row,
+  Col,
+  InputGroup,
+} from "react-bootstrap";
 import { toast, Bounce } from "react-toastify";
-import { FiUser, FiHash, FiLayers, FiPackage, FiDollarSign, FiMessageCircle } from "react-icons/fi";
+import { FiUser, FiCheckCircle } from "react-icons/fi";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
+
+interface Piece {
+  categorie: string;
+  type: string;
+  quantite: number;
+  prix: number;
+  commentaire?: string;
+}
+
+interface Bon {
+  num_bon: string;
+  client: string;
+  statut: string;
+  pieces: Piece[];
+}
 
 interface Props {
   show: boolean;
   onHide: () => void;
-  id_demande_piece: number | null;
+  num_bon: string | null;
   onSuccess?: () => void;
 }
 
-const categoriesTypes: { [key: string]: string[] } = {
-  Pneumatique: ["Pneu route", "Pneu tout-terrain", "Chambre à air", "Jante"],
-  Filtrage: ["Filtre à air", "Filtre à huile", "Filtre à carburant", "Filtre habitacle"],
-  Lubrification: ["Huile moteur", "Graisse", "Additif carburant"],
-  Electrique: ["Batterie", "Alternateur", "Ampoule", "Fusible"],
-  Freinage: ["Plaquette", "Disque", "Étrier", "Maître-cylindre"],
-  Transmission: ["Embrayage", "Boîte de vitesses", "Cardan", "Joint homocinétique"],
-  Refroidissement: ["Radiateur", "Thermostat", "Pompe à eau", "Durite"],
-  Carrosserie: ["Pare-chocs", "Capot", "Porte", "Rétroviseur"],
-  Suspension: ["Amortisseur", "Ressort", "Triangle", "Silentbloc"],
-  Accessoires: ["Essuie-glace", "Clignotant", "Rétroviseur intérieur", "Tapis"]
-};
-
-const EditDemandePiece: React.FC<Props> = ({ show, onHide, id_demande_piece, onSuccess }) => {
-  const [client, setClient] = useState("");
-  const [numeroBon, setNumeroBon] = useState("");
-  const [categorie, setCategorie] = useState("");
-  const [type, setType] = useState("");
-  const [prix, setPrix] = useState<number | null>(null);
-  const [quantite, setQuantite] = useState<number | null>(1);
-  const [commentaire, setCommentaire] = useState("");
-  const [statut, setStatut] = useState("En attente");
-  const [categorieOptions, setCategorieOptions] = useState<string[]>([]);
-  const [typeOptions, setTypeOptions] = useState<string[]>([]);
+const ModalEditDemandePiece: React.FC<Props> = ({
+  show,
+  onHide,
+  num_bon,
+  onSuccess,
+}) => {
+  const [bon, setBon] = useState<Bon | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { setCategorieOptions(Object.keys(categoriesTypes)); }, []);
-
+  // ================= CHARGEMENT =================
   useEffect(() => {
-    if (!show) return;
-    if (!id_demande_piece) {
-      setClient(""); setNumeroBon(""); setCategorie(""); setType("");
-      setPrix(null); setQuantite(1); setCommentaire(""); setStatut("En attente");
-      return;
-    }
-    const fetchOne = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${backendUrl}/api/geop/showdemandepiece/${id_demande_piece}`);
-        if (!res.ok) throw new Error("Erreur récupération");
-        const d = await res.json();
-        const record = Array.isArray(d) ? d[0] : d;
-        setClient(record.client ?? "");
-        setNumeroBon(record.num_bon ?? "");
-        setCategorie(record.categorie ?? "");
-        setType(record.type ?? "");
-        setPrix(record.prix ?? null);
-        setQuantite(record.quantite ?? 1);
-        setCommentaire(record.commentaire ?? "");
-        setStatut(record.statut ?? "En attente");
-      } catch (err) {
-        console.error("Erreur fetch demande:", err);
-        toast.error("Erreur chargement demande", { position: "bottom-right", transition: Bounce });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOne();
-  }, [show, id_demande_piece]);
+    if (!show || !num_bon) return;
 
-  useEffect(() => {
-    setTypeOptions(categorie && categoriesTypes[categorie] ? categoriesTypes[categorie] : []);
-  }, [categorie]);
+    fetch(`${backendUrl}/api/geop/demandepiece/show/${num_bon}`)
+      .then((res) => res.json())
+      .then(setBon)
+      .catch(() =>
+        toast.error("Erreur chargement", { transition: Bounce })
+      );
+  }, [show, num_bon]);
 
+  // ================= PIÈCES =================
+  const updatePiece = (index: number, field: string, value: any) => {
+    if (!bon) return;
+    const pieces = [...bon.pieces];
+    pieces[index] = { ...pieces[index], [field]: value };
+    setBon({ ...bon, pieces });
+  };
+
+  const addPiece = () => {
+    if (!bon) return;
+    setBon({
+      ...bon,
+      pieces: [
+        ...bon.pieces,
+        { categorie: "", type: "", quantite: 1, prix: 0 },
+      ],
+    });
+  };
+
+  const removePiece = (index: number) => {
+    if (!bon) return;
+    setBon({
+      ...bon,
+      pieces: bon.pieces.filter((_, i) => i !== index),
+    });
+  };
+
+  // ================= SAVE =================
   const handleSave = async () => {
+    if (!bon) return;
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const payload: any = {
-        id_demande_piece: id_demande_piece ?? undefined,
-        client,
-        num_bon: numeroBon,
-        categorie,
-        type,
-        prix,
-        quantite,
-        commentaire,
-        statut,
-        id_user: geopuserID ? Number(geopuserID) : null
-      };
+      const res = await fetch(
+        `${backendUrl}/api/geop/demandepiece/update/${bon.num_bon}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bon),
+        }
+      );
 
-      const url = `${backendUrl}/api/geop/${id_demande_piece ? "updatedemandepiece" : "createdemandepiece"}`;
-      const method = id_demande_piece ? "PUT" : "POST";
+      if (!res.ok) throw new Error();
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Erreur" }));
-        throw new Error(err.error || "Erreur sauvegarde");
-      }
-
-      toast.success(id_demande_piece ? "Demande mise à jour" : "Demande créée", { position: "bottom-right", transition: Bounce });
+      toast.success("Bon mis à jour", { transition: Bounce });
       onSuccess?.();
       onHide();
-    } catch (err) {
-      console.error("Erreur save:", err);
-      toast.error("Erreur lors de l'enregistrement", { position: "bottom-right", transition: Bounce });
+    } catch {
+      toast.error("Erreur sauvegarde", { transition: Bounce });
     } finally {
       setLoading(false);
     }
   };
 
+  if (!bon) return null;
+
   return (
-    <Modal show={show} onHide={onHide} size="lg">
+    <Modal show={show} onHide={onHide} size="xl">
       <Modal.Header closeButton>
-        <Modal.Title>{id_demande_piece ? "Modifier la demande" : "Nouvelle demande (Bon de livraison)"}</Modal.Title>
+        <Modal.Title>Modifier le bon {bon.num_bon}</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-        <Form>
-          <Row className="mb-3">
-            <Col md={6}>
-              <Form.Label>Client</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiUser />
-                </InputGroup.Text>
-                <Form.Control type="text" value={client} onChange={e => setClient(e.target.value)} />
-              </InputGroup>
-            </Col>
-            <Col md={6}>
-              <Form.Label>Numéro de bon</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiHash />
-                </InputGroup.Text>
-                <Form.Control type="text" value={numeroBon} onChange={e => setNumeroBon(e.target.value)} />
-              </InputGroup>
-            </Col>
-          </Row>
+        {/* ===== CLIENT + STATUT ===== */}
+        <Row className="mb-4">
+          <Col md={6}>
+            <Form.Label>Client</Form.Label>
+            <InputGroup>
+              <InputGroup.Text style={{ color: "#f97316" }}>
+                <FiUser />
+              </InputGroup.Text>
+              <Form.Control
+                value={bon.client}
+                onChange={(e) =>
+                  setBon({ ...bon, client: e.target.value })
+                }
+              />
+            </InputGroup>
+          </Col>
 
-          <Row className="mb-3">
-            <Col md={6}>
-              <Form.Label>Catégorie</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <i className="bi bi-diagram-3"></i>
-                </InputGroup.Text>
-                <Form.Control as="input" list="categorieOptions" value={categorie} onChange={e => setCategorie(e.target.value)} placeholder="Choisir ou taper une catégorie" />
-                <datalist id="categorieOptions">{categorieOptions.map((c, i) => <option key={i} value={c} />)}</datalist>
-              </InputGroup>
-            </Col>
-            <Col md={6}>
-              <Form.Label>Type</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiLayers />
-                </InputGroup.Text>
-                <Form.Control as="input" list="typeOptions" value={type} onChange={e => setType(e.target.value)} placeholder="Choisir ou taper" />
-                <datalist id="typeOptions">{typeOptions.map((t, i) => <option key={i} value={t} />)}</datalist>
-              </InputGroup>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <Col md={4}>
-              <Form.Label>Quantité</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiPackage />
-                </InputGroup.Text>
-                <Form.Control type="number" value={quantite ?? ""} onChange={e => setQuantite(Number(e.target.value) || 0)} />
-              </InputGroup>
-            </Col>
-            <Col md={4}>
-              <Form.Label>Prix</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiDollarSign />
-                </InputGroup.Text>
-                <Form.Control type="number" value={prix ?? ""} onChange={e => setPrix(Number(e.target.value) || 0)} />
-              </InputGroup>
-            </Col>
-            <Col md={4}>
-              <Form.Label>Statut</Form.Label>
-              <Form.Select value={statut} onChange={e => setStatut(e.target.value)}>
-                <option>En attente</option>
-                <option>approuvé</option>
-                <option>refusé</option>
+          <Col md={6}>
+            <Form.Label>Statut</Form.Label>
+            <InputGroup>
+              <InputGroup.Text style={{ color: "#f97316" }}>
+                <FiCheckCircle />
+              </InputGroup.Text>
+              <Form.Select
+                value={bon.statut}
+                onChange={(e) =>
+                  setBon({ ...bon, statut: e.target.value })
+                }
+              >
+                <option value="En attente">En attente</option>
+                <option value="Validé">Validé</option>
+                <option value="Refusé">Refusé</option>
               </Form.Select>
-            </Col>
-          </Row>
+            </InputGroup>
+          </Col>
+        </Row>
 
-          <Row>
-            <Col>
-              <Form.Label>Commentaire</Form.Label>
-              <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <FiMessageCircle />
-                </InputGroup.Text>
-                <Form.Control as="textarea" rows={3} value={commentaire} onChange={e => setCommentaire(e.target.value)} />
-              </InputGroup>
-            </Col>
-          </Row>
-        </Form>
+        {/* ===== PIÈCES ===== */}
+        <h5 className="mb-3">Pièces</h5>
+
+        <Table bordered hover responsive>
+          <thead style={{ background: "#f97316", color: "#fff" }}>
+            <tr>
+              <th>Catégorie</th>
+              <th>Type</th>
+              <th className="text-center">Quantité</th>
+              <th className="text-center">Prix</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {bon.pieces.map((p, i) => (
+              <tr key={i}>
+                <td>
+                  <Form.Control
+                    value={p.categorie}
+                    onChange={(e) =>
+                      updatePiece(i, "categorie", e.target.value)
+                    }
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    value={p.type}
+                    onChange={(e) =>
+                      updatePiece(i, "type", e.target.value)
+                    }
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="number"
+                    value={p.quantite}
+                    onChange={(e) =>
+                      updatePiece(i, "quantite", Number(e.target.value))
+                    }
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="number"
+                    value={p.prix}
+                    onChange={(e) =>
+                      updatePiece(i, "prix", Number(e.target.value))
+                    }
+                  />
+                </td>
+                <td className="text-center">
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => removePiece(i)}
+                  >
+                    ✕
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+
+        <Button variant="outline-primary" onClick={addPiece}>
+          + Ajouter une pièce
+        </Button>
       </Modal.Body>
+
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Annuler</Button>
-        <Button variant="primary" onClick={handleSave} disabled={loading}>{loading ? "Enregistrement..." : "Sauvegarder"}</Button>
+        <Button variant="secondary" onClick={onHide}>
+          Annuler
+        </Button>
+        <Button variant="primary" onClick={handleSave} disabled={loading}>
+          Enregistrer
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default EditDemandePiece;
+export default ModalEditDemandePiece;

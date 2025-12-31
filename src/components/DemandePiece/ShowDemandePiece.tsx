@@ -1,122 +1,80 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, InputGroup } from "react-bootstrap";
-import { FiUser, FiHash, FiLayers, FiPackage, FiDollarSign, FiMessageCircle, FiCheckCircle } from "react-icons/fi";
+import { Modal, Table } from "react-bootstrap";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface Props {
   show: boolean;
   onHide: () => void;
-  id_demande_piece: number | null;
+  num_bon: string | null;
 }
 
-const ShowDemandePiece: React.FC<Props> = ({ show, onHide, id_demande_piece }) => {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+interface Piece {
+  categorie: string;
+  type: string;
+  quantite: number;
+  prix: number;
+}
+
+interface BonData {
+  client: string;
+  num_bon: string;
+  statut: string;
+  date_creation: string;
+  pieces: Piece[];
+}
+
+const ModalShowDemandePiece: React.FC<Props> = ({ show, onHide, num_bon }) => {
+  const [data, setData] = useState<BonData | null>(null);
 
   useEffect(() => {
-    const fetchOne = async () => {
-      if (!show || !id_demande_piece) return;
-      try {
-        setLoading(true);
-        const res = await fetch(`${backendUrl}/api/geop/showdemandepiece/${id_demande_piece}`);
-        if (!res.ok) throw new Error("Erreur récupération");
-        const d = await res.json();
-        setData(d);
-      } catch (err) {
-        console.error("Erreur fetch demande:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOne();
-  }, [show, id_demande_piece]);
+    if (!show || !num_bon) return;
+
+    fetch(`${backendUrl}/api/geop/demandepiece/show/${num_bon}`)
+      .then((res) => res.json())
+      .then(setData)
+      .catch(() => setData(null));
+  }, [show, num_bon]);
+
+  if (!data) return null;
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" backdrop="static">
+    <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Détails de la demande</Modal.Title>
+        <Modal.Title>Détails du bon {data.num_bon}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        {loading ? (
-          <p>Loading...</p>
-        ) : data ? (
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>N° de bon</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.num_bon ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiHash /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
+        <p><b>Client :</b> {data.client}</p>
+        <p><b>Statut :</b> {data.statut}</p>
+        <p>
+          <b>Date création :</b>{" "}
+          {new Date(data.date_creation).toLocaleString("fr-FR")}
+        </p>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Client</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.client ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiUser /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Catégorie</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.categorie ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><i className="bi bi-diagram-3"></i></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Type</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.type ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiLayers /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Quantité</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.quantite ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiPackage /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Prix</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.prix ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiDollarSign /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Commentaire</Form.Label>
-              <InputGroup>
-                <Form.Control as="textarea" value={data.commentaire ?? ""} readOnly rows={3} />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiMessageCircle /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Statut</Form.Label>
-              <InputGroup>
-                <Form.Control value={data.statut ?? ""} readOnly />
-                <InputGroup.Text style={{ color: "#f97316" }}><FiCheckCircle /></InputGroup.Text>
-              </InputGroup>
-            </Form.Group>
-          </Form>
-        ) : (
-          <p>Aucune donnée</p>
-        )}
+        <Table bordered hover responsive>
+          <thead style={{ backgroundColor: "#f97316", color: "#fff" }}>
+            <tr>
+              <th className="text-center">Catégorie</th>
+              <th className="text-center">Type</th>
+              <th className="text-center">Quantité</th>
+              <th className="text-center">Prix</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.pieces.map((p, i) => (
+              <tr key={i}>
+                <td className="text-center">{p.categorie}</td>
+                <td className="text-center">{p.type}</td>
+                <td className="text-center">{p.quantite}</td>
+                <td className="text-center">{p.prix}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       </Modal.Body>
-
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Fermer</Button>
-      </Modal.Footer>
     </Modal>
   );
 };
 
-export default ShowDemandePiece;
+export default ModalShowDemandePiece;
