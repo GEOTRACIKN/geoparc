@@ -2238,13 +2238,13 @@ body.dark-theme .active {
 
 /* Light theme */
 .light-background {
-  background-image: url("../../public/asset/images/logo.png");
+  background-image: url("../../../../public/asset/images/logo.png");
   background-size: cover;
 }
 
 /* Dark theme */
 .dark-background {
-  background-image: url("../../public/asset/images/logo_dark.png");
+  background-image: url("../../../../public/asset/images/logo_dark.png");
   background-size: cover;
 }
 

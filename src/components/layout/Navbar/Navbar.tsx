@@ -6,10 +6,10 @@ import { Button, Image, Dropdown, Navbar as NavbarBs, NavLink, Badge, Card, Inpu
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useTranslate } from '../hooks/LanguageProvider';
+import { useTranslate } from '../../../hooks/LanguageProvider';
 import Cookies from 'universal-cookie';
-import Logout from './Logout';
-import { useTheme } from '../hooks/ThemeContext';
+import Logout from '../../Logout';
+import { useTheme } from '../../../hooks/ThemeContext';
 import { Bounce, toast } from 'react-toastify';
 import axios from 'axios';
 

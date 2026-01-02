@@ -12,7 +12,7 @@ import { VehiclesForms } from "./pages/Vehicles_forms";
 import { Vehicleschecks } from "./pages/Vehicles_checks";
 import { Vehiclecheck } from "./pages/Vehicle_check";
 import { LanguageProvider } from './hooks/LanguageProvider';
-import DashboardLayout from "./components/DashboardLayout";
+import DashboardLayout from "./components/layout/DashboardLayout";
 import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
 import { VehicleCost } from "./pages/Vehicle_cost"
