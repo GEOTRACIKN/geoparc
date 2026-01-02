@@ -87,6 +87,7 @@ import VignetteList from "./pages/VehicleStickerList";
 import DemandePiece from "./pages/DemandePiece";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
+import AdministratifPage from "./pages/AdministratifPage";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
