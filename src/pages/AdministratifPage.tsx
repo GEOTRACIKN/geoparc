@@ -4,8 +4,9 @@ import { Nav } from "react-bootstrap";
 import InsuranceList from "./InsuranceList";
 import TechnicalControlList from "./TechnicalControlList";
 import VignetteList from "./VehicleStickerList";
+import DriverLicenseList from "./DriverLicenseList";
 
-type Tab = "insurance" | "technical" | "vignette";
+type Tab = "insurance" | "technical" | "vignette" | "driver-license";
 
 export default function AdministratifPage() {
   const [activeTab, setActiveTab] = useState<Tab>("insurance");
@@ -29,6 +30,10 @@ export default function AdministratifPage() {
         <Nav.Item>
           <Nav.Link eventKey="vignette">Vignette</Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="driver-license">Permis de conduire</Nav.Link>
+        </Nav.Item>
+
       </Nav>
 
       {/* Tab content */}
@@ -36,6 +41,7 @@ export default function AdministratifPage() {
         {activeTab === "insurance" && <InsuranceList />}
         {activeTab === "technical" && <TechnicalControlList />}
         {activeTab === "vignette" && <VignetteList />}
+        {activeTab === "driver-license" && <DriverLicenseList />}
       </div>
     </div>
   );
