@@ -80,23 +80,15 @@ import Park from "./pages/park";
 import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
-import InsuranceList from "./pages/InsuranceList";
-import TechnicalControlList from "./pages/TechnicalControlList";
-import VignetteList from "./pages/VehicleStickerList";
+import AdministratifPage from "./pages/AdministratifPage";
 //import Reference from "./pages/Reference";
 import DemandePiece from "./pages/DemandePiece";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
-import AdministratifPage from "./pages/AdministratifPage";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
-
-
-  const navigate = useNavigate();
-
-
 
   const location = useLocation();
 
