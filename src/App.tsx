@@ -92,13 +92,12 @@ function App() {
 
   const location = useLocation();
 
-  // Extraction du paramètre apikey de l'URL
-  const getApiKeyFromURL = () => {
-    const searchParams = new URLSearchParams(location.search);
-    return searchParams.get('apikey');
-  };
+const getApiKeyFromStorage  =() => {
+  return localStorage.getItem("api_key");
+};
 
-  const apiKey = getApiKeyFromURL();
+const apiKey = getApiKeyFromStorage();
+ 
 
   const handleLogin = async () => {
     try {
@@ -145,7 +144,7 @@ function App() {
 
   useEffect(() => {
     console.log()
-  //  handleLogin()
+    handleLogin()
   }, []);
 
   return (
