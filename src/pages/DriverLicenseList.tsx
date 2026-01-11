@@ -189,13 +189,24 @@ export default function DriverLicenseList() {
 
   // ===== Sorting =====
   const handleSort = async (columnKey: string) => {
+    const columnMap: Record<string, string> = {
+      id_conducteur: "id_conducteur",
+      nom_conducteur: "nom_conducteur",
+      numero_permis_conducteur: "numero_permis_conducteur",
+      premis_conducteur: "premis_conducteur",
+      date_delivrance_permis_conducteur: "date_delivrance_permis_conducteur",
+      date_expir_permis_conducteur: "date_expir_permis_conducteur",
+    };
+
+    const backendColumn = columnMap[columnKey] || columnKey;
     const nextSort = sortDirection === "ASC" ? "DESC" : "ASC";
+    
     setSortColumn(columnKey);
     setSortDirection(nextSort);
+    setCurrentPage(1);
 
     await fetchDriverLicenseTotal(searchValue, searchType);
-    await fetchDriverLicensePage(limit, 1, searchValue, searchType, columnKey, nextSort);
-    setCurrentPage(1);
+    await fetchDriverLicensePage(limit, 1, searchValue, searchType, backendColumn, nextSort);    
   };
 
   return (
