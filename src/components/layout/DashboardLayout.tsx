@@ -1,11 +1,9 @@
 // src/components/DashboardLayout.tsx
 
 import React, { ReactNode, useEffect, useState } from 'react';
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import { ToastContainer } from 'react-toastify';
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import Sidebar from './Sidebar/Sidebar';
+import Navbar from './Navbar/Navbar';
+import Footer from './Footer/Footer';;
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -14,13 +12,13 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [contentPageStat, setcontentPageStat] = useState("content-page-push");
+  const [contentPageStat, setContentPageStat] = useState("content-page-push");
   const [isLoading, setLoading] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
     
-    isSidebarOpen ? setcontentPageStat("content-page-pool") : setcontentPageStat("content-page-push");
+    isSidebarOpen ? setContentPageStat("content-page-pool") : setContentPageStat("content-page-push");
 
   };
 

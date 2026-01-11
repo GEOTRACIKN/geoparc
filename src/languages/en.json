@@ -889,7 +889,17 @@
   "No Expiration": "No Expiration",
   "By Date Only": "By Date Only",
   "By Kilometer Only": "By Kilometer Only",
-  "By Date and Kilometer": "By Date and Kilometer"
+  "By Date and Kilometer": "By Date and Kilometer",
 
+  "Insurance": "Insurance",
+  "Vehicle Sticker": "Vehicle Sticker",
+  "Technical Control": "Technical Control",
+  "Insurance List": "Insurance List",
+  "Vehicle Sticker List": "Vehicle Sticker List",
+  "Technical Control List": "Technical Control List",
+  "Add Vehicle": "Add Vehicle",
+  "Vehicle ID": "Vehicle ID",
+  "Plate": "Plate",
+  "Number": "Number"
 
 }
