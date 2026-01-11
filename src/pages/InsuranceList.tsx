@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
 
 
 //TEMPORARY Geoparc has no authentication yet.
@@ -82,7 +83,24 @@ export default function InsuranceList() {
       }
 
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      const formatted =Array.isArray(data)
+      ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date (0000-00-00)
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              date_debut_assurance_vehicule: safeDate(row.date_debut_assurance_vehicule),
+              date_expir_assurance_vehicule: safeDate(row.date_expir_assurance_vehicule),
+            };
+          })
+        : [];
+      setRows(formatted);
     } catch (err) {
       console.error("Error fetching insurance page:", err);
       setRows([]);

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
+
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 const userRole = localStorage.getItem("GeopUserRole") || "user";
@@ -25,10 +27,9 @@ export default function DriverLicenseList() {
   // ===== Columns =====
   const columns = [
     ...(isAdmin ? [{ key: "id_conducteur", label: "ID" }] : []),
-    { key: "conducteur", label: "Conducteur" },
+    { key: "nom_conducteur", label: "Conducteur" },
     { key: "numero_permis_conducteur", label: "Numéro de permis" },
     { key: "premis_conducteur", label: "Type de permis" },
-    { key: "lieu_delivrance_permis_conducteur", label: "Lieu de délivrance" },
     { key: "date_delivrance_permis_conducteur", label: "Date de délivrance" },
     { key: "date_expir_permis_conducteur", label: "Date d’expiration" },
   ];
@@ -41,6 +42,8 @@ export default function DriverLicenseList() {
     { label: "Driver name", value: "name", column: "nom_conducteur" },
     { label: "License number", value: "license", column: "numero_permis_conducteur" },
     { label: "License type", value: "type", column: "premis_conducteur" },
+    { label: "Date délivrance", value: "delivery", column: "date_delivrance_permis_conducteur" },
+    { label: "Date expiration", value: "expiration", column: "date_expir_permis_conducteur" }
   ];
 
   // ===== Fetch page =====
@@ -79,10 +82,22 @@ export default function DriverLicenseList() {
 
       // combine nom + prenom into one column
       const formatted = Array.isArray(data)
-        ? data.map((row: any) => ({
-            ...row,
-            conducteur: `${row.nom_conducteur ?? ""} ${row.prenom_conducteur ?? ""}`,
-          }))
+        ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date (0000-00-00)
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              nom_conducteur: `${row.nom_conducteur ?? ""} ${row.prenom_conducteur ?? ""}`.trim(),
+              date_delivrance_permis_conducteur: safeDate(row.date_delivrance_permis_conducteur),
+              date_expir_permis_conducteur: safeDate(row.date_expir_permis_conducteur),
+            };
+          })
         : [];
 
       setRows(formatted);

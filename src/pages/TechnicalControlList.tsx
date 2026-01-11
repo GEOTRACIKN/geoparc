@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
 
 // TEMPORARY ,Geoparc has no authentication.
 // LocalStorage role/id is only a placeholder.
@@ -77,7 +78,24 @@ export default function TechnicalControlList() {
       });
 
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      const formatted = Array.isArray(data)
+       ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              date_debut_ctr_tech_vehicule: safeDate(row.date_debut_ctr_tech_vehicule),
+              date_fin_ctr_tech_vehicule: safeDate(row.date_fin_ctr_tech_vehicule),
+            };
+          })
+        : [];
+     setRows(formatted);
     } catch (err) {
       console.error("Error fetching CT page:", err);
       setRows([]);

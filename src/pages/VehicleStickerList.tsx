@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
 
 // temp: Geoparc uses no real auth.
 // localStorage id/role is only a placeholder.
@@ -76,7 +77,23 @@ export default function VignetteList() {
       });
 
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      const formatted =Array.isArray(data)
+      ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date (0000-00-00)
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              date_vignette_vehicule: safeDate(row.date_vignette_vehicule),
+            };
+          })
+        : [];
+      setRows(formatted);
     } catch {
       setRows([]);
     } finally {
