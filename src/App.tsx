@@ -82,7 +82,8 @@ import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
 //import Reference from "./pages/Reference";
 import DemandePiece from "./pages/DemandePiece";
-
+import BonReception from "./pages/BonReception";
+import Avoir from "./pages/Avoir";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
@@ -193,7 +194,9 @@ const handleLogin = async () => {
 
           <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
           <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
-          <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
+          <Route path="/Demandes_pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
+          <Route path="/Bon_Reception" element={<DashboardLayout>{<BonReception />}</DashboardLayout>} />
+          <Route path="/Avoir" element={<DashboardLayout>{<Avoir />}</DashboardLayout>} />
           <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
 
 
