@@ -30,7 +30,7 @@ const GeoFenceUploadModal: React.FC<GeoFenceUploadModalProps> = ({
   onHide,
   refreshGeofences,
 }) => {
-  const userID = localStorage.getItem("userID");
+  const userID = localStorage.getItem("GeopUserID");
   const [loading, setLoading] = useState<boolean>(false);
   const { translate } = useTranslate();
   const [file, setFile] = useState<File | null>(null);

@@ -916,5 +916,19 @@
    "No Expiration": "بدون انتهاء",
   "By Date Only": "حسب التاريخ فقط",
   "By Kilometer Only": "حسب الكيلومترات فقط",
-  "By Date and Kilometer": "حسب التاريخ والكيلومترات"
+  "By Date and Kilometer": "حسب التاريخ والكيلومترات",
+
+
+
+  "Insurance": "التأمين",
+  "Vehicle Sticker": "ملصق المركبة",
+  "Technical Control": "الفحص التقني",
+  "Insurance List": "قائمة التأمين",
+  "Vehicle Sticker List": "قائمة ملصقات المركبات",
+  "Technical Control List": "قائمة الفحص التقني",
+  "Add Vehicle": "إضافة مركبة",
+  "Vehicle ID": "معرّف المركبة",
+  "Plate": "اللوحة",
+  "Number": "الرقم"
+
 }
