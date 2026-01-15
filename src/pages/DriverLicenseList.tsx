@@ -55,24 +55,25 @@ export default function DriverLicenseList() {
     column = sortColumn,
     sort = sortDirection
   ) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     setLoading(true);
     try {
-      const res = await fetch(`${backendUrl}/api/geop/driverLicense/search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const body: any = {
           limitValue,
           currentPage: page,
           search,
           type,
           column,
           sort,
-          id_user,
           role,
-        }),
+        };
+        if (id_user) body.id_user = id_user; // include id_user only when present
+      const res = await fetch(`${backendUrl}/api/geop/driverLicense/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
         credentials: "include",
       });
 
@@ -111,14 +112,17 @@ export default function DriverLicenseList() {
 
   // ===== Fetch total =====
   const fetchDriverLicenseTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     try {
+      const body: any={ role, search, type };
+      if (id_user) body.id_user = id_user;
+      
       const res = await fetch(`${backendUrl}/api/geop/driverLicense/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_user, role, search, type }),
+        body: JSON.stringify(body),
         credentials: "include",
       });
 

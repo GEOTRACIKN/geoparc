@@ -54,26 +54,28 @@ export default function VignetteList() {
     column = sortColumn,
     sort = sortDirection
   ) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     setLoading(true);
 
     try {
+      const body: any = {
+        limitValue,
+        currentPage: page,
+        search,
+        type,
+        column,
+        sort,
+        role,
+      };
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/vignette/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          limitValue,
-          currentPage: page,
-          search,
-          type,
-          column,
-          sort,
-          id_user,
-          role,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -105,15 +107,18 @@ export default function VignetteList() {
   // FETCH TOTAL
   // ====================================================
   const fetchTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     try {
+      const body: any = { role, search, type };
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/vignette/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ id_user, role, search, type }),
+        body: JSON.stringify(body),
       });
 
       const json = await res.json();

@@ -55,25 +55,24 @@ export default function InsuranceList() {
     column = sortColumn,
     sort = sortDirection,
   ) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
     setLoading(true);
     try {
-      const body = JSON.stringify({
+      const bodyObj: any = {
         limitValue,
         currentPage: page,
         search,
         type,
         column,
         sort,
-        id_user,
         role,
-      });
-
+      };
+      if (id_user) bodyObj.id_user = id_user;
       const res = await fetch(`${backendUrl}/api/geop/insurance/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body,
+        body:JSON.stringify(bodyObj),
         credentials: "include",
       });
 
@@ -111,18 +110,16 @@ export default function InsuranceList() {
 
   // ===== Fetch total count so FE can compute pages =====
   const fetchInsuranceTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
     try {
+      const body: any = { role, search, type };// id_user from auth when available
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/insurance/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_user,
-          role,
-          search,
-          type,
-         }), // id_user from auth when available
+        body: JSON.stringify(body), 
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch total");
