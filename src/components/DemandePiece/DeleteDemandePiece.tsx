@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { toast, Bounce } from "react-toastify";
@@ -12,27 +11,34 @@ interface Props {
   onSuccess?: () => void;
 }
 
-const ModalDeleteDemandePiece: React.FC<Props> = ({
-  show,
-  onHide,
-  num_bon,
-  onSuccess,
-}) => {
+const ModalDeleteDemandePiece: React.FC<Props> = ({ show, onHide, num_bon, onSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
     if (!num_bon) return;
+
+    const username = (localStorage.getItem("Geopusername") || "").trim();
+    if (!username) {
+      toast.error("Utilisateur non détecté (username)", { transition: Bounce });
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.append("username", username);
+
     setLoading(true);
-
     try {
-      const res = await fetch(
-        `${backendUrl}/api/geop/demandepiece/delete/${num_bon}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`${backendUrl}/api/geop/demandepiece/delete/${num_bon}?${params}`, {
+        method: "DELETE",
+      });
 
-      if (!res.ok) throw new Error();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.message || "Erreur suppression", { transition: Bounce });
+        return;
+      }
 
-      toast.success("Bon supprimé", { transition: Bounce });
+      toast.success("Bon supprimé (lignes incluses)", { transition: Bounce });
       onSuccess?.();
       onHide();
     } catch {
@@ -48,7 +54,7 @@ const ModalDeleteDemandePiece: React.FC<Props> = ({
         <Modal.Title>Supprimer le bon</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Confirmer la suppression du bon <b>{num_bon}</b> et de toutes ses pièces ?
+        Confirmer la suppression du bon <b>{num_bon}</b> et de toutes ses lignes ?
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
