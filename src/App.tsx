@@ -1,22 +1,21 @@
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react"; // ✅ useState ajouté
 import "./assets/css/backend-plugin.min.css";
 import "./assets/vendor/remixicon/fonts/remixicon.css";
 import "./assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import "./assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
-import 'react-toastify/dist/ReactToastify.css';
-
+import "react-toastify/dist/ReactToastify.css";
 
 import { Vehicles } from "./pages/Vehicles";
 import { VehiclesForms } from "./pages/Vehicles_forms";
 import { Vehicleschecks } from "./pages/Vehicles_checks";
 import { Vehiclecheck } from "./pages/Vehicle_check";
-import { LanguageProvider } from './hooks/LanguageProvider';
+import { LanguageProvider } from "./hooks/LanguageProvider";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { ToastContainer } from "react-toastify";
 import { Dashboard } from "./pages/Dashboard";
-import { VehicleCost } from "./pages/Vehicle_cost"
-import { VehicleSinister } from "./pages/Vehicle_sinister"
+import { VehicleCost } from "./pages/Vehicle_cost";
+import { VehicleSinister } from "./pages/Vehicle_sinister";
 import Role from "./pages/Role";
 import { Permission } from "./pages/Permission";
 import { Permissions } from "./pages/Permissions";
@@ -41,30 +40,18 @@ import { TankManagement } from "./pages/TankManagement";
 import { CashManagement } from "./pages/CashManagement";
 import { FuelManagement } from "./pages/FuelManagement";
 
-
-
-
 import { PneuStock } from "./pages/PneuStock";
 import { PieceStock } from "./pages/PieceStock";
 
-
 import { Reference } from "./pages/Reference";
-
-
-
-
 import { InterviewSchedule } from "./pages/Planning_interviews";
-
 
 import { MissionOrder } from "./pages/MissionOrder";
 import { MissionOrderManage } from "./pages/MissionOrderManage";
-
 import { MissionReport } from "./pages/MissionReport";
 import { MissionReportManage } from "./pages/MissionReportManage";
 
 import { Fire } from "./pages/Fire";
-
-
 
 import axios from "axios";
 import { Driver } from "./pages/Driver";
@@ -81,7 +68,6 @@ import { Vehicle } from "./pages/Vehicle";
 import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
 import AdministratifPage from "./pages/AdministratifPage";
-//import Reference from "./pages/Reference";
 import DemandePiece from "./pages/DemandePiece";
 import BonReception from "./pages/BonReception";
 import Avoir from "./pages/Avoir";
@@ -91,63 +77,116 @@ import { UserProvider } from "./context/UserContext";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
-
   const location = useLocation();
 
-const getApiKeyFromStorage  =() => {
-  return localStorage.getItem("api_key");
-};
+  // ✅ LOADER STATE (GeoParc)
+  const [bootLoading, setBootLoading] = useState(true);
 
-const apiKey = getApiKeyFromStorage();
- 
+  const getApiKeyFromStorage = () => {
+    return localStorage.getItem("api_key");
+  };
+
+  const apiKey = getApiKeyFromStorage();
 
   const handleLogin = async () => {
     try {
       const response = await axios.get(
         `${backendUrl}/api/logingeop?apiKey=${apiKey}`,
-        {
-          withCredentials: true, // Important pour envoyer et recevoir les cookies
-        }
+        { withCredentials: true }
       );
 
       const data = response.data;
 
-      // Pas besoin de stocker le token dans localStorage s'il est en cookie HTTPOnly
+      // ✅ 1) Nettoyage minimal (ne touche pas autoSavedSql_*)
+      const keysToRemove = [
+        "userid",
+        "username",
+        "user_id",
+        "id_role",
+        "theme_mode",
+        "language",
+        "timezone",
+        "user",
+        "userPermissions",
+      ];
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
 
-      const GeoploginTime = new Date().getTime();
-      localStorage.setItem("GeoploginTime", GeoploginTime.toString());
-      localStorage.setItem("GeopUserID", data.id_user);
-      localStorage.setItem("Geopusername", data.username);
-      localStorage.setItem("api_key", data.api_key);
-      localStorage.setItem("id_role", data.id_role);
-      localStorage.setItem("theme_mode", data.profile_settings.theme_mode);
-      localStorage.setItem("language", data.profile_settings.language);
-      localStorage.setItem("timezone", data.profile_settings.timezone);
+      // ✅ 2) Stockage GeoParc
+      localStorage.setItem("GeoploginTime", String(Date.now()));
+      localStorage.setItem("GeopUserID", String(data.id_user));
+      localStorage.setItem("Geopusername", String(data.username));
 
-      // Fetch des permissions utilisateur
+      localStorage.setItem("api_key", String(data.api_key));
+      localStorage.setItem("id_role", String(data.id_role));
+      localStorage.setItem("theme_mode", String(data.profile_settings?.theme_mode ?? "0"));
+      localStorage.setItem("language", String(data.profile_settings?.language ?? "fr"));
+      localStorage.setItem("timezone", String(data.profile_settings?.timezone ?? ""));
+
+      // ✅ 3) Permissions GeoParc
       const permissionsResponse = await axios.get(
         `${backendUrl}/api/geop/permission/all/${data.id_role}`,
         { withCredentials: true }
       );
-      localStorage.setItem(
-        "userPermissions",
-        JSON.stringify(permissionsResponse.data)
-      );
-
-      // Redirection après login si nécessaire
-      // navigate("/");
-
+      localStorage.setItem("geop_userPermissions", JSON.stringify(permissionsResponse.data));
     } catch (error) {
       console.error("Login error", error);
     }
   };
 
-  // handleLogin()   
-
+  // ✅ IMPORTANT: attendre la fin du login AVANT de rendre l'app
   useEffect(() => {
-    console.log()
-    handleLogin()
+    (async () => {
+      try {
+        // si tu veux éviter relogin à chaque refresh:
+        // if (localStorage.getItem("GeopUserID")) return;
+        await handleLogin();
+      } finally {
+        setBootLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ✅ LOADER (GeoParc)
+  if (bootLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#fff",
+          flexDirection: "column",
+        }}
+      >
+        <img
+          src="https://geoparc.geotrackin.com/react/public/asset/images/logo.png?t=1768313723979"
+          alt="GeoTrackin"
+          style={{
+            width: 180,
+            marginBottom: 20,
+            animation: "pulse 1.5s ease-in-out infinite",
+          }}
+        />
+
+        <div style={{ fontWeight: 600, color: "#444" }}>
+          Chargement de GeoParc…
+        </div>
+
+        <style>
+          {`
+          @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.5; transform: scale(0.98); }
+          }
+        `}
+        </style>
+      </div>
+    );
+  }
+
 
   return (
     <AuthProvider>
@@ -198,7 +237,6 @@ const apiKey = getApiKeyFromStorage();
               <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
               <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
               <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
-              <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
               <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
               <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
               <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
