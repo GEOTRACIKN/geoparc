@@ -9,433 +9,486 @@ import ModalEditDemandePiece from "../components/DemandePiece/EditDemandePiece";
 import ModalShowDemandePiece from "../components/DemandePiece/ShowDemandePiece";
 import ModalDeleteDemandePiece from "../components/DemandePiece/DeleteDemandePiece";
 
-import { FaEye, FaEdit, FaTrash, FaFileExport, FaPrint, FaEyeSlash } from "react-icons/fa";
-import {formatDateToTimestamp,generateExcelFile,DownloadModal,generateBonPDF,generatePDFFile} from "../functions";
+import { FaEye, FaEdit, FaTrash, FaPrint, FaChevronDown } from "react-icons/fa";
 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const geopuserID = localStorage.getItem("GeopUserID");
 
-interface DemandePiece {
+type BonRow = {
   id_demande_piece: number;
-  type: string;
-  categorie: string;
+  num_bon: string;
+  client: string;
+  commentaire?: string | null;
   statut: string;
-  client?: string;
-  num_bon?: string;
-  quantite?: number;
-  prix?: number;
-  commentaire?: string;
-  date_creation?: string | null;
+  date_creation: string;
+  id_user: number;
+  totalCout?: number;
+};
+
+// ===== PDF =====
+type BonPDFPiece = {
+  categorie: string;
+  type: string;
+  quantite: number;
+  prix_unitaire: number;
+  prix_total: number;
+};
+
+type BonPDFData = {
+  num_bon: string;
+  client: string;
+  date_creation: string;
+  statut?: string;
+  pieces: BonPDFPiece[];
+};
+
+function formatDateTime(v: string) {
+  try {
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return v;
+    return d.toLocaleString("fr-FR");
+  } catch {
+    return v;
+  }
+}
+
+function generateBonPDF(d: BonPDFData) {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text("BON DE LIVRAISON", doc.internal.pageSize.getWidth() / 2, 50, {
+    align: "center",
+  });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+
+  const leftX = 40;
+  const rightX = 400;
+  const startY = 90;
+  const lineHeight = 20;
+
+  // infos société
+  doc.text("Société :", leftX, startY);
+  doc.text("Adresse :", leftX, startY + lineHeight);
+  doc.text("Téléphone :", leftX, startY + lineHeight * 2);
+
+  // infos client
+  doc.text(`Client : ${d.client || "-"}`, rightX, startY);
+  doc.text(`N° Bon : ${d.num_bon || "-"}`, rightX, startY + lineHeight);
+  doc.text(
+    `Date : ${
+      d.date_creation
+        ? formatDateTime(d.date_creation)
+        : formatDateTime(new Date().toISOString())
+    }`,
+    rightX,
+    startY + lineHeight * 2
+  );
+
+  const totalBon = (d.pieces || []).reduce(
+    (sum, p) => sum + Number(p.prix_total || 0),
+    0
+  );
+
+  // tableau pièces
+  autoTable(doc, {
+    startY: startY + lineHeight * 4,
+    head: [["Pièce", "Type", "Quantité", "Prix U", "Total"]],
+    body: (d.pieces || []).map((p) => [
+      p.categorie || "",
+      p.type || "",
+      p.quantite ?? "",
+      Number(p.prix_unitaire ?? 0).toFixed(2),
+      Number(p.prix_total ?? 0).toFixed(2),
+    ]),
+    styles: { fontSize: 10, valign: "middle" },
+    headStyles: {
+      fillColor: [249, 115, 22],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "center",
+    },
+    columnStyles: {
+      2: { halign: "center" },
+      3: { halign: "center" },
+      4: { halign: "center" },
+    },
+  });
+
+  const finalY = (doc as any).lastAutoTable?.finalY ?? startY + lineHeight * 6;
+
+  // Total bon
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total du bon : ${totalBon.toFixed(2)}`, rightX, finalY + 30);
+  doc.setFont("helvetica", "normal");
+
+  doc.text("Signature :", leftX, finalY + 80);
+  doc.text("Cachet :", rightX, finalY + 80);
+
+  doc.save(`Bon_${d.num_bon || "piece"}.pdf`);
 }
 
 const DemandePiecePage: React.FC = () => {
   const { translate } = useTranslate();
 
-  const [demandes, setDemandes] = useState<DemandePiece[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [total, setTotal] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(10);
-  const [typeSearch, setTypeSearch] = useState<string>("ID");
-  const [search, setSearch] = useState<string>("");
-  const [sortColumn, setSortColumn] = useState<string>("id_demande_piece");
-  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
-  const [pageCount, setPageCount] = useState<number>(0);
+  const [bons, setBons] = useState<BonRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
 
-  const [showDelete, setShowDelete] = useState(false);
+  const [search, setSearch] = useState("");
+  const [typeSearch, setTypeSearch] =
+    useState<"num_bon" | "client" | "statut">("num_bon"); // UI only (mais utilisé pour ESLint)
+
+  const [selectedNumBon, setSelectedNumBon] = useState<string | null>(null);
+  const [selectedNumBons, setSelectedNumBons] = useState<string[]>([]);
+
+  const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showView, setShowView] = useState(false);
-  const [showAdd, setShowAdd] = useState(false);
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  const initialColumns = {
-    id: true,
-    type: true,
-    categorie: true,
-    date_creation: true,
-    statut: true,
-    client: true,
-    num_bon: true,
-  };
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const [selectedColumns, setSelectedColumns] = useState<{
-    [k in keyof typeof initialColumns]: boolean;
-  }>(() => {
-    try {
-      const saved = localStorage.getItem("selectedColumnsDemande");
-      return saved ? JSON.parse(saved) : initialColumns;
-    } catch {
-      return initialColumns;
-    }
-  });
-
-  const menuItems = [
-    translate("ID"),
-    translate("Type"),
-    translate("Categorie"),
-    translate("Date création"),
-    translate("Statut"),
-  ];
-
-  const toggleColumn = (key: keyof typeof initialColumns) => {
-    const updated = { ...selectedColumns, [key]: !selectedColumns[key] };
-    setSelectedColumns(updated);
-    localStorage.setItem("selectedColumnsDemande", JSON.stringify(updated));
-  };
-
-  const fetchDemandes = useCallback(async () => {
+  // ================= FETCH =================
+  const fetchBons = useCallback(async () => {
     try {
       setLoading(true);
+
+      const username = (localStorage.getItem("Geopusername") || "").trim();
+      if (!username) {
+        toast.error("Utilisateur non détecté (username)", { transition: Bounce });
+        setBons([]);
+        setTotal(0);
+        setPageCount(1);
+        return;
+      }
+
       const params = new URLSearchParams();
+      params.append("username", username);
       params.append("page", String(page));
       params.append("limit", String(limit));
-      if (search) params.append("search", search);
-      params.append("sortColumn", sortColumn);
-      params.append("sortOrder", sortOrder);
+      params.append("search", (search || "").trim());
+      params.append("typeSearch", typeSearch);
+      params.append("_rk", String(reloadKey));
 
       const res = await fetch(
-        `${backendUrl}/api/geop/listdemandepiece/${geopuserID}?${params.toString()}`
+        `${backendUrl}/api/geop/demandepiece/list?${params.toString()}`
       );
-      if (!res.ok) throw new Error("Erreur récupération demandes");
-      const data = await res.json();
-      setDemandes(data.demandes || []);
-      setTotal(data.total ?? (data.demandes ? data.demandes.length : 0));
-      setPageCount(Math.max(1, Math.ceil((data.total ?? (data.demandes ? data.demandes.length : 0)) / limit)));
-    } catch (err) {
-      console.error(err);
-      toast.error(translate("Erreur lors de la récupération des demandes"), {
-        position: "bottom-right",
-        autoClose: 2400,
-        transition: Bounce,
-      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Erreur serveur");
+      }
+
+      const list: BonRow[] = Array.isArray(data?.list) ? data.list : [];
+      const totalCount = Number(data?.total ?? list.length ?? 0);
+      const totalPages = Number(
+        data?.totalPages ?? Math.ceil(totalCount / limit) ?? 1
+      );
+
+      setBons(list);
+      setTotal(totalCount);
+      setPageCount(Math.max(1, totalPages));
+      setSelectedNumBons([]);
+    } catch (e: any) {
+      const msg = String(e?.message || "");
+      toast.error(
+        `${translate("Erreur lors de la récupération")}${msg ? ` (${msg})` : ""}`,
+        { transition: Bounce }
+      );
+      setBons([]);
+      setTotal(0);
+      setPageCount(1);
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search, sortColumn, sortOrder, translate]);
+  }, [page, limit, search, typeSearch, translate, reloadKey]);
 
   useEffect(() => {
-    fetchDemandes();
-  }, [fetchDemandes]);
+    fetchBons();
+  }, [fetchBons]);
 
-  const handlePageClick = (data: any) => {
-    setPage(data.selected + 1);
-    window.scrollTo(0, 0);
-  };
-
-  const handleSelectChange = (e: any) => {
-    setLimit(Number(e.target.value));
-    setPage(1);
-  };
-  const handleResetSearch = async () => {
-    setSearch("");
-    setTypeSearch("ID");
-    setPage(1);
-    await fetchDemandes();
-  };
-  const handleSortingColumn = (col: string) => {
-    setSortColumn(col);
-    setSortOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
-  };
   const refreshList = () => {
     setPage(1);
-    fetchDemandes();
+    setReloadKey((k) => k + 1);
   };
 
-  const toggleSelect = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+  const toggleSelectAll = () => {
+    if (selectedNumBons.length === bons.length) {
+      setSelectedNumBons([]);
+    } else {
+      setSelectedNumBons(bons.map((b) => b.num_bon));
+    }
   };
 
-  // Export handlers
-  const handleExport = (format: string) => {
-    const headers = ["ID", "Client", "Num Bon", "Categorie", "Type", "Statut", "Date création"];
-    const data = demandes
-      .filter((d) => selectedIds.includes(d.id_demande_piece))
-      .map((d) => [
-        d.id_demande_piece,
-        d.client || "-",
-        d.num_bon || "-",
-        d.categorie || "-",
-        d.type || "-",
-        translate(d.statut),
-        formatDateToTimestamp(d.date_creation || ""),
-      ]);
+  // ================= PRINT PDF =================
+  const handlePrint = async (row: BonRow) => {
+    try {
+      const username = (localStorage.getItem("Geopusername") || "").trim();
+      if (!username) {
+        toast.error("Utilisateur non détecté (username)", { transition: Bounce });
+        return;
+      }
+      const params = new URLSearchParams();
+      params.append("username", username);
 
-    if (format === "excel") generateExcelFile("Demandes de pièces", headers, data);
-    else if (format === "pdf") generatePDFFile("Demandes de pièces", headers, data);
+      const res = await fetch(
+        `${backendUrl}/api/geop/demandepiece/show/${encodeURIComponent(
+          row.num_bon
+        )}?${params.toString()}`
+      );
 
-    setShowDownloadModal(false);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || "Erreur serveur");
+
+      const bonData = data?.bon || {};
+      const lignes = Array.isArray(data?.lignes) ? data.lignes : [];
+
+      const pdfData: BonPDFData = {
+        num_bon: bonData.num_bon || row.num_bon,
+        client: bonData.client || row.client,
+        date_creation: bonData.date_creation || row.date_creation,
+        statut: bonData.statut || row.statut,
+        pieces: lignes.map((l: any) => {
+          const q = Number(l?.quantite ?? 0);
+          const pu = Number(l?.prix_unitaire ?? 0);
+          const pt = Number(l?.prix_total ?? q * pu);
+
+          return {
+            categorie: l?.categorie || "",
+            type: l?.type_piece || "",
+            quantite: q,
+            prix_unitaire: pu,
+            prix_total: pt,
+          };
+        }),
+      };
+
+      generateBonPDF(pdfData);
+    } catch (e: any) {
+      toast.error(
+        `Erreur génération PDF${e?.message ? ` (${e.message})` : ""}`,
+        { transition: Bounce }
+      );
+    }
   };
-
-const handlePrintIndividual = (d: DemandePiece) => {
-  generateBonPDF({
-    client: d.client,
-    num_bon: d.num_bon || String(d.id_demande_piece),
-    date_creation: d.date_creation,
-    categorie: d.categorie,
-    type: d.type,
-    quantite: d.quantite,
-    prix: d.prix,
-  });
-};
 
   return (
     <div>
-      {/* Header */}
-      <div className="row mb-3">
-        <div className="col-md-6 col-sm-12">
-          <h4>{translate("Demande de pièces")} ({total})</h4>
-        </div>
+      <div className="d-flex justify-content-between mb-3">
+        <h4>
+          {translate("Bons de livraison")} ({total})
+        </h4>
 
-        {/* Boutons Bon de livraison + Export */}
-        <div className="col-md-6 col-sm-12 text-end d-flex gap-2 justify-content-end">
-          <Button variant="primary" onClick={() => setShowAdd(true)}>
-            + {translate("Bon de livraison")}
-          </Button>
-
-          <Button
-            variant="outline-warning"
-            className="d-flex align-items-center gap-1"
-            style={{
-              background: "transparent",
-              borderColor: "#e5a126",
-              color: "#e5a126",
-              fontWeight: 500,
-            }}
-            disabled={selectedIds.length === 0}
-            onClick={() => setShowDownloadModal(true)}
-          >
-            <FaFileExport /> {translate("Exporter")}
-          </Button>
-        </div>
+        <Button onClick={() => setShowAdd(true)}>
+          + {translate("Nouveau bon")}
+        </Button>
       </div>
 
-      {/* Search & Select */}
+      {/* ===== Recherche ===== */}
       <div className="row mb-3">
-        <div className="col-md-4" style={{ padding: 10 }}>
-          <div className="input-group">
-            <Dropdown>
-              <Dropdown.Toggle variant="link">
-                <i className="fas fa-chevron-down" style={{ fontSize: 20 }} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {menuItems.map((item, idx) => (
-                  <Dropdown.Item
-                    key={idx}
-                    onClick={() => setTypeSearch(item)}
-                    active={typeSearch === item}
-                  >
-                    {item}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-            <input
-              type="text"
-              className="form-control"
-              placeholder={`${translate("Search by")} ${typeSearch}`}
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-            <Button
-              variant="secondary"
-              className="btn-reset"
-              onClick={handleResetSearch}
-            >
-              <i className="las la-times" style={{ color: "#fff" }} />
-            </Button>
-          </div>
-        </div>
-
-        {/* Dropdown colonnes + limite */}
-        <div className="col-md-8 d-flex justify-content-end align-items-center gap-2">
-          <div className="dataTables_length">
-            <label style={{ marginBottom: 0 }}>
-              {translate("Show")}
-              <select
-                className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: 66 }}
-                onChange={handleSelectChange}
-                value={limit}
-              >
-                {[10, 20, 50, 100, 200, 500].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
+        <div className="col-md-6 d-flex gap-2 align-items-center">
           <Dropdown>
-            <Dropdown.Toggle variant="link" title="Afficher Colonnes">
-              <i className="las la-eye" />
+            <Dropdown.Toggle
+              variant="outline-primary"
+              className="d-flex align-items-center"
+            >
+              <FaChevronDown />
             </Dropdown.Toggle>
+
             <Dropdown.Menu>
-              {Object.keys(initialColumns).map((col, idx) => (
-                <Dropdown.Item
-                  key={idx}
-                  as="button"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={selectedColumns[col as keyof typeof initialColumns]}
-                    onChange={() => toggleColumn(col as keyof typeof initialColumns)}
-                  />
-                  <span style={{ marginLeft: 10 }}>{translate(col)}</span>
-                </Dropdown.Item>
-              ))}
+              <Dropdown.Item onClick={() => setTypeSearch("num_bon")}>
+                {translate("Num Bon")}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setTypeSearch("client")}>
+                {translate("Client")}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setTypeSearch("statut")}>
+                {translate("Statut")}
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="row m-1">
-        <Table className="dataTable" responsive>
-          <thead className="bg-white text-uppercase">
-            <tr>
-              <th style={{ width: 40 }}>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.length === demandes.length && demandes.length > 0}
-                  onChange={() => {
-                    if (selectedIds.length === demandes.length) setSelectedIds([]);
-                    else setSelectedIds(demandes.map((d) => d.id_demande_piece));
-                  }}
-                />
-              </th>
-
-              {selectedColumns.id && (
-                <th className="sorting" onClick={() => handleSortingColumn("id_demande_piece")}>
-                  {translate("ID")}
-                </th>
-              )}
-              {selectedColumns.client && <th>{translate("Client")}</th>}
-              {selectedColumns.num_bon && <th>{translate("Num Bon")}</th>}
-              {selectedColumns.categorie && (
-                <th className="sorting" onClick={() => handleSortingColumn("categorie")}>
-                  {translate("Categorie")}
-                </th>
-              )}
-              {selectedColumns.type && (
-                <th className="sorting" onClick={() => handleSortingColumn("type")}>
-                  {translate("Type")}
-                </th>
-              )}
-              {selectedColumns.statut && (
-                <th className="sorting" onClick={() => handleSortingColumn("statut")}>
-                  {translate("Statut")}
-                </th>
-              )}
-              {selectedColumns.date_creation && (
-                <th className="sorting" onClick={() => handleSortingColumn("date_creation")}>
-                  {translate("Date création")}
-                </th>
-              )}
-
-              {/* ACTION header centré */}
-              <th style={{ textAlign: "center", width: 160 }}>{translate("Action")}</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={9} className="text-center">{translate("Loading...")}</td>
-              </tr>
-            ) : demandes.length > 0 ? (
-              demandes.map((d) => (
-                <tr key={d.id_demande_piece}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(d.id_demande_piece)}
-                      onChange={() => toggleSelect(d.id_demande_piece)}
-                    />
-                  </td>
-
-                  {selectedColumns.id && <td>{d.id_demande_piece}</td>}
-                  {selectedColumns.client && <td>{d.client}</td>}
-                  {selectedColumns.num_bon && <td>{d.num_bon}</td>}
-                  {selectedColumns.categorie && <td>{d.categorie}</td>}
-                  {selectedColumns.type && <td>{d.type}</td>}
-                  {selectedColumns.statut && <td>{translate(d.statut)}</td>}
-                  {selectedColumns.date_creation && (
-                    <td>{d.date_creation ? new Date(d.date_creation).toLocaleString("fr-FR") : "-"}</td>
-                  )}
-
-                  {/* Actions */}
-                  <td style={{ whiteSpace: "nowrap", textAlign: "center" }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                      <FaPrint size={18} color="#427949" style={{ cursor: "pointer" }} title="Imprimer" onClick={() => handlePrintIndividual(d)} />
-                      <FaEye size={20} color="#3498db" style={{ cursor: "pointer" }} title="Voir" onClick={() => { setSelectedId(d.id_demande_piece); setShowView(true); }} />
-                      <FaEdit size={20} color="#e5a126" style={{ cursor: "pointer" }} title="Modifier" onClick={() => { setSelectedId(d.id_demande_piece); setShowEdit(true); }} />
-                      <FaTrash size={18} color="#e74c3c" style={{ cursor: "pointer" }} title="Supprimer" onClick={() => { setSelectedId(d.id_demande_piece); setShowDelete(true); }} />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9} className="text-center text-muted py-4">
-                  {translate("Aucune demande trouvée")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
-
-      {/* Pagination */}
-      <div className="row">
-        <div className="col-md-6 d-flex align-items-center">
-          <span>
-            {translate("Affichage")} {demandes.length ? (page - 1) * limit + 1 : 0} {translate("à")}{" "}
-            {Math.min(page * limit, total)} {translate("sur")} {total}
-          </span>
-        </div>
-        <div className="col-md-6 d-flex justify-content-end">
-          <ReactPaginate
-            previousLabel={"previous"}
-            nextLabel={"next"}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination justify-content-end"}
-            pageClassName={"page-item"}
-            pageLinkClassName={"page-link"}
-            previousClassName={"page-item"}
-            previousLinkClassName={"page-link"}
-            nextClassName={"page-item"}
-            nextLinkClassName={"page-link"}
-            breakClassName={"page-item"}
-            breakLinkClassName={"page-link"}
-            activeClassName={"active"}
+          <input
+            className="form-control"
+            style={{ maxWidth: 320 }}
+            placeholder={`${translate("Recherche")}...`}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
+
+        <div className="col-md-6 d-flex justify-content-end">
+          <select
+            className="form-select w-auto"
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+          >
+            {[10, 20, 50, 100].map((n) => (
+              <option key={n}>{n}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Modals */}
-      {showAdd && <AddDemandePiece show={showAdd} onHide={() => setShowAdd(false)} onSuccess={refreshList} />}
-      {showEdit && <ModalEditDemandePiece show={showEdit} onHide={() => setShowEdit(false)} id_demande_piece={selectedId ?? 0} onSuccess={refreshList} />}
-      {showView && <ModalShowDemandePiece show={showView} onHide={() => setShowView(false)} id_demande_piece={selectedId ?? 0} />}
-      {showDelete && <ModalDeleteDemandePiece show={showDelete} onHide={() => setShowDelete(false)} id_demande_piece={selectedId ?? 0} onSuccess={refreshList} />}
+      {/* ===== TABLE ===== */}
+      <Table hover responsive className="text-center table-clean">
+        <thead>
+          <tr>
+            <th>
+              <input
+                type="checkbox"
+                checked={bons.length > 0 && selectedNumBons.length === bons.length}
+                onChange={toggleSelectAll}
+              />
+            </th>
+            <th>{translate("Num Bon")}</th>
+            <th>{translate("Client")}</th>
+            <th>{translate("Statut")}</th>
+            <th>{translate("Date création")}</th>
+            <th>{translate("Action")}</th>
+          </tr>
+        </thead>
 
-      {/* Modal export */}
-      <DownloadModal show={showDownloadModal} onHide={() => setShowDownloadModal(false)} onDownloadConfirm={handleExport} />
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={6}>Loading...</td>
+            </tr>
+          ) : bons.length > 0 ? (
+            bons.map((b) => (
+              <tr key={b.id_demande_piece}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedNumBons.includes(b.num_bon)}
+                    onChange={() =>
+                      setSelectedNumBons((prev) =>
+                        prev.includes(b.num_bon)
+                          ? prev.filter((n) => n !== b.num_bon)
+                          : [...prev, b.num_bon]
+                      )
+                    }
+                  />
+                </td>
+
+                <td>{b.num_bon}</td>
+                <td>{b.client}</td>
+                <td>{translate(b.statut)}</td>
+                <td>
+                  {b.date_creation
+                    ? new Date(b.date_creation).toLocaleDateString("fr-FR")
+                    : ""}
+                </td>
+
+                <td>
+                  <div className="d-flex justify-content-center gap-3">
+                    <FaPrint
+                      color="#16a34a"
+                      onClick={() => handlePrint(b)}
+                      style={{ cursor: "pointer" }}
+                      title="Imprimer"
+                    />
+                    <FaEye
+                      color="#2563eb"
+                      onClick={() => {
+                        setSelectedNumBon(b.num_bon);
+                        setShowView(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                      title="Voir"
+                    />
+                    <FaEdit
+                      color="#f59e0b"
+                      onClick={() => {
+                        setSelectedNumBon(b.num_bon);
+                        setShowEdit(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                      title="Modifier"
+                    />
+                    <FaTrash
+                      color="#dc2626"
+                      onClick={() => {
+                        setSelectedNumBon(b.num_bon);
+                        setShowDelete(true);
+                      }}
+                      style={{ cursor: "pointer" }}
+                      title="Supprimer"
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={6} className="text-muted">
+                {translate("Aucune demande trouvée")}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+
+      <ReactPaginate
+        pageCount={pageCount}
+        forcePage={page - 1}
+        onPageChange={(e) => setPage(e.selected + 1)}
+        containerClassName="pagination justify-content-end"
+        pageClassName="page-item"
+        pageLinkClassName="page-link"
+        activeClassName="active"
+      />
+
+      {/* ===== MODALS ===== */}
+      <AddDemandePiece
+        show={showAdd}
+        onHide={() => setShowAdd(false)}
+        onSuccess={refreshList}
+      />
+
+      <ModalEditDemandePiece
+        show={showEdit}
+        num_bon={selectedNumBon}
+        onHide={() => {
+          setShowEdit(false);
+          setSelectedNumBon(null);
+        }}
+        onSuccess={refreshList}
+      />
+
+      <ModalShowDemandePiece
+        show={showView}
+        num_bon={selectedNumBon}
+        onHide={() => {
+          setShowView(false);
+          setSelectedNumBon(null);
+        }}
+      />
+
+      <ModalDeleteDemandePiece
+        show={showDelete}
+        num_bon={selectedNumBon}
+        onHide={() => {
+          setShowDelete(false);
+          setSelectedNumBon(null);
+        }}
+        onSuccess={refreshList}
+      />
     </div>
   );
 };
