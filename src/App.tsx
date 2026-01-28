@@ -191,7 +191,6 @@ function App() {
   return (
     <AuthProvider>
       <UserProvider>
-       
       <ThemeProvider>
         <LanguageProvider>
           <div className="wrapper" style={{ transition: 'width 0.3s', backgroundColor: '#fff', height: '100vh', padding: '0px' }}>
@@ -238,7 +237,6 @@ function App() {
               <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
               <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
               <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
-              <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
               <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
               <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
               <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />

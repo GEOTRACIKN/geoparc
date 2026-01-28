@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
-import TableHeader from "../components/common/AdministratifHeader";
+import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
 
 // TEMPORARY ,Geoparc has no authentication.
 // LocalStorage role/id is only a placeholder.
@@ -55,29 +56,48 @@ export default function TechnicalControlList() {
     column = sortColumn,
     sort = sortDirection
   ) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     setLoading(true);
     try {
+      const body: any = {
+        limitValue,
+        currentPage: page,
+        search,
+        type,
+        column,
+        sort,
+        role,
+      };
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/technical-control/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          limitValue,
-          currentPage: page,
-          search,
-          type,
-          column,
-          sort,
-          id_user,
-          role,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      const formatted = Array.isArray(data)
+       ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              date_debut_ctr_tech_vehicule: safeDate(row.date_debut_ctr_tech_vehicule),
+              date_fin_ctr_tech_vehicule: safeDate(row.date_fin_ctr_tech_vehicule),
+            };
+          })
+        : [];
+     setRows(formatted);
     } catch (err) {
       console.error("Error fetching CT page:", err);
       setRows([]);
@@ -90,20 +110,18 @@ export default function TechnicalControlList() {
   // FETCH TOTAL COUNT
   // ============================================
   const fetchTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
 
     try {
+      const body: any = { role, search, type };
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/technical-control/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          id_user,
-          role,
-          search,
-          type,
-        }),
+        body: JSON.stringify(body),
       });
 
       const json = await res.json();
