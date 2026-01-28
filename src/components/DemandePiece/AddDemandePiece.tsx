@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, InputGroup, Table } from "react-bootstrap";
 import { toast, Bounce } from "react-toastify";
-import { FiUser, FiHash, FiLayers, FiPackage, FiDollarSign, FiMessageCircle } from "react-icons/fi";
+import {FiUser,FiHash,FiLayers,FiPackage,FiDollarSign,FiMessageCircle,FiPlus,FiCheck} from "react-icons/fi";
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -25,14 +25,26 @@ const categoriesTypes: { [key: string]: string[] } = {
   Accessoires: ["Essuie-glace", "Clignotant", "Rétroviseur intérieur", "Tapis"]
 };
 
-const AddDemandePiece: React.FC<AddDemandePieceProps> = ({ show, onHide, onSuccess }) => {
+
+const AddDemandePiece: React.FC<AddDemandePieceProps> = ({
+  show,
+  onHide,
+  onSuccess
+}) => {
+  // BON
   const [client, setClient] = useState("");
   const [numeroBon, setNumeroBon] = useState("");
+
+  // PIÈCE
   const [categorie, setCategorie] = useState("");
   const [type, setType] = useState("");
   const [prix, setPrix] = useState<number | null>(null);
   const [quantite, setQuantite] = useState<number | null>(null);
   const [commentaire, setCommentaire] = useState("");
+
+  // LISTE DES LIGNES
+  const [lignesBon, setLignesBon] = useState<any[]>([]);
+
   const [categorieOptions, setCategorieOptions] = useState<string[]>([]);
   const [typeOptions, setTypeOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,47 +54,64 @@ const AddDemandePiece: React.FC<AddDemandePieceProps> = ({ show, onHide, onSucce
   }, []);
 
   useEffect(() => {
-    const foundTypes = categorie && categoriesTypes[categorie] ? categoriesTypes[categorie] : [];
-    setTypeOptions(foundTypes);
+    setTypeOptions(categorie ? categoriesTypes[categorie] || [] : []);
   }, [categorie]);
 
+  // AJOUTER UNE LIGNE AU BON
+  const handleAddLine = () => {
+    if (!categorie || !type || !quantite || !prix) {
+      toast.error("Veuillez remplir tous les champs de la pièce", { transition: Bounce });
+      return;
+    }
+
+    setLignesBon(prev => [
+      ...prev,
+      { categorie, type, quantite, prix, commentaire }
+    ]);
+
+    setCategorie(""); setType(""); setQuantite(null); setPrix(null); setCommentaire("");
+  };
+
+  // VALIDATION DU BON 
   const handleSave = async () => {
+    if (!client || !numeroBon || lignesBon.length === 0) {
+      toast.error("Bon incomplet", { transition: Bounce });
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await fetch(`${backendUrl}/api/geop/createdemandepiece`, {
+
+      // ENVOYER UN SEUL OBJET AVEC LES PIÈCES
+      const response = await fetch(`${backendUrl}/api/geop/demandepiece/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          num_bon: numeroBon,
           client,
-          categorie,
-          type,
-          quantite,
-          prix,
-          commentaire,
-          statut: "En attente",
-          id_user: 0
-        }),
+          num_bon: numeroBon,
+          id_user: 0,
+          pieces: lignesBon 
+        })
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Erreur lors de la création de la demande");
-      toast.success("Demande créée !", { autoClose: 2000, transition: Bounce });
+
+      if (!response.ok) throw new Error("Erreur lors de la création du bon");
+
+      toast.success("Bon de livraison créé avec succès !", { transition: Bounce });
+
+      setLignesBon([]);
       onSuccess();
       onHide();
     } catch (error) {
-      console.error("❌ FRONT ERROR:", error);
-      toast.error("Erreur lors de la création de la demande", { autoClose: 2000, transition: Bounce });
+      console.error(error);
+      toast.error("Erreur lors de la création du bon", { transition: Bounce });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Nouvelle Demande de pièce</Modal.Title>
-      </Modal.Header>
-
+    <Modal show={show} onHide={onHide} size="xl">
+      <Modal.Header closeButton><Modal.Title>Nouveau bon de livraison</Modal.Title></Modal.Header>
       <Modal.Body>
         <Form>
           {/* CLIENT + NUM BON */}
@@ -91,77 +120,88 @@ const AddDemandePiece: React.FC<AddDemandePieceProps> = ({ show, onHide, onSucce
               <Form.Label>Client</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiUser /></InputGroup.Text>
-                <Form.Control type="text" value={client} onChange={e => setClient(e.target.value)} placeholder="Nom du client" />
+                <Form.Control value={client} onChange={e => setClient(e.target.value)} />
               </InputGroup>
             </Col>
-
             <Col md={6}>
               <Form.Label>Numéro de bon</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiHash /></InputGroup.Text>
-                <Form.Control type="text" value={numeroBon} onChange={e => setNumeroBon(e.target.value)} placeholder="Numéro du bon" />
+                <Form.Control value={numeroBon} onChange={e => setNumeroBon(e.target.value)} />
               </InputGroup>
             </Col>
           </Row>
 
-          {/* CATEGORIE + TYPE */}
+          {/* PIÈCE */}
           <Row className="mb-3">
             <Col md={6}>
               <Form.Label>Catégorie</Form.Label>
               <InputGroup>
-                <InputGroup.Text style={{ color: "#f97316" }}>
-                  <i className="bi bi-diagram-3"></i>
-                </InputGroup.Text>
-                <Form.Control as="input" list="categorieOptions" value={categorie} onChange={e => setCategorie(e.target.value)} placeholder="Choisir ou taper une catégorie" />
-                <datalist id="categorieOptions">{categorieOptions.map((c, idx) => <option key={idx} value={c} />)}</datalist>
+                <InputGroup.Text style={{ color: "#f97316" }}><i className="bi bi-diagram-3"></i></InputGroup.Text>
+                <Form.Control list="categorieOptions" value={categorie} onChange={e => setCategorie(e.target.value)} />
+                <datalist id="categorieOptions">{categorieOptions.map((c,i)=><option key={i} value={c}/>)}</datalist>
               </InputGroup>
             </Col>
-
             <Col md={6}>
               <Form.Label>Type</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiLayers /></InputGroup.Text>
-                <Form.Control as="input" list="typeOptions" value={type} onChange={e => setType(e.target.value)} placeholder="Choisir ou taper un type" />
-                <datalist id="typeOptions">{typeOptions.map((t, idx) => <option key={idx} value={t} />)}</datalist>
+                <Form.Control list="typeOptions" value={type} onChange={e => setType(e.target.value)} />
+                <datalist id="typeOptions">{typeOptions.map((t,i)=><option key={i} value={t}/>)}</datalist>
               </InputGroup>
             </Col>
           </Row>
 
-          {/* PRIX + QUANTITE */}
           <Row className="mb-3">
             <Col md={6}>
               <Form.Label>Prix</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiDollarSign /></InputGroup.Text>
-                <Form.Control type="number" value={prix ?? ""} onChange={e => setPrix(e.target.value ? parseFloat(e.target.value) : null)} placeholder="Prix" />
+                <Form.Control type="number" value={prix ?? ""} onChange={e=>setPrix(e.target.value?Number(e.target.value):null)} />
               </InputGroup>
             </Col>
-
             <Col md={6}>
               <Form.Label>Quantité</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiPackage /></InputGroup.Text>
-                <Form.Control type="number" value={quantite ?? ""} onChange={e => setQuantite(e.target.value ? parseInt(e.target.value) : null)} placeholder="Quantité" />
+                <Form.Control type="number" value={quantite ?? ""} onChange={e=>setQuantite(e.target.value?Number(e.target.value):null)} />
               </InputGroup>
             </Col>
           </Row>
 
-          {/* COMMENTAIRE */}
-          <Row>
+          <Row className="mb-3">
             <Col>
               <Form.Label>Commentaire</Form.Label>
               <InputGroup>
                 <InputGroup.Text style={{ color: "#f97316" }}><FiMessageCircle /></InputGroup.Text>
-                <Form.Control as="textarea" value={commentaire} onChange={e => setCommentaire(e.target.value)} placeholder="Ajouter un commentaire" rows={3} />
+                <Form.Control as="textarea" rows={2} value={commentaire} onChange={e => setCommentaire(e.target.value)} />
               </InputGroup>
             </Col>
           </Row>
+
+          <Button variant="outline-primary" onClick={handleAddLine}><FiPlus /> Ajouter la pièce</Button>
+
+          {lignesBon.length>0 && <>
+            <hr />
+            <Table bordered size="sm">
+              <thead style={{background:"#f97316",color:"#fff"}}>
+                <tr><th>Catégorie</th><th>Type</th><th>Qté</th><th>Prix</th></tr>
+              </thead>
+              <tbody>
+                {lignesBon.map((l,i)=>(
+                  <tr key={i}><td>{l.categorie}</td><td>{l.type}</td><td className="text-center">{l.quantite}</td><td className="text-center">{l.prix}</td></tr>
+                ))}
+              </tbody>
+            </Table>
+          </>}
         </Form>
       </Modal.Body>
 
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Annuler</Button>
-        <Button variant="primary" onClick={handleSave} disabled={loading}>{loading ? "Enregistrement..." : "Créer"}</Button>
+        <Button variant="primary" onClick={handleSave} disabled={loading || lignesBon.length===0}>
+          <FiCheck /> {loading ? "Validation..." : "Valider le bon"}
+        </Button>
       </Modal.Footer>
     </Modal>
   );

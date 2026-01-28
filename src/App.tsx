@@ -69,6 +69,8 @@ import { Deadline } from "./pages/Deadline";
 import { Notifications } from "./pages/Notification";
 import AdministratifPage from "./pages/AdministratifPage";
 import DemandePiece from "./pages/DemandePiece";
+import BonReception from "./pages/BonReception";
+import Avoir from "./pages/Avoir";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
 
@@ -189,101 +191,91 @@ function App() {
   return (
     <AuthProvider>
       <UserProvider>
-        <ThemeProvider>
-          <LanguageProvider>
-            <div
-              className="wrapper"
-              style={{
-                transition: "width 0.3s",
-                backgroundColor: "#fff",
-                height: "100vh",
-                padding: "0px",
-              }}
-            >
-              <Routes>
-                <Route path="/" element={<DashboardLayout>{<Dashboard />}</DashboardLayout>} />
-                <Route path="/vehicles" element={<DashboardLayout>{<Vehicles />}</DashboardLayout>} />
-                <Route path="/vehicles-forms" element={<DashboardLayout>{<VehiclesForms />}</DashboardLayout>} />
-                <Route path="/vehicles-checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
-                <Route path="/vehicle-check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
-                <Route path="/vehicle-cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
-                <Route path="/vehicle-sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
-                <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
-                <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
-                <Route path="/driver/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
-                <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
-                <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
-                <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
-                <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
-                <Route path="/deadline/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
-                <Route path="/deadline/:id_alarm/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
-                <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
-                <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
-                <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
-                <Route path="/card-management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
-                <Route path="/tank-management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
-                <Route path="/cash-management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
-                <Route path="/detail-vehicle-check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
-                <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
-                <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
-                <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
-                <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
-                <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
-                <Route path="/piece" element={<DashboardLayout>{<Piece />}</DashboardLayout>} />
-                <Route path="/card_management" element={<DashboardLayout>{<CardManagement />}</DashboardLayout>} />
-                <Route path="/tank_management" element={<DashboardLayout>{<TankManagement />}</DashboardLayout>} />
-                <Route path="/cash_management" element={<DashboardLayout>{<CashManagement />}</DashboardLayout>} />
-                <Route path="/fuel_management" element={<DashboardLayout>{<FuelManagement />}</DashboardLayout>} />
-
-                <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
-                <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
-                <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
-                <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
-
-                <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
-                <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
-                <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} />
-
-                <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
-
-                <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
-                <Route path="/park/edit/:id_poi" element={<DashboardLayout>{<Park />}</DashboardLayout>} />
-                <Route path="/park/add" element={<DashboardLayout>{<Park />}</DashboardLayout>} />
-
-                <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
-                <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
-                <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
-
-                <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
-                <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
-                <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
-
-                <Route path="/notifications" element={<DashboardLayout>{<Notifications />}</DashboardLayout>} />
-                <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
-
-                <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
-                <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
-
-                <Route path="/administratif" element={<DashboardLayout><AdministratifPage /></DashboardLayout>} />
-
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
-          </LanguageProvider>
-        </ThemeProvider>
+       
+      <ThemeProvider>
+        <LanguageProvider>
+          <div className="wrapper" style={{ transition: 'width 0.3s', backgroundColor: '#fff', height: '100vh', padding: '0px' }}>
+            <Routes>
+              <Route path="/" element={<DashboardLayout>{<Dashboard />}</DashboardLayout>} />
+              <Route path="/vehicles" element={<DashboardLayout>{<Vehicles />}</DashboardLayout>} />
+              <Route path="/vehicles-forms" element={<DashboardLayout>{<VehiclesForms />}</DashboardLayout>} />
+              <Route path="/vehicles-checks" element={<DashboardLayout>{<Vehicleschecks />}</DashboardLayout>} />
+              <Route path="/vehicle-check" element={<DashboardLayout>{<Vehiclecheck />}</DashboardLayout>} />
+              <Route path="/vehicle-cost" element={<DashboardLayout>{<VehicleCost />}</DashboardLayout>} />
+              <Route path="/vehicle-sinister" element={<DashboardLayout>{<VehicleSinister />}</DashboardLayout>} />
+              <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+              <Route path="/role" element={<DashboardLayout>{<Permission />}</DashboardLayout>} />
+              <Route path="/drivers" element={<DashboardLayout>{<Drivers />}</DashboardLayout>} />
+              <Route path="/driver/add" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+              <Route path="/driver/edit/:id_conducteur" element={<DashboardLayout>{<Driver />}</DashboardLayout>} />
+              <Route path="/contrat" element={<DashboardLayout>{<Contrat />}</DashboardLayout>} />
+              <Route path="/training" element={<DashboardLayout>{<Training />}</DashboardLayout>} />
+              <Route path="/deadline" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+              <Route path="/deadline/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+              <Route path="/deadline/:id_alarm/:id_type" element={<DashboardLayout>{<Deadline />}</DashboardLayout>} />
+              <Route path="/warnings" element={<DashboardLayout>{<Warnings />}</DashboardLayout>} />
+              <Route path="/violation" element={<DashboardLayout>{<Violation />}</DashboardLayout>} />
+              <Route path="/fuel-consumption" element={<DashboardLayout>{<Fuel_consumption />}</DashboardLayout>} />
+              <Route path="/card-management" element={<DashboardLayout>{<Card_management />}</DashboardLayout>} />
+              <Route path="/tank-management" element={<DashboardLayout>{<Tank_management />}</DashboardLayout>} />
+              <Route path="/cash-management" element={<DashboardLayout>{<Cash_management />}</DashboardLayout>} />
+              <Route path="/detail-vehicle-check/:id_verif" element={<DashboardLayout>{<DetailVehicleCheck />}</DashboardLayout>} />
+              <Route path="/reception" element={<DashboardLayout>{<Reception />}</DashboardLayout>} />
+              <Route path="/fire-ext" element={<DashboardLayout>{<Fire />}</DashboardLayout>} />
+              <Route path="/garage" element={<DashboardLayout>{<Garage />}</DashboardLayout>} />
+              <Route path="/servicing" element={<DashboardLayout>{<Servicing />}</DashboardLayout>} />
+              <Route path="/pneu" element={<DashboardLayout>{<Pneu />}</DashboardLayout>} />
+              <Route path="/piece" element={<DashboardLayout>{<Piece />}</DashboardLayout>} />
+              <Route path="/card_management" element={<DashboardLayout>{<CardManagement />}</DashboardLayout>} />
+              <Route path="/tank_management" element={<DashboardLayout>{<TankManagement />}</DashboardLayout>} />
+              <Route path="/cash_management" element={<DashboardLayout>{<CashManagement />}</DashboardLayout>} />
+              <Route path="/fuel_management" element={<DashboardLayout>{<FuelManagement />}</DashboardLayout>} />
+              <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
+              <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
+              <Route path="/Demandes_pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
+              <Route path="/Bon_Reception" element={<DashboardLayout>{<BonReception />}</DashboardLayout>} />
+              <Route path="/Avoir" element={<DashboardLayout>{<Avoir />}</DashboardLayout>} />
+              <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
+              <Route path="/pneu_stock" element={<DashboardLayout>{<PneuStock />}</DashboardLayout>} />
+              <Route path="/piece_stock" element={<DashboardLayout>{<PieceStock />}</DashboardLayout>} />
+              <Route path="/Demandes-pieces" element={<DashboardLayout>{<DemandePiece />}</DashboardLayout>} />
+              <Route path="/reference" element={<DashboardLayout>{<Reference />}</DashboardLayout>} />
+              <Route path="/hse-dashboard" element={<DashboardLayout>{<DashboardKPI />}</DashboardLayout>} />
+              <Route path="/planning-interviews" element={<DashboardLayout>{<InterviewSchedule />}</DashboardLayout>} />
+              <Route path="/login-geoparc" element={<LoginLayout>{<LoginForm onLogin={handleLogin} />}</LoginLayout>} />
+              <Route path="/role" element={<DashboardLayout>{<Role />}</DashboardLayout>} />
+              <Route path="/role/permissions/:id_user/:id_role" element={<DashboardLayout>{<Permissions />}</DashboardLayout>} />
+              <Route path="/parks" element={<DashboardLayout>{<Parks />}</DashboardLayout>} />
+              <Route path="/park/edit/:id_poi" element={<DashboardLayout>{<Park />}</DashboardLayout>} />
+              <Route path="/park/add" element={<DashboardLayout>{< Park />}</DashboardLayout>} />
+              <Route path="/mission-order" element={<DashboardLayout>{<MissionOrder />}</DashboardLayout>} />
+              <Route path="/mission-order-manage/add" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
+              <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
+              <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />
+              <Route path="/mission-report-manage/add" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+              <Route path="/mission-report-manage/edit/:id_misrap" element={<DashboardLayout>{<MissionReportManage />}</DashboardLayout>} />
+              <Route path="/notifications" element={<DashboardLayout>{< Notifications />}</DashboardLayout>} />
+              <Route path="*" element={<NotFound />} />
+              <Route path="/pharmacy-box" element={<DashboardLayout>{<Pharmacy />}</DashboardLayout>} />
+              <Route path="/vehicle/add" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+              <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout>{<Vehicle />}</DashboardLayout>} />
+              <Route path="/administratif" element={<DashboardLayout><AdministratifPage /></DashboardLayout>}/>
+            </Routes>
+          </div>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </LanguageProvider>
+      </ThemeProvider>
       </UserProvider>
     </AuthProvider>
   );
