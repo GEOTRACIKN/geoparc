@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
-import TableHeader from "../components/common/AdministratifHeader";
+import TableHeader from "../components/common/TableHeader";
+import {toTimestamp} from '../functions';
 
 
 //TEMPORARY Geoparc has no authentication yet.
@@ -54,25 +55,24 @@ export default function InsuranceList() {
     column = sortColumn,
     sort = sortDirection,
   ) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
     setLoading(true);
     try {
-      const body = JSON.stringify({
+      const bodyObj: any = {
         limitValue,
         currentPage: page,
         search,
         type,
         column,
         sort,
-        id_user,
         role,
-      });
-
+      };
+      if (id_user) bodyObj.id_user = id_user;
       const res = await fetch(`${backendUrl}/api/geop/insurance/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body,
+        body:JSON.stringify(bodyObj),
         credentials: "include",
       });
 
@@ -82,7 +82,24 @@ export default function InsuranceList() {
       }
 
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      const formatted =Array.isArray(data)
+      ? data.map((row: any) => {
+            const safeDate = (d: any) => {
+              if (d === null || d === undefined || d === "") return "-";
+              const s = String(d);
+              if (/^0{4}-0{2}-0{2}/.test(s)) return "-"; // MySQL zero-date (0000-00-00)
+              if (isNaN(new Date(s).getTime())) return "-";
+              return toTimestamp(s);
+            };
+
+            return {
+              ...row,
+              date_debut_assurance_vehicule: safeDate(row.date_debut_assurance_vehicule),
+              date_expir_assurance_vehicule: safeDate(row.date_expir_assurance_vehicule),
+            };
+          })
+        : [];
+      setRows(formatted);
     } catch (err) {
       console.error("Error fetching insurance page:", err);
       setRows([]);
@@ -93,18 +110,16 @@ export default function InsuranceList() {
 
   // ===== Fetch total count so FE can compute pages =====
   const fetchInsuranceTotal = async (search = "", type = "", limitValue = limit) => {
-    const id_user = localStorage.getItem("GeopUserID") || "1";
+    const id_user = localStorage.getItem("GeopUserID") || "";
     const role = localStorage.getItem("GeopUserRole") || "user";
     try {
+      const body: any = { role, search, type };// id_user from auth when available
+      if (id_user) body.id_user = id_user;
+
       const res = await fetch(`${backendUrl}/api/geop/insurance/totalpage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_user,
-          role,
-          search,
-          type,
-         }), // id_user from auth when available
+        body: JSON.stringify(body), 
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch total");
@@ -155,7 +170,6 @@ export default function InsuranceList() {
   // Reset search
   const handleResetSearch = async() => {
     setSearchValue("");
-    setSearchType(isAdmin ? "id" : "plate");
     setCurrentPage(1);
     await fetchInsuranceTotal( "", "", limit);
     await fetchInsurancePage(limit, 1, "", "", sortColumn, sortDirection);
