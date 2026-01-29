@@ -114,7 +114,7 @@ export const menuItems: MenuItem[] = [
     subItems: [
       { id: 38, label: "Tire", icon: "las la-cogs", to: "/pneu_stock", permissionId: 42 },
       { id: 39, label: "Items", icon: "las la-boxes", to: "/piece_stock", permissionId: 42 },
-      { id: 40, label: "Demande pièces", icon: "las la-box-open", to: "/Demandes-pieces", permissionId: 42 },
+      { id: 40, label: "Demande pièces", icon: "las la-box-open", to: "/Demandes_pieces", permissionId: 42 },
     ],
   },
 
