@@ -56,6 +56,7 @@ export const menuItems: MenuItem[] = [
     icon: "las la-map-marked-alt",
     permissionId: 39,
     subItems: [
+      { id: 16, label: "Mission request", icon: "las la la-route", to: "/transport-request-list", permissionId: 39 },
       { id: 16, label: "Mission Order", icon: "las la-tasks", to: "/mission-order", permissionId: 39 },
       { id: 17, label: "Mission Report", icon: "las la-file-alt", to: "/mission-report", permissionId: 39 },
     ],
