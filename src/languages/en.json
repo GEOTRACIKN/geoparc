@@ -970,6 +970,10 @@
   "enter_departure_time": "Enter departure time",
   "Select departure time": "Select departure time",
   "Enter departure time": "Enter departure time",
-  "request_type": "Request Type"
-  
+  "request_type": "Request Type",
+  "mission_request": "Mission Request",
+  "parks": "Parks",
+  "list_parks": "List Parks",
+  "new_park": "New Park",
+  "create_mission": "Create Mission"
 }

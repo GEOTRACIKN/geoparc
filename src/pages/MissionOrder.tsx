@@ -3,20 +3,23 @@ import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { PropagateLoader } from 'react-spinners';
-import { jsPDF } from 'jspdf';
+import { PropagateLoader } from "react-spinners";
+import { jsPDF } from "jspdf";
 
-import 'jspdf-autotable';
+import "jspdf-autotable";
 //import DriverModal from "../components/Driver/DriverModal";
 import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
 import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
-import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import {
+  DownloadModal,
+  generateExcelFile,
+  generatePDFFile,
+  handleDownloadConfirm,
+  toTimestamp,
+} from "../utilities/functions";
 
 import MissionOrderPreview from "../components/MissionOrder/MissionOrderPreview";
 import MissionOrderDeleteModal from "../components/MissionOrder/MissionOrderDeleteModal";
-
-
-
 
 interface MissionOrder {
   id_mission: number;
@@ -39,13 +42,10 @@ interface MissionOrder {
   fuel_cost_mission: number;
   fuel_level_mission: number;
   voucher_mission: number;
-  immatriculation_vehicule : string;
-  id_vehicule : number;
+  immatriculation_vehicule: string;
+  id_vehicule: number;
   id_user: string;
-
 }
-
-
 
 export function MissionOrder() {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -56,18 +56,18 @@ export function MissionOrder() {
   const [fileData, setFileData] = useState<Blob | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
- 
+
   const [modalStatus, setModalStatus] = useState<string | null>(null);
   const [titleStatus, setTitleStatus] = useState<string | null>(null);
-  const [selectedMissionOrder, setSelectedMissionOrder] = useState<any | null>(null);
+  const [selectedMissionOrder, setSelectedMissionOrder] = useState<any | null>(
+    null,
+  );
 
   const [IdUser, setIdUser] = useState<number>(0);
   const [previewVisible, setPreviewVisible] = useState(false); // Gestion de la visibilité du modal
 
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Modal pour aperçu
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);   // Modal pour suppression
-
-  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Modal pour suppression
 
   const [loading, setLoading] = useState(true); // Add loading state
   const [pageCount, setPageCount] = useState(0);
@@ -80,81 +80,83 @@ export function MissionOrder() {
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
-
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
-
   const getMissionOrder = async (
-  limitValue: number, 
-  currentPage: number, 
-  search: string, 
-  type: number, 
-  colum: string, 
-  sort: string
-) => {
-  try {
-    setLoading(true);
+    limitValue: number,
+    currentPage: number,
+    search: string,
+    type: number,
+    colum: string,
+    sort: string,
+  ) => {
+    try {
+      setLoading(true);
 
-    // Préparation des paramètres pour la requête
-    const params = {
-      limitValue,
-      currentPage,
-      id_user,
-      search,
-      type,
-      colum,
-      sort
-    };
-
-    // 1. Récupération du nombre total de missions
-    const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/totalpage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        id_user, 
+      // Préparation des paramètres pour la requête
+      const params = {
+        limitValue,
+        currentPage,
+        id_user,
         search,
-        type // Ajout du type si nécessaire dans votre backend
-      }),
-      mode: 'cors',
-    });
+        type,
+        colum,
+        sort,
+      };
 
-    if (!totalPagesResponse.ok) {
-      throw new Error("Failed to fetch total pages");
+      // 1. Récupération du nombre total de missions
+      const totalPagesResponse = await fetch(
+        `${backendUrl}/api/geop/missionOrderManage/totalpage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_user,
+            search,
+            type, // Ajout du type si nécessaire dans votre backend
+          }),
+          mode: "cors",
+        },
+      );
+
+      if (!totalPagesResponse.ok) {
+        throw new Error("Failed to fetch total pages");
+      }
+
+      const totalData = await totalPagesResponse.json();
+      const total = totalData.count; // Accès direct à la propriété count
+      settotal(total);
+
+      // 2. Récupération des données paginées
+      const missionOrderResponse = await fetch(
+        `${backendUrl}/api/geop/missionOrderManage/search`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(params),
+          mode: "cors",
+        },
+      );
+
+      if (!missionOrderResponse.ok) {
+        throw new Error("Failed to fetch mission orders");
+      }
+
+      const data = await missionOrderResponse.json();
+
+      // Calcul de la pagination
+      setPageCount(Math.ceil(total / limitValue));
+      setLimit(limitValue);
+      setMissionOrder(data);
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching mission orders:", error);
+      // Gestion d'erreur avec toast ou autre
+    } finally {
+      setLoading(false);
     }
-
-    const totalData = await totalPagesResponse.json();
-    const total = totalData.count; // Accès direct à la propriété count
-    settotal(total);
-
-    // 2. Récupération des données paginées
-    const missionOrderResponse = await fetch(`${backendUrl}/api/geop/missionOrderManage/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-      mode: 'cors',
-    });
-
-    if (!missionOrderResponse.ok) {
-      throw new Error("Failed to fetch mission orders");
-    }
-
-    const data = await missionOrderResponse.json();
-    
-    // Calcul de la pagination
-    setPageCount(Math.ceil(total / limitValue));
-    setLimit(limitValue);
-    setMissionOrder(data);
-    
-    return data;
-  } catch (error) {
-    console.error("Error fetching mission orders:", error);
-    // Gestion d'erreur avec toast ou autre
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   const handlePageClick = async (data: any) => {
     let currentPage = data.selected + 1;
@@ -167,28 +169,32 @@ export function MissionOrder() {
   }, []);
 
   const handlePreviewClick = (missionOrder: any) => {
-    console.log("Selected Mission:", missionOrder); 
+    console.log("Selected Mission:", missionOrder);
     setSelectedMissionOrder(missionOrder); // Store the mission order data
     setIsPreviewModalOpen(true); // Open the modal
   };
-  
+
   const closePreviewModal = () => {
     setIsPreviewModalOpen(false); // Close the modal
   };
 
-
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
     setLimit(newValue);
-    const commentsFormServer = await getMissionOrder(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
+    const commentsFormServer = await getMissionOrder(
+      parseInt(newValue),
+      1,
+      search,
+      type,
+      colum,
+      sort,
+    ); // Ajouter await ici
     setMissionOrder(commentsFormServer);
     window.scrollTo(0, 0);
   };
-
 
   const [selectedColumns, setSelectedColumns] = useState({
     id_mission: true,
@@ -211,9 +217,8 @@ export function MissionOrder() {
     fuel_cost_mission: true,
     fuel_level_mission: true,
     voucher_mission: true,
-    immatriculation_vehicule : true,
+    immatriculation_vehicule: true,
   });
-  
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -222,80 +227,72 @@ export function MissionOrder() {
     }));
   };
 
-
   const searchColum: { [key: string]: number } = {
     id_mission: 0,
     object_mission: 1,
     ref_mission: 2,
     dep_date_mission: 3,
     vehicle_mission: 4,
-    driver_mission: 5
+    driver_mission: 5,
   };
 
-
-
   const handleTypeSearch = (selectedValue: string) => {
-
-    console.log(selectedValue)
+    console.log(selectedValue);
     switch (selectedValue) {
       case translate("ID"):
-        console.log(0)
+        console.log(0);
         setType(0);
         break;
       case translate("Object"):
-        console.log(1)
+        console.log(1);
         setType(1);
         break;
       case translate("Reference"):
-        console.log(2)
+        console.log(2);
         setType(2);
         break;
       case translate("Departure Date"):
-        console.log(3)
+        console.log(3);
         setType(3);
         break;
       case translate("Vehicle"):
-        console.log(4)
+        console.log(4);
         setType(4);
         break;
       case translate("Driver"):
-        console.log(5)
+        console.log(5);
         setType(5);
         break;
       default:
-        console.log('Unknown selection');
-        console.log(selectedValue)
+        console.log("Unknown selection");
+        console.log(selectedValue);
         break;
     }
     setTypeSearch(selectedValue);
-    console.log('Selected value:', selectedValue);
+    console.log("Selected value:", selectedValue);
   };
 
   const handleAdvancedSearch = async (event: any) => {
-
     const newValue = event.target.value;
-    setSearch(newValue)
+    setSearch(newValue);
     await getMissionOrder(limit, currentPage, newValue, type, colum, sort);
   };
 
-
   const handleSortingColum = (curentColum: string) => {
-
-    setSortColum(curentColum)
+    setSortColum(curentColum);
     sort === "ASC" ? setSort("DESC") : setSort("ASC");
     getMissionOrder(limit, currentPage, search, type, colum, sort);
   };
 
-
   const handledeleteMissionOrder = async (id_mission: number) => {
     try {
       console.log(id_mission);
-      setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Order')}?`);
-      setTitleStatus('Delete MissionOrder');
-      setIdUser(parseInt(id_user || '0', 0));
+      setModalStatus(
+        `${translate("Do you want to delete this")} ${translate("Mission Order")}?`,
+      );
+      setTitleStatus("Delete MissionOrder");
+      setIdUser(parseInt(id_user || "0", 0));
       setIdMissionOrder(id_mission);
-
-    
     } catch (error) {
       console.error(error);
     }
@@ -305,17 +302,18 @@ export function MissionOrder() {
     setModalStatus(null);
   };
 
-
   const handleUpdateMissionOrderList = () => {
-    getMissionOrder(limit, currentPage, search, type, colum, sort).catch(error => {
-      console.error('Failed to update driver list:', error);
-    });
+    getMissionOrder(limit, currentPage, search, type, colum, sort).catch(
+      (error) => {
+        console.error("Failed to update driver list:", error);
+      },
+    );
   };
 
   const handleResetSearch = async () => {
-    setSearch("")
+    setSearch("");
 
-    await getMissionOrder(limit, currentPage, search, type, colum, sort)
+    await getMissionOrder(limit, currentPage, search, type, colum, sort);
   };
 
   const menuItems = [
@@ -324,13 +322,12 @@ export function MissionOrder() {
     translate("Reference"),
     translate("Departure Date"),
     translate("Vehicle"),
-    translate("Driver")
-   ];
+    translate("Driver"),
+  ];
 
-   
-   const generatePDFPreview = (missionOrder: MissionOrder) => {
+  const generatePDFPreview = (missionOrder: MissionOrder) => {
     const doc = new jsPDF();
-  
+
     // Exemple : Ajout des détails de la mission dans le PDF
     doc.text("Mission Order Details", 20, 10);
     doc.text(`Mission Ref: ${missionOrder.ref_mission}`, 20, 20);
@@ -340,19 +337,23 @@ export function MissionOrder() {
     doc.text(`Departure Location: ${missionOrder.dep_loc_mission}`, 20, 60);
     doc.text(`Departure Date: ${missionOrder.dep_date_mission}`, 20, 70);
     doc.text(`Return Date: ${missionOrder.return_date_mission}`, 20, 80);
-    doc.text(`Vehicle Registration: ${missionOrder.immatriculation_vehicule}`, 20, 90);
-  
+    doc.text(
+      `Vehicle Registration: ${missionOrder.immatriculation_vehicule}`,
+      20,
+      90,
+    );
+
     // Génère le PDF comme un blob
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
-  
+
     // Affiche l'aperçu
     setPdfUrl(pdfUrl);
     setPreviewVisible(true);
   };
   const handleDownloadPreview = () => {
     const doc = new jsPDF();
-  
+
     // Récupérer le contenu du modal
     const content = `
       Mission Ref: ${selectedMissionOrder?.ref_mission}
@@ -362,17 +363,17 @@ export function MissionOrder() {
       Departure Location: ${selectedMissionOrder?.dep_loc_mission}
       Itinerary: ${selectedMissionOrder?.itinerary_mission}
     `;
-  
+
     // Ajouter le contenu au PDF
     doc.text(content, 10, 10);
-  
+
     // Télécharger le PDF
     doc.save("MissionOrder_Preview.pdf");
   };
-  
+
   const fetchPdf = async () => {
     try {
-      const response = await fetch('/path/to/your/pdf');
+      const response = await fetch("/path/to/your/pdf");
       const blob = await response.blob();
       setFileData(blob);
       const fileUrl = URL.createObjectURL(blob);
@@ -382,15 +383,11 @@ export function MissionOrder() {
     }
   };
 
- function formatDatetimeLocal(dateString: string): string {
+  function formatDatetimeLocal(dateString: string): string {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        }
-
-
-  
-
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  }
 
   return (
     <>
@@ -398,17 +395,18 @@ export function MissionOrder() {
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-            {translate("Missions Order")} <span>{total < 10 ? `0${total}` : total}</span> 
+            {translate("Missions Order")}{" "}
+            <span>{total < 10 ? `${total}` : total}</span>
           </h4>
         </div>
         <div className="col-md-6 col-sm-12 text-right">
-
-
-          <NavLink to="/mission-order-manage/add" className="btn btn-primary mt-2 mr-1">
+          <NavLink
+            to="/mission-order-manage/add"
+            className="btn btn-primary mt-2 mr-1"
+          >
             <i className="las la-plus mr-3"></i>
-             {translate("Missions Order")}
+            {translate("Missions Order")}
           </NavLink>
-
         </div>
       </div>
       <div className="row">
@@ -418,7 +416,7 @@ export function MissionOrder() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic" >
+              <Dropdown.Toggle variant="link" id="dropdown-basic">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20" }}
@@ -438,7 +436,12 @@ export function MissionOrder() {
                 ))}
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+            <input
+              type="text"
+              placeholder={` ${translate("Search by")} ${translate(typeSearch)}`}
+              onChange={handleAdvancedSearch}
+              className="form-control"
+            />
             <Button
               variant="secondary"
               onClick={handleResetSearch}
@@ -477,8 +480,7 @@ export function MissionOrder() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-      
-            <Dropdown.Item
+              <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
               >
@@ -488,9 +490,7 @@ export function MissionOrder() {
                   checked={selectedColumns.id_mission}
                   onChange={() => handleColumnChange("id_mission")}
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("ID")}
-                </span>
+                <span style={{ marginLeft: "10px" }}>{translate("ID")}</span>
               </Dropdown.Item>
 
               <Dropdown.Item
@@ -507,7 +507,7 @@ export function MissionOrder() {
                   {translate("Reference")}
                 </span>
               </Dropdown.Item>
-              
+
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -538,7 +538,6 @@ export function MissionOrder() {
                 </span>
               </Dropdown.Item>
 
-
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -553,7 +552,7 @@ export function MissionOrder() {
                   {translate("Departure Date")}
                 </span>
               </Dropdown.Item>
-             
+
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -561,14 +560,15 @@ export function MissionOrder() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.immatriculation_vehicule }
-                  onChange={() => handleColumnChange("immatriculation_vehicule ")}
+                  checked={selectedColumns.immatriculation_vehicule}
+                  onChange={() =>
+                    handleColumnChange("immatriculation_vehicule ")
+                  }
                 />
                 <span style={{ marginLeft: "10px" }}>
                   {translate("Vehicle")}
                 </span>
               </Dropdown.Item>
-
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -583,13 +583,56 @@ export function MissionOrder() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_mission && (<th className="sorting" onClick={() => handleSortingColum("id_mission")}>{translate("ID")}</th>)}
-              {selectedColumns.ref_mission && (<th className="sorting" onClick={() => handleSortingColum("ref_mission")}>{translate("Reference")}</th>)}
-              {selectedColumns.object_mission && (<th className="sorting" onClick={() => handleSortingColum("object_mission")}>{translate("Object")}</th>)}
-              {selectedColumns.dep_date_mission && (<th className="sorting" onClick={() => handleSortingColum("dep_date_mission")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.immatriculation_vehicule  && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule ")}>{translate("Vehicle")}</th>)}  
-              {selectedColumns.driver_mission && (<th className="sorting" onClick={() => handleSortingColum("driver_mission")}>{translate("Driver")}</th>)}
-
+              {selectedColumns.id_mission && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColum("id_mission")}
+                >
+                  {translate("ID")}
+                </th>
+              )}
+              {selectedColumns.ref_mission && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColum("ref_mission")}
+                >
+                  {translate("Reference")}
+                </th>
+              )}
+              {selectedColumns.object_mission && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColum("object_mission")}
+                >
+                  {translate("Object")}
+                </th>
+              )}
+              {selectedColumns.dep_date_mission && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColum("dep_date_mission")}
+                >
+                  {translate("Departure Date")}
+                </th>
+              )}
+              {selectedColumns.immatriculation_vehicule && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum("immatriculation_vehicule ")
+                  }
+                >
+                  {translate("Vehicle")}
+                </th>
+              )}
+              {selectedColumns.driver_mission && (
+                <th
+                  className="sorting"
+                  onClick={() => handleSortingColum("driver_mission")}
+                >
+                  {translate("Driver")}
+                </th>
+              )}
 
               {<th>{translate("Action")}</th>}
             </tr>
@@ -598,90 +641,108 @@ export function MissionOrder() {
             {loading ? (
               <tr style={{ textAlign: "center" }}>
                 <td className="text-center" colSpan={10}>
-                  <p><PropagateLoader
-                    color={"#123abc"}
-                    loading={loading}
-                    size={20}
-                  /></p>
+                  <p>
+                    <PropagateLoader
+                      color={"#123abc"}
+                      loading={loading}
+                      size={20}
+                    />
+                  </p>
                 </td>
               </tr>
-            ) :
-              (
-                list_MissionOrder.length > 0 ? (
-                  list_MissionOrder.map((missionOrder) => (
-                    <tr key={missionOrder.id_mission}>
-                      <td>
-                        <div className="form-check form-check-inline">
-                          <input type="checkbox" className="form-check-input" />
-                        </div>
-                      </td>
-                      {selectedColumns.id_mission && (<td>{missionOrder.id_mission}</td>)}
-                      {selectedColumns.ref_mission && (<td>{missionOrder.ref_mission}</td>)}
-                      {selectedColumns.object_mission && (<td>{missionOrder.object_mission}</td>)}
-                      {selectedColumns.dep_date_mission && (<td>{formatDatetimeLocal(missionOrder.dep_date_mission)}</td>)}
-                      {selectedColumns.immatriculation_vehicule  && (<td>{missionOrder.immatriculation_vehicule }</td>)}
-                      {selectedColumns.driver_mission && (<td>{missionOrder.driver_mission}</td>)}
+            ) : list_MissionOrder.length > 0 ? (
+              list_MissionOrder.map((missionOrder) => (
+                <tr key={missionOrder.id_mission}>
+                  <td>
+                    <div className="form-check form-check-inline">
+                      <input type="checkbox" className="form-check-input" />
+                    </div>
+                  </td>
+                  {selectedColumns.id_mission && (
+                    <td>{missionOrder.id_mission}</td>
+                  )}
+                  {selectedColumns.ref_mission && (
+                    <td>{missionOrder.ref_mission}</td>
+                  )}
+                  {selectedColumns.object_mission && (
+                    <td>{missionOrder.object_mission}</td>
+                  )}
+                  {selectedColumns.dep_date_mission && (
+                    <td>
+                      {formatDatetimeLocal(missionOrder.dep_date_mission)}
+                    </td>
+                  )}
+                  {selectedColumns.immatriculation_vehicule && (
+                    <td>{missionOrder.immatriculation_vehicule}</td>
+                  )}
+                  {selectedColumns.driver_mission && (
+                    <td>{missionOrder.driver_mission}</td>
+                  )}
 
-                     
-                      <td>
-                        <div className="d-flex align-items-center list-action">
-                        <a
-                          className="badge bg-primary mr-2"
-                          onClick={() => {
-                            console.log("Selected Mission:", missionOrder);
-                            setSelectedMissionOrder(missionOrder); // Set the mission
-                            setIsPreviewModalOpen(true); // Open the modal
-                          }}
-                          title={translate("Preview") + " " + translate("Mission Order")}
-                        >
-                          <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
-                        </a>
-                          <Link
-                            to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
-                            className="badge badge-success mr-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title={translate("Edit") + " " + translate("Mission Order")}
-                          >
-                            <i
-                              className="las la-edit"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </Link>
+                  <td>
+                    <div className="d-flex align-items-center list-action">
+                      <a
+                        className="badge bg-primary mr-2"
+                        onClick={() => {
+                          console.log("Selected Mission:", missionOrder);
+                          setSelectedMissionOrder(missionOrder); // Set the mission
+                          setIsPreviewModalOpen(true); // Open the modal
+                        }}
+                        title={
+                          translate("Preview") +
+                          " " +
+                          translate("Mission Order")
+                        }
+                      >
+                        <i
+                          className="las la-eye"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
+                      <Link
+                        to={`/mission-order-manage/edit/${missionOrder.id_mission}`}
+                        className="badge badge-success mr-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title={
+                          translate("Edit") + " " + translate("Mission Order")
+                        }
+                      >
+                        <i
+                          className="las la-edit"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </Link>
 
-                        
-
-                    <a
-                      className="badge bg-danger mr-2"
-                      onClick={() => handledeleteMissionOrder(missionOrder.id_mission)}
-                      title={translate("Delete")}
-                    >
-                      <i className="las la-trash" style={{ fontSize: "1.2em" }}></i>
-                    </a>
-
-
-                    
-
-
-                
-                        </div>
-                      </td>
-                    </tr>
-                  ))) : (
-
-                  <tr>
-                    <td colSpan={9}>No Mission Orders available</td>
-                  </tr>
-                )
-              )}
+                      <a
+                        className="badge bg-danger mr-2"
+                        onClick={() =>
+                          handledeleteMissionOrder(missionOrder.id_mission)
+                        }
+                        title={translate("Delete")}
+                      >
+                        <i
+                          className="las la-trash"
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={9}>No Mission Orders available</td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            {translate("Displaying")} {list_MissionOrder.length} {translate("on")}{" "}
-            {total}
+            {translate("Displaying")} {list_MissionOrder.length}{" "}
+            {translate("on")} {total}
           </span>
         </div>
         <div className="col-md-6 d-flex justify-content-end">
@@ -705,8 +766,8 @@ export function MissionOrder() {
             activeClassName={"active"}
           />
         </div>
-      
-          <MissionOrderDeleteModal
+
+        <MissionOrderDeleteModal
           show={modalStatus !== null}
           onHide={closeModal}
           status={modalStatus}
@@ -715,20 +776,16 @@ export function MissionOrder() {
           IdMissionOrder={IdMissionOrder}
           updateMissionOrderList={handleUpdateMissionOrderList}
         />
-         <MissionOrderPreview
-            show={isPreviewModalOpen} // Contrôle si le modal est ouvert
-            onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
-            status={modalStatus} // Statut de la mission (peut être null)
-            title={titleStatus} // Titre du modal
-            IdUser={IdUser} // Id de l'utilisateur
-            IdMissionOrder={IdMissionOrder} // Id de la mission
-            selectedMissionOrder={selectedMissionOrder} // Mission sélectionnée
-            updateMissionOrderList={handleUpdateMissionOrderList} // Fonction pour mettre à jour la liste
-          />
-
-
-
-      
+        <MissionOrderPreview
+          show={isPreviewModalOpen} // Contrôle si le modal est ouvert
+          onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
+          status={modalStatus} // Statut de la mission (peut être null)
+          title={titleStatus} // Titre du modal
+          IdUser={IdUser} // Id de l'utilisateur
+          IdMissionOrder={IdMissionOrder} // Id de la mission
+          selectedMissionOrder={selectedMissionOrder} // Mission sélectionnée
+          updateMissionOrderList={handleUpdateMissionOrderList} // Fonction pour mettre à jour la liste
+        />
       </div>
     </>
   );
@@ -736,4 +793,3 @@ export function MissionOrder() {
 function convertValue(maintenance: any) {
   throw new Error("Function not implemented.");
 }
-

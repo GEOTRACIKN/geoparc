@@ -970,7 +970,10 @@
   "send": "Envoyer",
   "Enter request object": "Saisir l'objet de la demande",
   "Select departure time": "Sélectionner l'heure de départ",
-  "request_type": "Type de demande"
-  
- 
+  "request_type": "Type de demande",
+  "mission_request": "Demande de mission",
+  "parks": "Parcs",
+  "list_parks": "Liste des parcs",
+  "new_park": "Nouveau parc",
+  "create_mission": "Créer la mission"
 }

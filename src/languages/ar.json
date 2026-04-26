@@ -965,6 +965,11 @@
   "Select departure time": "اختر وقت الانطلاق",
   "Departure Time": "وقت الانطلاق",
   "request_type": "نوع الطلب",
-  "Departure": "الانطلاق"
-
+  "Departure": "الانطلاق",
+  "mission_request": "طلب مهمة",
+  "parks": "الحدائق",
+  "list_parks": " قائمة الحدائق",
+  "new_park": "حديقة جديدة",
+  "create_mission": "إنشاء مهمة",
+   "Request ID": "معرّف الطلب"
 }

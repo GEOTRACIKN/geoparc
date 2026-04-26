@@ -977,7 +977,10 @@
   "Create Request": "Crear solicitud",
   "Request created successfully": "Solicitud creada con éxito",
   "An error occurred while creating the request": "Se produjo un error al crear la solicitud",
-  "request_type": "Tipo de solicitud"
-  
-
+  "request_type": "Tipo de solicitud",
+  "mission_request": "Solicitud de misión",
+  "parks": "Parques",
+  "list_parks": "Lista de parques",
+  "new_park": "Nuevo parque",
+  "create_mission": "Crear misión"
 }

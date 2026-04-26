@@ -24972,3 +24972,135 @@ r
               border-radius: 16px 16px 0 0;
             }
           }
+
+
+
+  .mission-form-page {
+  padding: 16px 18px 24px;
+ 
+  margin: 0 auto;
+}
+
+.mission-form-shell {
+  background: #fff;
+  border: 1px solid #e9edf5;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  padding: 18px;
+}
+
+.mission-form-header {
+  margin-bottom: 16px;
+}
+
+.mission-form-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #172554;
+}
+
+.mission-form-subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mission-form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.mission-form-section {
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fcfdff;
+}
+
+.mission-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.mission-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.mission-input {
+  height: 38px;
+  min-height: 38px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.mission-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.1);
+}
+
+.mission-textarea {
+  min-height: 70px;
+  height: 70px;
+  resize: vertical;
+  padding-top: 8px;
+}
+
+.mission-input-disabled {
+  background: #f8fafc !important;
+  color: #64748b;
+}
+
+.mission-warning-text,
+.mission-error-text {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mission-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf2f7;
+}
+
+.mission-cancel-btn,
+.mission-submit-btn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.mission-tabs {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mission-tabs .nav-link {
+  border: 1px solid #dbe3ef;
+  background: #f8fafc;
+  color: #334155;
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 10px 16px;
+}
+
+.mission-tabs .nav-link.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}

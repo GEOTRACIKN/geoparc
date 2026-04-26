@@ -19,6 +19,7 @@ export interface TransportRequestListItem {
   arrival_location: string;
   status_request: TransportRequestListStatus;
   created_at?: string | null;
+  id_vehicule?: number | string | null;
 }
 
 export interface TransportRequestListSearchPayload {

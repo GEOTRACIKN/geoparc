@@ -8,6 +8,7 @@ import {
     Table,
     Row,
     Col,
+    InputGroup,
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
@@ -22,7 +23,8 @@ import {
     TransportRequestListSearchPayload,
 } from "../types/transportRequestList.types";
 import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
-import { formatDateToTimestamp, toTimestamp } from "../functions";
+import { formatDateToTimestamp, } from "../functions";
+import { createMissionOrderApi } from "../services/missionOrder.service";
 
 const id_user = localStorage.getItem("GeopUserID");
 
@@ -64,7 +66,6 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
     "actions",
 ];
 export function TransportRequestList() {
-  
     const navigate = useNavigate();
 
     const [requests, setRequests] = useState<TransportRequestListItem[]>([]);
@@ -78,12 +79,13 @@ export function TransportRequestList() {
     const [pageCount, setPageCount] = useState<number>(1);
     const [total, setTotal] = useState<number>(0);
 
-    const [sortColumn, setSortColumn] =
-        useState<ColumnKey>("id_transport_request");
+    const [sortColumn, setSortColumn] = useState<ColumnKey>(
+        "id_transport_request",
+    );
     const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
 
     const [selectedColumns, setSelectedColumns] = useState<ColumnKey[]>(
-        DEFAULT_SELECTED_COLUMNS
+        DEFAULT_SELECTED_COLUMNS,
     );
 
     const [selectedRequest, setSelectedRequest] =
@@ -102,7 +104,7 @@ export function TransportRequestList() {
         typeValue = requestType,
         limit = limitValue,
         column = sortColumn,
-        sort = sortOrder
+        sort = sortOrder,
     ) => {
         try {
             setLoading(true);
@@ -138,14 +140,11 @@ export function TransportRequestList() {
             }
         } catch (error: any) {
             console.error("Load transport requests error:", error);
-            toast.error(
-                error?.message || "Failed to load transport request list",
-                {
-                    position: "bottom-right",
-                    autoClose: 2400,
-                    transition: Bounce,
-                }
-            );
+            toast.error(error?.message || "Failed to load transport request list", {
+                position: "bottom-right",
+                autoClose: 2400,
+                transition: Bounce,
+            });
         } finally {
             setLoading(false);
         }
@@ -163,7 +162,7 @@ export function TransportRequestList() {
             requestType,
             limitValue,
             sortColumn,
-            sortOrder
+            sortOrder,
         );
     };
 
@@ -196,7 +195,7 @@ export function TransportRequestList() {
     };
 
     const handleLimitChange = async (
-        event: React.ChangeEvent<HTMLSelectElement>
+        event: React.ChangeEvent<HTMLSelectElement>,
     ) => {
         const newLimit = Number(event.target.value);
         setLimitValue(newLimit);
@@ -208,7 +207,7 @@ export function TransportRequestList() {
             requestType,
             newLimit,
             sortColumn,
-            sortOrder
+            sortOrder,
         );
     };
 
@@ -255,20 +254,20 @@ export function TransportRequestList() {
 
     const updateRequestStatus = (
         id: number,
-        newStatus: "approved" | "rejected" | "cancelled" | "mission_created"
+        newStatus: "approved" | "rejected" | "cancelled" | "mission_created",
     ) => {
         setRequests((prev) =>
             prev.map((item) =>
                 item.id_transport_request === id
                     ? { ...item, status_request: newStatus }
-                    : item
-            )
+                    : item,
+            ),
         );
 
         setSelectedRequest((prev) =>
             prev && prev.id_transport_request === id
                 ? { ...prev, status_request: newStatus }
-                : prev
+                : prev,
         );
     };
 
@@ -276,15 +275,15 @@ export function TransportRequestList() {
         openDrawer(row);
     };
 
-    const handleApprove = (row: TransportRequestListItem) => {
-        updateRequestStatus(row.id_transport_request, "approved");
+    // const handleApprove = (row: TransportRequestListItem) => {
+    //     updateRequestStatus(row.id_transport_request, "approved");
 
-        toast.success(`Request #${row.id_transport_request} approved`, {
-            position: "bottom-right",
-            autoClose: 1800,
-            transition: Bounce,
-        });
-    };
+    //     toast.success(`Request #${row.id_transport_request} approved`, {
+    //         position: "bottom-right",
+    //         autoClose: 1800,
+    //         transition: Bounce,
+    //     });
+    // };
 
     const handleReject = (row: TransportRequestListItem) => {
         updateRequestStatus(row.id_transport_request, "rejected");
@@ -322,31 +321,126 @@ export function TransportRequestList() {
         navigate("/transport-request");
     };
 
+    const handleApprove = async (row: TransportRequestListItem) => {
+        try {
+            const payload = {
+                id_vehicule: 0,
+                ref_mission: row.id_transport_request,
+                object_mission: row.object_request || "",
+                fuel_loading_mission: 0,
+                fuel_type_mission: "",
+                expenses_mission: 0,
+                tank_mission: 0,
+                trailer_mission: "0",
+                driver_mission: "",
+                accomp_mission: "",
+                dep_loc_mission: row.departure_location || "",
+                dep_date_mission: row.departure_datetime || "",
+                dep_dest_mission: row.arrival_location || "",
+                return_date_mission: row.arrival_datetime || "",
+                itinerary_mission: "",
+                new_km_mission: 0,
+                fuel_cost_mission: 0,
+                fuel_level_mission: 0,
+                voucher_mission: 0,
+                id_user: localStorage.getItem("GeopUserID"),
+            };
+            
+            const result = await createMissionOrderApi(payload);
+
+            updateRequestStatus(row.id_transport_request, "mission_created");
+
+            toast.success(result.message || "Mission created successfully", {
+                position: "bottom-right",
+                autoClose: 2000,
+                transition: Bounce,
+            });
+        } catch (error: any) {
+            console.error("Create mission on approve error:", error);
+
+            toast.error(error?.message || "Failed to create mission", {
+                position: "bottom-right",
+                autoClose: 2400,
+                transition: Bounce,
+            });
+        }
+    };
+
     return (
         <div className="page-content">
             <Card className="shadow-sm border-0">
                 <Card.Body className="p-4">
                     <div className="mb-4">
-                        <h4 className="mb-1 fw-bold">{translate("transport_requests")}</h4>
-                        <p className="text-muted mb-0">
-                            {translate("request_validation_list_before_mission_creation")}
-                        </p>
+                        <div className="row align-items-center">
+                            <div className="col-md-8">
+                                <h4 className="mb-1 fw-bold">
+                                    {translate("transport_requests")} : {requests?.length || 0}
+                                </h4>
+
+                                <p className="text-muted mb-1">
+                                    {translate("request_validation_list_before_mission_creation")}
+                                </p>
+                            </div>
+
+                            <div className="col-md-4 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+                                <Button
+                                    variant="success"
+                                    onClick={handleNewRequest}
+                                    style={{ height: "42px", minWidth: "160px" }}
+                                    className="d-inline-flex align-items-center justify-content-center gap-2"
+                                >
+                                    <i className="las la-plus"></i>
+                                    {translate("New Request")}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
 
                     <Row className="g-2 align-items-center mb-3">
                         <Col xl={4} lg={4} md={12}>
-                            <Form.Control
-                                type="text"
-                                placeholder={translate("search")+"..."}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                style={{
-                                    height: "42px",
-                                    minHeight: "42px",
-                                    padding: "6px 12px",
-                                    lineHeight: "1.2",
-                                }}
-                            />
+                            <InputGroup>
+                                <InputGroup.Text
+                                    style={{
+                                        height: "42px",
+                                        minHeight: "42px",
+                                        backgroundColor: "#fff",
+                                        borderRight: "0",
+                                    }}
+                                >
+                                    <i className="las la-search"></i>
+                                </InputGroup.Text>
+
+                                <Form.Control
+                                    type="text"
+                                    placeholder={translate("search") + "..."}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    style={{
+                                        height: "42px",
+                                        minHeight: "42px",
+                                        padding: "6px 12px",
+                                        lineHeight: "1.2",
+                                        borderLeft: "0",
+                                        borderRight: search ? "0" : undefined,
+                                        boxShadow: "none",
+                                    }}
+                                />
+
+                                {search && (
+                                    <Button
+                                        variant="outline-secondary"
+                                        onClick={() => setSearch("")}
+                                        style={{
+                                            height: "42px",
+                                            minHeight: "42px",
+                                            borderLeft: "0",
+                                        }}
+                                        className="d-inline-flex align-items-center justify-content-center"
+                                    >
+                                        <i className="las la-times"></i>
+                                    </Button>
+                                )}
+                            </InputGroup>
                         </Col>
 
                         <Col xl={2} lg={3} md={4}>
@@ -364,26 +458,21 @@ export function TransportRequestList() {
                         <Col xl={2} lg={2} md={4}>
                             <Button
                                 variant="warning"
-                                className="w-100"
+                                className="w-100 d-inline-flex align-items-center justify-content-center gap-2"
                                 onClick={handleSearch}
                                 disabled={loading}
                                 style={{ height: "42px" }}
                             >
+                                <i className="las la-search-plus"></i>
                                 {translate("search")}
                             </Button>
                         </Col>
 
                         <Col xl={4} lg={4} md={4}>
                             <div className="d-flex align-items-center justify-content-lg-end gap-2 flex-wrap">
-                                <Button
-                                    variant="success"
-                                    onClick={handleNewRequest}
-                                    style={{ height: "42px" }}
-                                >
-                                    {translate("New Request")}
-                                </Button>
-
-                                <span className="fw-medium text-dark">{translate("displaying")}</span>
+                                <span className="fw-medium text-dark">
+                                    {translate("displaying")}
+                                </span>
 
                                 <Form.Select
                                     value={limitValue}
@@ -396,7 +485,6 @@ export function TransportRequestList() {
                                     <option value="100">100</option>
                                     <option value="200">200</option>
                                     <option value="500">500</option>
-
                                 </Form.Select>
 
                                 <Dropdown align="end">
@@ -490,20 +578,29 @@ export function TransportRequestList() {
                                                         );
 
                                                     case "request_type":
-                                                        return <td key={column.key}>{translate(row.request_type)}</td>;
+                                                        return (
+                                                            <td key={column.key}>
+                                                                {translate(row.request_type)}
+                                                            </td>
+                                                        );
 
                                                     case "object_request":
                                                         return (
-                                                            <td key={column.key}>{translate(row.object_request)}</td>
+                                                            <td key={column.key}>
+                                                                {translate(row.object_request)}
+                                                            </td>
                                                         );
-
 
                                                     case "departure_location":
                                                         return (
                                                             <td key={column.key}>
-                                                                <div className="fw-medium">{translate(row.departure_location) || "-"}</div>
+                                                                <div className="fw-medium">
+                                                                    {translate(row.departure_location) || "-"}
+                                                                </div>
                                                                 <div className="text-muted small">
-                                                                    {formatDateToTimestamp(row.departure_datetime || "-")}
+                                                                    {formatDateToTimestamp(
+                                                                        row.departure_datetime || "-",
+                                                                    )}
                                                                 </div>
                                                             </td>
                                                         );
@@ -511,9 +608,13 @@ export function TransportRequestList() {
                                                     case "arrival_location":
                                                         return (
                                                             <td key={column.key}>
-                                                                <div className="fw-medium">{row.arrival_location || "-"}</div>
+                                                                <div className="fw-medium">
+                                                                    {row.arrival_location || "-"}
+                                                                </div>
                                                                 <div className="text-muted small">
-                                                                    {formatDateToTimestamp(row.arrival_datetime || "-")}
+                                                                    {formatDateToTimestamp(
+                                                                        row.arrival_datetime || "-",
+                                                                    )}
                                                                 </div>
                                                             </td>
                                                         );
@@ -521,9 +622,6 @@ export function TransportRequestList() {
                                                         return (
                                                             <td key={column.key}>{row.requester_phone}</td>
                                                         );
-
-
-
 
                                                     case "status_request":
                                                         return (
@@ -534,7 +632,10 @@ export function TransportRequestList() {
 
                                                     case "created_at":
                                                         return (
-                                                            <td key={column.key}>{formatDateToTimestamp(row.created_at || "") || "-"}</td>
+                                                            <td key={column.key}>
+                                                                {formatDateToTimestamp(row.created_at || "") ||
+                                                                    "-"}
+                                                            </td>
                                                         );
 
                                                     case "actions":
@@ -589,11 +690,9 @@ export function TransportRequestList() {
 
                     <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
                         <div className="text-dark">
-                            {translate("displaying")} {requests.length} {translate("on")} {total}
-                        </div>
-
-                        <div className="text-muted">
-                            {translate("Page")} {currentPage} {translate("on")} {pageCount}
+                            {translate("displaying")} {requests.length} {translate("on")}{" "}
+                            {total} / {translate("Page")} {currentPage} {translate("on")}{" "}
+                            {pageCount}
                         </div>
 
                         <ReactPaginate
@@ -628,7 +727,6 @@ export function TransportRequestList() {
                 onApprove={handleApprove}
                 onReject={handleReject}
                 onCancel={handleCancel}
-                onCreateMission={handleCreateMission}
             />
         </div>
     );
