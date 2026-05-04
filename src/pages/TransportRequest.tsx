@@ -25,6 +25,7 @@ export function TransportRequestManage() {
     object_request: "",
     request_type: "Normal",
     requester_phone: "",
+    requester_email: "",
     departure_datetime: null,
     departure_location: "",
     arrival_datetime: null,
@@ -169,6 +170,26 @@ export function TransportRequestManage() {
         return;
       }
 
+      if (!request.requester_email?.trim()) {
+        toast.warn(translate("requester_email_is_required"), {
+          position: "bottom-right",
+          autoClose: 2400,
+          transition: Bounce,
+        });
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(request.requester_email.trim())) {
+        toast.warn(translate("invalid_requester_email"), {
+          position: "bottom-right",
+          autoClose: 2400,
+          transition: Bounce,
+        });
+        return;
+      }
+
       if (dateError) {
         toast.warn(dateError, {
           position: "bottom-right",
@@ -180,6 +201,7 @@ export function TransportRequestManage() {
 
       const payload: TransportRequestInterface = {
         ...request,
+        requester_email: request.requester_email.trim().toLowerCase(),
         departure_datetime: request.departure_datetime
           ? request.departure_datetime.replace("T", " ")
           : null,
@@ -206,7 +228,7 @@ export function TransportRequestManage() {
 
       toast.error(
         error?.message ||
-          translate("an_error_occurred_while_creating_the_transport_request"),
+        translate("an_error_occurred_while_creating_the_transport_request"),
         {
           position: "bottom-right",
           autoClose: 2400,
@@ -250,11 +272,12 @@ export function TransportRequestManage() {
         />
 
         <TransportRequestDetailsCard
-          translate={translate}
-          objectRequest={request.object_request}
-          requesterPhone={request.requester_phone}
-          onTextChange={handleChange}
-        />
+  translate={translate}
+  objectRequest={request.object_request}
+  requesterPhone={request.requester_phone}
+  requesterEmail={request.requester_email || ""}
+  onTextChange={handleChange}
+/>
       </div>
 
       <TransportRequestBottomBar

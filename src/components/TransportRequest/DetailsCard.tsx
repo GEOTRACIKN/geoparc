@@ -5,8 +5,9 @@ type Props = {
   translate: (key: string) => string;
   objectRequest: string;
   requesterPhone: string;
+  requesterEmail: string;
   onTextChange: (
-    name: "object_request" | "requester_phone",
+    name: "object_request" | "requester_phone" | "requester_email",
     value: string
   ) => void;
 };
@@ -15,6 +16,7 @@ export default function TransportRequestDetailsCard({
   translate,
   objectRequest,
   requesterPhone,
+  requesterEmail,
   onTextChange,
 }: Props) {
   return (
@@ -37,7 +39,7 @@ export default function TransportRequestDetailsCard({
           />
         </Form.Group>
 
-        <Form.Group className="form-group mb-0">
+        <Form.Group className="form-group">
           <Form.Label>{translate("Phone Number")} *</Form.Label>
           <Form.Control
             type="text"
@@ -45,6 +47,19 @@ export default function TransportRequestDetailsCard({
             value={requesterPhone}
             onChange={(e) => onTextChange("requester_phone", e.target.value)}
           />
+        </Form.Group>
+
+        <Form.Group className="form-group mb-0">
+          <Form.Label>{translate("Requester Email")} *</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="samia.sebaa@sorfert.com"
+            value={requesterEmail}
+            onChange={(e) => onTextChange("requester_email", e.target.value)}
+          />
+          <Form.Text className="text-muted">
+            {translate("This email will be used to detect the responsible person")}
+          </Form.Text>
         </Form.Group>
       </Card.Body>
     </Card>

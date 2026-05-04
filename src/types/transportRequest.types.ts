@@ -12,6 +12,7 @@ export interface TransportRequestInterface {
   object_request: string;
   request_type: "Normal" | "Urgent";
   requester_phone: string;
+  requester_email: string;
   departure_datetime: string | null;
   departure_location: string;
   arrival_datetime: string | null;
