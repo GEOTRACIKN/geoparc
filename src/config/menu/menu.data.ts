@@ -38,15 +38,14 @@ export const menuItems: MenuItem[] = [
       { id: 11, label: "Training", icon: "las la-user-nurse", to: "/training", permissionId: 38 },
     ],
   },
-
   {
     id: 12,
-    label: "Parks",
+    label: "parks",
     icon: "las la-parking",
     permissionId: 34,
     subItems: [
-      { id: 13, label: "List parks", icon: "las la-list-alt", to: "/parks", permissionId: 34 },
-      { id: 14, label: "New park", icon: "las la-pen-nib", to: "/park/add", permissionId: 34 },
+      { id: 13, label: "list_parks", icon: "las la-list-alt", to: "/parks", permissionId: 34 },
+      { id: 14, label: "new_park", icon: "las la-pen-nib", to: "/park/add", permissionId: 34 },
     ],
   },
 
@@ -56,6 +55,7 @@ export const menuItems: MenuItem[] = [
     icon: "las la-map-marked-alt",
     permissionId: 39,
     subItems: [
+      { id: 16, label: "mission_request", icon: "las la la-route", to: "/transport-request-list", permissionId: 39 },
       { id: 16, label: "Mission Order", icon: "las la-tasks", to: "/mission-order", permissionId: 39 },
       { id: 17, label: "Mission Report", icon: "las la-file-alt", to: "/mission-report", permissionId: 39 },
     ],
