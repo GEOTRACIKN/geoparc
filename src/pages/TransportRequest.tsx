@@ -272,12 +272,12 @@ export function TransportRequestManage() {
         />
 
         <TransportRequestDetailsCard
-  translate={translate}
-  objectRequest={request.object_request}
-  requesterPhone={request.requester_phone}
-  requesterEmail={request.requester_email || ""}
-  onTextChange={handleChange}
-/>
+          translate={translate}
+          objectRequest={request.object_request}
+          requesterPhone={request.requester_phone}
+          requesterEmail={request.requester_email || ""}
+          onTextChange={handleChange}
+        />
       </div>
 
       <TransportRequestBottomBar
