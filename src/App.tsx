@@ -75,6 +75,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
 import { TransportRequestManage } from "./pages/TransportRequest";
 import TransportRequestList from "./pages/TransportRequestList";
+import { RequestResponsibility } from "./pages/RequestResponsibility";
 
 
 
@@ -256,8 +257,9 @@ function App() {
                 
                 <Route path="/transport-request" element={<DashboardLayout> <TransportRequestManage /> </DashboardLayout>} />
                 <Route path="/transport-request-list" element={<DashboardLayout> <TransportRequestList /> </DashboardLayout>} />
+                <Route path="/request-responsibility" element={<DashboardLayout> <RequestResponsibility /> </DashboardLayout>} />
 
-
+ 
 
                 <Route path="/mission-order-manage/edit/:id_mission" element={<DashboardLayout>{<MissionOrderManage />}</DashboardLayout>} />
                 <Route path="/mission-report" element={<DashboardLayout>{<MissionReport />}</DashboardLayout>} />

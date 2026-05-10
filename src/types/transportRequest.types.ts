@@ -21,7 +21,11 @@ export interface TransportRequestInterface {
   status_request: "pending";
 }
 
+
 export interface TransportRequestResponse {
-  id_transport_request: number;
-  message: string;
+  message?: string;
+  success?: boolean;
+  id_demande?: number;
+  id_transport_request?: number;
+  data?: TransportRequestInterface | TransportRequestInterface[];
 }
