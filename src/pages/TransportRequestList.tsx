@@ -26,7 +26,7 @@ import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
 import { formatDateToTimestamp, } from "../functions";
 import { createMissionOrderApi } from "../services/missionOrder.service";
 
-const id_user = localStorage.getItem("GeopUserID");
+
 
 type ColumnKey =
     | "id_transport_request"
@@ -67,6 +67,8 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 ];
 export function TransportRequestList() {
     const navigate = useNavigate();
+
+    const id_user = localStorage.getItem("GeopUserID");
 
     const [requests, setRequests] = useState<TransportRequestListItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);

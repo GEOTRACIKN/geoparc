@@ -112,7 +112,7 @@ function addExtraCharactersToPassword(password:String) {
         `${backendUrl}/api/geop/permission/all/${response.data.id_role}`
       );
       localStorage.setItem(
-        "userPermissions",
+        "geop_userPermissions",
         JSON.stringify(permissionsResponse.data)
       );
 
