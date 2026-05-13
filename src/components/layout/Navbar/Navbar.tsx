@@ -374,7 +374,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   let userPermissions: Permission[] = [];
 
   try {
-    const permissionsString = localStorage.getItem("userPermissions");
+    const permissionsString = localStorage.getItem("geop_userPermissions");
     if (permissionsString) {
       userPermissions = JSON.parse(permissionsString);
     }
