@@ -17,7 +17,7 @@ export function TransportRequestManage() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
 
-const id_user = localStorage.getItem("GeopUserID");
+  const id_user = localStorage.getItem("GeopUserID");
   const [buttonClicked, setButtonClicked] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
 
