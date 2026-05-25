@@ -12,12 +12,12 @@ import TransportRequestDetailsCard from "../components/TransportRequest/DetailsC
 import TransportRequestBottomBar from "../components/TransportRequest/BottomBar";
 import { createTransportRequestApi } from "../services/transportRequest.service";
 
-const id_user = localStorage.getItem("GeopUserID");
 
 export function TransportRequestManage() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
 
+const id_user = localStorage.getItem("GeopUserID");
   const [buttonClicked, setButtonClicked] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
 
