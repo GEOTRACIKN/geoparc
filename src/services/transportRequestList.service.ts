@@ -54,3 +54,31 @@ export async function getTransportRequestListCount(
 
   return result;
 }
+
+export async function updateTransportRequestListStatus(payload: {
+  id_transport_request: number;
+  id_user: string | null;
+  status_request: string;
+  approval_status?: string;
+  approval_required?: number;
+}): Promise<{ message?: string }> {
+  const response = await fetch(
+    `${backendUrl}/api/geop/transportRequestManage/update`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update transport request");
+  }
+
+  return result;
+}

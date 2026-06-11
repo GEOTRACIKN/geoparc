@@ -13,10 +13,11 @@ import {
 import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
     getTransportRequestList,
     getTransportRequestListCount,
+    updateTransportRequestListStatus,
 } from "../services/transportRequestList.service";
 import {
     TransportRequestListItem,
@@ -67,6 +68,7 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 ];
 export function TransportRequestList() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const id_user = localStorage.getItem("GeopUserID");
 
@@ -99,6 +101,39 @@ export function TransportRequestList() {
     }, [selectedColumns]);
 
     const { translate } = useTranslate();
+
+    useEffect(() => {
+        const mailDecision = searchParams.get("mailDecision");
+
+        if (mailDecision !== "approved" && mailDecision !== "rejected") {
+            return;
+        }
+
+        const alreadyDecided = searchParams.get("already_decided") === "1";
+        const toastOptions = {
+            position: "bottom-right" as const,
+            autoClose: 3000,
+            transition: Bounce,
+        };
+
+        if (mailDecision === "approved") {
+            toast.success(
+                alreadyDecided
+                    ? "Cette demande a deja ete approuvee"
+                    : "Demande approuvee depuis l'email",
+                toastOptions,
+            );
+        } else {
+            toast.warn(
+                alreadyDecided
+                    ? "Cette demande a deja ete traitee"
+                    : "Demande rejetee depuis l'email",
+                toastOptions,
+            );
+        }
+
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }, [searchParams]);
 
     const loadTransportRequests = async (
         page = currentPage,
@@ -349,6 +384,14 @@ export function TransportRequestList() {
             };
             
             const result = await createMissionOrderApi(payload);
+
+            await updateTransportRequestListStatus({
+                id_transport_request: row.id_transport_request,
+                id_user,
+                status_request: "mission_created",
+                approval_status: "approved",
+                approval_required: 0,
+            });
 
             updateRequestStatus(row.id_transport_request, "mission_created");
 
