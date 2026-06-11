@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
@@ -46,9 +46,29 @@ const id_user = localStorage.getItem("GeopUserID");
 
 export function MissionOrderManage() {
   const { id_mission } = useParams<{ id_mission?: string }>();
+  const [searchParams] = useSearchParams();
   const isEditing = Boolean(id_mission);
   const navigate = useNavigate();
   const { translate } = useTranslate();
+
+  useEffect(() => {
+    if (searchParams.get("mailDecision") !== "approved") {
+      return;
+    }
+
+    toast.success(
+      searchParams.get("already_decided") === "1"
+        ? "Cette demande a deja ete approuvee"
+        : "Demande approuvee et mission creee",
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      }
+    );
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [searchParams]);
 
 
 

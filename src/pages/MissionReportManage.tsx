@@ -1,14 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import Select from 'react-select';
-import { InputActionMeta } from "react-select";
 interface Vehicle {
     id_vehicule: number;
     immatriculation_vehicule: string;
+    LAT?: string | number | null;
+    LON?: string | number | null;
+    latitude_vehicule?: string | number | null;
+    longitude_vehicule?: string | number | null;
+}
+interface VehiclePosition {
+    id_vehicule: number;
+    LAT?: string | number | null;
+    LON?: string | number | null;
+}
+interface UserPosition {
+    latitude: number;
+    longitude: number;
+}
+interface VehicleOption {
+    value: number;
+    label: string;
+    searchLabel: string;
+    distanceKm: number | null;
 }
 interface Driver {
     id_conducteur: number;
@@ -48,6 +66,34 @@ interface MissionReportInterface {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const id_user = localStorage.getItem("GeopUserID");
 
+const getDistanceKm = (
+  fromLat: number,
+  fromLon: number,
+  toLat: number,
+  toLon: number
+) => {
+  const earthRadiusKm = 6371;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const latDelta = toRadians(toLat - fromLat);
+  const lonDelta = toRadians(toLon - fromLon);
+  const a =
+    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+    Math.cos(toRadians(fromLat)) *
+      Math.cos(toRadians(toLat)) *
+      Math.sin(lonDelta / 2) *
+      Math.sin(lonDelta / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+};
+
+const formatDistanceKm = (distanceKm: number) => {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)} m`;
+  }
+
+  return `${distanceKm.toFixed(distanceKm < 10 ? 1 : 0)} km`;
+};
+
 export function MissionReportManage() {
   const { id_misrap } = useParams<{ id_misrap?: string }>();
   const isEditing = Boolean(id_misrap);
@@ -56,6 +102,8 @@ export function MissionReportManage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
 const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+const [vehiclePositions, setVehiclePositions] = useState<VehiclePosition[]>([]);
+const [userPosition, setUserPosition] = useState<UserPosition | null>(null);
 const [dateError, setDateError] = useState<string | null>(null);
 // Ajoutez cette constante au début de votre composant (après les interfaces)
 const initialMissionState: MissionReportInterface = {
@@ -98,7 +146,30 @@ const [mission, setMission] = useState<MissionReportInterface | null>(
   const cancelClicked = () => {
     navigate("/mission-report");
   };
+
+  const requestUserPosition = useCallback(() => {
+    if (!navigator.geolocation) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserPosition({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn("Unable to get current user position:", error);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
   
+useEffect(() => {
+  requestUserPosition();
+}, [requestUserPosition]);
+
 useEffect(() => {
   const getMissionReport = async () => {
     try {
@@ -111,11 +182,13 @@ useEffect(() => {
 
       const [
         vehiclesRes,
+        vehiclePositionsRes,
         driversRes,
         trailersRes,
         reportRes
       ] = await Promise.all([
         fetch(`${backendUrl}/api/geop/vehicule/${id_user}`),
+        fetch(`${backendUrl}/api/map/find/${id_user}`).catch(() => null),
         fetch(`${backendUrl}/api/geop/driver/${id_user}`),
         fetch(`${backendUrl}/api/geop/trailer/${id_user}`),
         isEditing && id_misrap 
@@ -130,15 +203,20 @@ useEffect(() => {
 
       const [
         vehiclesData,
+        vehiclePositionsData,
         driversData,
         trailersData
       ] = await Promise.all([
         vehiclesRes.json(),
+        vehiclePositionsRes && vehiclePositionsRes.ok
+          ? vehiclePositionsRes.json()
+          : Promise.resolve([]),
         driversRes.json(),
         trailersRes.json()
       ]);
 
       setVehicles(vehiclesData.vehicles || []);
+      setVehiclePositions(Array.isArray(vehiclePositionsData) ? vehiclePositionsData : []);
       setDrivers(Array.isArray(driversData) ? driversData : []);
       console.log("Drivers data:", drivers);
 drivers.forEach(driver => {
@@ -169,6 +247,50 @@ drivers.forEach(driver => {
 
   getMissionReport();
 }, [id_misrap, id_user, isEditing]);
+
+const vehicleOptions = useMemo<VehicleOption[]>(() => {
+  const positionByVehicleId = new Map<number, VehiclePosition>();
+
+  vehiclePositions.forEach((position) => {
+    positionByVehicleId.set(Number(position.id_vehicule), position);
+  });
+
+  return vehicles
+    .map((vehicle) => {
+      const lastPosition = positionByVehicleId.get(Number(vehicle.id_vehicule));
+      const latValue = lastPosition?.LAT ?? vehicle.LAT ?? vehicle.latitude_vehicule;
+      const lonValue = lastPosition?.LON ?? vehicle.LON ?? vehicle.longitude_vehicule;
+      const lat = Number(latValue);
+      const lon = Number(lonValue);
+      const hasVehiclePosition = Number.isFinite(lat) && Number.isFinite(lon);
+      const distanceKm =
+        userPosition && hasVehiclePosition
+          ? getDistanceKm(userPosition.latitude, userPosition.longitude, lat, lon)
+          : null;
+      const distanceLabel =
+        distanceKm !== null
+          ? formatDistanceKm(distanceKm)
+          : "distance indisponible";
+      const registration = vehicle.immatriculation_vehicule || "";
+
+      return {
+        value: vehicle.id_vehicule,
+        label: `${registration} - ${distanceLabel}`,
+        searchLabel: registration,
+        distanceKm,
+      };
+    })
+    .sort((first, second) => {
+      if (first.distanceKm === null && second.distanceKm === null) {
+        return first.searchLabel.localeCompare(second.searchLabel);
+      }
+
+      if (first.distanceKm === null) return 1;
+      if (second.distanceKm === null) return -1;
+
+      return first.distanceKm - second.distanceKm;
+    });
+}, [userPosition, vehiclePositions, vehicles]);
 
 
 
@@ -540,20 +662,17 @@ const handleDateTimeChange = (name: string, value: string) => {
           <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle")}{translate(" *")}
         </Form.Label>
         <Select
-          options={vehicles.map(vehicle => ({
-            value: vehicle.id_vehicule,
-            label: vehicle.immatriculation_vehicule
-          }))}
+          options={vehicleOptions}
           placeholder={translate("Select Vehicle")}
           isLoading={vehicles.length === 0}
           noOptionsMessage={() => translate("No vehicles available")}
           isSearchable
-          value={vehicles
-            .map(vehicle => ({
-              value: vehicle.id_vehicule,
-              label: vehicle.immatriculation_vehicule
-            }))
-            .find(option => option.value === mission?.id_vehicule) || null}
+          filterOption={(option, inputValue) =>
+            option.data.searchLabel
+              .toLowerCase()
+              .includes(inputValue.toLowerCase())
+          }
+          value={vehicleOptions.find(option => option.value === mission?.id_vehicule) || null}
           onChange={async (selectedOption) => {
             const id = selectedOption?.value ?? null;
             
@@ -580,9 +699,7 @@ const handleDateTimeChange = (name: string, value: string) => {
               }));
             }
           }}
-          inputValue={""}
-          onInputChange={function (newValue: string, actionMeta: InputActionMeta): void {}}
-          onMenuOpen={function (): void {}}
+          onMenuOpen={requestUserPosition}
           onMenuClose={function (): void {}}
         />
       </Form.Group>
