@@ -232,7 +232,7 @@ export function MissionOrderManage() {
 
   const geocodeDepartureLocation = useCallback(async (location: string) => {
     const response = await fetch(
-      `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`
+      `https://geotrackin.com/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`
     );
 
     if (!response.ok) {
