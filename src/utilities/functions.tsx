@@ -291,7 +291,7 @@ export async function getAddressFromCoordinates(
   lat: number,
   lon: number
 ): Promise<string> {
-  const apiUrl = `https://geotrackin.xyz/nominatim/reverse.php?format=jsonv2&lat=${lat}&lon=${lon}`;
+  const apiUrl = `https://geotrackin.com/nominatim/reverse.php?format=jsonv2&lat=${lat}&lon=${lon}`;
   try {
     const response = await fetch(apiUrl);
     if (!response.ok) {
