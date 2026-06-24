@@ -6,6 +6,7 @@ import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";
 import Select, { SingleValue } from "react-select";
+import { useAuth } from "../context/AuthContext";
 
 interface Vehicle {
   id_vehicule: number;
@@ -58,7 +59,6 @@ interface MissionOrderInterface {
   id_user: string | null;
 }
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
 const MAX_DEPARTURE_DISTANCE_KM = 20;
 
 const getDistanceKm = (
@@ -96,6 +96,11 @@ export function MissionOrderManage() {
   const isEditing = Boolean(id_mission);
   const navigate = useNavigate();
   const { translate } = useTranslate();
+  const { user, loading: authLoading } = useAuth();
+  const id_user =
+    user?.id_user !== undefined && user?.id_user !== null
+      ? String(user.id_user)
+      : localStorage.getItem("GeopUserID") ?? localStorage.getItem("userid");
 
   useEffect(() => {
     if (searchParams.get("mailDecision") !== "approved") {
@@ -147,6 +152,17 @@ export function MissionOrderManage() {
   const [error, setError] = useState<string | null>(null);
   const [buttonClicked, setButtonClicked] = useState(false);
 
+  useEffect(() => {
+    if (isEditing || !id_user) {
+      return;
+    }
+
+    setMission((prev) => prev && prev.id_user !== id_user ? {
+      ...prev,
+      id_user,
+    } : prev);
+  }, [id_user, isEditing]);
+
 
   const cancelClicked = () => {
     navigate("/mission-order");
@@ -164,9 +180,16 @@ export function MissionOrderManage() {
 
 
   useEffect(() => {
+    if (!id_user && authLoading) {
+      setLoading(true);
+      setError(null);
+      return;
+    }
+
     const getMissionOrder = async () => {
       try {
         setLoading(true);
+        setError(null);
 
         if (!id_user) {
           setError("Missing user ID");
@@ -228,7 +251,7 @@ export function MissionOrderManage() {
     };
 
     getMissionOrder();
-  }, [id_mission, id_user, isEditing]);
+  }, [authLoading, id_mission, id_user, isEditing]);
 
   const geocodeDepartureLocation = useCallback(async (location: string) => {
     const response = await fetch(
