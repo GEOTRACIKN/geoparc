@@ -30,26 +30,37 @@ export default function Data() {
   const [customers, setCustomers] = useState<DataItem[] | null>(null);
   const [goods, setGoods] = useState<DataItem[] | null>(null);
   const [locations, setLocations] = useState<DataItem[] | null>(null);
+  const [units, setUnits] = useState<DataItem[] | null>(null);
   
   const [loading, setLoading] = useState({
     services: true,
     customers: true,
     goods: true,
-    locations: true
+    locations: true,
+    units: true
   });
   
   const [showModal, setShowModal] = useState({
     services: false,
     customers: false,
     goods: false,
-    locations: false
+    locations: false,
+    units: false
   });
   
   const [newItem, setNewItem] = useState({
     services: '',
     customers: '',
     goods: '',
-    locations: ''
+    locations: '',
+    units: ''
+  });
+  const [sectionSearch, setSectionSearch] = useState({
+    services: '',
+    customers: '',
+    goods: '',
+    locations: '',
+    units: ''
   });
 
   // Fonction générique pour charger les données avec gestion d'erreur améliorée
@@ -159,6 +170,7 @@ export default function Data() {
     fetchData('customers', setCustomers);
     fetchData('goods', setGoods);
     fetchData('locations', setLocations);
+    fetchData('units', setUnits);
   }, [fetchData]);
 
   // Composant de section réutilisable avec gestion améliorée des états
@@ -172,7 +184,9 @@ export default function Data() {
     showModal,
     setShowModal,
     newItem,
-    setNewItem
+    setNewItem,
+    searchTerm,
+    setSearchTerm
   }: {
     title: string;
     endpoint: string;
@@ -184,7 +198,14 @@ export default function Data() {
     setShowModal: (val: boolean) => void;
     newItem: string;
     setNewItem: (val: string) => void;
-  }) => (
+    searchTerm: string;
+    setSearchTerm: (val: string) => void;
+  }) => {
+    const visibleItems = items?.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+    );
+
+    return (
     <Card className="mb-4">
       <Card.Header className="d-flex justify-content-between align-items-center">
         <h5>{translate(title)}</h5>
@@ -197,26 +218,35 @@ export default function Data() {
         </Button>
       </Card.Header>
       <Card.Body>
+        <Form.Control
+          className="mb-3"
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={translate('Search...')}
+        />
+
         {items === null ? (
           <div className="text-center">
             <Spinner animation="border" />
             <p className="mt-2">{translate('Loading...')}</p>
           </div>
-        ) : items.length === 0 ? (
+        ) : visibleItems?.length === 0 ? (
           <Alert variant="info">
             {translate(`No ${title.toLowerCase()} found`)}
             <Button 
               variant="link" 
               onClick={() => fetchData(endpoint, endpoint === 'services' ? setServices : 
                 endpoint === 'customers' ? setCustomers : 
-                endpoint === 'goods' ? setGoods : setLocations)}
+                endpoint === 'goods' ? setGoods :
+                endpoint === 'units' ? setUnits : setLocations)}
             >
               {translate('Retry')}
             </Button>
           </Alert>
         ) : (
           <ListGroup>
-            {items.map((item) => (
+            {visibleItems?.map((item) => (
               <ListGroup.Item 
                 key={item.id}
                 className="d-flex justify-content-between align-items-center"
@@ -235,7 +265,7 @@ export default function Data() {
         )}
       </Card.Body>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} className="reference-drawer-modal">
         <Modal.Header closeButton>
           <Modal.Title>{translate(`Add ${title}`)}</Modal.Title>
         </Modal.Header>
@@ -267,6 +297,7 @@ export default function Data() {
       </Modal>
     </Card>
   );
+  };
 
   return (
     <div className="container mt-4">
@@ -283,6 +314,8 @@ export default function Data() {
         setShowModal={(val) => setShowModal({...showModal, services: val})}
         newItem={newItem.services}
         setNewItem={(val) => setNewItem({...newItem, services: val})}
+        searchTerm={sectionSearch.services}
+        setSearchTerm={(val) => setSectionSearch({...sectionSearch, services: val})}
       />
       
       <DataSection
@@ -296,6 +329,8 @@ export default function Data() {
         setShowModal={(val) => setShowModal({...showModal, customers: val})}
         newItem={newItem.customers}
         setNewItem={(val) => setNewItem({...newItem, customers: val})}
+        searchTerm={sectionSearch.customers}
+        setSearchTerm={(val) => setSectionSearch({...sectionSearch, customers: val})}
       />
       
       <DataSection
@@ -309,6 +344,8 @@ export default function Data() {
         setShowModal={(val) => setShowModal({...showModal, goods: val})}
         newItem={newItem.goods}
         setNewItem={(val) => setNewItem({...newItem, goods: val})}
+        searchTerm={sectionSearch.goods}
+        setSearchTerm={(val) => setSectionSearch({...sectionSearch, goods: val})}
       />
       
       <DataSection
@@ -322,6 +359,23 @@ export default function Data() {
         setShowModal={(val) => setShowModal({...showModal, locations: val})}
         newItem={newItem.locations}
         setNewItem={(val) => setNewItem({...newItem, locations: val})}
+        searchTerm={sectionSearch.locations}
+        setSearchTerm={(val) => setSectionSearch({...sectionSearch, locations: val})}
+      />
+
+      <DataSection
+        title="Units"
+        endpoint="units"
+        items={units}
+        loading={loading.units}
+        onAdd={(name) => handleAdd('units', name, setUnits)}
+        onDelete={(id) => handleDelete('units', id, setUnits)}
+        showModal={showModal.units}
+        setShowModal={(val) => setShowModal({...showModal, units: val})}
+        newItem={newItem.units}
+        setNewItem={(val) => setNewItem({...newItem, units: val})}
+        searchTerm={sectionSearch.units}
+        setSearchTerm={(val) => setSectionSearch({...sectionSearch, units: val})}
       />
     </div>
   );
