@@ -41,7 +41,7 @@ export default function DriversTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   // Search and sort state
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,7 +85,7 @@ export default function DriversTab() {
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPage, searchTerm, sortColumn, sortOrder, translate]);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, translate]);
 
   const handleShowAdd = () => {
     setCurrentCategory(null);
@@ -220,19 +220,35 @@ export default function DriversTab() {
     <div className="container mt-4">
       <h2>{translate('Driver Categories Management')}</h2>
       
-      <div className="d-flex justify-content-between mb-3">
+      <div className="reference-table-toolbar">
         <Button variant="primary" onClick={handleShowAdd}>
           {translate('Add Driver Category')}
         </Button>
         
-        <Form.Group className="w-25">
+        <div className="reference-table-controls">
+          <span className="reference-total-items">{totalItems} {translate('items')}</span>
+          <Form.Select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            aria-label={translate('Items per page')}
+          >
+            <option value={10}>10 / page</option>
+            <option value={25}>25 / page</option>
+            <option value={50}>50 / page</option>
+          </Form.Select>
           <Form.Control
             type="text"
             placeholder={translate('Search...')}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
-        </Form.Group>
+        </div>
       </div>
       
       {loading ? (
@@ -337,7 +353,7 @@ export default function DriversTab() {
       )}
 
       {/* Modal pour ajouter/modifier une catégorie */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" size="lg">
+      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" size="lg" className="reference-drawer-modal">
         <Modal.Header closeButton>
           <Modal.Title>
             {currentCategory ? translate('Edit Driver Category') : translate('Add Driver Category')}
