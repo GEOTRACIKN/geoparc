@@ -34,7 +34,7 @@ export default function Supplier() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   // Form state
   const [formData, setFormData] = useState<Omit<Supplier, 'id_supplier'>>({ 
@@ -77,7 +77,7 @@ export default function Supplier() {
 
   useEffect(() => {
     fetchSuppliers();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   const handleShowAdd = () => {
     setCurrentSupplier(null);
@@ -189,12 +189,31 @@ export default function Supplier() {
     <div className="p-3">
       <h4 className="mb-4">Gestion des Fournisseurs</h4>
 
+      <div className="reference-table-controls mb-3">
+        <span className="reference-total-items">{totalItems} elements</span>
+        <Form.Select
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+          aria-label="Elements par page"
+        >
+          <option value={10}>10 / page</option>
+          <option value={25}>25 / page</option>
+          <option value={50}>50 / page</option>
+        </Form.Select>
+      </div>
+
       {/* Barre de recherche */}
       <InputGroup className="mb-4">
         <Form.Control
           placeholder="Rechercher par nom, téléphone ou activité..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
         />
         <Button variant="outline-secondary">
           <i className="fas fa-search"></i>
@@ -297,7 +316,7 @@ export default function Supplier() {
       )}
 
       {/* Modal pour ajouter/modifier */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" size="lg">
+      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" size="lg" className="reference-drawer-modal">
         <Modal.Header closeButton>
           <Modal.Title>
             {currentSupplier ? 'Modifier le fournisseur' : 'Ajouter un fournisseur'}

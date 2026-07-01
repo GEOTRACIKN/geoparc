@@ -6,6 +6,7 @@ import axios from "axios";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useNavigate , useLocation, redirect} from "react-router-dom";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 
 interface LogoutButtonProps {
   onLogout: () => void;
@@ -60,6 +61,7 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   localStorage.removeItem("GeopUserID");
   localStorage.removeItem("geop_userPermissions");
   cookies.remove("jwtToken");
+  cookies.remove("jwtTokenGEOP");
   window.location.href ="https://geotrackin.com";
 };
 
@@ -89,10 +91,10 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
 
     window.addEventListener("unload", handleUnload);
 
-    // Gérer la déconnexion après 30 minutes d'inactivité
+    // Gérer la déconnexion après 4 heures d'inactivité
     const inactivityTimeout = setTimeout(() => {
       handleLogout();
-    }, 30 * 60 * 1000); // 30 minutes
+    }, SESSION_TIMEOUT_MS);
 
     return () => {
       window.removeEventListener("unload", handleUnload);
@@ -104,7 +106,7 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
   const handleShowConfirmation = () => setShowConfirmation(true);
 
   useEffect(() => {
-    const inactivityTimeout = setTimeout(handleLogout, 30 * 60 * 1000); //  30 minutes
+    const inactivityTimeout = setTimeout(handleLogout, SESSION_TIMEOUT_MS);
 
     return () => {
       clearTimeout(inactivityTimeout); // Annuler le minuteur si le composant est démonté
