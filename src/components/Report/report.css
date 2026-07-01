@@ -1,0 +1,186 @@
+.reports-page {
+  --report-orange: #ffc107;
+  --report-orange-dark: #000000;
+  --report-orange-soft: #fff7ed;
+  --report-orange-border: #ffc107;
+  --report-line: #e6eaf2;
+  --report-text: #0f172a;
+  --report-muted: #64748b;
+}
+
+.report-title {
+  color: var(--report-text);
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+
+.report-main-btn {
+  background: var(--report-orange) !important;
+  border-color: var(--report-orange) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  border-radius: 14px !important;
+  padding: 10px 16px !important;
+  box-shadow: 0 10px 22px rgba(249, 115, 22, 0.22);
+}
+
+.report-main-btn:hover {
+  background: var(--report-orange-dark) !important;
+  border-color: var(--report-orange-dark) !important;
+  transform: translateY(-1px);
+}
+
+.report-table-card {
+  background: #fff;
+  border: 1px solid var(--report-line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+}
+
+.report-filter-card {
+  background: #fff;
+  border: 1px solid var(--report-line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.report-filter-label {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--report-muted);
+  margin-bottom: 6px;
+}
+
+.report-filter-input {
+  border-radius: 12px !important;
+  border: 1px solid var(--report-line) !important;
+  min-height: 42px;
+  font-size: 14px !important;
+}
+
+.report-filter-input:focus {
+  border-color: var(--report-orange) !important;
+  box-shadow: 0 0 0 0.2rem rgba(249, 115, 22, 0.15) !important;
+}
+
+.report-reset-btn {
+  border-radius: 12px !important;
+  border: 1px solid var(--report-orange-border) !important;
+  background: var(--report-orange-soft) !important;
+  color: var(--report-orange-dark) !important;
+  min-height: 42px;
+  font-weight: 800 !important;
+}
+
+.report-reset-btn:hover {
+  background: #ffc107 !important;
+}
+
+.report-history-table {
+  margin-bottom: 0 !important;
+  border: 1px solid var(--report-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.report-history-table thead th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--report-line) !important;
+  vertical-align: middle;
+}
+
+.report-history-table tbody td {
+  vertical-align: middle;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.report-history-table tbody tr:hover {
+  background: #fff7ed55;
+}
+
+.report-id {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.report-orange-badge {
+  background: var(--report-orange-soft) !important;
+  color: #9a3412 !important;
+  border: 1px solid var(--report-orange-border);
+  font-weight: 900 !important;
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+}
+
+.report-status-badge {
+  font-weight: 900 !important;
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+}
+
+.report-status-completed {
+  background: rgba(22, 163, 74, 0.12) !important;
+  color: #166534 !important;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.report-status-failed {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.report-status-processing {
+  background: rgba(245, 158, 11, 0.14) !important;
+  color: #92400e !important;
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.report-status-pending {
+  background: rgba(100, 116, 139, 0.12) !important;
+  color: #475569 !important;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.report-action-icon {
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.report-action-icon:hover {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.report-pagination .page-link {
+  color: var(--report-orange) !important;
+  border-color: var(--report-orange-border) !important;
+  border-radius: 10px !important;
+  margin-left: 4px;
+}
+
+.report-pagination .active .page-link {
+  background: var(--report-orange) !important;
+  border-color: var(--report-orange) !important;
+  color: #fff !important;
+  font-weight: 900;
+}
+
+.report-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(249, 115, 22, 0.15) !important;
+}
+
+@media (max-width: 768px) {
+  .report-table-card {
+    padding: 10px;
+  }
+
+  .report-filter-card {
+    padding: 12px;
+  }
+}
