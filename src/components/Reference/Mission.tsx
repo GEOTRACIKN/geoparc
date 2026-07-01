@@ -30,7 +30,7 @@ export default function Mission() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   // Search and sort state
   const [searchTerm, setSearchTerm] = useState('');
@@ -76,7 +76,7 @@ export default function Mission() {
     if (geopuserID) {
       fetchBonuses();
     }
-  }, [currentPage, searchTerm, sortColumn, sortOrder, geopuserID]);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, geopuserID]);
 
   const handleShowAdd = () => {
     setCurrentBonus(null);
@@ -199,19 +199,35 @@ export default function Mission() {
     <div className="container mt-4">
       <h2>Mission Bonus Management</h2>
       
-      <div className="d-flex justify-content-between mb-3">
+      <div className="reference-table-toolbar">
         <Button variant="primary" onClick={handleShowAdd}>
           Add Bonus
         </Button>
         
-        <Form.Group className="w-25">
+        <div className="reference-table-controls">
+          <span className="reference-total-items">{totalItems} items</span>
+          <Form.Select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            aria-label="Items per page"
+          >
+            <option value={10}>10 / page</option>
+            <option value={25}>25 / page</option>
+            <option value={50}>50 / page</option>
+          </Form.Select>
           <Form.Control
             type="text"
             placeholder="Search..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
-        </Form.Group>
+        </div>
       </div>
       
       {loading ? (
@@ -299,7 +315,7 @@ export default function Mission() {
         </>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static">
+      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" className="reference-drawer-modal">
         <Modal.Header closeButton>
           <Modal.Title>
             {currentBonus ? 'Edit Bonus' : 'Add Bonus'}

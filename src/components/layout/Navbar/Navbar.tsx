@@ -15,6 +15,7 @@ import axios from 'axios';
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 
 interface NavbarProps {
   changNavbar: boolean;
@@ -139,9 +140,9 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     const handleActivity = () => {
       clearTimeout(inactivityTimeout); // Reset the timeout on user activity
       inactivityTimeout = setTimeout(() => {
-        // Auto logout after 15 minutes of inactivity
+        // Auto logout after 4 hours of inactivity
         handleLogout();
-      }, 14400000); // 15 minutes in milliseconds
+      }, SESSION_TIMEOUT_MS);
     };
 
     const handleStorageChange = (event: StorageEvent) => {
