@@ -6,6 +6,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
+  setThemeMode: (enabled: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -69,21 +70,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const applyThemeMode = (enabled: boolean, persistToBackend = false) => {
+    setIsDarkMode(enabled);
+    localStorage.setItem("theme_mode", enabled ? "1" : "0");
+    document.body.className = enabled ? "dark-theme" : "light-theme";
+
+    if (persistToBackend) {
+      handleThemeChange(enabled);
+    }
+  };
+
   const toggleTheme = () => {
-    setIsDarkMode((prev) => {
-      const newTheme = !prev;
-
-      handleThemeChange(newTheme);
-
-
-      localStorage.setItem("theme_mode", newTheme ? "1" : "0");
-      document.body.className = newTheme ? "dark-theme" : "light-theme";
-      return newTheme;
-    });
+    applyThemeMode(!isDarkMode, true);
   };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme, setThemeMode: applyThemeMode }}>
       {children}
     </ThemeContext.Provider>
   );

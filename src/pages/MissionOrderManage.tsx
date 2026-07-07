@@ -1,15 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";
 import Select, { SingleValue } from "react-select";
+import { useAuth } from "../context/AuthContext";
 
 interface Vehicle {
   id_vehicule: number;
   immatriculation_vehicule: string;
+  LAT?: string | number | null;
+  LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+  latitude_vehicule?: string | number | null;
+  longitude_vehicule?: string | number | null;
+}
+interface VehiclePosition {
+  id_vehicule: number;
+  LAT?: string | number | null;
+  LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+}
+interface VehiclePositionResponse {
+  value?: VehiclePosition[];
+  Count?: number;
+}
+interface LocationCoordinates {
+  latitude: number;
+  longitude: number;
+}
+interface VehicleOption {
+  value: number;
+  label: string;
+  searchLabel: string;
+  distanceKm: number | null;
+  isNearby: boolean;
 }
 interface Trailer {
   id_remorque?: number;       // Ajoutez si disponible
@@ -41,14 +74,82 @@ interface MissionOrderInterface {
   id_user: string | null;
 }
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const id_user = localStorage.getItem("GeopUserID");
+const MAX_DEPARTURE_DISTANCE_KM = 20;
+
+const getDistanceKm = (
+  fromLat: number,
+  fromLon: number,
+  toLat: number,
+  toLon: number
+) => {
+  const earthRadiusKm = 6371;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const latDelta = toRadians(toLat - fromLat);
+  const lonDelta = toRadians(toLon - fromLon);
+  const a =
+    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+    Math.cos(toRadians(fromLat)) *
+      Math.cos(toRadians(toLat)) *
+      Math.sin(lonDelta / 2) *
+      Math.sin(lonDelta / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+};
+
+const formatDistanceKm = (distanceKm: number) => {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)} m`;
+  }
+
+  return `${distanceKm.toFixed(distanceKm < 10 ? 1 : 0)} km`;
+};
+
+const readCoordinate = (...values: Array<string | number | null | undefined>) => {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") {
+      continue;
+    }
+
+    const coordinate = Number(value);
+    if (Number.isFinite(coordinate)) {
+      return coordinate;
+    }
+  }
+
+  return null;
+};
 
 
 export function MissionOrderManage() {
   const { id_mission } = useParams<{ id_mission?: string }>();
+  const [searchParams] = useSearchParams();
   const isEditing = Boolean(id_mission);
   const navigate = useNavigate();
   const { translate } = useTranslate();
+  const { user, loading: authLoading } = useAuth();
+  const id_user =
+    user?.id_user !== undefined && user?.id_user !== null
+      ? String(user.id_user)
+      : localStorage.getItem("GeopUserID") ?? localStorage.getItem("userid");
+
+  useEffect(() => {
+    if (searchParams.get("mailDecision") !== "approved") {
+      return;
+    }
+
+    toast.success(
+      searchParams.get("already_decided") === "1"
+        ? "Cette demande a deja ete approuvee"
+        : "Demande approuvee et mission creee",
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      }
+    );
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [searchParams]);
 
 
 
@@ -81,6 +182,17 @@ export function MissionOrderManage() {
   const [error, setError] = useState<string | null>(null);
   const [buttonClicked, setButtonClicked] = useState(false);
 
+  useEffect(() => {
+    if (isEditing || !id_user) {
+      return;
+    }
+
+    setMission((prev) => prev && prev.id_user !== id_user ? {
+      ...prev,
+      id_user,
+    } : prev);
+  }, [id_user, isEditing]);
+
 
   const cancelClicked = () => {
     navigate("/mission-order");
@@ -90,14 +202,24 @@ export function MissionOrderManage() {
   const [trailer, setTrailer] = useState<{ trailer_mission: string }[]>([]);
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehiclePositions, setVehiclePositions] = useState<VehiclePosition[]>([]);
+  const [departureCoordinates, setDepartureCoordinates] = useState<LocationCoordinates | null>(null);
+  const [departureLookupStatus, setDepartureLookupStatus] = useState<"idle" | "loading" | "found" | "not-found">("idle");
   const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
   const [dateError, setDateError] = useState<string | null>(null);
 
 
   useEffect(() => {
+    if (!id_user && authLoading) {
+      setLoading(true);
+      setError(null);
+      return;
+    }
+
     const getMissionOrder = async () => {
       try {
         setLoading(true);
+        setError(null);
 
         if (!id_user) {
           setError("Missing user ID");
@@ -110,18 +232,28 @@ export function MissionOrderManage() {
             ? fetch(`${backendUrl}/api/geop/missionOrderManage/find/${id_mission}`)
             : Promise.resolve(null),
           fetch(`${backendUrl}/api/geop/vehicule/${id_user}`),
+          fetch(`${backendUrl}/api/map/find/${id_user}`).catch(() => null),
           fetch(`${backendUrl}/api/geop/driver/${id_user}`),
           fetch(`${backendUrl}/api/geop/trailer/${id_user}`)
         ]);
 
         // Traitement des réponses
-        const [missionRes, vehiclesRes, driverRes, trailerRes] = responses;
+        const [missionRes, vehiclesRes, vehiclePositionsRes, driverRes, trailerRes] = responses;
 
         // Véhicules - s'assurer que c'est un tableau
         const vehiclesData = vehiclesRes?.ok
           ? await vehiclesRes.json()
           : [];
         setVehicles(vehiclesData.vehicles || []);
+        const vehiclePositionsData: VehiclePosition[] | VehiclePositionResponse =
+          vehiclePositionsRes && vehiclePositionsRes.ok
+            ? await vehiclePositionsRes.json()
+            : [];
+        setVehiclePositions(
+          Array.isArray(vehiclePositionsData)
+            ? vehiclePositionsData
+            : vehiclePositionsData.value || []
+        );
         // Mission (si édition)
         if (isEditing && missionRes?.ok) {
           const missionData: MissionOrderInterface = await missionRes.json();
@@ -154,7 +286,165 @@ export function MissionOrderManage() {
     };
 
     getMissionOrder();
-  }, [id_mission, id_user, isEditing]);
+  }, [authLoading, id_mission, id_user, isEditing]);
+
+  const geocodeDepartureLocation = useCallback(async (location: string) => {
+    const urls = [
+      `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+    ];
+
+    for (const url of urls) {
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+        const firstResult = Array.isArray(data) ? data[0] : null;
+        const latitude = Number(firstResult?.lat);
+        const longitude = Number(firstResult?.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          return { latitude, longitude };
+        }
+      } catch (error) {
+        console.warn("Geocoding provider failed:", error);
+      }
+    }
+
+    return null;
+  }, []);
+
+  useEffect(() => {
+    const departureLocation = mission?.dep_loc_mission?.trim();
+
+    if (!departureLocation) {
+      setDepartureCoordinates(null);
+      setDepartureLookupStatus("idle");
+      return;
+    }
+
+    let isCurrent = true;
+    setDepartureLookupStatus("loading");
+
+    const timeoutId = window.setTimeout(() => {
+      geocodeDepartureLocation(departureLocation)
+        .then((coordinates) => {
+          if (!isCurrent) return;
+
+          setDepartureCoordinates(coordinates);
+          setDepartureLookupStatus(coordinates ? "found" : "not-found");
+        })
+        .catch((error) => {
+          if (!isCurrent) return;
+
+          console.error("Erreur geocodage lieu de depart:", error);
+          setDepartureCoordinates(null);
+          setDepartureLookupStatus("not-found");
+        });
+    }, 500);
+
+    return () => {
+      isCurrent = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, [geocodeDepartureLocation, mission?.dep_loc_mission]);
+
+  const vehicleOptions = useMemo<VehicleOption[]>(() => {
+    const positionByVehicleId = new Map<number, VehiclePosition>();
+
+    vehiclePositions.forEach((position) => {
+      positionByVehicleId.set(Number(position.id_vehicule), position);
+    });
+
+    return vehicles
+      .map((vehicle) => {
+        const lastPosition = positionByVehicleId.get(Number(vehicle.id_vehicule));
+        const latitude = readCoordinate(
+          lastPosition?.LAT,
+          lastPosition?.lat,
+          lastPosition?.latitude,
+          vehicle.LAT,
+          vehicle.lat,
+          vehicle.latitude,
+          vehicle.latitude_vehicule
+        );
+        const longitude = readCoordinate(
+          lastPosition?.LON,
+          lastPosition?.lon,
+          lastPosition?.longitude,
+          vehicle.LON,
+          vehicle.lon,
+          vehicle.longitude,
+          vehicle.longitude_vehicule
+        );
+        const registration = vehicle.immatriculation_vehicule || "";
+
+        const canCalculateDistance =
+          departureCoordinates &&
+          latitude !== null &&
+          longitude !== null;
+
+        const calculatedDistanceKm = canCalculateDistance
+          ? getDistanceKm(
+              departureCoordinates.latitude,
+              departureCoordinates.longitude,
+              latitude,
+              longitude
+            )
+          : null;
+        const isNearby =
+          calculatedDistanceKm !== null &&
+          calculatedDistanceKm <= MAX_DEPARTURE_DISTANCE_KM;
+
+        return {
+          value: vehicle.id_vehicule,
+          label: registration,
+          searchLabel: registration,
+          distanceKm: isNearby ? calculatedDistanceKm : null,
+          isNearby,
+        };
+      })
+      .sort((first, second) => {
+        if (first.isNearby !== second.isNearby) {
+          return first.isNearby ? -1 : 1;
+        }
+
+        if (first.distanceKm !== null && second.distanceKm !== null) {
+          return first.distanceKm - second.distanceKm;
+        }
+
+        if (first.distanceKm !== null) return -1;
+        if (second.distanceKm !== null) return 1;
+
+        return first.searchLabel.localeCompare(second.searchLabel);
+      });
+  }, [departureCoordinates, vehiclePositions, vehicles]);
+
+  const nearbyVehicleCount = useMemo(
+    () => vehicleOptions.filter((option) => option.isNearby).length,
+    [vehicleOptions]
+  );
+
+  useEffect(() => {
+    if (
+      departureLookupStatus !== "found" ||
+      !mission?.id_vehicule ||
+      vehicles.some((vehicle) => vehicle.id_vehicule === mission.id_vehicule)
+    ) {
+      return;
+    }
+
+    setMission((prev) => prev ? {
+      ...prev,
+      id_vehicule: null,
+      vehicle_km_mission: null,
+    } : prev);
+  }, [departureLookupStatus, mission?.id_vehicule, vehicleOptions]);
+
   const fetchVehicleKm = async (id_vehicule: number) => {
     try {
       const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
@@ -356,6 +646,27 @@ export function MissionOrderManage() {
   };
 
 
+
+  const handleVehicleSelectChange = async (selectedOption: SingleValue<VehicleOption>) => {
+    const id = selectedOption?.value ?? null;
+
+    if (!id) {
+      setMission((prev) => prev ? {
+        ...prev,
+        id_vehicule: null,
+        vehicle_km_mission: null,
+      } : prev);
+      return;
+    }
+
+    const km = await fetchVehicleKm(id);
+
+    setMission((prev) => prev ? {
+      ...prev,
+      id_vehicule: id,
+      vehicle_km_mission: km,
+    } : prev);
+  };
 
   const formatToDatetimeLocal = (isoString: string | null | undefined): string => {
     if (!isoString) return '';
@@ -586,19 +897,52 @@ export function MissionOrderManage() {
                     <div className="row g-3">
                       <div className="col-lg-6">
                         <label className="mission-label">{translate("Vehicle")} *</label>
-                        <select
-                          name="id_vehicule"
-                          className="form-select mission-input"
-                          value={mission?.id_vehicule || ""}
-                          onChange={handleVehicleChange}
-                        >
-                          <option value="">{translate("Select Vehicle")}</option>
-                          {vehicles?.map((vehicle: any) => (
-                            <option key={vehicle.id_vehicule} value={vehicle.id_vehicule}>
-                              {vehicle.immatriculation_vehicule}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          options={vehicleOptions}
+                          placeholder={translate("Select Vehicle")}
+                          isSearchable
+                          isLoading={departureLookupStatus === "loading"}
+                          noOptionsMessage={() => {
+                            return translate("No vehicles available");
+                          }}
+                          formatOptionLabel={(option) => (
+                            <div className="d-flex align-items-center justify-content-between gap-3">
+                              <span>{option.searchLabel}</span>
+                              {option.distanceKm !== null && option.isNearby && (
+                                <span className="text-muted small ms-auto">
+                                  {formatDistanceKm(option.distanceKm)}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          filterOption={(option, inputValue) =>
+                            option.data.searchLabel
+                              .toLowerCase()
+                              .includes(inputValue.toLowerCase())
+                          }
+                          value={vehicleOptions.find(option => option.value === mission?.id_vehicule) || null}
+                          onChange={handleVehicleSelectChange}
+                        />
+                        {departureLookupStatus === "loading" && (
+                          <div className="mission-muted-text mt-2">
+                            Recherche du lieu de depart...
+                          </div>
+                        )}
+                        {departureLookupStatus === "not-found" && (
+                          <div className="mission-muted-text mt-2">
+                            Lieu de depart introuvable. Tous les vehicules restent disponibles sans distance.
+                          </div>
+                        )}
+                        {departureCoordinates && nearbyVehicleCount > 0 && (
+                          <div className="mission-muted-text mt-2">
+                            {nearbyVehicleCount} vehicule(s) proche(s) dans un rayon de {MAX_DEPARTURE_DISTANCE_KM} km. Les autres restent disponibles sans distance.
+                          </div>
+                        )}
+                        {departureCoordinates && nearbyVehicleCount === 0 && (
+                          <div className="mission-muted-text mt-2">
+                            Aucun vehicule dans un rayon de {MAX_DEPARTURE_DISTANCE_KM} km. Les autres vehicules sont disponibles sans distance.
+                          </div>
+                        )}
                       </div>
 
                       <div className="col-lg-6">

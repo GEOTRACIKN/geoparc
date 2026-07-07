@@ -4,41 +4,41 @@ import { Nav, Image } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { useTranslate } from "../../../hooks/LanguageProvider";
-import Cookies from "universal-cookie";
 import Logout from "../../Logout";
-import { useTheme } from "../../../hooks/ThemeContext";
 import usePermissions from "../../../hooks/usePermissions";
-import { useUser } from "../../../context/UserContext";
 import { useAuth } from "../../../context/AuthContext";
+import { useTheme } from "../../../hooks/ThemeContext";
 import { menuItems } from "../../../config/menu/menu.data";
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import {
+  loadSidebarAppearancePreference,
+  persistSidebarAppearanceLocally,
+  readStoredSidebarAppearance,
+  SIDEBAR_APPEARANCE_CHANGE_EVENT,
+  SidebarAppearancePreference,
+} from "../../../utilities/sidebarPreference";
 
 interface SidebarProps {
+  isSidebarPinned: boolean;
   onToggleSidebar: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) => {
   const { translate } = useTranslate();
-  const [isOpen, setIsOpen] = useState("");
-  const [activeLogo, setActiveLogo] = useState("header-logo-hide");
-  const [activeMenuText, setActiveMenuText] = useState("iq-menu-span-hide");
-  const [menuButtonSidebar, setMenuButtonSidebar] = useState(
-    "iq-menu-bt-sidebar-hide"
-  );
-  const [sidebar, setSidebar] = useState("sidebar-close");
-  const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
-  //const [pathImg, setPathImg] = useState<string | undefined>(undefined);
-  const id_user = localStorage.getItem("GeopUserID");
-  const { pathImg } = useUser();
-
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-
+  const [isHovering, setIsHovering] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(
     window.matchMedia("(max-width: 1299px)").matches
   );
+  const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
+  const [appearance, setAppearance] = useState<SidebarAppearancePreference>(readStoredSidebarAppearance);
+  const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const isSidebarExpanded = isSidebarPinned || (!isSmallScreen && isHovering);
+  const isOpen = isSidebarExpanded ? "open" : "";
+  const activeLogo = isSidebarExpanded ? "header-logo-show" : "header-logo-hide";
+  const activeMenuText = isSidebarExpanded ? "" : "iq-menu-span-hide";
+  const sidebar = isSidebarExpanded ? "sidebar-open" : "sidebar-close";
+  const sidebarAppearanceClass = `sidebar-color-${appearance.colorMode} sidebar-icons-${appearance.iconMode}`;
 
 
   useEffect(() => {
@@ -54,11 +54,33 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
     mediaQuery.addListener(handleMediaQueryChange);
 
     // Clean the listener when unmounting the component
-    if (isSmallScreen) {
-      //  handleSetIsOpen()
-    }
     return () => {
       mediaQuery.removeListener(handleMediaQueryChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const idUser = Number(localStorage.getItem("GeopUserID") ?? 0);
+
+    if (idUser) {
+      loadSidebarAppearancePreference(idUser)
+        .then((savedAppearance) => {
+          setAppearance(savedAppearance);
+          persistSidebarAppearanceLocally(savedAppearance);
+        })
+        .catch((error) => {
+          console.warn("Unable to load sidebar appearance:", error);
+        });
+    }
+
+    const handleSidebarAppearanceChange = (event: Event) => {
+      setAppearance((event as CustomEvent<SidebarAppearancePreference>).detail);
+    };
+
+    window.addEventListener(SIDEBAR_APPEARANCE_CHANGE_EVENT, handleSidebarAppearanceChange);
+
+    return () => {
+      window.removeEventListener(SIDEBAR_APPEARANCE_CHANGE_EVENT, handleSidebarAppearanceChange);
     };
   }, []);
 
@@ -78,24 +100,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
       // sinon -> on garde seulement ce menu ouvert
       setOpenSubmenus([submenuId]);
     }
-  };
-
-  const handleSetIsOpen = () => {
-    isOpen == "open" ? setIsOpen("") : setIsOpen("open");
-
-    sidebar == "sidebar-close"
-      ? setSidebar("sidebar-open")
-      : setSidebar("sidebar-close");
-
-    activeLogo == "header-logo-show"
-      ? setActiveLogo("header-logo-hide")
-      : setActiveLogo("header-logo-show");
-    activeMenuText == "iq-menu-span-hide"
-      ? setActiveMenuText("")
-      : setActiveMenuText("iq-menu-span-hide");
-    menuButtonSidebar == "iq-menu-bt-sidebar-show"
-      ? setMenuButtonSidebar("iq-menu-bt-sidebar-hide")
-      : setMenuButtonSidebar("iq-menu-bt-sidebar-show");
   };
 
   const handleLogout = async () => {
@@ -124,25 +128,26 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
 
 
   const handleMouseEnter = () => {
-    setIsOpen("open");
-    setSidebar("sidebar-open");
-    setActiveLogo("header-logo-show");
-    setActiveMenuText(""); // Afficher le texte du menu
-    setMenuButtonSidebar("iq-menu-bt-sidebar-show");
+    if (isSmallScreen || isSidebarPinned) return;
+    setIsHovering(true);
   };
 
   const handleMouseLeave = () => {
-    setIsOpen("");
-    setSidebar("sidebar-close");
-    setActiveLogo("header-logo-hide");
-    setActiveMenuText("iq-menu-span-hide"); // Cacher le texte du menu
-    setMenuButtonSidebar("iq-menu-bt-sidebar-hide");
+    if (isSmallScreen || isSidebarPinned) return;
+    setIsHovering(false);
+  };
+
+  const handleMenuNavigation = () => {
+    setOpenSubmenus([]);
+    if (isSmallScreen && isSidebarPinned) {
+      onToggleSidebar();
+    }
   };
 
   return (
     <div
       style={{ zIndex: 10015 }}
-      className={`iq-sidebar  sidebar-default  ${sidebar}`}
+      className={`iq-sidebar sidebar-default ${sidebar} ${sidebarAppearanceClass}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -156,24 +161,26 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
               maxHeight: "50px", // Ajuste selon tes besoins
               objectFit: "contain",
             }}
-            src={pathImg}
+            src={isDarkMode ? "asset/images/logo_dark.png" : "asset/images/logo.png"}
+            alt="GeoTrackin"
           ></Image>
         </Nav.Link>
-        <div
-          className={`iq-menu-bt-sidebar ml-0 ${menuButtonSidebar}`}
+        <button
+          type="button"
+          className="iq-menu-bt-sidebar sidebar-menu-toggle"
+          title={translate("Menu")}
           onClick={() => {
-            handleSetIsOpen();
             onToggleSidebar();
           }}
         >
-          <i className={`las la-bars wrapper-menu ${isOpen}`}></i>
-        </div>
+          <i className="las la-bars wrapper-menu sidebar-menu-icon"></i>
+        </button>
       </div>
       <div
         className={`data-scrollbar `}
         data-scroll="1"
         data-scrollbar="true"
-        style={{ overflow: "hidden", outline: "none" }}
+        style={{ overflowX: "hidden", overflowY: "auto", outline: "none" }}
       >
         <div className="scroll-content">
           <nav className="iq-sidebar-menu">
@@ -190,9 +197,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                           className="svg-icon"
                           as={NavLink}
                           onClick={() => {
-                            setOpenSubmenus([]); // ferme tous les autres
-                            handleSetIsOpen();
-                            onToggleSidebar();
+                            handleMenuNavigation();
                           }}
                         >
                           <i className={menuItem.icon} />
@@ -244,8 +249,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
                                   className="svg-icon"
                                   as={NavLink}
                                   onClick={() => {
-                                    handleSetIsOpen();
-                                    onToggleSidebar();
+                                    handleMenuNavigation();
                                   }}
                                 >
                                   <i className={subItem.icon} />
@@ -274,6 +278,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleSidebar }) => {
             <nav className="iq-sidebar-menu">
               <ul className="iq-menu" style={{ padding: 0 }}>
                 <li className="divider" style={{ margin: "0 0 5px" }}></li>
+                <li>
+                  <Nav.Link
+                    to="/profile"
+                    className="svg-icon"
+                    as={NavLink}
+                    onClick={handleMenuNavigation}
+                  >
+                    <i className="las la-user-circle" />
+                    <span className={`ml-3 ${activeMenuText}`}>
+                      {translate("Profile")}
+                    </span>
+                  </Nav.Link>
+                </li>
                 <Logout
                   onLogout={handleLogout}
                   activeMenu={activeMenuText}
