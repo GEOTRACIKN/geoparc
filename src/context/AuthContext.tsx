@@ -116,6 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("language", u.profile_settings.language);
     localStorage.setItem("timezone", u.profile_settings.timezone);
     localStorage.setItem("userid", String(u.id_user));
+    localStorage.setItem("GeopUserID", String(u.id_user));
   };
 
   const clearUserFromLocalStorage = () => {
@@ -127,6 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("language");
     localStorage.removeItem("timezone");
     localStorage.removeItem("userid");
+    localStorage.removeItem("GeopUserID");
   };
 
   /** ===== Bootstrapping de session + refresh périodique ===== */
