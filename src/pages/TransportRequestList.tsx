@@ -213,6 +213,35 @@ export function TransportRequestList() {
         );
     };
 
+    const handleClearSearch = async () => {
+        setSearch("");
+        setCurrentPage(1);
+        await loadTransportRequests(
+            1,
+            "",
+            requestType,
+            limitValue,
+            sortColumn,
+            sortOrder,
+        );
+    };
+
+    const handleRequestTypeChange = async (
+        event: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        const nextType = event.target.value;
+        setRequestType(nextType);
+        setCurrentPage(1);
+        await loadTransportRequests(
+            1,
+            search,
+            nextType,
+            limitValue,
+            sortColumn,
+            sortOrder,
+        );
+    };
+
     const handlePageClick = (event: { selected: number }) => {
         setCurrentPage(event.selected + 1);
         window.scrollTo(0, 0);
@@ -558,6 +587,11 @@ export function TransportRequestList() {
                                     placeholder={translate("search") + "..."}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSearch();
+                                        }
+                                    }}
                                     style={{
                                         height: "42px",
                                         minHeight: "42px",
@@ -572,7 +606,7 @@ export function TransportRequestList() {
                                 {search && (
                                     <Button
                                         variant="outline-secondary"
-                                        onClick={() => setSearch("")}
+                                        onClick={handleClearSearch}
                                         style={{
                                             height: "42px",
                                             minHeight: "42px",
@@ -589,7 +623,7 @@ export function TransportRequestList() {
                         <Col xl={2} lg={3} md={4}>
                             <Form.Select
                                 value={requestType}
-                                onChange={(e) => setRequestType(e.target.value)}
+                                onChange={handleRequestTypeChange}
                                 style={{ height: "42px" }}
                             >
                                 <option value="all">{translate("all")}</option>
