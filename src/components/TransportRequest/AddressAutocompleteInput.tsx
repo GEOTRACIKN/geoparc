@@ -38,7 +38,9 @@ export default function AddressAutocompleteInput({
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
-    setInputValue(value);
+    if (!value) {
+      setInputValue("");
+    }
   }, [value]);
 
   useEffect(() => {
@@ -140,18 +142,30 @@ export default function AddressAutocompleteInput({
         value={selectedOption}
         onChange={(option: SingleValue<AddressOption>) => {
           const nextValue = option?.value || "";
-          setInputValue(nextValue);
+          setInputValue("");
           onChange(nextValue);
           setSuggestions([]);
         }}
-        onInputChange={(inputValue, actionMeta) => {
+        onInputChange={(nextInputValue, actionMeta) => {
           if (actionMeta.action === "input-change") {
-            setInputValue(inputValue);
-            onChange(inputValue);
+            setInputValue(nextInputValue);
+            onChange(nextInputValue);
+            return nextInputValue;
           }
 
-          return inputValue;
+          if (actionMeta.action === "set-value") {
+            setInputValue("");
+            return "";
+          }
+
+          return nextInputValue;
         }}
+        onFocus={() => {
+          if (value) {
+            setInputValue(value);
+          }
+        }}
+        onBlur={() => setInputValue("")}
         styles={selectStyles}
       />
     </Form.Group>

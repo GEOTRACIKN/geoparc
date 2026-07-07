@@ -7,14 +7,17 @@ import { TransportRequestResponsibleOption } from "../../types/transportRequest.
 type Props = {
   translate: (key: string) => string;
   objectRequest: string;
+  requesterEmail: string;
   requesterPhone: string;
   selectedResponsibleId: number | null;
   responsibles: TransportRequestResponsibleOption[];
   isLoadingResponsibles: boolean;
+  isLoadingRequester: boolean;
   onTextChange: (
     name: "object_request" | "requester_phone" | "requester_email",
     value: string
   ) => void;
+  onRequesterEmailBlur: (email: string) => void;
   onResponsibleChange: (id_responsable: number | null) => void;
 };
 
@@ -26,11 +29,14 @@ type SelectOption = {
 export default function TransportRequestDetailsCard({
   translate,
   objectRequest,
+  requesterEmail,
   requesterPhone,
   selectedResponsibleId,
   responsibles,
   isLoadingResponsibles,
+  isLoadingRequester: _isLoadingRequester,
   onTextChange,
+  onRequesterEmailBlur,
   onResponsibleChange,
 }: Props) {
   const { isDarkMode } = useTheme();
@@ -62,6 +68,7 @@ export default function TransportRequestDetailsCard({
       borderColor: state.isFocused ? "#ff8a00" : isDarkMode ? "#5b6470" : "#d7dee8",
       boxShadow: "none",
       color: isDarkMode ? "#f8fafc" : "#1f2937",
+      opacity: state.isDisabled ? 0.85 : 1,
     }),
     input: (base: any) => ({
       ...base,
@@ -74,6 +81,24 @@ export default function TransportRequestDetailsCard({
     placeholder: (base: any) => ({
       ...base,
       color: isDarkMode ? "#9aa4b2" : "#6b7280",
+    }),
+    clearIndicator: (base: any, state: any) => ({
+      ...base,
+      color: state.isFocused ? "#ff8a00" : isDarkMode ? "#d1d5db" : "#9ca3af",
+      ":hover": {
+        color: "#ff8a00",
+      },
+    }),
+    dropdownIndicator: (base: any, state: any) => ({
+      ...base,
+      color: state.isFocused ? "#ff8a00" : isDarkMode ? "#d1d5db" : "#9ca3af",
+      ":hover": {
+        color: "#ff8a00",
+      },
+    }),
+    indicatorSeparator: (base: any) => ({
+      ...base,
+      backgroundColor: isDarkMode ? "#5b6470" : "#d7dee8",
     }),
     menu: (base: any) => ({
       ...base,
@@ -114,6 +139,17 @@ export default function TransportRequestDetailsCard({
             placeholder={translate("Enter request object")}
             value={objectRequest}
             onChange={(e) => onTextChange("object_request", e.target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group className="form-group">
+          <Form.Label>{translate("Requester Email")} *</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder={translate("Enter requester email")}
+            value={requesterEmail}
+            onChange={(e) => onTextChange("requester_email", e.target.value)}
+            onBlur={(e) => onRequesterEmailBlur(e.target.value)}
           />
         </Form.Group>
 
