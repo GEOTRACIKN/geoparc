@@ -3,6 +3,7 @@ import {
   TransportRequestListCountResponse,
   TransportRequestListItem,
   TransportRequestListSearchPayload,
+  TransportRequestListStatusUpdatePayload,
 } from "../types/transportRequestList.types";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -28,7 +29,7 @@ export async function getTransportRequestList(
     throw new Error(result.message || "Failed to load transport requests");
   }
 
-  return result;
+  return Array.isArray(result) ? result : result.value || [];
 }
 
 export async function getTransportRequestListCount(
@@ -55,13 +56,9 @@ export async function getTransportRequestListCount(
   return result;
 }
 
-export async function updateTransportRequestListStatus(payload: {
-  id_transport_request: number;
-  id_user: string | null;
-  status_request: string;
-  approval_status?: string;
-  approval_required?: number;
-}): Promise<{ message?: string }> {
+export async function updateTransportRequestListStatus(
+  payload: TransportRequestListStatusUpdatePayload
+): Promise<{ message: string }> {
   const response = await fetch(
     `${backendUrl}/api/geop/transportRequestManage/update`,
     {

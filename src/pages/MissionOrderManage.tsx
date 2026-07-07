@@ -13,11 +13,25 @@ interface Vehicle {
   immatriculation_vehicule: string;
   LAT?: string | number | null;
   LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+  latitude_vehicule?: string | number | null;
+  longitude_vehicule?: string | number | null;
 }
 interface VehiclePosition {
   id_vehicule: number;
   LAT?: string | number | null;
   LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+}
+interface VehiclePositionResponse {
+  value?: VehiclePosition[];
+  Count?: number;
 }
 interface LocationCoordinates {
   latitude: number;
@@ -27,7 +41,8 @@ interface VehicleOption {
   value: number;
   label: string;
   searchLabel: string;
-  distanceKm: number;
+  distanceKm: number | null;
+  isNearby: boolean;
 }
 interface Trailer {
   id_remorque?: number;       // Ajoutez si disponible
@@ -87,6 +102,21 @@ const formatDistanceKm = (distanceKm: number) => {
   }
 
   return `${distanceKm.toFixed(distanceKm < 10 ? 1 : 0)} km`;
+};
+
+const readCoordinate = (...values: Array<string | number | null | undefined>) => {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") {
+      continue;
+    }
+
+    const coordinate = Number(value);
+    if (Number.isFinite(coordinate)) {
+      return coordinate;
+    }
+  }
+
+  return null;
 };
 
 
@@ -215,10 +245,15 @@ export function MissionOrderManage() {
           ? await vehiclesRes.json()
           : [];
         setVehicles(vehiclesData.vehicles || []);
-        const vehiclePositionsData = vehiclePositionsRes && vehiclePositionsRes.ok
-          ? await vehiclePositionsRes.json()
-          : [];
-        setVehiclePositions(Array.isArray(vehiclePositionsData) ? vehiclePositionsData : []);
+        const vehiclePositionsData: VehiclePosition[] | VehiclePositionResponse =
+          vehiclePositionsRes && vehiclePositionsRes.ok
+            ? await vehiclePositionsRes.json()
+            : [];
+        setVehiclePositions(
+          Array.isArray(vehiclePositionsData)
+            ? vehiclePositionsData
+            : vehiclePositionsData.value || []
+        );
         // Mission (si édition)
         if (isEditing && missionRes?.ok) {
           const missionData: MissionOrderInterface = await missionRes.json();
@@ -254,24 +289,33 @@ export function MissionOrderManage() {
   }, [authLoading, id_mission, id_user, isEditing]);
 
   const geocodeDepartureLocation = useCallback(async (location: string) => {
-    const response = await fetch(
-      `https://geotrackin.com/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`
-    );
+    const urls = [
+      `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+    ];
 
-    if (!response.ok) {
-      throw new Error("Failed to geocode departure location");
+    for (const url of urls) {
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+        const firstResult = Array.isArray(data) ? data[0] : null;
+        const latitude = Number(firstResult?.lat);
+        const longitude = Number(firstResult?.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          return { latitude, longitude };
+        }
+      } catch (error) {
+        console.warn("Geocoding provider failed:", error);
+      }
     }
 
-    const data = await response.json();
-    const firstResult = Array.isArray(data) ? data[0] : null;
-    const latitude = Number(firstResult?.lat);
-    const longitude = Number(firstResult?.lon);
-
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-      return null;
-    }
-
-    return { latitude, longitude };
+    return null;
   }, []);
 
   useEffect(() => {
@@ -310,10 +354,6 @@ export function MissionOrderManage() {
   }, [geocodeDepartureLocation, mission?.dep_loc_mission]);
 
   const vehicleOptions = useMemo<VehicleOption[]>(() => {
-    if (!departureCoordinates) {
-      return [];
-    }
-
     const positionByVehicleId = new Map<number, VehiclePosition>();
 
     vehiclePositions.forEach((position) => {
@@ -323,42 +363,77 @@ export function MissionOrderManage() {
     return vehicles
       .map((vehicle) => {
         const lastPosition = positionByVehicleId.get(Number(vehicle.id_vehicule));
-        const latitude = Number(lastPosition?.LAT ?? vehicle.LAT);
-        const longitude = Number(lastPosition?.LON ?? vehicle.LON);
-
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-          return null;
-        }
-
-        const distanceKm = getDistanceKm(
-          departureCoordinates.latitude,
-          departureCoordinates.longitude,
-          latitude,
-          longitude
+        const latitude = readCoordinate(
+          lastPosition?.LAT,
+          lastPosition?.lat,
+          lastPosition?.latitude,
+          vehicle.LAT,
+          vehicle.lat,
+          vehicle.latitude,
+          vehicle.latitude_vehicule
         );
-
-        if (distanceKm > MAX_DEPARTURE_DISTANCE_KM) {
-          return null;
-        }
-
+        const longitude = readCoordinate(
+          lastPosition?.LON,
+          lastPosition?.lon,
+          lastPosition?.longitude,
+          vehicle.LON,
+          vehicle.lon,
+          vehicle.longitude,
+          vehicle.longitude_vehicule
+        );
         const registration = vehicle.immatriculation_vehicule || "";
+
+        const canCalculateDistance =
+          departureCoordinates &&
+          latitude !== null &&
+          longitude !== null;
+
+        const calculatedDistanceKm = canCalculateDistance
+          ? getDistanceKm(
+              departureCoordinates.latitude,
+              departureCoordinates.longitude,
+              latitude,
+              longitude
+            )
+          : null;
+        const isNearby =
+          calculatedDistanceKm !== null &&
+          calculatedDistanceKm <= MAX_DEPARTURE_DISTANCE_KM;
 
         return {
           value: vehicle.id_vehicule,
-          label: `${registration} - ${formatDistanceKm(distanceKm)}`,
+          label: registration,
           searchLabel: registration,
-          distanceKm,
+          distanceKm: isNearby ? calculatedDistanceKm : null,
+          isNearby,
         };
       })
-      .filter((option): option is VehicleOption => Boolean(option))
-      .sort((first, second) => first.distanceKm - second.distanceKm);
+      .sort((first, second) => {
+        if (first.isNearby !== second.isNearby) {
+          return first.isNearby ? -1 : 1;
+        }
+
+        if (first.distanceKm !== null && second.distanceKm !== null) {
+          return first.distanceKm - second.distanceKm;
+        }
+
+        if (first.distanceKm !== null) return -1;
+        if (second.distanceKm !== null) return 1;
+
+        return first.searchLabel.localeCompare(second.searchLabel);
+      });
   }, [departureCoordinates, vehiclePositions, vehicles]);
+
+  const nearbyVehicleCount = useMemo(
+    () => vehicleOptions.filter((option) => option.isNearby).length,
+    [vehicleOptions]
+  );
 
   useEffect(() => {
     if (
       departureLookupStatus !== "found" ||
       !mission?.id_vehicule ||
-      vehicleOptions.some((option) => option.value === mission.id_vehicule)
+      vehicles.some((vehicle) => vehicle.id_vehicule === mission.id_vehicule)
     ) {
       return;
     }
@@ -826,23 +901,20 @@ export function MissionOrderManage() {
                           options={vehicleOptions}
                           placeholder={translate("Select Vehicle")}
                           isSearchable
-                          isDisabled={!departureCoordinates}
                           isLoading={departureLookupStatus === "loading"}
                           noOptionsMessage={() => {
-                            if (!mission?.dep_loc_mission?.trim()) {
-                              return "Saisir le lieu de depart";
-                            }
-
-                            if (departureLookupStatus === "loading") {
-                              return "Recherche du lieu de depart...";
-                            }
-
-                            if (departureLookupStatus === "not-found") {
-                              return "Lieu de depart introuvable";
-                            }
-
-                            return "Aucun vehicule dans un rayon de 20 km";
+                            return translate("No vehicles available");
                           }}
+                          formatOptionLabel={(option) => (
+                            <div className="d-flex align-items-center justify-content-between gap-3">
+                              <span>{option.searchLabel}</span>
+                              {option.distanceKm !== null && option.isNearby && (
+                                <span className="text-muted small ms-auto">
+                                  {formatDistanceKm(option.distanceKm)}
+                                </span>
+                              )}
+                            </div>
+                          )}
                           filterOption={(option, inputValue) =>
                             option.data.searchLabel
                               .toLowerCase()
@@ -851,9 +923,24 @@ export function MissionOrderManage() {
                           value={vehicleOptions.find(option => option.value === mission?.id_vehicule) || null}
                           onChange={handleVehicleSelectChange}
                         />
-                        {departureCoordinates && (
+                        {departureLookupStatus === "loading" && (
                           <div className="mission-muted-text mt-2">
-                            {vehicleOptions.length} vehicule(s) dans un rayon de 20 km.
+                            Recherche du lieu de depart...
+                          </div>
+                        )}
+                        {departureLookupStatus === "not-found" && (
+                          <div className="mission-muted-text mt-2">
+                            Lieu de depart introuvable. Tous les vehicules restent disponibles sans distance.
+                          </div>
+                        )}
+                        {departureCoordinates && nearbyVehicleCount > 0 && (
+                          <div className="mission-muted-text mt-2">
+                            {nearbyVehicleCount} vehicule(s) proche(s) dans un rayon de {MAX_DEPARTURE_DISTANCE_KM} km. Les autres restent disponibles sans distance.
+                          </div>
+                        )}
+                        {departureCoordinates && nearbyVehicleCount === 0 && (
+                          <div className="mission-muted-text mt-2">
+                            Aucun vehicule dans un rayon de {MAX_DEPARTURE_DISTANCE_KM} km. Les autres vehicules sont disponibles sans distance.
                           </div>
                         )}
                       </div>

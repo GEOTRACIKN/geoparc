@@ -41,3 +41,11 @@ export interface TransportRequestListCountPayload {
 export interface TransportRequestListCountResponse {
   count: number;
 }
+
+export interface TransportRequestListStatusUpdatePayload {
+  id_transport_request: number;
+  id_user: string | null;
+  status_request: TransportRequestListStatus;
+  approval_status?: "pending" | "approved" | "rejected" | "cancelled";
+  approval_required?: 0 | 1;
+}

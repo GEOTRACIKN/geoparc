@@ -31,7 +31,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const [appearance, setAppearance] = useState<SidebarAppearancePreference>(readStoredSidebarAppearance);
   const { isDarkMode } = useTheme();
-
   const navigate = useNavigate();
   const { logout } = useAuth();
   const isSidebarExpanded = isSidebarPinned || (!isSmallScreen && isHovering);
@@ -39,8 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
   const activeLogo = isSidebarExpanded ? "header-logo-show" : "header-logo-hide";
   const activeMenuText = isSidebarExpanded ? "" : "iq-menu-span-hide";
   const sidebar = isSidebarExpanded ? "sidebar-open" : "sidebar-close";
-  const effectiveSidebarColor = isDarkMode ? "dark" : "light";
-  const sidebarAppearanceClass = `sidebar-color-${effectiveSidebarColor} sidebar-icons-${appearance.iconMode}`;
+  const sidebarAppearanceClass = `sidebar-color-${appearance.colorMode} sidebar-icons-${appearance.iconMode}`;
 
 
   useEffect(() => {

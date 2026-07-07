@@ -2925,3 +2925,29 @@ body.dark-theme .navbar-sidebar-fix-toggle:hover {
   background: #ff6f2b !important;
 }
 
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active > a i,
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active-menu > a i,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a.active i,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a[aria-current="page"] i,
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active > a svg,
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active-menu > a svg,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a.active svg,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a[aria-current="page"] svg {
+  color: #ff7e41 !important;
+}
+
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active > a,
+.iq-sidebar .iq-sidebar-menu .iq-menu li.active-menu > a,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a.active,
+.iq-sidebar .iq-sidebar-menu .iq-menu li > a[aria-current="page"] {
+  color: #ff7e41 !important;
+  background: rgba(255, 126, 65, 0.1) !important;
+}
+
+body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu li.active > a,
+body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu li.active-menu > a,
+body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu li > a.active,
+body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu li > a[aria-current="page"] {
+  background: rgba(255, 126, 65, 0.18) !important;
+}
+
