@@ -78,6 +78,7 @@ import { UserProvider } from "./context/UserContext";
 import { TransportRequestManage } from "./pages/TransportRequest";
 import TransportRequestList from "./pages/TransportRequestList";
 import { RequestResponsibility } from "./pages/RequestResponsibility";
+import Reports from "./pages/Reports";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -297,7 +298,7 @@ function App() {
                 <Route path="/reference" element={<DashboardLayout><Reference /></DashboardLayout>} />
                 <Route path="/hse-dashboard" element={<DashboardLayout><DashboardKPI /></DashboardLayout>} />
                 <Route path="/planning-interviews" element={<DashboardLayout><InterviewSchedule /></DashboardLayout>} />
-
+                <Route path="/Reports" element={<DashboardLayout><Reports /></DashboardLayout>} /> 
                 <Route
                   path="/login-geoparc"
                   element={

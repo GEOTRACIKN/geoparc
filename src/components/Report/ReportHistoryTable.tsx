@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge, Table } from "react-bootstrap";
-import { FaDownload, FaEye, FaTrash } from "react-icons/fa";
+import { Download, Eye, FileText, Trash2 } from "lucide-react";
 
 export type ReportStatus =
   | "pending"
@@ -64,16 +64,32 @@ function parseParams(params: ReportHistoryRow["parameters_json"]) {
 function getStatusBadge(status: string) {
   switch (status) {
     case "completed":
-      return <Badge className="report-status-badge report-status-completed">✓ Terminé</Badge>;
+      return (
+        <Badge className="report-status-badge report-status-completed">
+          Terminé
+        </Badge>
+      );
 
     case "failed":
-      return <Badge className="report-status-badge report-status-failed">× Erreur</Badge>;
+      return (
+        <Badge className="report-status-badge report-status-failed">
+          Erreur
+        </Badge>
+      );
 
     case "processing":
-      return <Badge className="report-status-badge report-status-processing">En cours</Badge>;
+      return (
+        <Badge className="report-status-badge report-status-processing">
+          En cours
+        </Badge>
+      );
 
     default:
-      return <Badge className="report-status-badge report-status-pending">En attente</Badge>;
+      return (
+        <Badge className="report-status-badge report-status-pending">
+          En attente
+        </Badge>
+      );
   }
 }
 
@@ -84,106 +100,135 @@ const ReportHistoryTable: React.FC<ReportHistoryTableProps> = ({
   onDelete,
 }) => {
   return (
-    <Table hover responsive className="text-center report-history-table">
-      <thead>
-        <tr>
-          <th>Rapport ID</th>
-          <th>Nom du rapport</th>
-          <th>Catégorie</th>
-          <th>Paramètres</th>
-          <th>Utilisateur</th>
-          <th>Date</th>
-          <th>Statut</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {loading ? (
+    <div className="report-table-shell">
+      <Table responsive className="report-history-table">
+        <thead>
           <tr>
-            <td colSpan={8} className="text-muted py-4">
-              Chargement...
-            </td>
+            <th>Rapport ID</th>
+            <th>Nom du rapport</th>
+            <th>Catégorie</th>
+            <th>Paramètres</th>
+            <th>Utilisateur</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th className="text-end">Actions</th>
           </tr>
-        ) : reports.length > 0 ? (
-          reports.map((report) => {
-            const params = parseParams(report.parameters_json);
+        </thead>
 
-            return (
-              <tr key={report.id_report}>
-                <td className="report-id">#{report.id_report}</td>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={8}>
+                <div className="report-table-state">
+                  <span className="report-loading-dot" />
+                  Chargement des rapports...
+                </div>
+              </td>
+            </tr>
+          ) : reports.length > 0 ? (
+            reports.map((report) => {
+              const params = parseParams(report.parameters_json);
 
-                <td className="text-start">
-                  <strong>{report.report_name}</strong>
-                  <div className="text-muted" style={{ fontSize: 12 }}>
-                    {report.category} • {report.format || "Excel"}
-                  </div>
-                </td>
+              return (
+                <tr key={report.id_report}>
+                  <td>
+                    <span className="report-id">#{report.id_report}</span>
+                  </td>
 
-                <td>
-                  <Badge className="report-orange-badge">
-                    {report.category}
-                  </Badge>
-                </td>
-
-                <td className="text-start">
-                  {Object.keys(params).length > 0 ? (
-                    <div className="d-flex flex-wrap gap-2">
-                      {Object.entries(params).map(([key, value]) => (
-                        <Badge key={key} className="report-orange-badge">
-                          {key}: {String(value)}
-                        </Badge>
-                      ))}
+                  <td>
+                    <div className="report-name-cell">
+                      <div className="report-file-icon">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <strong>{report.report_name}</strong>
+                        <div className="report-row-meta">
+                          {report.category} · {report.format || "Excel"}
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <span className="text-muted">—</span>
-                  )}
-                </td>
+                  </td>
 
-                <td>{report.username || "GEOT"}</td>
+                  <td>
+                    <Badge className="report-category-badge">
+                      {report.category}
+                    </Badge>
+                  </td>
 
-                <td>{formatDate(report.created_at)}</td>
-
-                <td>{getStatusBadge(report.status)}</td>
-
-                <td>
-                  <div className="d-flex justify-content-center gap-3">
-                    {report.file_url && (
-                      <FaDownload
-                        color="#16a34a"
-                        className="report-action-icon"
-                        title="Télécharger"
-                        onClick={() => window.open(report.file_url || "", "_blank")}
-                      />
+                  <td>
+                    {Object.keys(params).length > 0 ? (
+                      <div className="report-param-list">
+                        {Object.entries(params).map(([key, value]) => (
+                          <Badge key={key} className="report-param-badge">
+                            {key}: {String(value)}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="report-muted-text">-</span>
                     )}
+                  </td>
 
-                    <FaEye
-                      color="#f97316"
-                      className="report-action-icon"
-                      title="Voir"
-                      onClick={() => onView(report.id_report)}
-                    />
+                  <td>{report.username || "GEOT"}</td>
 
-                    <FaTrash
-                      color="#dc2626"
-                      className="report-action-icon"
-                      title="Supprimer"
-                      onClick={() => onDelete(report.id_report)}
-                    />
-                  </div>
-                </td>
-              </tr>
-            );
-          })
-        ) : (
-          <tr>
-            <td colSpan={8} className="text-muted py-4">
-              Aucun rapport trouvé
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </Table>
+                  <td className="report-date-cell">
+                    {formatDate(report.created_at)}
+                  </td>
+
+                  <td>{getStatusBadge(report.status)}</td>
+
+                  <td>
+                    <div className="report-action-group">
+                      {report.file_url && (
+                        <button
+                          type="button"
+                          className="report-action-btn report-action-download"
+                          title="Télécharger"
+                          aria-label="Télécharger"
+                          onClick={() =>
+                            window.open(report.file_url || "", "_blank")
+                          }
+                        >
+                          <Download size={16} />
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        className="report-action-btn report-action-view"
+                        title="Voir"
+                        aria-label="Voir"
+                        onClick={() => onView(report.id_report)}
+                      >
+                        <Eye size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        className="report-action-btn report-action-delete"
+                        title="Supprimer"
+                        aria-label="Supprimer"
+                        onClick={() => onDelete(report.id_report)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={8}>
+                <div className="report-table-state">
+                  Aucun rapport trouvé
+                </div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 

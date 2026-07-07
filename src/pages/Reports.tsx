@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { toast, Bounce } from "react-toastify";
+import { Plus, RotateCcw } from "lucide-react";
 
 import AddReport from "../components/Report/AddReport";
 import ShowReport from "../components/Report/ShowReport";
@@ -241,50 +242,54 @@ const ReportsPage: React.FC = () => {
 
   return (
     <div className="reports-page">
-      <div className="d-flex justify-content-between align-items-start mb-3">
+      <div className="report-page-header">
         <div>
+          <div className="report-eyebrow">Centre GeoParc</div>
           <h4 className="mb-1 report-title">Rapports & Statistiques</h4>
-          <div className="text-muted" style={{ fontSize: 13 }}>
+          <div className="report-subtitle">
             Centre de génération et suivi des rapports GeoParc.
           </div>
         </div>
 
         <Button className="report-main-btn" onClick={() => setShowAdd(true)}>
-          + Créer un rapport
+          <Plus size={18} strokeWidth={2.5} />
+          Créer un rapport
         </Button>
       </div>
 
       <ReportKpiCards />
 
       <div className="report-table-card">
-        <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="report-table-toolbar">
           <div>
-            <h5 className="mb-0">Historique des rapports générés</h5>
-            <div className="text-muted" style={{ fontSize: 13 }}>
+            <h5 className="report-section-title">Historique des rapports générés</h5>
+            <div className="report-section-subtitle">
               Affichage {reports.length} sur {total}
             </div>
           </div>
 
-          <select
-            className="form-select report-filter-input"
-            style={{ width: 110 }}
-            value={limit}
-            onChange={(e) => {
-              setLimit(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            {[10, 20, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+          <div className="report-limit-control">
+            <span>Par page</span>
+            <select
+              className="form-select report-filter-input"
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {[10, 20, 50, 100].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="report-filter-card mb-3">
-          <div className="row g-3 align-items-end">
-            <div className="col-md-2">
+          <div className="report-filter-grid">
+            <div className="report-filter-field report-filter-id">
               <label className="report-filter-label">ID rapport</label>
               <input
                 className="form-control report-filter-input"
@@ -297,7 +302,7 @@ const ReportsPage: React.FC = () => {
               />
             </div>
 
-            <div className="col-md-3">
+            <div className="report-filter-field report-filter-name">
               <label className="report-filter-label">Nom du rapport</label>
               <input
                 className="form-control report-filter-input"
@@ -310,7 +315,7 @@ const ReportsPage: React.FC = () => {
               />
             </div>
 
-            <div className="col-md-2">
+            <div className="report-filter-field">
               <label className="report-filter-label">Date</label>
               <input
                 type="date"
@@ -323,7 +328,7 @@ const ReportsPage: React.FC = () => {
               />
             </div>
 
-            <div className="col-md-2">
+            <div className="report-filter-field">
               <label className="report-filter-label">Catégorie</label>
               <select
                 className="form-select report-filter-input"
@@ -342,7 +347,7 @@ const ReportsPage: React.FC = () => {
               </select>
             </div>
 
-            <div className="col-md-2">
+            <div className="report-filter-field">
               <label className="report-filter-label">Statut</label>
               <select
                 className="form-select report-filter-input"
@@ -360,13 +365,14 @@ const ReportsPage: React.FC = () => {
               </select>
             </div>
 
-            <div className="col-md-1">
+            <div className="report-filter-actions">
               <Button
                 variant="light"
                 className="w-100 report-reset-btn"
                 onClick={resetFilters}
                 title="Réinitialiser les filtres"
               >
+                <RotateCcw size={16} />
                 Reset
               </Button>
             </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Button,
-  Card,
   Col,
   Form,
   Offcanvas,
@@ -11,12 +10,15 @@ import {
 } from "react-bootstrap";
 import { toast, Bounce } from "react-toastify";
 import {
-  FaCar,
-  FaGasPump,
-  FaShieldAlt,
-  FaUserTie,
-  FaWallet,
-} from "react-icons/fa";
+  Car,
+  Check,
+  FileBarChart,
+  Fuel,
+  Loader2,
+  ShieldCheck,
+  UserCheck,
+  WalletCards,
+} from "lucide-react";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -57,7 +59,7 @@ const FIELD_CONFIG: Record<
   year: {
     label: "Année",
     options: ["2026", "2025", "2024", "2023"],
-    helper: "Année d’analyse du rapport.",
+    helper: "Année d'analyse du rapport.",
   },
   month: {
     label: "Mois",
@@ -98,7 +100,7 @@ const FIELD_CONFIG: Record<
 const fakeCatalog: ReportCategory[] = [
   {
     category: "Véhicules",
-    icon: <FaCar />,
+    icon: <Car size={20} />,
     reports: [
       {
         report_key: "vehicle_list",
@@ -120,7 +122,7 @@ const fakeCatalog: ReportCategory[] = [
   },
   {
     category: "Carburants",
-    icon: <FaGasPump />,
+    icon: <Fuel size={20} />,
     reports: [
       {
         report_key: "fuel_by_vehicle",
@@ -142,7 +144,7 @@ const fakeCatalog: ReportCategory[] = [
   },
   {
     category: "Conducteurs",
-    icon: <FaUserTie />,
+    icon: <UserCheck size={20} />,
     reports: [
       {
         report_key: "driver_hse",
@@ -156,7 +158,7 @@ const fakeCatalog: ReportCategory[] = [
   },
   {
     category: "Missions",
-    icon: <FaShieldAlt />,
+    icon: <ShieldCheck size={20} />,
     reports: [
       {
         report_key: "missions_report",
@@ -170,7 +172,7 @@ const fakeCatalog: ReportCategory[] = [
   },
   {
     category: "Budget",
-    icon: <FaWallet />,
+    icon: <WalletCards size={20} />,
     reports: [
       {
         report_key: "budget_expenses",
@@ -235,6 +237,11 @@ const AddReport: React.FC<AddReportProps> = ({
     if (!selectedReport) return [];
     return selectedReport.fields || [];
   }, [selectedReport]);
+
+  const totalTemplates = useMemo(
+    () => catalog.reduce((sum, cat) => sum + cat.reports.length, 0),
+    [catalog]
+  );
 
   const handleSelectReport = (report: ReportItem) => {
     setSelectedReport(report);
@@ -314,132 +321,180 @@ const AddReport: React.FC<AddReportProps> = ({
   };
 
   return (
-    <Offcanvas show={show} onHide={onHide} placement="end" style={{ width: 980 }}>
-      <Offcanvas.Header closeButton>
-        <Offcanvas.Title>Créer un rapport</Offcanvas.Title>
+    <Offcanvas
+      show={show}
+      onHide={onHide}
+      placement="end"
+      className="report-create-drawer"
+    >
+      <Offcanvas.Header closeButton className="report-drawer-header">
+        <div>
+          <div className="report-drawer-eyebrow">Nouveau rapport</div>
+          <Offcanvas.Title className="report-drawer-title">
+            Créer un rapport
+          </Offcanvas.Title>
+        </div>
       </Offcanvas.Header>
 
-      <Offcanvas.Body>
+      <Offcanvas.Body className="report-drawer-body">
         {catalogLoading ? (
-          <div className="text-center p-5">
+          <div className="report-drawer-loading">
             <Spinner animation="border" />
-            <div className="mt-2 text-muted">Chargement des rapports...</div>
+            <div>Chargement des rapports...</div>
           </div>
         ) : (
           <>
-            <div className="mb-3">
-              <div className="fw-bold">Rapports disponibles</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                Sélectionnez une catégorie puis choisissez le rapport à générer.
+            <div className="report-drawer-intro">
+              <div>
+                <h5>Rapports disponibles</h5>
+                <p>
+                  Sélectionnez un modèle, puis ajustez les paramètres avant la
+                  génération.
+                </p>
               </div>
+              <Badge className="report-drawer-count">
+                {totalTemplates} modèles
+              </Badge>
             </div>
 
-            <Row>
+            <div className="report-catalog-grid">
               {catalog.map((cat) => (
-                <Col md={6} xl={4} className="mb-3" key={cat.category}>
-                  <Card className="h-100 shadow-sm border-0">
-                    <Card.Header className="bg-light d-flex align-items-center gap-2">
-                      <span style={{ color: "#f97316" }}>{cat.icon}</span>
+                <section className="report-catalog-card" key={cat.category}>
+                  <div className="report-catalog-header">
+                    <div className="report-catalog-title">
+                      <span className="report-catalog-icon">{cat.icon}</span>
                       <strong>{cat.category}</strong>
-                      <Badge bg="secondary" className="ms-auto">
-                        {cat.reports.length}
-                      </Badge>
-                    </Card.Header>
+                    </div>
+                    <Badge className="report-catalog-badge">
+                      {cat.reports.length}
+                    </Badge>
+                  </div>
 
-                    <Card.Body className="p-0">
-                      {cat.reports.map((report) => {
-                        const active =
-                          selectedReport?.report_key === report.report_key;
+                  <div className="report-catalog-list">
+                    {cat.reports.map((report) => {
+                      const active =
+                        selectedReport?.report_key === report.report_key;
 
-                        return (
-                          <button
-                            key={report.report_key}
-                            type="button"
-                            className="w-100 text-start border-0 p-3"
-                            style={{
-                              background: active ? "#fff7ed" : "#fff",
-                              borderLeft: active
-                                ? "4px solid #f97316"
-                                : "4px solid transparent",
-                            }}
-                            onClick={() => handleSelectReport(report)}
-                          >
-                            <div className="fw-bold">{report.report_name}</div>
-                            <div className="text-muted" style={{ fontSize: 12 }}>
-                              {report.description}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </Card.Body>
-                  </Card>
-                </Col>
+                      return (
+                        <button
+                          key={report.report_key}
+                          type="button"
+                          className={`report-template-btn${
+                            active ? " is-active" : ""
+                          }`}
+                          onClick={() => handleSelectReport(report)}
+                        >
+                          <span className="report-template-check">
+                            {active ? (
+                              <Check size={15} />
+                            ) : (
+                              <FileBarChart size={15} />
+                            )}
+                          </span>
+                          <span>
+                            <strong>{report.report_name}</strong>
+                            <small>{report.description}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
               ))}
-            </Row>
-
-            <hr />
-
-            <div className="mb-3">
-              <div className="fw-bold">Paramètres</div>
-              <div className="text-muted" style={{ fontSize: 13 }}>
-                {selectedReport
-                  ? `${selectedReport.category} • ${selectedReport.report_name}`
-                  : "Sélectionnez un rapport pour afficher les paramètres."}
-              </div>
             </div>
 
-            {!selectedReport ? (
-              <div className="alert alert-light border">
-                Aucun rapport sélectionné.
+            <section className="report-parameters-panel">
+              <div className="report-parameters-heading">
+                <div>
+                  <h5>Paramètres</h5>
+                  <p>
+                    {selectedReport
+                      ? `${selectedReport.category} · ${selectedReport.report_name}`
+                      : "Sélectionnez un rapport pour afficher les paramètres."}
+                  </p>
+                </div>
+                {selectedReport && (
+                  <Badge className="report-selected-badge">
+                    {selectedFields.length} paramètres
+                  </Badge>
+                )}
               </div>
-            ) : (
-              <Form>
-                <Row>
-                  {selectedFields.map((fieldKey) => {
-                    const config = FIELD_CONFIG[fieldKey];
 
-                    return (
-                      <Col md={6} xl={3} className="mb-3" key={fieldKey}>
-                        <Form.Label>{config.label}</Form.Label>
-                        <Form.Select
-                          value={formValues[fieldKey] || ""}
-                          onChange={(e) =>
-                            setFormValues((prev) => ({
-                              ...prev,
-                              [fieldKey]: e.target.value,
-                            }))
-                          }
-                        >
-                          {config.options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </Form.Select>
+              {!selectedReport ? (
+                <div className="report-empty-params">
+                  <FileBarChart size={22} />
+                  <span>Aucun rapport sélectionné.</span>
+                </div>
+              ) : (
+                <Form>
+                  <Row>
+                    {selectedFields.map((fieldKey) => {
+                      const config = FIELD_CONFIG[fieldKey];
 
-                        {config.helper && (
-                          <div className="text-muted mt-1" style={{ fontSize: 12 }}>
-                            {config.helper}
-                          </div>
-                        )}
-                      </Col>
-                    );
-                  })}
-                </Row>
-              </Form>
-            )}
+                      return (
+                        <Col md={6} xl={3} className="mb-3" key={fieldKey}>
+                          <Form.Label className="report-param-label">
+                            {config.label}
+                          </Form.Label>
+                          <Form.Select
+                            className="report-param-select"
+                            value={formValues[fieldKey] || ""}
+                            onChange={(e) =>
+                              setFormValues((prev) => ({
+                                ...prev,
+                                [fieldKey]: e.target.value,
+                              }))
+                            }
+                          >
+                            {config.options.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </Form.Select>
+
+                          {config.helper && (
+                            <div className="report-param-helper">
+                              {config.helper}
+                            </div>
+                          )}
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                </Form>
+              )}
+            </section>
           </>
         )}
       </Offcanvas.Body>
 
-      <div className="border-top p-3 d-flex justify-content-end gap-2">
-        <Button variant="secondary" onClick={onHide}>
-          Annuler
-        </Button>
+      <div className="report-drawer-footer">
+        <div className="report-footer-selection">
+          {selectedReport ? (
+            <>
+              <span>Prêt à générer</span>
+              <strong>{selectedReport.report_name}</strong>
+            </>
+          ) : (
+            <span>Sélectionnez un modèle pour continuer.</span>
+          )}
+        </div>
 
-        <Button onClick={handleSave} disabled={loading || !selectedReport}>
-          {loading ? "Création..." : "Générer le rapport"}
-        </Button>
+        <div className="report-footer-actions">
+          <Button className="report-cancel-btn" onClick={onHide}>
+            Annuler
+          </Button>
+
+          <Button
+            className="report-generate-btn"
+            onClick={handleSave}
+            disabled={loading || !selectedReport}
+          >
+            {loading && <Loader2 size={16} className="report-spin-icon" />}
+            {loading ? "Création..." : "Générer le rapport"}
+          </Button>
+        </div>
       </div>
     </Offcanvas>
   );
