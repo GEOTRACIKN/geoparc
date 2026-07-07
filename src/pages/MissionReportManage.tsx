@@ -10,6 +10,10 @@ interface Vehicle {
   immatriculation_vehicule: string;
   LAT?: string | number | null;
   LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
   latitude_vehicule?: string | number | null;
   longitude_vehicule?: string | number | null;
 }
@@ -18,6 +22,10 @@ interface VehiclePosition {
   id_vehicule: number;
   LAT?: string | number | null;
   LON?: string | number | null;
+  lat?: string | number | null;
+  lon?: string | number | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
 }
 
 interface VehiclePositionResponse {
@@ -94,6 +102,17 @@ const getDistanceKm = (fromLat: number, fromLon: number, toLat: number, toLon: n
 const formatDistanceKm = (distanceKm: number) => {
   if (distanceKm < 1) return `${Math.round(distanceKm * 1000)} m`;
   return `${distanceKm.toFixed(distanceKm < 10 ? 1 : 0)} km`;
+};
+
+const readCoordinate = (...values: Array<string | number | null | undefined>) => {
+  for (const value of values) {
+    const coordinate = Number(value);
+    if (Number.isFinite(coordinate)) {
+      return coordinate;
+    }
+  }
+
+  return null;
 };
 
 const parseDatetimeLocal = (localString: string): string | null => {
@@ -280,21 +299,39 @@ export function MissionReportManage() {
     return vehicles
       .map((vehicle) => {
         const lastPosition = positionByVehicleId.get(Number(vehicle.id_vehicule));
-        const lat = Number(lastPosition?.LAT ?? vehicle.LAT ?? vehicle.latitude_vehicule);
-        const lon = Number(lastPosition?.LON ?? vehicle.LON ?? vehicle.longitude_vehicule);
-        const hasVehiclePosition = Number.isFinite(lat) && Number.isFinite(lon);
-        const distanceKm =
+        const lat = readCoordinate(
+          lastPosition?.LAT,
+          lastPosition?.lat,
+          lastPosition?.latitude,
+          vehicle.LAT,
+          vehicle.lat,
+          vehicle.latitude,
+          vehicle.latitude_vehicule
+        );
+        const lon = readCoordinate(
+          lastPosition?.LON,
+          lastPosition?.lon,
+          lastPosition?.longitude,
+          vehicle.LON,
+          vehicle.lon,
+          vehicle.longitude,
+          vehicle.longitude_vehicule
+        );
+        const hasVehiclePosition = lat !== null && lon !== null;
+        const calculatedDistanceKm =
           departureCoordinates && hasVehiclePosition
             ? getDistanceKm(departureCoordinates.latitude, departureCoordinates.longitude, lat, lon)
             : null;
-        const isNearby = distanceKm !== null && distanceKm <= MAX_DEPARTURE_DISTANCE_KM;
+        const isNearby =
+          calculatedDistanceKm !== null &&
+          calculatedDistanceKm <= MAX_DEPARTURE_DISTANCE_KM;
         const registration = vehicle.immatriculation_vehicule || "";
 
         return {
           value: vehicle.id_vehicule,
           label: registration,
           searchLabel: registration,
-          distanceKm,
+          distanceKm: isNearby ? calculatedDistanceKm : null,
           isNearby,
         };
       })
