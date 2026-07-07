@@ -156,6 +156,20 @@ test("complete transport request process creates mission and opens edit page", a
     });
   });
 
+  await page.route("**/api/geop/transportRequestManage/update", async (route) => {
+    const payload = route.request().postDataJSON();
+
+    expect(payload.id_transport_request).toBe(transportRequest.id_transport_request);
+    expect(payload.status_request).toBe("mission_created");
+
+    await route.fulfill({
+      json: {
+        message: "Transport request updated successfully",
+        success: true,
+      },
+    });
+  });
+
   await page.route("**/api/geop/missionOrderManage/totalpage", (route) =>
     route.fulfill({ json: { count: missionCreated ? 1 : 0 } })
   );

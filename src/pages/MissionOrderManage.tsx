@@ -106,6 +106,10 @@ const formatDistanceKm = (distanceKm: number) => {
 
 const readCoordinate = (...values: Array<string | number | null | undefined>) => {
   for (const value of values) {
+    if (value === null || value === undefined || value === "") {
+      continue;
+    }
+
     const coordinate = Number(value);
     if (Number.isFinite(coordinate)) {
       return coordinate;
