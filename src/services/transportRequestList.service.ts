@@ -28,7 +28,7 @@ export async function getTransportRequestList(
     throw new Error(result.message || "Failed to load transport requests");
   }
 
-  return result;
+  return Array.isArray(result) ? result : result.value || [];
 }
 
 export async function getTransportRequestListCount(

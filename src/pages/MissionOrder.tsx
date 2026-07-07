@@ -143,13 +143,14 @@ export function MissionOrder() {
       }
 
       const data = await missionOrderResponse.json();
+      const missionOrders = Array.isArray(data) ? data : data.value || [];
 
       // Calcul de la pagination
       setPageCount(Math.ceil(total / limitValue));
       setLimit(limitValue);
-      setMissionOrder(data);
+      setMissionOrder(missionOrders);
 
-      return data;
+      return missionOrders;
     } catch (error) {
       console.error("Error fetching mission orders:", error);
       // Gestion d'erreur avec toast ou autre

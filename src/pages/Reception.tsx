@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
+import { Badge, Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
+import { useTheme } from "../hooks/ThemeContext";
 import ModalNewIntervention from "../components/Reception/NewIntervention"
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
+import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
@@ -31,6 +33,7 @@ export function Reception() {
 
 
     const { translate } = useTranslate();
+    const { isDarkMode } = useTheme();
     const [list_intervention, setintervention] = useState<Intervention[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
@@ -47,32 +50,48 @@ export function Reception() {
 
 
 
+    const columnStorageKey = "gmao_reception_selected_columns";
     const initialColumns = {
         ID: true,
         Date: true,
-        Priority: true,
-        Statut: true,
         Vehicule: true,
         Km: true,
         Client: true,
+        Priority: true,
+        Statut: true,
     };
 
-    // Load selected columns from localStorage or use initial state
-    const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumns");
-        return savedColumns ? JSON.parse(savedColumns) : initialColumns;
-    };
+    const [selectedColumns, setSelectedColumns] = useState(() =>
+        loadColumnVisibility(columnStorageKey, initialColumns)
+    );
 
-    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
-
-    const handleColumnChange = (column: string) => {
+    const handleColumnChange = (column: keyof typeof initialColumns) => {
         const updatedColumns = {
             ...selectedColumns,
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
+        localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
     };
+
+    const isClosedStatus = (status?: string) => {
+        const normalized = String(status || "").toLowerCase();
+        return normalized.includes("clot") || normalized.includes("closed");
+    };
+
+    const renderInterventionStatus = (status?: string) => {
+        if (isClosedStatus(status)) {
+            return <Badge bg="success">{translate("Closed")}</Badge>;
+        }
+
+        return <Badge bg="warning" text="dark">{translate("Request")}</Badge>;
+    };
+
+    const pageThemeStyle = {
+        color: isDarkMode ? "#f8fafc" : undefined,
+    };
+
+    const tableClassName = `dataTable ${isDarkMode ? "table-dark" : ""}`;
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
@@ -194,7 +213,7 @@ export function Reception() {
 
     return (
         <>
-            <div className="row">
+            <div className="row" style={pageThemeStyle}>
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Intervention Requests")} ({total})</h4>
                 </div>
@@ -205,7 +224,7 @@ export function Reception() {
                     </Button>
                 </div>
             </div>
-            <div className="row">
+            <div className="row" style={pageThemeStyle}>
                 <div
                     className="col-md-4"
                     style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
@@ -256,7 +275,7 @@ export function Reception() {
                         <Dropdown.Toggle
                             variant="link"
                             id="dropdown-basic"
-                            title="Display Columns"
+                            title={translate("Display Columns")}
                         >
                             <i className="las la-eye"></i>
                         </Dropdown.Toggle>
@@ -281,9 +300,9 @@ export function Reception() {
                 </div>
             </div>
 
-            <div className="row m-1">
-                <Table className="dataTable" responsive>
-                    <thead className="bg-white text-uppercase">
+            <div className="row m-1" style={pageThemeStyle}>
+                <Table className={tableClassName} responsive>
+                    <thead className={isDarkMode ? "text-uppercase" : "bg-white text-uppercase"}>
                         <tr className="ligth ligth-data">
                             <th className="text-center">
                                 <div className="form-check form-check-inline">
@@ -416,26 +435,9 @@ export function Reception() {
                                             {Intervention.priority}
                                         </td>
                                     )}
-                                    { selectedColumns.Statut && (
-                                    <td
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        {Intervention.statut === "Cloturé" ? (
-                                            <>
-                                                <i className="fas fa-check-circle" style={{ marginRight: "5px", color: "#28a745" }}></i>
-                                                Clôturé
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-hourglass-start" style={{ marginRight: "5px", color: "#ffc107" }}></i>
-                                                Demande
-                                            </>
-                                        )}
-                                    </td>
-                                   ) }
+                                    {selectedColumns.Statut && (
+                                        <td>{renderInterventionStatus(Intervention.statut)}</td>
+                                    )}
                                     <td className="text-center">
                                         <div className="d-flex justify-content-center align-items-center list-action">
                                             <Link
@@ -479,8 +481,8 @@ export function Reception() {
                             ))
                         ) : (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={selectedColumns.length || 10}>
-                                    No data available
+                                <td colSpan={visibleColumnCount(selectedColumns, 2)}>
+                                    {translate("No data available")}
                                 </td>
                             </tr>
                         )}
@@ -490,7 +492,7 @@ export function Reception() {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>Affichage 1 à {limit} sur {total} </span>
+                    <span>{translate("Displaying")} {list_intervention.length} {translate("on")} {total}</span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -521,3 +523,4 @@ export function Reception() {
         </>
     );
 }
+
