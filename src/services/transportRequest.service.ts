@@ -82,6 +82,7 @@ export async function getTransportRequestResponsiblesApi(
   }
 
   return (result.data || []).map((responsible: any) => ({
+    id_demandeur: responsible.id_demandeur,
     id_responsable: responsible.id_responsable,
     mat_responsable: responsible.mat,
     first_name: responsible.first_name,

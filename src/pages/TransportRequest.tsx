@@ -150,7 +150,7 @@ export function TransportRequestManage() {
 
     setRequest((prev) => ({
       ...prev,
-      id_gp_demandeur: null,
+      id_gp_demandeur: responsible?.id_demandeur ?? null,
       id_gp_responsable: responsible?.id_responsable || null,
       requester_email: responsible?.email_responsable || "",
       requester_phone: responsible?.phone || "",

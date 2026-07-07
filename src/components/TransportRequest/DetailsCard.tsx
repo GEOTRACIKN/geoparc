@@ -118,9 +118,9 @@ export default function TransportRequestDetailsCard({
         </Form.Group>
 
         <Form.Group className="form-group">
-          <Form.Label>{translate("Requester")}</Form.Label>
+          <Form.Label>{translate("Responsible")} *</Form.Label>
           <Select<SelectOption, false>
-            inputId="requester-select"
+            inputId="responsible-select"
             isClearable
             isDisabled={isLoadingResponsibles}
             isLoading={isLoadingResponsibles}
@@ -128,7 +128,7 @@ export default function TransportRequestDetailsCard({
             menuPortalTarget={document.body}
             noOptionsMessage={() => translate("No responsible found")}
             options={responsibleOptions}
-            placeholder={translate("Choose requester")}
+            placeholder={translate("Choose responsible")}
             value={selectedResponsible}
             onChange={(option: SingleValue<SelectOption>) =>
               onResponsibleChange(option?.value || null)

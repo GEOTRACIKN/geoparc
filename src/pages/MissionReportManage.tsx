@@ -653,7 +653,7 @@ export function MissionReportManage() {
                         )}
                         {departureCoordinates && nearbyVehicleCount > 0 && (
                           <div className="mission-muted-text mt-2">
-                            {nearbyVehicleCount} vehicule(s) proche(s) dans un rayon de 20 km. Les autres restent disponibles sans distance.
+                            {nearbyVehicleCount} vehicule(s) proche(s) dans un rayon de {MAX_DEPARTURE_DISTANCE_KM} km. Les autres restent disponibles sans distance.
                           </div>
                         )}
                         {departureCoordinates && nearbyVehicleCount === 0 && (

@@ -12,10 +12,11 @@ const requester = {
 const responsible = {
   id_demandeur: 1,
   id_responsable: 7,
-  mat_responsable: "RESP-007",
+  mat: "RESP-007",
   first_name: "Ali",
   last_name: "Responsable",
-  email_responsable: "ali.responsable@sorfert.com",
+  email: requester.email,
+  phone: requester.phone,
 };
 
 const transportRequest = {
@@ -78,12 +79,8 @@ test("complete transport request process creates mission and opens edit page", a
     route.fulfill({ json: [] })
   );
 
-  await page.route("**/api/geop/transportRequestManage/requesters**", (route) =>
-    route.fulfill({ json: { data: [requester] } })
-  );
-
   await page.route(
-    "**/api/geop/transportRequestManage/requester-responsibles**",
+    "**/api/geop/request-responsibilities/responsibles/search",
     (route) => {
       responsibleDetected = true;
       return route.fulfill({ json: { data: [responsible] } });
@@ -205,14 +202,14 @@ test("complete transport request process creates mission and opens edit page", a
     .getByPlaceholder(/object|objet/i)
     .fill(transportRequest.object_request);
 
-  await page.locator("#requester-select").fill("Samia");
-  await page.getByText("Samia Sebaa - samia.sebaa@sorfert.com").click();
+  await page.locator("#responsible-select").fill("Ali");
+  await page.getByText("Ali Responsable - samia.sebaa@sorfert.com").click();
   await expect(page.getByPlaceholder(/phone|telephone|téléphone/i)).toHaveValue(
     requester.phone
   );
   await expect
     .poll(() => responsibleDetected, {
-      message: "responsible should be detected from requester email",
+      message: "responsible list should be loaded",
     })
     .toBe(true);
   await page.waitForTimeout(100);

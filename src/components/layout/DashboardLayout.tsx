@@ -5,6 +5,7 @@ import Sidebar from './Sidebar/Sidebar';
 import Navbar from './Navbar/Navbar';
 import {
   loadSidebarPinnedPreference,
+  dispatchSidebarPinnedChange,
   persistSidebarPinnedLocally,
   readStoredSidebarPinned,
   saveSidebarPinnedPreference,
@@ -35,6 +36,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       const idUser = Number(localStorage.getItem("GeopUserID") ?? 0);
 
       persistSidebarPinnedLocally(next);
+      dispatchSidebarPinnedChange(next);
       saveSidebarPinnedPreference(idUser, next).catch((error) => {
         console.warn("Unable to save sidebar preference:", error);
       });
