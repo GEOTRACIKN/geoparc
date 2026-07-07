@@ -661,6 +661,12 @@ export function MissionReportManage() {
                           placeholder={translate("Select Vehicle")}
                           isSearchable
                           isLoading={departureLookupStatus === "loading"}
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
                           noOptionsMessage={() => translate("No vehicles available")}
                           formatOptionLabel={(option) => (
                             <div className="d-flex align-items-center justify-content-between gap-3">
@@ -738,6 +744,12 @@ export function MissionReportManage() {
                           placeholder={translate("Select Driver")}
                           isClearable
                           isSearchable
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
                           noOptionsMessage={() => translate("No drivers")}
                           value={
                             driverOptions.find(

@@ -3294,56 +3294,16 @@ body.dark-theme .mission-location-card-title {
   color: #f8fafc;
 }
 
-.mission-assignment-section > .row > [class*="col-"] {
-  position: relative;
-  padding: 10px;
-  border: 0;
-  background: transparent;
-}
-
 .mission-assignment-section > .row {
-  align-items: stretch;
-}
-
-.mission-assignment-section > .row > [class*="col-"]::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  z-index: 0;
-  border: 1px solid #dde4ee;
-  border-radius: 8px;
-  background: #ffffff;
-  pointer-events: none;
-}
-
-.mission-assignment-section > .row > [class*="col-"] > * {
-  position: relative;
-  z-index: 1;
+  align-items: flex-start;
 }
 
 .mission-assignment-section > .row > [class*="col-"] .mission-label {
   margin-bottom: 6px;
 }
 
-body.dark-theme .mission-assignment-section > .row > [class*="col-"] {
-  background: #2b3033;
-}
-
-body.dark-theme .mission-assignment-section > .row > [class*="col-"]::before {
-  border-color: #3f474d;
-  background: #2b3033;
-}
-
 @media (max-width: 767.98px) {
   .mission-assignment-section .row.g-3 {
     --bs-gutter-y: 0.55rem;
-  }
-
-  .mission-assignment-section > .row > [class*="col-"] {
-    padding: 8px;
-  }
-
-  .mission-assignment-section > .row > [class*="col-"]::before {
-    inset: 2px;
   }
 }
