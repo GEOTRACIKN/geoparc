@@ -38,8 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
   const activeLogo = isSidebarExpanded ? "header-logo-show" : "header-logo-hide";
   const activeMenuText = isSidebarExpanded ? "" : "iq-menu-span-hide";
   const sidebar = isSidebarExpanded ? "sidebar-open" : "sidebar-close";
-  const effectiveSidebarColor = appearance.colorMode;
-  const sidebarAppearanceClass = `sidebar-color-${effectiveSidebarColor} sidebar-icons-${appearance.iconMode}`;
+  const sidebarAppearanceClass = `sidebar-color-${appearance.colorMode} sidebar-icons-${appearance.iconMode}`;
 
 
   useEffect(() => {
