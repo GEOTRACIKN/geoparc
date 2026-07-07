@@ -39,12 +39,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       // ▼▼▼ Modification clé ici ▼▼▼
       const newPath = `${"https://geotrackin.com"}/react/public/${profile.img}?t=${Date.now()}`;
+      localStorage.setItem("GeopProfileImage", newPath);
       // ▲▲▲ Suppression de la distinction default/dynamic ▲▲▲
 
       setPathImg(newPath);
     } catch (error) {
       console.error("Erreur :", error);
-      setPathImg("");
+      const storedImage = localStorage.getItem("GeopProfileImage");
+      setPathImg(storedImage || "asset/images/logo.png");
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +60,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   // Synchronisation entre onglets
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "userid") refreshImage();
+      if (e.key === "GeopUserID" || e.key === "GeopProfileImage") refreshImage();
     };
 
     window.addEventListener("storage", handleStorageChange);

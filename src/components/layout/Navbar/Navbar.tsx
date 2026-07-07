@@ -12,6 +12,7 @@ import Logout from '../../Logout';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { Bounce, toast } from 'react-toastify';
 import axios from 'axios';
+import { useUser } from '../../../context/UserContext';
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -70,10 +71,10 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const { lang, setLang } = useTranslate();
   const navigate = useNavigate();
   const { translate } = useTranslate();
+  const { pathImg } = useUser();
   const handleLanguageChange = (newLang: any) => { setLang(newLang); };
   const userID = localStorage.getItem("GeopUserID");
   const APIkey = localStorage.getItem("api_key");
-  const theme = localStorage.getItem("theme_mode");
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   const strLang = {
@@ -352,26 +353,6 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
 
 
 
-  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(theme == '1' ? true : false);
-
-
-  // Use useEffect to save the theme in localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme_mode");
-    if (savedTheme === "1") {
-      setIsDarkTheme(true);
-      document.body.classList.add("dark-theme");
-    } else {
-      setIsDarkTheme(false);
-      document.body.classList.add("light-theme");
-    }
-  }, []);
-
-  // Save the selected theme in localStorage
-  useEffect(() => {
-    localStorage.setItem("theme_mode", isDarkTheme ? "1" : "0");
-  }, [isDarkTheme]);
-
   let userPermissions: Permission[] = [];
 
   try {
@@ -485,9 +466,17 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   return (
     <div className={`iq-top-navbar  ${changNavbar ? "navbar-push" : "navbar-pool"}`} >
       <div className="iq-navbar-custom">
+        <button
+          type="button"
+          className="navbar-sidebar-fix-toggle"
+          title={changNavbar ? translate("Unpin sidebar") : translate("Pin sidebar")}
+          onClick={onToggleSidebarInNavbar}
+        >
+          <i className={`las ${changNavbar ? "la-angle-double-left" : "la-angle-double-right"} navbar-sidebar-fix-icon`}></i>
+        </button>
         <nav className="navbar navbar-expand-lg navbar-light p-0">
           <div className="iq-navbar-logo d-flex align-items-center justify-content-between">
-            <i className={` wrapper-menu `}
+            <i className="las la-bars wrapper-menu"
               onClick={() => {
                 handleSetIsOpen();
                 onToggleSidebarInNavbar();
@@ -594,7 +583,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                 <li className="nav-item nav-icon dropdown" style={{ margin: "0 5px" }}>
                   <div className="dropdown" onClick={toggleTheme} style={{ cursor: "pointer" }}>
                     {/* Display the icon based on the theme */}
-                    {isDarkTheme ? (
+                    {isDarkMode ? (
                       <i className="las la-moon" style={{ fontSize: "22px" }}></i> // Moon icon for dark theme
                     ) : (
                       <i className="las la-sun" style={{ fontSize: "22px" }}></i> // Sun icon for light theme
@@ -715,7 +704,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                         <div className="card-body p-0 text-center">
                           <div className="media-body profile-detail text-center">
                             <img src="asset/images/page-img/profile-bg.jpg" alt="profile-bg" className="rounded-top img-fluid mb-4" />
-                            <img src="asset/images/user/blank.png" alt="profile-img" className="rounded profile-img img-fluid avatar-70" />
+                            <img src={pathImg || "asset/images/user/blank.png"} alt="profile-img" className="rounded profile-img img-fluid avatar-70" />
                           </div>
                           <div className="p-3">
                             <h5 className="mb-1">{userName}</h5>
