@@ -931,6 +931,12 @@ export function MissionOrderManage() {
                           placeholder={translate("Select Vehicle")}
                           isSearchable
                           isLoading={departureLookupStatus === "loading"}
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
                           noOptionsMessage={() => {
                             return translate("No vehicles available");
                           }}
@@ -1015,6 +1021,12 @@ export function MissionOrderManage() {
                           placeholder={translate("Select Driver")}
                           isClearable
                           isSearchable
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
                           noOptionsMessage={() => translate("No drivers")}
                           value={
                             driverOptions.find(
