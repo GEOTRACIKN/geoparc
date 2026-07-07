@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
-import { TransportRequestInterface } from "../types/transportRequest.types";
+import {
+  TransportRequestInterface,
+  TransportRequestResponsibleOption,
+} from "../types/transportRequest.types";
 
 import TransportRequestHeader from "../components/TransportRequest/Header";
 import TransportRequestTypeCard from "../components/TransportRequest/TypeCard";
@@ -10,7 +13,10 @@ import TransportRequestDepartureCard from "../components/TransportRequest/Depart
 import TransportRequestArrivalCard from "../components/TransportRequest/ArrivalCard";
 import TransportRequestDetailsCard from "../components/TransportRequest/DetailsCard";
 import TransportRequestBottomBar from "../components/TransportRequest/BottomBar";
-import { createTransportRequestApi } from "../services/transportRequest.service";
+import {
+  createTransportRequestApi,
+  getTransportRequestResponsiblesApi,
+} from "../services/transportRequest.service";
 
 const id_user = localStorage.getItem("GeopUserID");
 
@@ -20,19 +26,43 @@ export function TransportRequestManage() {
 
   const [buttonClicked, setButtonClicked] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [responsibles, setResponsibles] = useState<TransportRequestResponsibleOption[]>(
+    []
+  );
+  const [isLoadingResponsibles, setIsLoadingResponsibles] = useState(false);
 
   const [request, setRequest] = useState<TransportRequestInterface>({
     object_request: "",
     request_type: "Normal",
     requester_phone: "",
     requester_email: "",
+    id_gp_demandeur: null,
     departure_datetime: null,
     departure_location: "",
     arrival_datetime: null,
     arrival_location: "",
+    id_gp_responsable: null,
     id_user: id_user,
     status_request: "pending",
   });
+
+  useEffect(() => {
+    const loadResponsibles = async () => {
+      setIsLoadingResponsibles(true);
+
+      try {
+        const data = await getTransportRequestResponsiblesApi("");
+        setResponsibles(data);
+      } catch (error) {
+        console.error("Load responsibles error:", error);
+        setResponsibles([]);
+      } finally {
+        setIsLoadingResponsibles(false);
+      }
+    };
+
+    loadResponsibles();
+  }, []);
 
   const cancelClicked = () => {
     navigate("");
@@ -104,11 +134,26 @@ export function TransportRequestManage() {
 
   const handleChange = (
     name: keyof TransportRequestInterface,
-    value: string
+    value: string | number | null
   ) => {
     setRequest((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "requester_email" ? { id_gp_demandeur: null } : {}),
+    }));
+  };
+
+  const handleResponsibleChange = (id_responsable: number | null) => {
+    const responsible = responsibles.find(
+      (item) => item.id_responsable === id_responsable
+    );
+
+    setRequest((prev) => ({
+      ...prev,
+      id_gp_demandeur: responsible?.id_demandeur ?? null,
+      id_gp_responsable: responsible?.id_responsable || null,
+      requester_email: responsible?.email_responsable || "",
+      requester_phone: responsible?.phone || "",
     }));
   };
 
@@ -171,7 +216,7 @@ export function TransportRequestManage() {
       }
 
       if (!request.requester_email?.trim()) {
-        toast.warn(translate("requester_email_is_required"), {
+        toast.warn(translate("requester_is_required"), {
           position: "bottom-right",
           autoClose: 2400,
           transition: Bounce,
@@ -202,6 +247,8 @@ export function TransportRequestManage() {
       const payload: TransportRequestInterface = {
         ...request,
         requester_email: request.requester_email.trim().toLowerCase(),
+        id_gp_demandeur: request.id_gp_demandeur || null,
+        id_gp_responsable: request.id_gp_responsable || null,
         departure_datetime: request.departure_datetime
           ? request.departure_datetime.replace("T", " ")
           : null,
@@ -275,8 +322,11 @@ export function TransportRequestManage() {
           translate={translate}
           objectRequest={request.object_request}
           requesterPhone={request.requester_phone}
-          requesterEmail={request.requester_email || ""}
+          selectedResponsibleId={request.id_gp_responsable || null}
+          responsibles={responsibles}
+          isLoadingResponsibles={isLoadingResponsibles}
           onTextChange={handleChange}
+          onResponsibleChange={handleResponsibleChange}
         />
       </div>
 

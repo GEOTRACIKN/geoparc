@@ -9,14 +9,16 @@ import {
     Row,
     Col,
     InputGroup,
+    Modal,
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
     getTransportRequestList,
     getTransportRequestListCount,
+    updateTransportRequestListStatus,
 } from "../services/transportRequestList.service";
 import {
     TransportRequestListItem,
@@ -44,6 +46,13 @@ interface ColumnOption {
     label: string;
 }
 
+type TransportRequestAction = "approve" | "reject" | "cancel";
+
+interface PendingAction {
+    action: TransportRequestAction;
+    request: TransportRequestListItem;
+}
+
 const ALL_COLUMNS: ColumnOption[] = [
     { key: "id_transport_request", label: "ID" },
     { key: "request_type", label: "Type" },
@@ -67,6 +76,7 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 ];
 export function TransportRequestList() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const id_user = localStorage.getItem("GeopUserID");
 
@@ -93,12 +103,47 @@ export function TransportRequestList() {
     const [selectedRequest, setSelectedRequest] =
         useState<TransportRequestListItem | null>(null);
     const [showDrawer, setShowDrawer] = useState(false);
+    const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+    const [isConfirmingAction, setIsConfirmingAction] = useState(false);
 
     const visibleColumns = useMemo(() => {
         return ALL_COLUMNS.filter((column) => selectedColumns.includes(column.key));
     }, [selectedColumns]);
 
     const { translate } = useTranslate();
+
+    useEffect(() => {
+        const mailDecision = searchParams.get("mailDecision");
+
+        if (mailDecision !== "approved" && mailDecision !== "rejected") {
+            return;
+        }
+
+        const alreadyDecided = searchParams.get("already_decided") === "1";
+        const toastOptions = {
+            position: "bottom-right" as const,
+            autoClose: 3000,
+            transition: Bounce,
+        };
+
+        if (mailDecision === "approved") {
+            toast.success(
+                alreadyDecided
+                    ? "Cette demande a deja ete approuvee"
+                    : "Demande approuvee depuis l'email",
+                toastOptions,
+            );
+        } else {
+            toast.warn(
+                alreadyDecided
+                    ? "Cette demande a deja ete traitee"
+                    : "Demande rejetee depuis l'email",
+                toastOptions,
+            );
+        }
+
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }, [searchParams]);
 
     const loadTransportRequests = async (
         page = currentPage,
@@ -287,8 +332,36 @@ export function TransportRequestList() {
     //     });
     // };
 
-    const handleReject = (row: TransportRequestListItem) => {
-        updateRequestStatus(row.id_transport_request, "rejected");
+    const requestConfirmation = (
+        action: TransportRequestAction,
+        request: TransportRequestListItem,
+    ) => {
+        setPendingAction({ action, request });
+    };
+
+    const closeConfirmation = () => {
+        if (isConfirmingAction) return;
+        setPendingAction(null);
+    };
+
+    const persistRequestStatus = async (
+        row: TransportRequestListItem,
+        status_request: "rejected" | "cancelled",
+        approval_status: "rejected" | "cancelled",
+    ) => {
+        await updateTransportRequestListStatus({
+            id_transport_request: row.id_transport_request,
+            id_user,
+            status_request,
+            approval_status,
+            approval_required: 0,
+        });
+
+        updateRequestStatus(row.id_transport_request, status_request);
+    };
+
+    const executeReject = async (row: TransportRequestListItem) => {
+        await persistRequestStatus(row, "rejected", "rejected");
 
         toast.warn(`Request #${row.id_transport_request} rejected`, {
             position: "bottom-right",
@@ -297,8 +370,8 @@ export function TransportRequestList() {
         });
     };
 
-    const handleCancel = (row: TransportRequestListItem) => {
-        updateRequestStatus(row.id_transport_request, "cancelled");
+    const executeCancel = async (row: TransportRequestListItem) => {
+        await persistRequestStatus(row, "cancelled", "cancelled");
 
         toast.warn(`Request #${row.id_transport_request} cancelled`, {
             position: "bottom-right",
@@ -307,23 +380,11 @@ export function TransportRequestList() {
         });
     };
 
-    const handleCreateMission = (row: TransportRequestListItem) => {
-        updateRequestStatus(row.id_transport_request, "mission_created");
-
-        toast.success(`Request #${row.id_transport_request} converted to mission`, {
-            position: "bottom-right",
-            autoClose: 1800,
-            transition: Bounce,
-        });
-
-        closeDrawer();
-    };
-
     const handleNewRequest = () => {
         navigate("/transport-request");
     };
 
-    const handleApprove = async (row: TransportRequestListItem) => {
+    const executeApprove = async (row: TransportRequestListItem) => {
         try {
             const payload = {
                 id_vehicule: 0,
@@ -350,6 +411,14 @@ export function TransportRequestList() {
             
             const result = await createMissionOrderApi(payload);
 
+            await updateTransportRequestListStatus({
+                id_transport_request: row.id_transport_request,
+                id_user,
+                status_request: "mission_created",
+                approval_status: "approved",
+                approval_required: 0,
+            });
+
             updateRequestStatus(row.id_transport_request, "mission_created");
 
             toast.success(result.message || "Mission created successfully", {
@@ -365,8 +434,80 @@ export function TransportRequestList() {
                 autoClose: 2400,
                 transition: Bounce,
             });
+
+            throw error;
         }
     };
+
+    const confirmPendingAction = async () => {
+        if (!pendingAction) return;
+
+        try {
+            setIsConfirmingAction(true);
+
+            if (pendingAction.action === "approve") {
+                await executeApprove(pendingAction.request);
+            } else if (pendingAction.action === "reject") {
+                await executeReject(pendingAction.request);
+            } else {
+                await executeCancel(pendingAction.request);
+            }
+
+            setPendingAction(null);
+        } catch (error) {
+            console.error("Confirm transport request action error:", error);
+        } finally {
+            setIsConfirmingAction(false);
+        }
+    };
+
+    const handleApprove = (row: TransportRequestListItem) =>
+        requestConfirmation("approve", row);
+
+    const handleReject = (row: TransportRequestListItem) =>
+        requestConfirmation("reject", row);
+
+    const handleCancel = (row: TransportRequestListItem) =>
+        requestConfirmation("cancel", row);
+
+    const getConfirmationContent = () => {
+        if (!pendingAction) {
+            return {
+                title: "",
+                message: "",
+                confirmLabel: translate("confirm"),
+                variant: "primary",
+            };
+        }
+
+        const requestLabel = `#${pendingAction.request.id_transport_request}`;
+
+        switch (pendingAction.action) {
+            case "approve":
+                return {
+                    title: translate("Confirm approval"),
+                    message: `${translate("Approve request")} ${requestLabel} ? ${translate("A mission order will be created.")}`,
+                    confirmLabel: translate("approve"),
+                    variant: "success",
+                };
+            case "reject":
+                return {
+                    title: translate("Confirm rejection"),
+                    message: `${translate("Reject request")} ${requestLabel} ?`,
+                    confirmLabel: translate("reject"),
+                    variant: "danger",
+                };
+            default:
+                return {
+                    title: translate("Confirm cancellation"),
+                    message: `${translate("Cancel request")} ${requestLabel} ?`,
+                    confirmLabel: translate("cancel"),
+                    variant: "secondary",
+                };
+        }
+    };
+
+    const confirmationContent = getConfirmationContent();
 
     return (
         <div className="page-content">
@@ -730,6 +871,38 @@ export function TransportRequestList() {
                 onReject={handleReject}
                 onCancel={handleCancel}
             />
+
+            <Modal
+                show={Boolean(pendingAction)}
+                onHide={closeConfirmation}
+                centered
+                backdrop={isConfirmingAction ? "static" : true}
+            >
+                <Modal.Header closeButton={!isConfirmingAction}>
+                    <Modal.Title>{confirmationContent.title}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="mb-0">{confirmationContent.message}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="light"
+                        onClick={closeConfirmation}
+                        disabled={isConfirmingAction}
+                    >
+                        {translate("cancel")}
+                    </Button>
+                    <Button
+                        variant={confirmationContent.variant}
+                        onClick={confirmPendingAction}
+                        disabled={isConfirmingAction}
+                    >
+                        {isConfirmingAction
+                            ? translate("processing")
+                            : confirmationContent.confirmLabel}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

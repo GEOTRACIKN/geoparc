@@ -10,6 +10,60 @@ import length from "@turf/length";
 import { format, parseISO, isValid } from "date-fns";
 import { useState } from "react";
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+interface PreferencePayload {
+  id_user: number;
+  id_page: number;
+  column_name: string;
+}
+
+export async function addHiddenColumn(payload: PreferencePayload) {
+  const res = await fetch(`${backendUrl}/api/preference/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || "Failed to save preference");
+  return data;
+}
+
+export async function removeHiddenColumn(payload: PreferencePayload) {
+  const { id_user, id_page, column_name } = payload;
+
+  const res = await fetch(
+    `${backendUrl}/api/preference/delete/${id_user}/${id_page}/${encodeURIComponent(
+      column_name
+    )}`,
+    { method: "DELETE", credentials: "include" }
+  );
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || "Failed to delete preference");
+  return data;
+}
+
+export async function getHiddenColumns(
+  id_user: number,
+  id_page: number
+): Promise<string[]> {
+  const res = await fetch(
+    `${backendUrl}/api/preference/hidden/${id_user}/${id_page}`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  const data = await res.json().catch(() => []);
+  if (!res.ok) throw new Error(data?.message || "Failed to load hidden columns");
+
+  return Array.isArray(data) ? data.map((r: any) => r.column_name) : [];
+}
+
 export function formatDateToTimestamp(dateString: string): string {
   if (!dateString) {
     return "-";

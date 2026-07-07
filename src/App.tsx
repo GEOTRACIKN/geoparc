@@ -78,6 +78,7 @@ import { UserProvider } from "./context/UserContext";
 import { TransportRequestManage } from "./pages/TransportRequest";
 import TransportRequestList from "./pages/TransportRequestList";
 import { RequestResponsibility } from "./pages/RequestResponsibility";
+import Profile from "./pages/Profile";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -327,6 +328,7 @@ function App() {
                 <Route path="/vehicle/add" element={<DashboardLayout><Vehicle /></DashboardLayout>} />
                 <Route path="/vehicle/edit/:id_vehicule" element={<DashboardLayout><Vehicle /></DashboardLayout>} />
                 <Route path="/administratif" element={<DashboardLayout><AdministratifPage /></DashboardLayout>} />
+                <Route path="/profile" element={<DashboardLayout><Profile /></DashboardLayout>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

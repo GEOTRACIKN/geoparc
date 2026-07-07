@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Form } from "react-bootstrap";
+import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 type Props = {
   translate: (key: string) => string;
@@ -41,15 +42,15 @@ export default function TransportRequestArrivalCard({
           {dateError && <div className="invalid-mobile">{dateError}</div>}
         </Form.Group>
 
-        <Form.Group className="form-group mb-0">
-          <Form.Label>{translate("Arrival Point")} *</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder={translate("Enter arrival point")}
-            value={arrivalLocation}
-            onChange={(e) => onTextChange("arrival_location", e.target.value)}
-          />
-        </Form.Group>
+        <AddressAutocompleteInput
+          translate={translate}
+          controlId="arrival-location"
+          label={translate("Arrival Point")}
+          placeholder={translate("Enter arrival point")}
+          required
+          value={arrivalLocation}
+          onChange={(value) => onTextChange("arrival_location", value)}
+        />
       </Card.Body>
     </Card>
   );
