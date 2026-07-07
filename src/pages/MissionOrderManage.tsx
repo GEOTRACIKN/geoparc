@@ -7,6 +7,7 @@ import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";
 import Select, { SingleValue } from "react-select";
 import { useAuth } from "../context/AuthContext";
+import AddressAutocompleteInput from "../components/TransportRequest/AddressAutocompleteInput";
 
 interface Vehicle {
   id_vehicule: number;
@@ -424,6 +425,18 @@ export function MissionOrderManage() {
       });
   }, [departureCoordinates, vehiclePositions, vehicles]);
 
+  const driverOptions = useMemo(
+    () =>
+      driver
+        .map((item) => item.driver_mission)
+        .filter(Boolean)
+        .map((driverName) => ({
+          value: driverName,
+          label: driverName,
+        })),
+    [driver]
+  );
+
   const nearbyVehicleCount = useMemo(
     () => vehicleOptions.filter((option) => option.isNearby).length,
     [vehicleOptions]
@@ -822,17 +835,6 @@ export function MissionOrderManage() {
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Departure Date")} (*)</label>
-                        <input
-                          type="datetime-local"
-                          className="form-control mission-input"
-                          name="dep_date_mission"
-                          value={formatToDatetimeLocal(mission?.dep_date_mission)}
-                          onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-6">
                         <label className="mission-label">{translate("Mission Object")} (*)</label>
                         <input
                           type="text"
@@ -844,39 +846,66 @@ export function MissionOrderManage() {
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Destination")} (*)</label>
-                        <input
-                          type="text"
-                          className="form-control mission-input"
-                          name="dep_dest_mission"
-                          value={mission?.dep_dest_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        />
+                        <div className="mission-location-card">
+                          <div className="mission-location-card-title">
+                            <i className="las la-map-marker-alt" />
+                            {translate("Departure")}
+                          </div>
+                          <div className="mission-location-card-fields">
+                            <div>
+                              <label className="mission-label">{translate("Departure Date")} (*)</label>
+                              <input
+                                type="datetime-local"
+                                className="form-control mission-input"
+                                name="dep_date_mission"
+                                value={formatToDatetimeLocal(mission?.dep_date_mission)}
+                                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
+                              />
+                            </div>
+                            <AddressAutocompleteInput
+                              translate={translate}
+                              controlId="dep-loc-mission"
+                              label={translate("Departure Location")}
+                              placeholder={translate("Enter departure point")}
+                              required
+                              value={mission?.dep_loc_mission || ""}
+                              onChange={(value) => handleChange("dep_loc_mission", value)}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Departure Location")} (*)</label>
-                        <input
-                          type="text"
-                          className="form-control mission-input"
-                          name="dep_loc_mission"
-                          value={mission?.dep_loc_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-6">
-                        <label className="mission-label">{translate("Return Date")} (*)</label>
-                        <input
-                          type="datetime-local"
-                          className="form-control mission-input"
-                          name="return_date_mission"
-                          value={formatToDatetimeLocal(mission?.return_date_mission)}
-                          onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
-                        />
-                        {dateError && (
-                          <div className="mission-error-text mt-2">{dateError}</div>
-                        )}
+                        <div className="mission-location-card">
+                          <div className="mission-location-card-title">
+                            <i className="las la-flag-checkered" />
+                            {translate("Arrival")}
+                          </div>
+                          <div className="mission-location-card-fields">
+                            <div>
+                              <label className="mission-label">{translate("Return Date")} (*)</label>
+                              <input
+                                type="datetime-local"
+                                className="form-control mission-input"
+                                name="return_date_mission"
+                                value={formatToDatetimeLocal(mission?.return_date_mission)}
+                                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
+                              />
+                              {dateError && (
+                                <div className="mission-error-text mt-2">{dateError}</div>
+                              )}
+                            </div>
+                            <AddressAutocompleteInput
+                              translate={translate}
+                              controlId="dep-dest-mission"
+                              label={translate("Destination")}
+                              placeholder={translate("Enter arrival point")}
+                              required
+                              value={mission?.dep_dest_mission || ""}
+                              onChange={(value) => handleChange("dep_dest_mission", value)}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="col-12">
@@ -893,7 +922,7 @@ export function MissionOrderManage() {
                 )}
 
                 {activeTab === "assignment" && (
-                  <div className="mission-form-section">
+                  <div className="mission-form-section mission-assignment-section">
                     <div className="row g-3">
                       <div className="col-lg-6">
                         <label className="mission-label">{translate("Vehicle")} *</label>
@@ -981,19 +1010,21 @@ export function MissionOrderManage() {
 
                       <div className="col-lg-6">
                         <label className="mission-label">{translate("Driver")} (*)</label>
-                        <select
-                          name="driver_mission"
-                          className="form-select mission-input"
-                          value={mission?.driver_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        >
-                          <option value="">{translate("Select Driver")}</option>
-                          {driver?.map((item: any, index: number) => (
-                            <option key={index} value={item.driver_mission}>
-                              {item.driver_mission}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          options={driverOptions}
+                          placeholder={translate("Select Driver")}
+                          isClearable
+                          isSearchable
+                          noOptionsMessage={() => translate("No drivers")}
+                          value={
+                            driverOptions.find(
+                              (option) => option.value === mission?.driver_mission
+                            ) || null
+                          }
+                          onChange={(option) =>
+                            handleChange("driver_mission", option?.value || "")
+                          }
+                        />
                       </div>
 
                       <div className="col-12">
@@ -1144,4 +1175,3 @@ export function MissionOrderManage() {
     </>
   );
 }
-

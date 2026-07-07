@@ -494,12 +494,13 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             </Nav.Link>
 
 
-            <div className="search-container  hide-on-mobile">
-              <InputGroup className="">
-                <InputGroup.Text id="search-icon">
+            <div className="search-container navbar-search-container hide-on-mobile">
+              <InputGroup className="navbar-search-group">
+                <InputGroup.Text id="search-icon" className="navbar-search-icon">
                   <i className="fas fa-search"></i>
                 </InputGroup.Text>
                 <Form.Control
+                  className="navbar-search-input"
                   type="text"
                   value={searchTerm}
                   onChange={handleSearch}
