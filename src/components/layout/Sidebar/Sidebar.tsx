@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { Nav, Image } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { useTranslate } from "../../../hooks/LanguageProvider";
 import Logout from "../../Logout";
@@ -31,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
   const [appearance, setAppearance] = useState<SidebarAppearancePreference>(readStoredSidebarAppearance);
   const { isDarkMode } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const isSidebarExpanded = isSidebarPinned || (!isSmallScreen && isHovering);
@@ -144,6 +145,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
     }
   };
 
+  const isRouteActive = (to?: string) => {
+    if (!to) return false;
+    if (to === "/") return location.pathname === "/";
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
+
+  const isMenuItemActive = (menuItem: MenuItem) => {
+    return (
+      isRouteActive(menuItem.to) ||
+      Boolean(menuItem.subItems?.some((subItem) => isRouteActive(subItem.to)))
+    );
+  };
+
   return (
     <div
       style={{ zIndex: 10015 }}
@@ -190,11 +204,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                   menuItem.divider ? (
                     <li key={menuItem.id} className=""></li>
                   ) : (
-                    <li key={menuItem.id}>
+                    <li
+                      key={menuItem.id}
+                      className={isMenuItemActive(menuItem) ? "active" : ""}
+                    >
                       {menuItem.to ? (
                         <Nav.Link
                           to={menuItem.to}
-                          className="svg-icon"
+                          className={`svg-icon ${isRouteActive(menuItem.to) ? "active" : ""}`}
                           as={NavLink}
                           onClick={() => {
                             handleMenuNavigation();
@@ -207,6 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                         </Nav.Link>
                       ) : (
                         <Nav.Link
+                          className={isMenuItemActive(menuItem) ? "active" : ""}
                           onClick={() => handleSubmenuClick(menuItem.label)}
                         >
                           <i className={menuItem.icon} />
@@ -246,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                                 <Nav.Link
                                   key={subItem.id}
                                   to={subItem.to || "/"}
-                                  className="svg-icon"
+                                  className={`svg-icon ${isRouteActive(subItem.to) ? "active" : ""}`}
                                   as={NavLink}
                                   onClick={() => {
                                     handleMenuNavigation();
@@ -278,10 +296,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
             <nav className="iq-sidebar-menu">
               <ul className="iq-menu" style={{ padding: 0 }}>
                 <li className="divider" style={{ margin: "0 0 5px" }}></li>
-                <li>
+                <li className={isRouteActive("/profile") ? "active" : ""}>
                   <Nav.Link
                     to="/profile"
-                    className="svg-icon"
+                    className={`svg-icon ${isRouteActive("/profile") ? "active" : ""}`}
                     as={NavLink}
                     onClick={handleMenuNavigation}
                   >
