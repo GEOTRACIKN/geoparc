@@ -1,14 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { toast, Bounce } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
 import Select from 'react-select';
-import { InputActionMeta } from "react-select";
 interface Vehicle {
     id_vehicule: number;
     immatriculation_vehicule: string;
+    LAT?: string | number | null;
+    LON?: string | number | null;
+    latitude_vehicule?: string | number | null;
+    longitude_vehicule?: string | number | null;
+}
+interface VehiclePosition {
+    id_vehicule: number;
+    LAT?: string | number | null;
+    LON?: string | number | null;
+}
+interface VehiclePositionResponse {
+    value?: VehiclePosition[];
+    Count?: number;
+}
+interface LocationCoordinates {
+    latitude: number;
+    longitude: number;
+}
+interface VehicleOption {
+    value: number;
+    label: string;
+    searchLabel: string;
+    distanceKm: number | null;
+    isNearby: boolean;
 }
 interface Driver {
     id_conducteur: number;
@@ -47,6 +70,35 @@ interface MissionReportInterface {
   
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   const id_user = localStorage.getItem("GeopUserID");
+  const MAX_DEPARTURE_DISTANCE_KM = 20;
+
+const getDistanceKm = (
+  fromLat: number,
+  fromLon: number,
+  toLat: number,
+  toLon: number
+) => {
+  const earthRadiusKm = 6371;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const latDelta = toRadians(toLat - fromLat);
+  const lonDelta = toRadians(toLon - fromLon);
+  const a =
+    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+    Math.cos(toRadians(fromLat)) *
+      Math.cos(toRadians(toLat)) *
+      Math.sin(lonDelta / 2) *
+      Math.sin(lonDelta / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+};
+
+const formatDistanceKm = (distanceKm: number) => {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)} m`;
+  }
+
+  return `${distanceKm.toFixed(distanceKm < 10 ? 1 : 0)} km`;
+};
 
 export function MissionReportManage() {
   const { id_misrap } = useParams<{ id_misrap?: string }>();
@@ -56,6 +108,9 @@ export function MissionReportManage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
 const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+const [vehiclePositions, setVehiclePositions] = useState<VehiclePosition[]>([]);
+const [departureCoordinates, setDepartureCoordinates] = useState<LocationCoordinates | null>(null);
+const [departureLookupStatus, setDepartureLookupStatus] = useState<"idle" | "loading" | "found" | "not-found">("idle");
 const [dateError, setDateError] = useState<string | null>(null);
 // Ajoutez cette constante au début de votre composant (après les interfaces)
 const initialMissionState: MissionReportInterface = {
@@ -98,7 +153,37 @@ const [mission, setMission] = useState<MissionReportInterface | null>(
   const cancelClicked = () => {
     navigate("/mission-report");
   };
-  
+
+  const geocodeDepartureLocation = useCallback(async (location: string) => {
+    const urls = [
+      `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+    ];
+
+    for (const url of urls) {
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+        const firstResult = Array.isArray(data) ? data[0] : null;
+        const latitude = Number(firstResult?.lat);
+        const longitude = Number(firstResult?.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          return { latitude, longitude };
+        }
+      } catch (error) {
+        console.warn("Geocoding provider failed:", error);
+      }
+    }
+
+    return null;
+  }, []);
+
 useEffect(() => {
   const getMissionReport = async () => {
     try {
@@ -111,11 +196,13 @@ useEffect(() => {
 
       const [
         vehiclesRes,
+        vehiclePositionsRes,
         driversRes,
         trailersRes,
         reportRes
       ] = await Promise.all([
         fetch(`${backendUrl}/api/geop/vehicule/${id_user}`),
+        fetch(`${backendUrl}/api/map/find/${id_user}`).catch(() => null),
         fetch(`${backendUrl}/api/geop/driver/${id_user}`),
         fetch(`${backendUrl}/api/geop/trailer/${id_user}`),
         isEditing && id_misrap 
@@ -130,15 +217,25 @@ useEffect(() => {
 
       const [
         vehiclesData,
+        vehiclePositionsData,
         driversData,
         trailersData
       ] = await Promise.all([
         vehiclesRes.json(),
+        vehiclePositionsRes && vehiclePositionsRes.ok
+          ? vehiclePositionsRes.json()
+          : Promise.resolve([]),
         driversRes.json(),
         trailersRes.json()
       ]);
 
       setVehicles(vehiclesData.vehicles || []);
+      const parsedVehiclePositions: VehiclePosition[] | VehiclePositionResponse = vehiclePositionsData;
+      setVehiclePositions(
+        Array.isArray(parsedVehiclePositions)
+          ? parsedVehiclePositions
+          : parsedVehiclePositions.value || []
+      );
       setDrivers(Array.isArray(driversData) ? driversData : []);
       console.log("Drivers data:", drivers);
 drivers.forEach(driver => {
@@ -169,6 +266,93 @@ drivers.forEach(driver => {
 
   getMissionReport();
 }, [id_misrap, id_user, isEditing]);
+
+useEffect(() => {
+  const departureLocation = mission?.lieu_misrap?.trim();
+
+  if (!departureLocation) {
+    setDepartureCoordinates(null);
+    setDepartureLookupStatus("idle");
+    return;
+  }
+
+  let isCurrent = true;
+  setDepartureLookupStatus("loading");
+
+  const timeoutId = window.setTimeout(() => {
+    geocodeDepartureLocation(departureLocation)
+      .then((coordinates) => {
+        if (!isCurrent) return;
+
+        setDepartureCoordinates(coordinates);
+        setDepartureLookupStatus(coordinates ? "found" : "not-found");
+      })
+      .catch((error) => {
+        if (!isCurrent) return;
+
+        console.error("Erreur geocodage lieu de depart:", error);
+        setDepartureCoordinates(null);
+        setDepartureLookupStatus("not-found");
+      });
+  }, 500);
+
+  return () => {
+    isCurrent = false;
+    window.clearTimeout(timeoutId);
+  };
+}, [geocodeDepartureLocation, mission?.lieu_misrap]);
+
+const vehicleOptions = useMemo<VehicleOption[]>(() => {
+  const positionByVehicleId = new Map<number, VehiclePosition>();
+
+  vehiclePositions.forEach((position) => {
+    positionByVehicleId.set(Number(position.id_vehicule), position);
+  });
+
+  return vehicles
+    .map((vehicle) => {
+      const lastPosition = positionByVehicleId.get(Number(vehicle.id_vehicule));
+      const latValue = lastPosition?.LAT ?? vehicle.LAT ?? vehicle.latitude_vehicule;
+      const lonValue = lastPosition?.LON ?? vehicle.LON ?? vehicle.longitude_vehicule;
+      const lat = Number(latValue);
+      const lon = Number(lonValue);
+      const hasVehiclePosition = Number.isFinite(lat) && Number.isFinite(lon);
+      const distanceKm =
+        departureCoordinates && hasVehiclePosition
+          ? getDistanceKm(departureCoordinates.latitude, departureCoordinates.longitude, lat, lon)
+          : null;
+      const isNearby =
+        distanceKm !== null && distanceKm <= MAX_DEPARTURE_DISTANCE_KM;
+      const registration = vehicle.immatriculation_vehicule || "";
+
+      return {
+        value: vehicle.id_vehicule,
+        label: registration,
+        searchLabel: registration,
+        distanceKm,
+        isNearby,
+      };
+    })
+    .sort((first, second) => {
+      if (first.isNearby !== second.isNearby) {
+        return first.isNearby ? -1 : 1;
+      }
+
+      if (first.distanceKm === null && second.distanceKm === null) {
+        return first.searchLabel.localeCompare(second.searchLabel);
+      }
+
+      if (first.distanceKm === null) return 1;
+      if (second.distanceKm === null) return -1;
+
+      return first.distanceKm - second.distanceKm;
+    });
+}, [departureCoordinates, vehiclePositions, vehicles]);
+
+const nearbyVehicleCount = useMemo(
+  () => vehicleOptions.filter((option) => option.isNearby).length,
+  [vehicleOptions]
+);
 
 
 
@@ -540,20 +724,27 @@ const handleDateTimeChange = (name: string, value: string) => {
           <i className="fas fa-car" style={{ color: 'orange' }}></i> {translate("Vehicle")}{translate(" *")}
         </Form.Label>
         <Select
-          options={vehicles.map(vehicle => ({
-            value: vehicle.id_vehicule,
-            label: vehicle.immatriculation_vehicule
-          }))}
+          options={vehicleOptions}
           placeholder={translate("Select Vehicle")}
           isLoading={vehicles.length === 0}
           noOptionsMessage={() => translate("No vehicles available")}
           isSearchable
-          value={vehicles
-            .map(vehicle => ({
-              value: vehicle.id_vehicule,
-              label: vehicle.immatriculation_vehicule
-            }))
-            .find(option => option.value === mission?.id_vehicule) || null}
+          formatOptionLabel={(option) => (
+            <div className="d-flex align-items-center justify-content-between gap-3">
+              <span>{option.searchLabel}</span>
+              {option.distanceKm !== null && option.isNearby && (
+                <span className="text-muted small ms-auto">
+                  {formatDistanceKm(option.distanceKm)}
+                </span>
+              )}
+            </div>
+          )}
+          filterOption={(option, inputValue) =>
+            option.data.searchLabel
+              .toLowerCase()
+              .includes(inputValue.toLowerCase())
+          }
+          value={vehicleOptions.find(option => option.value === mission?.id_vehicule) || null}
           onChange={async (selectedOption) => {
             const id = selectedOption?.value ?? null;
             
@@ -580,11 +771,28 @@ const handleDateTimeChange = (name: string, value: string) => {
               }));
             }
           }}
-          inputValue={""}
-          onInputChange={function (newValue: string, actionMeta: InputActionMeta): void {}}
-          onMenuOpen={function (): void {}}
           onMenuClose={function (): void {}}
         />
+        {departureLookupStatus === "loading" && (
+          <div className="text-muted small mt-2">
+            Recherche du lieu de depart...
+          </div>
+        )}
+        {departureLookupStatus === "not-found" && (
+          <div className="text-muted small mt-2">
+            Lieu de depart introuvable. Tous les vehicules restent disponibles sans distance.
+          </div>
+        )}
+        {departureCoordinates && nearbyVehicleCount > 0 && (
+          <div className="text-muted small mt-2">
+            {nearbyVehicleCount} vehicule(s) proche(s) dans un rayon de 20 km. Les autres restent disponibles sans distance.
+          </div>
+        )}
+        {departureCoordinates && nearbyVehicleCount === 0 && (
+          <div className="text-muted small mt-2">
+            Aucun vehicule dans un rayon de 20 km. Les autres vehicules sont disponibles sans distance.
+          </div>
+        )}
       </Form.Group>
           
       <Form.Group className="form-group" controlId="formDriver">
