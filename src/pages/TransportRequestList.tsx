@@ -27,7 +27,6 @@ import {
 } from "../types/transportRequestList.types";
 import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
 import { formatDateToTimestamp, } from "../functions";
-import { autoAssignMissionVehicle } from "../utilities/missionAutoAssignment";
 
 
 
@@ -78,7 +77,6 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 export function TransportRequestList() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const id_user = localStorage.getItem("GeopUserID");
 
@@ -417,18 +415,9 @@ export function TransportRequestList() {
 
     const executeApprove = async (row: TransportRequestListItem) => {
         try {
-            const assignment = await autoAssignMissionVehicle({
-                backendUrl,
-                idUser: id_user,
-                departureLocation: row.departure_location || "",
-            });
-
             const result = await approveTransportRequestList({
                 id_transport_request: row.id_transport_request,
                 id_user,
-                id_vehicule: assignment?.vehicle.id_vehicule || 0,
-                driver_mission: assignment?.driverName || "",
-                vehicle_km_mission: assignment?.vehicle.kilometrage_vehicule || 0,
             });
 
             updateRequestStatus(row.id_transport_request, "mission_created");
