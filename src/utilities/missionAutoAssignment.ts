@@ -1,8 +1,10 @@
 export const DEFAULT_MAX_DEPARTURE_DISTANCE_KM = 20;
+export const NO_DRIVER_FOUND_LABEL = "No driver found";
 
 export interface AutoAssignmentVehicle {
   id_vehicule: number | string;
   immatriculation_vehicule?: string | null;
+  kilometrage_vehicule?: string | number | null;
   id_conducteur_vehicule?: number | string | null;
   driver_first_name?: string | null;
   driver_last_name?: string | null;
@@ -267,7 +269,10 @@ export const resolveMissionAutoAssignment = async ({
 
   return {
     ...bestCandidate,
-    driverName: getDriverName(vehicleDriver) || getVehicleDriverName(bestCandidate.vehicle),
+    driverName:
+      getDriverName(vehicleDriver) ||
+      getVehicleDriverName(bestCandidate.vehicle) ||
+      NO_DRIVER_FOUND_LABEL,
     driverPhone: vehicleDriver?.telephone_conducteur || "",
   };
 };

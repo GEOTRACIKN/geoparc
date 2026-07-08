@@ -84,7 +84,11 @@ export async function approveTransportRequestList(
   payload: Pick<
     TransportRequestListStatusUpdatePayload,
     "id_transport_request" | "id_user"
-  >
+  > & {
+    id_vehicule?: number | string | null;
+    driver_mission?: string | null;
+    vehicle_km_mission?: number | string | null;
+  }
 ): Promise<{
   message: string;
   idTransportRequest: number;

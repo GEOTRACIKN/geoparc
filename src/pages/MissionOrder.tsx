@@ -73,7 +73,7 @@ export function MissionOrder() {
   const [pageCount, setPageCount] = useState(0);
   let [total, settotal] = useState(0);
   const [colum, setSortColum] = useState("id_mission");
-  const [sort, setSort] = useState("ASC");
+  const [sort, setSort] = useState("DESC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState(translate("ID"));
@@ -280,9 +280,10 @@ export function MissionOrder() {
   };
 
   const handleSortingColum = (curentColum: string) => {
+    const nextSort = colum === curentColum && sort === "DESC" ? "ASC" : "DESC";
     setSortColum(curentColum);
-    sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getMissionOrder(limit, currentPage, search, type, colum, sort);
+    setSort(nextSort);
+    getMissionOrder(limit, currentPage, search, type, curentColum, nextSort);
   };
 
   const handledeleteMissionOrder = async (id_mission: number) => {
@@ -620,7 +621,7 @@ export function MissionOrder() {
                 <th
                   className="sorting"
                   onClick={() =>
-                    handleSortingColum("immatriculation_vehicule ")
+                    handleSortingColum("immatriculation_vehicule")
                   }
                 >
                   {translate("Vehicle")}

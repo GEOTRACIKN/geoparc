@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -17,10 +17,17 @@ const UserContext = createContext<UserContextType>({
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [pathImg, setPathImg] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const isRefreshingRef = useRef(false);
   
   const getCurrentUserId = () => localStorage.getItem("GeopUserID");
 
-  const refreshImage = async () => {
+  const refreshImage = useCallback(async () => {
+    if (isRefreshingRef.current) {
+      return;
+    }
+
+    isRefreshingRef.current = true;
+
     try {
       setIsLoading(true);
       const currentUserId = getCurrentUserId();
@@ -48,24 +55,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const storedImage = localStorage.getItem("GeopProfileImage");
       setPathImg(storedImage || "asset/images/logo.png");
     } finally {
+      isRefreshingRef.current = false;
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Rafraîchir quand l'user change
   useEffect(() => {
     refreshImage();
-  }, [getCurrentUserId()]);
+  }, [refreshImage]);
 
   // Synchronisation entre onglets
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "GeopUserID" || e.key === "GeopProfileImage") refreshImage();
+      if (e.key === "GeopUserID") refreshImage();
     };
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  }, [refreshImage]);
 
   return (
     <UserContext.Provider value={{ pathImg, refreshImage, isLoading }}>
