@@ -130,6 +130,13 @@ export interface ReverseAddressResult {
   lon: number;
 }
 
+export interface RouteDirectionsResult {
+  coordinates: [number, number][];
+  distanceMeters: number;
+  durationSeconds: number;
+  provider: "mapbox" | "osrm";
+}
+
 export async function searchAddressSuggestionsApi(
   query: string
 ): Promise<AddressSuggestion[]> {
@@ -194,4 +201,74 @@ export async function reverseAddressApi(
     lat,
     lon,
   };
+}
+
+function mapRouteCoordinates(coordinates: any[]): [number, number][] {
+  return coordinates
+    .map((coordinate) => {
+      const lon = Number(coordinate?.[0]);
+      const lat = Number(coordinate?.[1]);
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+        return null;
+      }
+
+      return [lat, lon] as [number, number];
+    })
+    .filter((coordinate): coordinate is [number, number] => Boolean(coordinate));
+}
+
+export async function getRouteDirectionsApi(
+  departure: { lat: number; lon: number },
+  arrival: { lat: number; lon: number },
+  signal?: AbortSignal
+): Promise<RouteDirectionsResult> {
+  const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN;
+  const endpoints = [
+    ...(mapboxToken
+      ? [
+          {
+            provider: "mapbox" as const,
+            url: `https://api.mapbox.com/directions/v5/mapbox/driving/${departure.lon},${departure.lat};${arrival.lon},${arrival.lat}?geometries=geojson&overview=full&access_token=${encodeURIComponent(
+              mapboxToken
+            )}`,
+          },
+        ]
+      : []),
+    {
+      provider: "osrm" as const,
+      url: `https://router.project-osrm.org/route/v1/driving/${departure.lon},${departure.lat};${arrival.lon},${arrival.lat}?overview=full&geometries=geojson`,
+    },
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint.url, { signal });
+
+      if (!response.ok) {
+        continue;
+      }
+
+      const data = await response.json();
+      const route = data.routes?.[0];
+      const coordinates = mapRouteCoordinates(route?.geometry?.coordinates || []);
+
+      if (coordinates.length > 1) {
+        return {
+          coordinates,
+          distanceMeters: Number(route.distance) || 0,
+          durationSeconds: Number(route.duration) || 0,
+          provider: endpoint.provider,
+        };
+      }
+    } catch (error: any) {
+      if (error?.name === "AbortError") {
+        throw error;
+      }
+
+      console.error("Route calculation failed:", error);
+    }
+  }
+
+  throw new Error("Failed to calculate route");
 }

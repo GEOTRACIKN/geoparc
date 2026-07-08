@@ -3252,31 +3252,71 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
 }
 
 .location-map-drawer {
-  width: min(94vw, 980px) !important;
+  width: min(94vw, 1220px) !important;
 }
 
 .location-map-drawer .drawer-body {
   display: grid;
-  grid-template-rows: auto minmax(380px, 1fr) auto;
-  gap: 14px;
-  padding: 18px;
+  grid-template-rows: minmax(540px, calc(100vh - 210px)) auto;
+  gap: 10px;
+  padding: 0 20px 18px;
+}
+
+.location-map-drawer-header {
+  min-height: 44px;
+  padding: 8px 16px;
 }
 
 .location-drawer-search {
-  position: relative;
-  display: grid;
-  gap: 10px;
+  position: absolute;
+  top: 12px;
+  left: 62px;
+  z-index: 1001;
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  width: min(430px, calc(100% - 148px));
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #d7dee8;
+  border-radius: 7px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
 }
 
 .location-mode-toggle {
-  width: fit-content;
+  flex: 0 0 auto;
+}
+
+.location-mode-toggle .btn {
+  min-height: 34px;
+  padding: 5px 9px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.location-drawer-search .input-group {
+  min-width: 170px;
+}
+
+.location-drawer-search .form-control,
+.location-drawer-search .input-group-text {
+  min-height: 34px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 14px;
 }
 
 .location-drawer-loading {
+  position: absolute;
+  left: 8px;
+  bottom: -32px;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  padding: 5px 9px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d7dee8;
+  border-radius: 6px;
   color: #64748b;
   font-size: 14px;
 }
@@ -3287,7 +3327,7 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   top: calc(100% + 6px);
   left: 0;
   right: 0;
-  max-height: 240px;
+  max-height: 210px;
   overflow-y: auto;
   background: #ffffff;
   border: 1px solid #d7dee8;
@@ -3304,7 +3344,8 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   border-bottom: 1px solid #eef2f7;
   background: #ffffff;
   color: #1f2937;
-  padding: 11px 14px;
+  padding: 9px 12px;
+  font-size: 13px;
   text-align: left;
 }
 
@@ -3313,7 +3354,8 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
 }
 
 .location-drawer-map {
-  min-height: 380px;
+  position: relative;
+  min-height: 540px;
   overflow: hidden;
   border: 1px solid #d7dee8;
 }
@@ -3321,15 +3363,21 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
 .location-drawer-selected {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  padding: 12px;
+  gap: 14px;
+  align-items: stretch;
+  padding: 14px 16px;
   border: 1px solid #d7dee8;
   background: #ffffff;
 }
 
 .route-selection-summary {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 160px auto;
+}
+
+.route-selection-summary > .btn {
+  align-self: center;
+  min-height: 46px;
+  white-space: nowrap;
 }
 
 .route-marker {
@@ -3396,13 +3444,141 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
 }
 
 .location-drawer-selected p {
-  margin: 4px 0;
+  margin: 5px 0;
   color: #475569;
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .location-drawer-selected small {
   color: #0d6efd;
   font-weight: 700;
+}
+
+.route-path-summary {
+  min-width: 160px;
+}
+
+.route-path-summary p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+  font-weight: 700;
+  -webkit-line-clamp: initial;
+}
+
+.route-path-summary span {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.base-map-layer-control__button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1001;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #c8d0da;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.base-map-layer-control__button--active,
+.base-map-layer-control__button:hover {
+  border-color: #0d6efd;
+}
+
+.base-map-layer-control__panel {
+  position: absolute;
+  top: 54px;
+  right: 12px;
+  z-index: 1001;
+  width: 236px;
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #c8d0da;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  padding: 10px;
+  color: #101828;
+  font-size: 13px;
+}
+
+.base-map-layer-control__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.base-map-layer-control__group {
+  padding-top: 8px;
+}
+
+.base-map-layer-control__group + .base-map-layer-control__group {
+  border-top: 1px solid #edf0f4;
+  margin-top: 8px;
+}
+
+.base-map-layer-control__group-title {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.base-map-layer-control__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  margin: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.base-map-layer-control__option:hover {
+  background: #f4f7fb;
+}
+
+.base-map-layer-control__option--active {
+  background: #eaf2ff;
+  color: #0b5ed7;
+  font-weight: 600;
+}
+
+.base-map-layer-control__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.base-map-layer-control__radio {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 1px solid #98a2b3;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.base-map-layer-control__option--active .base-map-layer-control__radio {
+  border: 4px solid #0d6efd;
 }
 
 @media (max-width: 768px) {
@@ -3411,7 +3587,15 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   }
 
   .location-map-drawer .drawer-body {
-    grid-template-rows: auto minmax(320px, 1fr) auto;
+    grid-template-rows: minmax(440px, 1fr) auto;
+    padding: 0 12px 12px;
+  }
+
+  .location-drawer-search {
+    left: 54px;
+    right: 58px;
+    width: auto;
+    flex-direction: column;
   }
 
   .location-field-with-map {

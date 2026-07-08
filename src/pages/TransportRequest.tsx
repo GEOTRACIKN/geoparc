@@ -20,6 +20,35 @@ import {
   getTransportRequestResponsiblesApi,
 } from "../services/transportRequest.service";
 
+type LocationCoordinates = {
+  lat: number;
+  lon: number;
+};
+
+const cleanLocationAddress = (value: string) =>
+  value
+    .replace(/\s*\(-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\)\s*$/, "")
+    .trim();
+
+const formatLocalDateTimeValue = (date: Date) => {
+  const pad = (num: number) => num.toString().padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+};
+
+const getDefaultTransportRequestDates = () => {
+  const departure = new Date();
+  const arrival = new Date(departure);
+  arrival.setDate(arrival.getDate() + 1);
+
+  return {
+    departure_datetime: formatLocalDateTimeValue(departure),
+    arrival_datetime: formatLocalDateTimeValue(arrival),
+  };
+};
+
 const getTransportRequestErrorMessage = (
   message: string | undefined,
   translate: (key: string) => string
@@ -103,6 +132,11 @@ export function TransportRequestManage() {
   const [locationDrawer, setLocationDrawer] = useState<
     "departure_location" | "arrival_location" | null
   >(null);
+  const [departureCoordinates, setDepartureCoordinates] =
+    useState<LocationCoordinates | null>(null);
+  const [arrivalCoordinates, setArrivalCoordinates] =
+    useState<LocationCoordinates | null>(null);
+  const defaultDates = getDefaultTransportRequestDates();
 
   const [request, setRequest] = useState<TransportRequestInterface>({
     object_request: "",
@@ -110,9 +144,9 @@ export function TransportRequestManage() {
     requester_phone: "",
     requester_email: "",
     id_gp_demandeur: null,
-    departure_datetime: null,
+    departure_datetime: defaultDates.departure_datetime,
     departure_location: "",
-    arrival_datetime: null,
+    arrival_datetime: defaultDates.arrival_datetime,
     arrival_location: "",
     id_gp_responsable: null,
     id_user: id_user,
@@ -266,9 +300,22 @@ export function TransportRequestManage() {
     name: keyof TransportRequestInterface,
     value: string | number | null
   ) => {
+    const nextValue =
+      name === "departure_location" || name === "arrival_location"
+        ? cleanLocationAddress(String(value || ""))
+        : value;
+
+    if (name === "departure_location") {
+      setDepartureCoordinates(null);
+    }
+
+    if (name === "arrival_location") {
+      setArrivalCoordinates(null);
+    }
+
     setRequest((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: nextValue,
       ...(name === "requester_email"
         ? { id_gp_demandeur: null }
         : {}),
@@ -492,15 +539,25 @@ export function TransportRequestManage() {
         show={!!locationDrawer}
         departureValue={request.departure_location}
         arrivalValue={request.arrival_location}
+        departureCoordinates={departureCoordinates}
+        arrivalCoordinates={arrivalCoordinates}
         initialActiveField={locationDrawer || "departure_location"}
         onHide={() => setLocationDrawer(null)}
         onApply={(values) => {
           if (values.departure_location) {
-            handleChange("departure_location", values.departure_location);
+            setRequest((prev) => ({
+              ...prev,
+              departure_location: cleanLocationAddress(values.departure_location || ""),
+            }));
+            setDepartureCoordinates(values.departure_coordinates || null);
           }
 
           if (values.arrival_location) {
-            handleChange("arrival_location", values.arrival_location);
+            setRequest((prev) => ({
+              ...prev,
+              arrival_location: cleanLocationAddress(values.arrival_location || ""),
+            }));
+            setArrivalCoordinates(values.arrival_coordinates || null);
           }
         }}
       />
