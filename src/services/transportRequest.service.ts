@@ -124,6 +124,12 @@ export interface AddressSuggestion {
   lon?: string;
 }
 
+export interface ReverseAddressResult {
+  display_name: string;
+  lat: number;
+  lon: number;
+}
+
 export async function searchAddressSuggestionsApi(
   query: string
 ): Promise<AddressSuggestion[]> {
@@ -134,7 +140,7 @@ export async function searchAddressSuggestionsApi(
   }
 
   const urls = [
-    `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(
+    `https://geotrackin.com/nominatim/search.php?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(
       search
     )}`,
     `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(
@@ -155,4 +161,37 @@ export async function searchAddressSuggestionsApi(
   }
 
   throw new Error("Failed to search address");
+}
+
+export async function reverseAddressApi(
+  lat: number,
+  lon: number
+): Promise<ReverseAddressResult> {
+  const urls = [
+    `https://geotrackin.com/nominatim/reverse.php?format=jsonv2&lat=${lat}&lon=${lon}`,
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          display_name: data.display_name || `${lat}, ${lon}`,
+          lat,
+          lon,
+        };
+      }
+    } catch (error) {
+      console.error("Address reverse geocoding failed:", error);
+    }
+  }
+
+  return {
+    display_name: `${lat}, ${lon}`,
+    lat,
+    lon,
+  };
 }

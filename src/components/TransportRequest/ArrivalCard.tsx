@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Form } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
 import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   formatToDatetimeLocal: (value: string | null | undefined) => string;
   onDateChange: (name: string, value: string) => void;
   onTextChange: (name: "arrival_location", value: string) => void;
+  onOpenMap: () => void;
 };
 
 export default function TransportRequestArrivalCard({
@@ -20,6 +21,7 @@ export default function TransportRequestArrivalCard({
   formatToDatetimeLocal,
   onDateChange,
   onTextChange,
+  onOpenMap,
 }: Props) {
   return (
     <Card className="mobile-request-card">
@@ -42,15 +44,25 @@ export default function TransportRequestArrivalCard({
           {dateError && <div className="invalid-mobile">{dateError}</div>}
         </Form.Group>
 
-        <AddressAutocompleteInput
-          translate={translate}
-          controlId="arrival-location"
-          label={translate("Arrival Point")}
-          placeholder={translate("Enter arrival point")}
-          required
-          value={arrivalLocation}
-          onChange={(value) => onTextChange("arrival_location", value)}
-        />
+        <div className="location-field-with-map">
+          <AddressAutocompleteInput
+            translate={translate}
+            controlId="arrival-location"
+            label={translate("Arrival Point")}
+            placeholder={translate("Enter arrival point")}
+            required
+            value={arrivalLocation}
+            onChange={(value) => onTextChange("arrival_location", value)}
+          />
+          <Button
+            type="button"
+            variant="outline-primary"
+            className="location-map-button"
+            onClick={onOpenMap}
+          >
+            <i className="fas fa-map-marker-alt"></i>
+          </Button>
+        </div>
       </Card.Body>
     </Card>
   );

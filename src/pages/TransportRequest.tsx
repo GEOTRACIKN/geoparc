@@ -13,6 +13,7 @@ import TransportRequestDepartureCard from "../components/TransportRequest/Depart
 import TransportRequestArrivalCard from "../components/TransportRequest/ArrivalCard";
 import TransportRequestDetailsCard from "../components/TransportRequest/DetailsCard";
 import TransportRequestBottomBar from "../components/TransportRequest/BottomBar";
+import LocationMapDrawer from "../components/TransportRequest/LocationMapDrawer";
 import {
   createTransportRequestApi,
   getTransportRequestRequestersApi,
@@ -99,6 +100,9 @@ export function TransportRequestManage() {
   );
   const [isLoadingResponsibles, setIsLoadingResponsibles] = useState(false);
   const [isLoadingRequester, setIsLoadingRequester] = useState(false);
+  const [locationDrawer, setLocationDrawer] = useState<
+    "departure_location" | "arrival_location" | null
+  >(null);
 
   const [request, setRequest] = useState<TransportRequestInterface>({
     object_request: "",
@@ -447,6 +451,7 @@ export function TransportRequestManage() {
           formatToDatetimeLocal={formatToDatetimeLocal}
           onDateChange={handleDateTimeChange}
           onTextChange={handleChange}
+          onOpenMap={() => setLocationDrawer("departure_location")}
         />
 
         <TransportRequestArrivalCard
@@ -457,6 +462,7 @@ export function TransportRequestManage() {
           formatToDatetimeLocal={formatToDatetimeLocal}
           onDateChange={handleDateTimeChange}
           onTextChange={handleChange}
+          onOpenMap={() => setLocationDrawer("arrival_location")}
         />
 
         <TransportRequestDetailsCard
@@ -479,6 +485,27 @@ export function TransportRequestManage() {
         buttonClicked={buttonClicked}
         onCancel={cancelClicked}
         onSubmit={createTransportRequest}
+      />
+
+      <LocationMapDrawer
+        translate={translate}
+        show={!!locationDrawer}
+        title={
+          locationDrawer === "arrival_location"
+            ? translate("Arrival Point")
+            : translate("Departure Point")
+        }
+        initialValue={
+          locationDrawer === "arrival_location"
+            ? request.arrival_location
+            : request.departure_location
+        }
+        onHide={() => setLocationDrawer(null)}
+        onApply={(value) => {
+          if (locationDrawer) {
+            handleChange(locationDrawer, value);
+          }
+        }}
       />
     </>
   );
