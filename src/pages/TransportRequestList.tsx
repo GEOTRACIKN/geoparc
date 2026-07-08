@@ -16,6 +16,7 @@ import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
+    approveTransportRequestList,
     getTransportRequestList,
     getTransportRequestListCount,
     updateTransportRequestListStatus,
@@ -26,7 +27,7 @@ import {
 } from "../types/transportRequestList.types";
 import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
 import { formatDateToTimestamp, } from "../functions";
-import { createMissionOrderApi } from "../services/missionOrder.service";
+import { autoAssignMissionVehicle } from "../utilities/missionAutoAssignment";
 
 
 
@@ -77,6 +78,7 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 export function TransportRequestList() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const id_user = localStorage.getItem("GeopUserID");
 
@@ -415,37 +417,18 @@ export function TransportRequestList() {
 
     const executeApprove = async (row: TransportRequestListItem) => {
         try {
-            const payload = {
-                id_vehicule: 0,
-                ref_mission: row.id_transport_request,
-                object_mission: row.object_request || "",
-                fuel_loading_mission: 0,
-                fuel_type_mission: "",
-                expenses_mission: 0,
-                tank_mission: 0,
-                trailer_mission: "0",
-                driver_mission: "",
-                accomp_mission: "",
-                dep_loc_mission: row.departure_location || "",
-                dep_date_mission: row.departure_datetime || "",
-                dep_dest_mission: row.arrival_location || "",
-                return_date_mission: row.arrival_datetime || "",
-                itinerary_mission: "",
-                new_km_mission: 0,
-                fuel_cost_mission: 0,
-                fuel_level_mission: 0,
-                voucher_mission: 0,
-                id_user: localStorage.getItem("GeopUserID"),
-            };
-            
-            const result = await createMissionOrderApi(payload);
+            const assignment = await autoAssignMissionVehicle({
+                backendUrl,
+                idUser: id_user,
+                departureLocation: row.departure_location || "",
+            });
 
-            await updateTransportRequestListStatus({
+            const result = await approveTransportRequestList({
                 id_transport_request: row.id_transport_request,
                 id_user,
-                status_request: "mission_created",
-                approval_status: "approved",
-                approval_required: 0,
+                id_vehicule: assignment?.vehicle.id_vehicule || 0,
+                driver_mission: assignment?.driverName || "",
+                vehicle_km_mission: assignment?.vehicle.kilometrage_vehicule || 0,
             });
 
             updateRequestStatus(row.id_transport_request, "mission_created");
