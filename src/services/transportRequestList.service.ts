@@ -79,3 +79,37 @@ export async function updateTransportRequestListStatus(
 
   return result;
 }
+
+export async function approveTransportRequestList(
+  payload: Pick<
+    TransportRequestListStatusUpdatePayload,
+    "id_transport_request" | "id_user"
+  >
+): Promise<{
+  message: string;
+  idTransportRequest: number;
+  missionId: number | null;
+  status: string;
+  transportStatus: string;
+  alreadyDecided?: boolean;
+}> {
+  const response = await fetch(
+    `${backendUrl}/api/geop/transportRequestManage/approve`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to approve transport request");
+  }
+
+  return result;
+}
