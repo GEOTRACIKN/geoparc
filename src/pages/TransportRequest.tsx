@@ -490,20 +490,17 @@ export function TransportRequestManage() {
       <LocationMapDrawer
         translate={translate}
         show={!!locationDrawer}
-        title={
-          locationDrawer === "arrival_location"
-            ? translate("Arrival Point")
-            : translate("Departure Point")
-        }
-        initialValue={
-          locationDrawer === "arrival_location"
-            ? request.arrival_location
-            : request.departure_location
-        }
+        departureValue={request.departure_location}
+        arrivalValue={request.arrival_location}
+        initialActiveField={locationDrawer || "departure_location"}
         onHide={() => setLocationDrawer(null)}
-        onApply={(value) => {
-          if (locationDrawer) {
-            handleChange(locationDrawer, value);
+        onApply={(values) => {
+          if (values.departure_location) {
+            handleChange("departure_location", values.departure_location);
+          }
+
+          if (values.arrival_location) {
+            handleChange("arrival_location", values.arrival_location);
           }
         }}
       />

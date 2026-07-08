@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Form, InputGroup, Offcanvas, Spinner } from "react-bootstrap";
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { Button, ButtonGroup, Form, InputGroup, Offcanvas, Spinner } from "react-bootstrap";
+import {
+  LayersControl,
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -8,6 +15,8 @@ import {
   reverseAddressApi,
   searchAddressSuggestionsApi,
 } from "../../services/transportRequest.service";
+
+type LocationField = "departure_location" | "arrival_location";
 
 type LocationValue = {
   address: string;
@@ -18,23 +27,31 @@ type LocationValue = {
 type Props = {
   translate: (key: string) => string;
   show: boolean;
-  title: string;
-  initialValue: string;
+  departureValue: string;
+  arrivalValue: string;
+  initialActiveField: LocationField;
   onHide: () => void;
-  onApply: (value: string) => void;
+  onApply: (values: {
+    departure_location?: string;
+    arrival_location?: string;
+  }) => void;
 };
 
-const markerIcon = new L.Icon({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+const DEFAULT_CENTER: [number, number] = [35.6971, -0.6308];
+
+const departureIcon = L.divIcon({
+  className: "",
+  html: '<div class="route-marker route-marker-departure">D</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
 });
 
-const DEFAULT_CENTER: [number, number] = [35.6971, -0.6308];
+const arrivalIcon = L.divIcon({
+  className: "",
+  html: '<div class="route-marker route-marker-arrival">A</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
 
 function readCoordinates(value: string): [number, number] | null {
   const match = value.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
@@ -45,6 +62,21 @@ function readCoordinates(value: string): [number, number] | null {
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   return [lat, lon];
+}
+
+function formatLocation(value: LocationValue) {
+  return `${value.address} (${value.lat.toFixed(6)}, ${value.lon.toFixed(6)})`;
+}
+
+function buildLocationFromText(value: string): LocationValue | null {
+  const coordinates = readCoordinates(value);
+  if (!coordinates) return null;
+
+  return {
+    address: value,
+    lat: coordinates[0],
+    lon: coordinates[1],
+  };
 }
 
 function MapClickHandler({
@@ -61,7 +93,13 @@ function MapClickHandler({
   return null;
 }
 
-function MapResize({ show, center }: { show: boolean; center: [number, number] }) {
+function MapResize({
+  show,
+  center,
+}: {
+  show: boolean;
+  center: [number, number];
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -81,40 +119,38 @@ function MapResize({ show, center }: { show: boolean; center: [number, number] }
 export default function LocationMapDrawer({
   translate,
   show,
-  title,
-  initialValue,
+  departureValue,
+  arrivalValue,
+  initialActiveField,
   onHide,
   onApply,
 }: Props) {
-  const initialCoordinates = useMemo(
-    () => readCoordinates(initialValue),
-    [initialValue]
-  );
+  const [activeField, setActiveField] =
+    useState<LocationField>(initialActiveField);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
-  const [selected, setSelected] = useState<LocationValue | null>(null);
+  const [departure, setDeparture] = useState<LocationValue | null>(null);
+  const [arrival, setArrival] = useState<LocationValue | null>(null);
 
-  const mapCenter: [number, number] = selected
-    ? [selected.lat, selected.lon]
-    : initialCoordinates || DEFAULT_CENTER;
+  const activeLocation = activeField === "departure_location" ? departure : arrival;
+  const mapCenter: [number, number] = useMemo(() => {
+    if (activeLocation) return [activeLocation.lat, activeLocation.lon];
+    if (departure) return [departure.lat, departure.lon];
+    if (arrival) return [arrival.lat, arrival.lon];
+    return DEFAULT_CENTER;
+  }, [activeLocation, arrival, departure]);
 
   useEffect(() => {
     if (!show) return;
 
-    setQuery(initialValue || "");
-    setSelected(
-      initialCoordinates
-        ? {
-            address: initialValue,
-            lat: initialCoordinates[0],
-            lon: initialCoordinates[1],
-          }
-        : null
-    );
+    setActiveField(initialActiveField);
+    setDeparture(buildLocationFromText(departureValue));
+    setArrival(buildLocationFromText(arrivalValue));
+    setQuery("");
     setSuggestions([]);
-  }, [initialCoordinates, initialValue, show]);
+  }, [arrivalValue, departureValue, initialActiveField, show]);
 
   useEffect(() => {
     const search = query.trim();
@@ -140,6 +176,14 @@ export default function LocationMapDrawer({
     return () => window.clearTimeout(timeoutId);
   }, [query, show]);
 
+  const setActiveLocation = (value: LocationValue) => {
+    if (activeField === "departure_location") {
+      setDeparture(value);
+    } else {
+      setArrival(value);
+    }
+  };
+
   const selectPoint = async (lat: number, lon: number, fallbackAddress?: string) => {
     setIsResolving(true);
 
@@ -148,11 +192,13 @@ export default function LocationMapDrawer({
         ? { display_name: fallbackAddress, lat, lon }
         : await reverseAddressApi(lat, lon);
 
-      setSelected({
+      const nextLocation = {
         address: result.display_name,
         lat,
         lon,
-      });
+      };
+
+      setActiveLocation(nextLocation);
       setQuery(result.display_name);
       setSuggestions([]);
     } finally {
@@ -161,28 +207,46 @@ export default function LocationMapDrawer({
   };
 
   const applySelection = () => {
-    if (!selected) return;
-
-    onApply(
-      `${selected.address} (${selected.lat.toFixed(6)}, ${selected.lon.toFixed(6)})`
-    );
+    onApply({
+      departure_location: departure ? formatLocation(departure) : undefined,
+      arrival_location: arrival ? formatLocation(arrival) : undefined,
+    });
     onHide();
   };
 
   return (
     <Offcanvas show={show} onHide={onHide} placement="end" className="location-map-drawer">
       <Offcanvas.Header closeButton className="drawer-header">
-        <Offcanvas.Title className="drawer-title">{title}</Offcanvas.Title>
+        <Offcanvas.Title className="drawer-title">
+          {translate("Select departure and arrival")}
+        </Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body className="drawer-body">
         <div className="location-drawer-search">
+          <ButtonGroup className="location-mode-toggle">
+            <Button
+              type="button"
+              variant={activeField === "departure_location" ? "primary" : "outline-primary"}
+              onClick={() => setActiveField("departure_location")}
+            >
+              <i className="fas fa-location-dot"></i> {translate("Departure")}
+            </Button>
+            <Button
+              type="button"
+              variant={activeField === "arrival_location" ? "primary" : "outline-primary"}
+              onClick={() => setActiveField("arrival_location")}
+            >
+              <i className="fas fa-flag-checkered"></i> {translate("arrival")}
+            </Button>
+          </ButtonGroup>
+
           <InputGroup>
             <InputGroup.Text>
               <i className="fas fa-search"></i>
             </InputGroup.Text>
             <Form.Control
               value={query}
-              placeholder={translate("Search address or POI")}
+              placeholder={translate("Search address")}
               onChange={(event) => setQuery(event.target.value)}
             />
           </InputGroup>
@@ -217,34 +281,60 @@ export default function LocationMapDrawer({
 
         <div className="location-drawer-map">
           <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            <LayersControl position="topright">
+              <LayersControl.BaseLayer checked name="OpenStreetMap">
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+              </LayersControl.BaseLayer>
+              <LayersControl.BaseLayer name="Humanitarian">
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                />
+              </LayersControl.BaseLayer>
+              <LayersControl.BaseLayer name="Topographic">
+                <TileLayer
+                  attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                />
+              </LayersControl.BaseLayer>
+            </LayersControl>
             <MapResize show={show} center={mapCenter} />
             <MapClickHandler onPick={selectPoint} />
-            {selected && (
-              <Marker position={[selected.lat, selected.lon]} icon={markerIcon} />
+            {departure && (
+              <Marker position={[departure.lat, departure.lon]} icon={departureIcon} />
             )}
+            {arrival && <Marker position={[arrival.lat, arrival.lon]} icon={arrivalIcon} />}
           </MapContainer>
         </div>
 
-        <div className="location-drawer-selected">
+        <div className="location-drawer-selected route-selection-summary">
           <div>
-            <strong>{translate("Selected point")}</strong>
-            <p>{selected?.address || translate("Click on the map or search a POI")}</p>
-            {selected && (
+            <strong>{translate("Departure")}</strong>
+            <p>{departure?.address || translate("Click on the map")}</p>
+            {departure && (
               <small>
-                {selected.lat.toFixed(6)}, {selected.lon.toFixed(6)}
+                {departure.lat.toFixed(6)}, {departure.lon.toFixed(6)}
+              </small>
+            )}
+          </div>
+          <div>
+            <strong>{translate("arrival")}</strong>
+            <p>{arrival?.address || translate("Click on the map")}</p>
+            {arrival && (
+              <small>
+                {arrival.lat.toFixed(6)}, {arrival.lon.toFixed(6)}
               </small>
             )}
           </div>
           <Button
             variant="primary"
-            disabled={!selected || isResolving}
+            disabled={isResolving || (!departure && !arrival)}
             onClick={applySelection}
           >
-            {isResolving ? translate("loading") : translate("Use this point")}
+            {isResolving ? translate("loading") : translate("Use selected points")}
           </Button>
         </div>
       </Offcanvas.Body>
