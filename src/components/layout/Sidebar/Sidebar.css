@@ -3264,6 +3264,12 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
 
 .location-drawer-search {
   position: relative;
+  display: grid;
+  gap: 10px;
+}
+
+.location-mode-toggle {
+  width: fit-content;
 }
 
 .location-drawer-loading {
@@ -3322,6 +3328,73 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   background: #ffffff;
 }
 
+.route-selection-summary {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.route-marker {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50% 50% 50% 6px;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.28);
+  transform: rotate(-45deg);
+}
+
+.route-marker-departure {
+  background: #0d6efd;
+}
+
+.route-marker-arrival {
+  background: #16a34a;
+}
+
+.route-marker::before {
+  content: attr(class);
+  display: none;
+}
+
+.route-marker {
+  line-height: 1;
+}
+
+.route-marker-departure,
+.route-marker-arrival {
+  text-align: center;
+}
+
+.route-marker-departure,
+.route-marker-arrival {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.route-marker-departure {
+  color: transparent;
+}
+
+.route-marker-arrival {
+  color: transparent;
+}
+
+.route-marker-departure::after,
+.route-marker-arrival::after {
+  color: #ffffff;
+  transform: rotate(45deg);
+}
+
+.route-marker-departure::after {
+  content: "D";
+}
+
+.route-marker-arrival::after {
+  content: "A";
+}
+
 .location-drawer-selected p {
   margin: 4px 0;
   color: #475569;
@@ -3346,6 +3419,10 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   }
 
   .location-drawer-selected {
+    grid-template-columns: 1fr;
+  }
+
+  .route-selection-summary {
     grid-template-columns: 1fr;
   }
 }
