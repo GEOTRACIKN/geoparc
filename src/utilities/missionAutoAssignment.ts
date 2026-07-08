@@ -118,7 +118,7 @@ export const formatMissionAssignmentDistance = (distanceKm: number) => {
 
 export const geocodeMissionDeparture = async (location: string) => {
   const urls = [
-    `https://geotrackin.xyz/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
+    `https://geotrackin.com/nominatim/search.php?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
     `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(location)}`,
   ];
 
