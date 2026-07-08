@@ -3239,6 +3239,117 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   font-weight: 650 !important;
 }
 
+.location-field-with-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 10px;
+  align-items: end;
+}
+
+.location-map-button {
+  height: 52px;
+  margin-bottom: 0;
+}
+
+.location-map-drawer {
+  width: min(94vw, 980px) !important;
+}
+
+.location-map-drawer .drawer-body {
+  display: grid;
+  grid-template-rows: auto minmax(380px, 1fr) auto;
+  gap: 14px;
+  padding: 18px;
+}
+
+.location-drawer-search {
+  position: relative;
+}
+
+.location-drawer-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.location-drawer-results {
+  position: absolute;
+  z-index: 1100;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #d7dee8;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
+}
+
+.location-drawer-results button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  border: 0;
+  border-bottom: 1px solid #eef2f7;
+  background: #ffffff;
+  color: #1f2937;
+  padding: 11px 14px;
+  text-align: left;
+}
+
+.location-drawer-results button:hover {
+  background: #fff4e8;
+}
+
+.location-drawer-map {
+  min-height: 380px;
+  overflow: hidden;
+  border: 1px solid #d7dee8;
+}
+
+.location-drawer-selected {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #d7dee8;
+  background: #ffffff;
+}
+
+.location-drawer-selected p {
+  margin: 4px 0;
+  color: #475569;
+}
+
+.location-drawer-selected small {
+  color: #0d6efd;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .location-map-drawer {
+    width: 100vw !important;
+  }
+
+  .location-map-drawer .drawer-body {
+    grid-template-rows: auto minmax(320px, 1fr) auto;
+  }
+
+  .location-field-with-map {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+
+  .location-drawer-selected {
+    grid-template-columns: 1fr;
+  }
+}
+
 .mission-location-card {
   height: 100%;
   padding: 16px;
