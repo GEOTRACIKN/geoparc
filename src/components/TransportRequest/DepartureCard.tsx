@@ -28,7 +28,7 @@ export default function TransportRequestDepartureCard({
       <Card.Body>
         <div className="section-title">
           <span className="section-icon">
-            <i className="fas fa-location-dot"></i>
+            <i className="fas fa-map-marker-alt"></i>
           </span>
           {translate("Departure")}
         </div>
