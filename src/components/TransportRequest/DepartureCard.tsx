@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Form } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
 import AddressAutocompleteInput from "./AddressAutocompleteInput";
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   formatToDatetimeLocal: (value: string | null | undefined) => string;
   onDateChange: (name: string, value: string) => void;
   onTextChange: (name: "departure_location", value: string) => void;
+  onOpenMap: () => void;
 };
 
 export default function TransportRequestDepartureCard({
@@ -20,13 +21,14 @@ export default function TransportRequestDepartureCard({
   formatToDatetimeLocal,
   onDateChange,
   onTextChange,
+  onOpenMap,
 }: Props) {
   return (
     <Card className="mobile-request-card">
       <Card.Body>
         <div className="section-title">
           <span className="section-icon">
-            <i className="fas fa-location-dot"></i>
+            <i className="fas fa-map-marker-alt"></i>
           </span>
           {translate("Departure")}
         </div>
@@ -43,15 +45,25 @@ export default function TransportRequestDepartureCard({
           />
         </Form.Group>
 
-        <AddressAutocompleteInput
-          translate={translate}
-          controlId="departure-location"
-          label={translate("Departure Point")}
-          placeholder={translate("Enter departure point")}
-          required
-          value={departureLocation}
-          onChange={(value) => onTextChange("departure_location", value)}
-        />
+        <div className="location-field-with-map">
+          <AddressAutocompleteInput
+            translate={translate}
+            controlId="departure-location"
+            label={translate("Departure Point")}
+            placeholder={translate("Enter departure point")}
+            required
+            value={departureLocation}
+            onChange={(value) => onTextChange("departure_location", value)}
+          />
+          <Button
+            type="button"
+            variant="outline-primary"
+            className="location-map-button"
+            onClick={onOpenMap}
+          >
+            <i className="fas fa-map-marker-alt"></i>
+          </Button>
+        </div>
       </Card.Body>
     </Card>
   );

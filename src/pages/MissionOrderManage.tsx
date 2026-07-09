@@ -7,10 +7,20 @@ import { PropagateLoader } from "react-spinners";
 import { MissionOrder } from "./MissionOrder";
 import Select, { SingleValue } from "react-select";
 import { useAuth } from "../context/AuthContext";
+import AddressAutocompleteInput from "../components/TransportRequest/AddressAutocompleteInput";
+import {
+  autoAssignMissionVehicle,
+  formatMissionAssignmentDistance,
+} from "../utilities/missionAutoAssignment";
 
 interface Vehicle {
-  id_vehicule: number;
+  id_vehicule: number | string;
   immatriculation_vehicule: string;
+  id_conducteur_vehicule?: number | string | null;
+  driver_first_name?: string | null;
+  driver_last_name?: string | null;
+  nom_conducteur?: string | null;
+  prenom_conducteur?: string | null;
   LAT?: string | number | null;
   LON?: string | number | null;
   lat?: string | number | null;
@@ -21,7 +31,7 @@ interface Vehicle {
   longitude_vehicule?: string | number | null;
 }
 interface VehiclePosition {
-  id_vehicule: number;
+  id_vehicule: number | string;
   LAT?: string | number | null;
   LON?: string | number | null;
   lat?: string | number | null;
@@ -72,6 +82,14 @@ interface MissionOrderInterface {
   voucher_mission: number | null;
   id_vehicule: number | null;
   id_user: string | null;
+}
+
+interface DriverOptionSource {
+  id_conducteur?: number | string | null;
+  nom_conducteur?: string | null;
+  prenom_conducteur?: string | null;
+  telephone_conducteur?: string | null;
+  driver_mission?: string | null;
 }
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const MAX_DEPARTURE_DISTANCE_KM = 20;
@@ -205,8 +223,9 @@ export function MissionOrderManage() {
   const [vehiclePositions, setVehiclePositions] = useState<VehiclePosition[]>([]);
   const [departureCoordinates, setDepartureCoordinates] = useState<LocationCoordinates | null>(null);
   const [departureLookupStatus, setDepartureLookupStatus] = useState<"idle" | "loading" | "found" | "not-found">("idle");
-  const [driver, setDriver] = useState<{ driver_mission: string }[]>([]);
+  const [driver, setDriver] = useState<DriverOptionSource[]>([]);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [isAutoAssigning, setIsAutoAssigning] = useState(false);
 
 
   useEffect(() => {
@@ -401,7 +420,7 @@ export function MissionOrderManage() {
           calculatedDistanceKm <= MAX_DEPARTURE_DISTANCE_KM;
 
         return {
-          value: vehicle.id_vehicule,
+          value: Number(vehicle.id_vehicule),
           label: registration,
           searchLabel: registration,
           distanceKm: isNearby ? calculatedDistanceKm : null,
@@ -424,6 +443,39 @@ export function MissionOrderManage() {
       });
   }, [departureCoordinates, vehiclePositions, vehicles]);
 
+  const driverOptions = useMemo(
+    () =>
+      driver
+        .map((item) =>
+          [item.nom_conducteur, item.prenom_conducteur]
+            .filter(Boolean)
+            .join(" ")
+            .trim() || item.driver_mission
+        )
+        .filter((driverName): driverName is string => Boolean(driverName))
+        .map((driverName) => ({
+          value: driverName,
+          label: driverName,
+        })),
+    [driver]
+  );
+
+  const selectedDriverPhone = useMemo(() => {
+    if (!mission?.driver_mission) return "";
+
+    const selectedDriver = driver.find((item) => {
+      const driverName =
+        [item.nom_conducteur, item.prenom_conducteur]
+          .filter(Boolean)
+          .join(" ")
+          .trim() || item.driver_mission;
+
+      return driverName === mission.driver_mission;
+    });
+
+    return selectedDriver?.telephone_conducteur || "";
+  }, [driver, mission?.driver_mission]);
+
   const nearbyVehicleCount = useMemo(
     () => vehicleOptions.filter((option) => option.isNearby).length,
     [vehicleOptions]
@@ -433,7 +485,7 @@ export function MissionOrderManage() {
     if (
       departureLookupStatus !== "found" ||
       !mission?.id_vehicule ||
-      vehicles.some((vehicle) => vehicle.id_vehicule === mission.id_vehicule)
+      vehicles.some((vehicle) => Number(vehicle.id_vehicule) === Number(mission.id_vehicule))
     ) {
       return;
     }
@@ -668,6 +720,88 @@ export function MissionOrderManage() {
     } : prev);
   };
 
+  const handleAutoAssignMission = async () => {
+    const departureLocation = mission?.dep_loc_mission?.trim();
+
+    if (!departureLocation) {
+      toast.warn("Renseignez le lieu de depart avant l'affectation automatique", {
+        position: "bottom-right",
+        autoClose: 2400,
+        transition: Bounce,
+      });
+      return;
+    }
+
+    try {
+      setIsAutoAssigning(true);
+
+      const assignment = await autoAssignMissionVehicle({
+        departureLocation,
+        vehicles,
+        vehiclePositions,
+        drivers: driver,
+        maxDistanceKm: MAX_DEPARTURE_DISTANCE_KM,
+      });
+
+      if (!assignment) {
+        toast.warn("Aucun vehicule disponible pour cette mission", {
+          position: "bottom-right",
+          autoClose: 2400,
+          transition: Bounce,
+        });
+        return;
+      }
+
+      const assignedVehicleId = Number(assignment.vehicle.id_vehicule);
+      const vehicleKm = await fetchVehicleKm(assignedVehicleId);
+
+      setMission((prev) =>
+        prev
+          ? {
+              ...prev,
+              id_vehicule: assignedVehicleId,
+              vehicle_km_mission: vehicleKm,
+              driver_mission: assignment.driverName || prev.driver_mission || "",
+            }
+          : prev
+      );
+
+      const distanceLabel =
+        assignment.distanceKm !== null
+          ? ` (${formatMissionAssignmentDistance(assignment.distanceKm)})`
+          : "";
+      const fallbackLabel = assignment.isNearby
+        ? ""
+        : " Aucun vehicule proche trouve, meilleur vehicule disponible affecte.";
+
+      toast.success(
+        `Vehicule ${assignment.vehicle.immatriculation_vehicule || ""} affecte${distanceLabel}.${fallbackLabel}`,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+          transition: Bounce,
+        }
+      );
+
+      if (!assignment.driverName) {
+        toast.warn("Aucun chauffeur associe a ce vehicule", {
+          position: "bottom-right",
+          autoClose: 3000,
+          transition: Bounce,
+        });
+      }
+    } catch (error) {
+      console.error("Auto assignment error:", error);
+      toast.error("Erreur lors de l'affectation automatique", {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } finally {
+      setIsAutoAssigning(false);
+    }
+  };
+
   const formatToDatetimeLocal = (isoString: string | null | undefined): string => {
     if (!isoString) return '';
     try {
@@ -822,17 +956,6 @@ export function MissionOrderManage() {
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Departure Date")} (*)</label>
-                        <input
-                          type="datetime-local"
-                          className="form-control mission-input"
-                          name="dep_date_mission"
-                          value={formatToDatetimeLocal(mission?.dep_date_mission)}
-                          onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-6">
                         <label className="mission-label">{translate("Mission Object")} (*)</label>
                         <input
                           type="text"
@@ -844,39 +967,66 @@ export function MissionOrderManage() {
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Destination")} (*)</label>
-                        <input
-                          type="text"
-                          className="form-control mission-input"
-                          name="dep_dest_mission"
-                          value={mission?.dep_dest_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        />
+                        <div className="mission-location-card">
+                          <div className="mission-location-card-title">
+                            <i className="las la-map-marker-alt" />
+                            {translate("Departure")}
+                          </div>
+                          <div className="mission-location-card-fields">
+                            <div>
+                              <label className="mission-label">{translate("Departure Date")} (*)</label>
+                              <input
+                                type="datetime-local"
+                                className="form-control mission-input"
+                                name="dep_date_mission"
+                                value={formatToDatetimeLocal(mission?.dep_date_mission)}
+                                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
+                              />
+                            </div>
+                            <AddressAutocompleteInput
+                              translate={translate}
+                              controlId="dep-loc-mission"
+                              label={translate("Departure Location")}
+                              placeholder={translate("Enter departure point")}
+                              required
+                              value={mission?.dep_loc_mission || ""}
+                              onChange={(value) => handleChange("dep_loc_mission", value)}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="col-lg-6">
-                        <label className="mission-label">{translate("Departure Location")} (*)</label>
-                        <input
-                          type="text"
-                          className="form-control mission-input"
-                          name="dep_loc_mission"
-                          value={mission?.dep_loc_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        />
-                      </div>
-
-                      <div className="col-lg-6">
-                        <label className="mission-label">{translate("Return Date")} (*)</label>
-                        <input
-                          type="datetime-local"
-                          className="form-control mission-input"
-                          name="return_date_mission"
-                          value={formatToDatetimeLocal(mission?.return_date_mission)}
-                          onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
-                        />
-                        {dateError && (
-                          <div className="mission-error-text mt-2">{dateError}</div>
-                        )}
+                        <div className="mission-location-card">
+                          <div className="mission-location-card-title">
+                            <i className="las la-flag-checkered" />
+                            {translate("Arrival")}
+                          </div>
+                          <div className="mission-location-card-fields">
+                            <div>
+                              <label className="mission-label">{translate("Return Date")} (*)</label>
+                              <input
+                                type="datetime-local"
+                                className="form-control mission-input"
+                                name="return_date_mission"
+                                value={formatToDatetimeLocal(mission?.return_date_mission)}
+                                onChange={(e) => handleDateTimeChange(e.target.name, e.target.value)}
+                              />
+                              {dateError && (
+                                <div className="mission-error-text mt-2">{dateError}</div>
+                              )}
+                            </div>
+                            <AddressAutocompleteInput
+                              translate={translate}
+                              controlId="dep-dest-mission"
+                              label={translate("Destination")}
+                              placeholder={translate("Enter arrival point")}
+                              required
+                              value={mission?.dep_dest_mission || ""}
+                              onChange={(value) => handleChange("dep_dest_mission", value)}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="col-12">
@@ -893,8 +1043,27 @@ export function MissionOrderManage() {
                 )}
 
                 {activeTab === "assignment" && (
-                  <div className="mission-form-section">
+                  <div className="mission-form-section mission-assignment-section">
                     <div className="row g-3">
+                      <div className="col-12 d-flex justify-content-end">
+                        <Button
+                          type="button"
+                          variant="outline-primary"
+                          className="d-inline-flex align-items-center gap-2"
+                          onClick={handleAutoAssignMission}
+                          disabled={
+                            isAutoAssigning ||
+                            departureLookupStatus === "loading" ||
+                            !mission?.dep_loc_mission
+                          }
+                        >
+                          <i className="las la-route" />
+                          {isAutoAssigning
+                            ? translate("Loading...")
+                            : "Affectation automatique"}
+                        </Button>
+                      </div>
+
                       <div className="col-lg-6">
                         <label className="mission-label">{translate("Vehicle")} *</label>
                         <Select
@@ -902,6 +1071,12 @@ export function MissionOrderManage() {
                           placeholder={translate("Select Vehicle")}
                           isSearchable
                           isLoading={departureLookupStatus === "loading"}
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
                           noOptionsMessage={() => {
                             return translate("No vehicles available");
                           }}
@@ -920,7 +1095,7 @@ export function MissionOrderManage() {
                               .toLowerCase()
                               .includes(inputValue.toLowerCase())
                           }
-                          value={vehicleOptions.find(option => option.value === mission?.id_vehicule) || null}
+                          value={vehicleOptions.find(option => option.value === Number(mission?.id_vehicule)) || null}
                           onChange={handleVehicleSelectChange}
                         />
                         {departureLookupStatus === "loading" && (
@@ -981,19 +1156,32 @@ export function MissionOrderManage() {
 
                       <div className="col-lg-6">
                         <label className="mission-label">{translate("Driver")} (*)</label>
-                        <select
-                          name="driver_mission"
-                          className="form-select mission-input"
-                          value={mission?.driver_mission || ""}
-                          onChange={(e) => handleChange(e.target.name, e.target.value)}
-                        >
-                          <option value="">{translate("Select Driver")}</option>
-                          {driver?.map((item: any, index: number) => (
-                            <option key={index} value={item.driver_mission}>
-                              {item.driver_mission}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          options={driverOptions}
+                          placeholder={translate("Select Driver")}
+                          isClearable
+                          isSearchable
+                          menuPortalTarget={document.body}
+                          menuPosition="fixed"
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            menu: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
+                          noOptionsMessage={() => translate("No drivers")}
+                          value={
+                            driverOptions.find(
+                              (option) => option.value === mission?.driver_mission
+                            ) || null
+                          }
+                          onChange={(option) =>
+                            handleChange("driver_mission", option?.value || "")
+                          }
+                        />
+                        {selectedDriverPhone && (
+                          <div className="mission-muted-text mt-2">
+                            {translate("Phone")}: {selectedDriverPhone}
+                          </div>
+                        )}
                       </div>
 
                       <div className="col-12">
@@ -1144,4 +1332,3 @@ export function MissionOrderManage() {
     </>
   );
 }
-

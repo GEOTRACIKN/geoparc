@@ -13,23 +13,130 @@ import TransportRequestDepartureCard from "../components/TransportRequest/Depart
 import TransportRequestArrivalCard from "../components/TransportRequest/ArrivalCard";
 import TransportRequestDetailsCard from "../components/TransportRequest/DetailsCard";
 import TransportRequestBottomBar from "../components/TransportRequest/BottomBar";
+import LocationMapDrawer from "../components/TransportRequest/LocationMapDrawer";
 import {
   createTransportRequestApi,
+  getTransportRequestRequestersApi,
   getTransportRequestResponsiblesApi,
 } from "../services/transportRequest.service";
 
-const id_user = localStorage.getItem("GeopUserID");
+type LocationCoordinates = {
+  lat: number;
+  lon: number;
+};
+
+const cleanLocationAddress = (value: string) =>
+  value
+    .replace(/\s*\(-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\)\s*$/, "")
+    .trim();
+
+const formatLocalDateTimeValue = (date: Date) => {
+  const pad = (num: number) => num.toString().padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+};
+
+const getDefaultTransportRequestDates = () => {
+  const departure = new Date();
+  const arrival = new Date(departure);
+  arrival.setDate(arrival.getDate() + 1);
+
+  return {
+    departure_datetime: formatLocalDateTimeValue(departure),
+    arrival_datetime: formatLocalDateTimeValue(arrival),
+  };
+};
+
+const getTransportRequestErrorMessage = (
+  message: string | undefined,
+  translate: (key: string) => string
+) => {
+  const normalizedMessage = (message || "").toLowerCase();
+
+  if (!normalizedMessage) {
+    return translate("an_error_occurred_while_creating_the_transport_request");
+  }
+
+  if (
+    normalizedMessage.includes("email demandeur invalide") ||
+    normalizedMessage.includes("requester email")
+  ) {
+    return translate("invalid_requester_email");
+  }
+
+  if (
+    normalizedMessage.includes("demandeur actif introuvable") ||
+    normalizedMessage.includes("aucun demandeur")
+  ) {
+    return translate("requester_not_found");
+  }
+
+  if (
+    normalizedMessage.includes("email responsable non envoye") ||
+    normalizedMessage.includes("email du responsable")
+  ) {
+    return translate("responsible_email_not_sent");
+  }
+
+  if (
+    normalizedMessage.includes("aucun responsable actif") ||
+    normalizedMessage.includes("responsable sélectionné") ||
+    normalizedMessage.includes("responsable selectionne") ||
+    normalizedMessage.includes("non assigné") ||
+    normalizedMessage.includes("non assigne")
+  ) {
+    return translate("responsible_not_available_for_requester");
+  }
+
+  if (
+    normalizedMessage.includes("dates invalides") ||
+    normalizedMessage.includes("l'heure de départ") ||
+    normalizedMessage.includes("heure de depart")
+  ) {
+    return translate("departure_time_must_be_earlier_than_or_equal_to_arrival_time");
+  }
+
+  if (normalizedMessage.includes("champs obligatoires")) {
+    return translate("required_transport_request_fields_missing");
+  }
+
+  if (
+    normalizedMessage.includes("failed to fetch") ||
+    normalizedMessage.includes("network")
+  ) {
+    return translate("transport_request_network_error");
+  }
+
+  if (normalizedMessage.includes("erreur serveur")) {
+    return translate("an_error_occurred_while_creating_the_transport_request");
+  }
+
+  return message || translate("an_error_occurred_while_creating_the_transport_request");
+};
+
 
 export function TransportRequestManage() {
   const navigate = useNavigate();
   const { translate } = useTranslate();
 
+  const id_user = localStorage.getItem("GeopUserID");
   const [buttonClicked, setButtonClicked] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
   const [responsibles, setResponsibles] = useState<TransportRequestResponsibleOption[]>(
     []
   );
   const [isLoadingResponsibles, setIsLoadingResponsibles] = useState(false);
+  const [isLoadingRequester, setIsLoadingRequester] = useState(false);
+  const [locationDrawer, setLocationDrawer] = useState<
+    "departure_location" | "arrival_location" | null
+  >(null);
+  const [departureCoordinates, setDepartureCoordinates] =
+    useState<LocationCoordinates | null>(null);
+  const [arrivalCoordinates, setArrivalCoordinates] =
+    useState<LocationCoordinates | null>(null);
+  const defaultDates = getDefaultTransportRequestDates();
 
   const [request, setRequest] = useState<TransportRequestInterface>({
     object_request: "",
@@ -37,14 +144,16 @@ export function TransportRequestManage() {
     requester_phone: "",
     requester_email: "",
     id_gp_demandeur: null,
-    departure_datetime: null,
+    departure_datetime: defaultDates.departure_datetime,
     departure_location: "",
-    arrival_datetime: null,
+    arrival_datetime: defaultDates.arrival_datetime,
     arrival_location: "",
     id_gp_responsable: null,
     id_user: id_user,
     status_request: "pending",
   });
+
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   useEffect(() => {
     const loadResponsibles = async () => {
@@ -63,6 +172,61 @@ export function TransportRequestManage() {
 
     loadResponsibles();
   }, []);
+
+  const loadResponsiblesForRequester = async (email: string) => {
+    const requesterEmail = email.trim().toLowerCase();
+
+    if (!requesterEmail || !isValidEmail(requesterEmail)) {
+      setRequest((prev) => ({
+        ...prev,
+        id_gp_demandeur: null,
+      }));
+      return;
+    }
+
+    setIsLoadingRequester(true);
+
+    try {
+      const requestersData = await getTransportRequestRequestersApi(requesterEmail);
+      const requester = requestersData.find(
+        (item) => item.email?.trim().toLowerCase() === requesterEmail
+      );
+
+      setRequest((prev) => ({
+        ...prev,
+        requester_email: requesterEmail,
+        id_gp_demandeur: requester?.id_demandeur ?? null,
+        requester_phone: requester?.phone || prev.requester_phone,
+      }));
+    } catch (error) {
+      console.error("Load requester error:", error);
+      setRequest((prev) => ({
+        ...prev,
+        id_gp_demandeur: null,
+      }));
+    } finally {
+      setIsLoadingRequester(false);
+    }
+  };
+
+  useEffect(() => {
+    const requesterEmail = request.requester_email.trim().toLowerCase();
+
+    if (!requesterEmail) {
+      return;
+    }
+
+    if (!isValidEmail(requesterEmail)) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      loadResponsiblesForRequester(requesterEmail);
+    }, 450);
+
+    return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request.requester_email]);
 
   const cancelClicked = () => {
     navigate("");
@@ -136,10 +300,25 @@ export function TransportRequestManage() {
     name: keyof TransportRequestInterface,
     value: string | number | null
   ) => {
+    const nextValue =
+      name === "departure_location" || name === "arrival_location"
+        ? cleanLocationAddress(String(value || ""))
+        : value;
+
+    if (name === "departure_location") {
+      setDepartureCoordinates(null);
+    }
+
+    if (name === "arrival_location") {
+      setArrivalCoordinates(null);
+    }
+
     setRequest((prev) => ({
       ...prev,
-      [name]: value,
-      ...(name === "requester_email" ? { id_gp_demandeur: null } : {}),
+      [name]: nextValue,
+      ...(name === "requester_email"
+        ? { id_gp_demandeur: null }
+        : {}),
     }));
   };
 
@@ -150,10 +329,8 @@ export function TransportRequestManage() {
 
     setRequest((prev) => ({
       ...prev,
-      id_gp_demandeur: responsible?.id_demandeur ?? null,
+      id_gp_demandeur: responsible?.id_demandeur ?? prev.id_gp_demandeur,
       id_gp_responsable: responsible?.id_responsable || null,
-      requester_email: responsible?.email_responsable || "",
-      requester_phone: responsible?.phone || "",
     }));
   };
 
@@ -224,9 +401,7 @@ export function TransportRequestManage() {
         return;
       }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(request.requester_email.trim())) {
+      if (!isValidEmail(request.requester_email.trim())) {
         toast.warn(translate("invalid_requester_email"), {
           position: "bottom-right",
           autoClose: 2400,
@@ -237,6 +412,24 @@ export function TransportRequestManage() {
 
       if (dateError) {
         toast.warn(dateError, {
+          position: "bottom-right",
+          autoClose: 2400,
+          transition: Bounce,
+        });
+        return;
+      }
+
+      if (isLoadingResponsibles && !request.id_gp_responsable) {
+        toast.warn(translate("please_wait_until_requester_is_loaded"), {
+          position: "bottom-right",
+          autoClose: 2400,
+          transition: Bounce,
+        });
+        return;
+      }
+
+      if (!request.id_gp_responsable) {
+        toast.warn(translate("responsible_is_required"), {
           position: "bottom-right",
           autoClose: 2400,
           transition: Bounce,
@@ -274,8 +467,7 @@ export function TransportRequestManage() {
       console.error("Create transport request error:", error);
 
       toast.error(
-        error?.message ||
-        translate("an_error_occurred_while_creating_the_transport_request"),
+        getTransportRequestErrorMessage(error?.message, translate),
         {
           position: "bottom-right",
           autoClose: 2400,
@@ -306,6 +498,7 @@ export function TransportRequestManage() {
           formatToDatetimeLocal={formatToDatetimeLocal}
           onDateChange={handleDateTimeChange}
           onTextChange={handleChange}
+          onOpenMap={() => setLocationDrawer("departure_location")}
         />
 
         <TransportRequestArrivalCard
@@ -316,16 +509,20 @@ export function TransportRequestManage() {
           formatToDatetimeLocal={formatToDatetimeLocal}
           onDateChange={handleDateTimeChange}
           onTextChange={handleChange}
+          onOpenMap={() => setLocationDrawer("arrival_location")}
         />
 
         <TransportRequestDetailsCard
           translate={translate}
           objectRequest={request.object_request}
+          requesterEmail={request.requester_email}
           requesterPhone={request.requester_phone}
           selectedResponsibleId={request.id_gp_responsable || null}
           responsibles={responsibles}
           isLoadingResponsibles={isLoadingResponsibles}
+          isLoadingRequester={isLoadingRequester}
           onTextChange={handleChange}
+          onRequesterEmailBlur={loadResponsiblesForRequester}
           onResponsibleChange={handleResponsibleChange}
         />
       </div>
@@ -335,6 +532,34 @@ export function TransportRequestManage() {
         buttonClicked={buttonClicked}
         onCancel={cancelClicked}
         onSubmit={createTransportRequest}
+      />
+
+      <LocationMapDrawer
+        translate={translate}
+        show={!!locationDrawer}
+        departureValue={request.departure_location}
+        arrivalValue={request.arrival_location}
+        departureCoordinates={departureCoordinates}
+        arrivalCoordinates={arrivalCoordinates}
+        initialActiveField={locationDrawer || "departure_location"}
+        onHide={() => setLocationDrawer(null)}
+        onApply={(values) => {
+          if (values.departure_location) {
+            setRequest((prev) => ({
+              ...prev,
+              departure_location: cleanLocationAddress(values.departure_location || ""),
+            }));
+            setDepartureCoordinates(values.departure_coordinates || null);
+          }
+
+          if (values.arrival_location) {
+            setRequest((prev) => ({
+              ...prev,
+              arrival_location: cleanLocationAddress(values.arrival_location || ""),
+            }));
+            setArrivalCoordinates(values.arrival_coordinates || null);
+          }
+        }}
       />
     </>
   );

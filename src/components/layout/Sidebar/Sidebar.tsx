@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import React, { useEffect, useState } from "react";
 import { Nav, Image } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { useTranslate } from "../../../hooks/LanguageProvider";
 import Logout from "../../Logout";
@@ -32,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
   const [appearance, setAppearance] = useState<SidebarAppearancePreference>(readStoredSidebarAppearance);
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
   const isSidebarExpanded = isSidebarPinned || (!isSmallScreen && isHovering);
   const isOpen = isSidebarExpanded ? "open" : "";
@@ -101,6 +102,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
       setOpenSubmenus([submenuId]);
     }
   };
+
+  const isRouteActive = (path?: string): boolean => {
+    if (!path) return false;
+    if (path === "/") return location.pathname === "/";
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
+  const hasActiveSubItem = (menuItem: MenuItem): boolean =>
+    Boolean(menuItem.subItems?.some((subItem) => isRouteActive(subItem.to)));
 
   const handleLogout = async () => {
     try {
@@ -207,6 +217,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                         </Nav.Link>
                       ) : (
                         <Nav.Link
+                          className={hasActiveSubItem(menuItem) ? "active-parent" : ""}
                           onClick={() => handleSubmenuClick(menuItem.label)}
                         >
                           <i className={menuItem.icon} />
@@ -243,18 +254,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                           {menuItem.subItems.map(
                             (subItem) =>
                               checkPermission(subItem.permissionId) && (
-                                <Nav.Link
-                                  key={subItem.id}
-                                  to={subItem.to || "/"}
-                                  className="svg-icon"
-                                  as={NavLink}
-                                  onClick={() => {
-                                    handleMenuNavigation();
-                                  }}
+                                <li
+                                  key={`${menuItem.id}-${subItem.id}-${subItem.to}`}
                                 >
-                                  <i className={subItem.icon} />
-                                  <span>{translate(subItem.label)}</span>
-                                </Nav.Link>
+                                  <Nav.Link
+                                    to={subItem.to || "/"}
+                                    className="svg-icon"
+                                    as={NavLink}
+                                    onClick={() => {
+                                      handleMenuNavigation();
+                                    }}
+                                  >
+                                    <i className={subItem.icon} />
+                                    <span>{translate(subItem.label)}</span>
+                                  </Nav.Link>
+                                </li>
                               )
                           )}
                         </ul>

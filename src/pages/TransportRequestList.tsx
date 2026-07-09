@@ -16,6 +16,7 @@ import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
+    approveTransportRequestList,
     getTransportRequestList,
     getTransportRequestListCount,
     updateTransportRequestListStatus,
@@ -26,7 +27,6 @@ import {
 } from "../types/transportRequestList.types";
 import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
 import { formatDateToTimestamp, } from "../functions";
-import { createMissionOrderApi } from "../services/missionOrder.service";
 
 
 
@@ -213,6 +213,35 @@ export function TransportRequestList() {
         );
     };
 
+    const handleClearSearch = async () => {
+        setSearch("");
+        setCurrentPage(1);
+        await loadTransportRequests(
+            1,
+            "",
+            requestType,
+            limitValue,
+            sortColumn,
+            sortOrder,
+        );
+    };
+
+    const handleRequestTypeChange = async (
+        event: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        const nextType = event.target.value;
+        setRequestType(nextType);
+        setCurrentPage(1);
+        await loadTransportRequests(
+            1,
+            search,
+            nextType,
+            limitValue,
+            sortColumn,
+            sortOrder,
+        );
+    };
+
     const handlePageClick = (event: { selected: number }) => {
         setCurrentPage(event.selected + 1);
         window.scrollTo(0, 0);
@@ -386,37 +415,9 @@ export function TransportRequestList() {
 
     const executeApprove = async (row: TransportRequestListItem) => {
         try {
-            const payload = {
-                id_vehicule: 0,
-                ref_mission: row.id_transport_request,
-                object_mission: row.object_request || "",
-                fuel_loading_mission: 0,
-                fuel_type_mission: "",
-                expenses_mission: 0,
-                tank_mission: 0,
-                trailer_mission: "0",
-                driver_mission: "",
-                accomp_mission: "",
-                dep_loc_mission: row.departure_location || "",
-                dep_date_mission: row.departure_datetime || "",
-                dep_dest_mission: row.arrival_location || "",
-                return_date_mission: row.arrival_datetime || "",
-                itinerary_mission: "",
-                new_km_mission: 0,
-                fuel_cost_mission: 0,
-                fuel_level_mission: 0,
-                voucher_mission: 0,
-                id_user: localStorage.getItem("GeopUserID"),
-            };
-            
-            const result = await createMissionOrderApi(payload);
-
-            await updateTransportRequestListStatus({
+            const result = await approveTransportRequestList({
                 id_transport_request: row.id_transport_request,
                 id_user,
-                status_request: "mission_created",
-                approval_status: "approved",
-                approval_required: 0,
             });
 
             updateRequestStatus(row.id_transport_request, "mission_created");
@@ -558,6 +559,11 @@ export function TransportRequestList() {
                                     placeholder={translate("search") + "..."}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSearch();
+                                        }
+                                    }}
                                     style={{
                                         height: "42px",
                                         minHeight: "42px",
@@ -572,7 +578,7 @@ export function TransportRequestList() {
                                 {search && (
                                     <Button
                                         variant="outline-secondary"
-                                        onClick={() => setSearch("")}
+                                        onClick={handleClearSearch}
                                         style={{
                                             height: "42px",
                                             minHeight: "42px",
@@ -589,7 +595,7 @@ export function TransportRequestList() {
                         <Col xl={2} lg={3} md={4}>
                             <Form.Select
                                 value={requestType}
-                                onChange={(e) => setRequestType(e.target.value)}
+                                onChange={handleRequestTypeChange}
                                 style={{ height: "42px" }}
                             >
                                 <option value="all">{translate("all")}</option>
