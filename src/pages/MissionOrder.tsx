@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import { jsPDF } from "jspdf";
+import { toast, Bounce } from "react-toastify";
 
 import "jspdf-autotable";
 //import DriverModal from "../components/Driver/DriverModal";
@@ -79,6 +80,9 @@ export function MissionOrder() {
   const [typeSearch, setTypeSearch] = useState(translate("ID"));
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
+  const [sendingSmsMissionId, setSendingSmsMissionId] = useState<number | null>(
+    null,
+  );
 
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
@@ -310,6 +314,53 @@ export function MissionOrder() {
         console.error("Failed to update driver list:", error);
       },
     );
+  };
+
+  const handleSendMissionSms = async (missionOrder: MissionOrder) => {
+    if (!backendUrl) {
+      toast.error("Backend URL manquante", {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+      return;
+    }
+
+    try {
+      setSendingSmsMissionId(missionOrder.id_mission);
+
+      const response = await fetch(
+        `${backendUrl}/api/geop/missionOrderManage/${missionOrder.id_mission}/send-sms`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: process.env.REACT_APP_SMS_TEST_PHONE || undefined,
+          }),
+          mode: "cors",
+        },
+      );
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.message || "Erreur lors de l'envoi SMS");
+      }
+
+      toast.success(result.message || "SMS envoye au chauffeur", {
+        position: "bottom-right",
+        autoClose: 2400,
+        transition: Bounce,
+      });
+    } catch (error: any) {
+      toast.error(error?.message || "Erreur lors de l'envoi SMS", {
+        position: "bottom-right",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } finally {
+      setSendingSmsMissionId(null);
+    }
   };
 
   const handleResetSearch = async () => {
@@ -715,6 +766,35 @@ export function MissionOrder() {
                           style={{ fontSize: "1.2em" }}
                         ></i>
                       </Link>
+
+                      <a
+                        className="badge bg-info mr-2"
+                        onClick={() => {
+                          if (sendingSmsMissionId !== missionOrder.id_mission) {
+                            handleSendMissionSms(missionOrder);
+                          }
+                        }}
+                        title="Envoyer SMS au chauffeur"
+                        style={{
+                          pointerEvents:
+                            sendingSmsMissionId === missionOrder.id_mission
+                              ? "none"
+                              : "auto",
+                          opacity:
+                            sendingSmsMissionId === missionOrder.id_mission
+                              ? 0.65
+                              : 1,
+                        }}
+                      >
+                        <i
+                          className={
+                            sendingSmsMissionId === missionOrder.id_mission
+                              ? "las la-spinner"
+                              : "las la-sms"
+                          }
+                          style={{ fontSize: "1.2em" }}
+                        ></i>
+                      </a>
 
                       <a
                         className="badge bg-danger mr-2"
