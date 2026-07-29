@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 // temp: Geoparc uses no real auth.
 // localStorage id/role is only a placeholder.
@@ -22,6 +23,14 @@ export default function VignetteList() {
   const [searchType, setSearchType] = useState(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "administrative-vehicle-stickers",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchValue, setSearchText: setSearchValue,
+    sortColumn, setSortColumn,
+    sortDirection, setSortDirection,
+  });
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -135,10 +144,11 @@ export default function VignetteList() {
 
   // INITIAL LOAD
   useEffect(() => {
-    fetchTotal("", "", limit);
-    fetchPage(limit, 1, "", "", sortColumn, sortDirection);
+    if (!listPreferencesReady) return;
+    fetchTotal(searchValue, searchType, limit);
+    fetchPage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
 // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
   // ====================================================
   // SEARCH LOGIC

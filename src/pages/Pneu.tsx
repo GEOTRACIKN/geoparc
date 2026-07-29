@@ -9,6 +9,8 @@ import ModalShowPneu from "../components/Pneu/ShowPneu";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPneu from "../components/Pneu/EditPneu";
 import ModalDeletePneu from "../components/Pneu/DeletePneu";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface Pneu {
     id_pneu: number;
@@ -31,6 +33,15 @@ export function Pneu() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_pneu");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "tire-changes",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [selectedPneuId, setSelectedPneuId] = useState<number | null>(null);
@@ -51,6 +62,7 @@ export function Pneu() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("tire-changes", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -125,9 +137,10 @@ export function Pneu() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountPneu();
         getPneu();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -218,7 +231,7 @@ const stateLabels: { [key: string]: string } = {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

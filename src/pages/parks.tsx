@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import * as XLSX from 'xlsx';
 import GeoFenceUploadModal from "../components/Park/GeoFenceUploadModal";
 import DeletePOIModal from "../components/Park/PoiModal";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface ParkInterface{
   idgeof: number;
@@ -39,6 +41,15 @@ export function Parks() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("ID POI");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "parks",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: colum, setSortColumn: setSortColum,
+    sortDirection: sort, setSortDirection: setSort,
+  });
   const [selectedSearch, setSelectedSearch] = useState(translate("ID POI"));
   const [selectedPois, setSelectedPois] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -227,8 +238,9 @@ export function Parks() {
   };
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getPOI(limit, currentPage, search, type, colum, sort);
-  }, []);
+  }, [limit, currentPage, search, type, colum, sort, listPreferencesReady]);
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -256,6 +268,7 @@ export function Parks() {
     etatgeof: true,
     datecreategeof: true,
   });
+  useGpVisibleColumns("parks", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -503,7 +516,7 @@ export function Parks() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20" }}

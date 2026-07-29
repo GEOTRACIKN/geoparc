@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
@@ -22,6 +23,14 @@ export default function DriverLicenseList() {
   const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "name");
   const [sortColumn, setSortColumn] = useState("id_conducteur");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "administrative-driver-licenses",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchValue, setSearchText: setSearchValue,
+    sortColumn, setSortColumn,
+    sortDirection, setSortDirection,
+  });
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // ===== Columns =====
@@ -143,10 +152,11 @@ export default function DriverLicenseList() {
 
   // ===== Initial load =====
   useEffect(() => {
-    fetchDriverLicenseTotal("", "", limit);
-    fetchDriverLicensePage(limit, 1, "", "", sortColumn, sortDirection);
+    if (!listPreferencesReady) return;
+    fetchDriverLicenseTotal(searchValue, searchType, limit);
+    fetchDriverLicensePage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
   // ===== Search handlers =====
   const handleSearchChange = (value: string) => {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useReferenceTablePreferences } from '../../hooks/useReferenceTablePreferences';
 import { Table, Button, Modal, Form, Spinner, Alert, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
@@ -30,12 +31,22 @@ export default function Mission() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 10;
+  const {
+    currentPageSize: itemsPerPage,
+    setCurrentPageSize: setItemsPerPage,
+    currentSearchText: searchTerm,
+    setCurrentSearchText: setSearchTerm,
+    currentSortColumn: sortColumn,
+    setCurrentSortColumn: setSortColumn,
+    currentSortDirection: sortOrder,
+    setCurrentSortDirection: setSortOrder,
+    loaded: preferencesLoaded,
+  } = useReferenceTablePreferences('missions', {
+    sortColumn: 'created_at',
+    sortDirection: 'DESC',
+  });
   
   // Search and sort state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('DESC');
 
   const geopuserID = localStorage.getItem("GeopUserID");
 
@@ -73,10 +84,10 @@ export default function Mission() {
   };
 
   useEffect(() => {
-    if (geopuserID) {
+    if (geopuserID && preferencesLoaded) {
       fetchBonuses();
     }
-  }, [currentPage, searchTerm, sortColumn, sortOrder, geopuserID]);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, geopuserID, preferencesLoaded]);
 
   const handleShowAdd = () => {
     setCurrentBonus(null);
