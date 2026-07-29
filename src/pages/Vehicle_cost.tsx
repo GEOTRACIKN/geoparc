@@ -4,6 +4,8 @@ import ReactPaginate from "react-paginate";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useTranslate } from "../hooks/LanguageProvider";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 
 type Vehicles = {
@@ -39,6 +41,12 @@ export function VehicleCost() {
   const { translate } = useTranslate();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('vehicule');
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "vehicle-costs",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchTerm, setSearchText: setSearchTerm,
+  });
 
   const [list_Vehiclescosts, setItems] = useState<Vehicles[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -55,6 +63,7 @@ export function VehicleCost() {
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  useGpVisibleColumns("vehicle-costs", selectedColumns, setSelectedColumns, listPreferencesReady);
 
 
   const handleColumnChange = (column: string) => {

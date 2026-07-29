@@ -18,6 +18,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import moment from "moment";
 import timeGridPlugin from "@fullcalendar/timegrid"; // Pour la vue semaine/jour
 import listPlugin from "@fullcalendar/list"; // Pour la vue liste (année)
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toast } from "react-toastify";
 
@@ -43,6 +45,15 @@ export function Training() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_training");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "training",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
     const [selectedTrainingId, setSelectedTrainingId] = useState<number | null>(null);
@@ -162,6 +173,7 @@ const customLocale = {
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("training", selectedColumns, setSelectedColumns, listPreferencesReady);
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
@@ -268,10 +280,11 @@ const customLocale = {
     
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountTraining();
         getTraining();
         getCalendarTrainings();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
    
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -538,7 +551,7 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}
@@ -882,4 +895,3 @@ const adjustEndDate = (events: { start: string; end: string }[]) => {
         </>
     );
 }
-                  

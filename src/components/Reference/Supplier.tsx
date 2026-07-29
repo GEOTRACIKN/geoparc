@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useReferenceTablePreferences } from '../../hooks/useReferenceTablePreferences';
 import { Table, Button, Form, Badge, InputGroup, Card, Modal, Spinner, Alert, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
@@ -28,13 +29,18 @@ export default function Supplier() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [currentSupplier, setCurrentSupplier] = useState<Supplier | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const {
+    currentPageSize: itemsPerPage,
+    setCurrentPageSize: setItemsPerPage,
+    currentSearchText: searchTerm,
+    setCurrentSearchText: setSearchTerm,
+    loaded: preferencesLoaded,
+  } = useReferenceTablePreferences('suppliers');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   // Form state
   const [formData, setFormData] = useState<Omit<Supplier, 'id_supplier'>>({ 
@@ -76,8 +82,9 @@ export default function Supplier() {
   };
 
   useEffect(() => {
+    if (!preferencesLoaded) return;
     fetchSuppliers();
-  }, [currentPage, itemsPerPage, searchTerm]);
+  }, [currentPage, itemsPerPage, preferencesLoaded, searchTerm]);
 
   const handleShowAdd = () => {
     setCurrentSupplier(null);

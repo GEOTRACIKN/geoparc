@@ -15,6 +15,8 @@ import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import {
     approveTransportRequestList,
     getTransportRequestList,
@@ -95,10 +97,19 @@ export function TransportRequestList() {
         "id_transport_request",
     );
     const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "transport-requests",
+        pageSize: limitValue, setPageSize: setLimitValue,
+        searchType: requestType, setSearchType: setRequestType,
+        searchText: search, setSearchText: setSearch,
+        sortColumn, setSortColumn,
+        sortDirection: sortOrder, setSortDirection: setSortOrder,
+    });
 
     const [selectedColumns, setSelectedColumns] = useState<ColumnKey[]>(
         DEFAULT_SELECTED_COLUMNS,
     );
+    useGpVisibleColumns("transport-requests", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const [selectedRequest, setSelectedRequest] =
         useState<TransportRequestListItem | null>(null);
@@ -198,8 +209,9 @@ export function TransportRequestList() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         loadTransportRequests();
-    }, [currentPage, limitValue, sortColumn, sortOrder]);
+    }, [currentPage, limitValue, search, requestType, sortColumn, sortOrder, listPreferencesReady]);
 
     const handleSearch = async () => {
         setCurrentPage(1);

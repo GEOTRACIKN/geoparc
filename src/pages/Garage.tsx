@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
@@ -8,7 +8,30 @@ import { useTheme } from "../hooks/ThemeContext";
 import { PropagateLoader } from "react-spinners";
 import { formatDateToTimestamp } from "../utilities/functions";
 import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";
-import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
+import { visibleColumnCount } from "../utilities/tableColumns";
+import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
+
+const garageDefaultColumns = {
+    id_garage: true,
+    immatriculation_vehicule: true,
+    subject: true,
+    priority: true,
+    status: true,
+    date_intervention: true,
+    service: true,
+    date_update: true,
+};
+
+const garagePreferenceDefaults = {
+    visibleColumns: Object.keys(garageDefaultColumns),
+    pageSize: 10,
+    searchType: 0,
+    searchText: "",
+    sortColumn: "id_garage",
+    sortDirection: "ASC",
+    filters: {} as Record<string, unknown>,
+    selectedVehicleId: null as number | null,
+};
 
 interface Intervention {
     id_garage: number;
@@ -50,19 +73,16 @@ export function Garage() {
     const [IdGarage, setIdGarage] = useState<number>(0);
     const [IdUser, setIdUser] = useState<number>(0);
 
-    const handlePageClick = async (data: any) => {
-        let page = data.selected + 1;
-        await getGarages(limit, page, search, type, Column, sort);
-
+    const handlePageClick = (data: any) => {
+        setPage(data.selected + 1);
         window.scrollTo(0, 0);
     };
 
 
     const handleSortingColumn = (currentColumn: string) => {
-
-        setSortColumn(currentColumn)
-        sort === "ASC" ? setSort("DESC") : setSort("ASC");
-        getGarages(limit, page, search, type, Column, sort);
+        setSortColumn(currentColumn);
+        setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+        setPage(1);
     };
 
 
@@ -80,10 +100,6 @@ export function Garage() {
         service: 5,
         date_update: 6,
     };
-
-    useEffect(() => {
-        getGarages(limit, page, search, type, Column, sort);
-    }, []);
 
     const getGarages = async (
         limit: number,
@@ -154,7 +170,7 @@ export function Garage() {
 
 
         switch (selectedValue) {
-            case 'ID ' + translate("Garage"):
+            case translate("ID"):
                 setType(0);
                 break;
             case translate("Date of request"):
@@ -205,29 +221,95 @@ export function Garage() {
     ];
 
 
-    const handleResetSearch = async () => {
-        setSearch("")
-
-        await getGarages(limit, page, search, type, Column, sort)
+    const handleResetSearch = () => {
+        setSearch("");
+        setPage(1);
     };
 
 
 
     const columnStorageKey = "gmao_garage_selected_columns";
-    const initialColumns = {
-        id_garage: true,
-        immatriculation_vehicule: true,
-        subject: true,
-        priority: true,
-        status: true,
-        date_intervention: true,
-        service: true,
-        date_update: true,
-    };
+    const initialColumns = garageDefaultColumns;
+    const [selectedColumns, setselectedColumns] = useState(initialColumns);
+    const {
+        preferences: garagePreferences,
+        setPreferences: saveGaragePreferences,
+        loaded: garagePreferencesLoaded,
+    } = useGpPagePreferences("garage", garagePreferenceDefaults);
+    const garagePreferencesHydratedRef = useRef(false);
+    const [garagePreferencesReady, setGaragePreferencesReady] = useState(false);
 
-    const [selectedColumns, setselectedColumns] = useState(() =>
-        loadColumnVisibility(columnStorageKey, initialColumns)
-    );
+    useEffect(() => {
+        if (!garagePreferencesLoaded || garagePreferencesHydratedRef.current) return;
+        garagePreferencesHydratedRef.current = true;
+
+        const visibleColumns = new Set(garagePreferences.visibleColumns);
+        setselectedColumns(
+            Object.keys(garageDefaultColumns).reduce(
+                (result, key) => ({
+                    ...result,
+                    [key]: visibleColumns.has(key),
+                }),
+                {} as typeof garageDefaultColumns
+            )
+        );
+        setLimit(garagePreferences.pageSize);
+        setType(garagePreferences.searchType);
+        setTypeSearch(
+            [
+                translate("ID"),
+                translate("Date of request"),
+                translate("Vehicle"),
+                translate("Object"),
+                translate("Priority"),
+                translate("Status"),
+                translate("Updated date"),
+            ][garagePreferences.searchType] || translate("ID")
+        );
+        setSearch(garagePreferences.searchText);
+        setSortColumn(garagePreferences.sortColumn);
+        setSort(garagePreferences.sortDirection);
+        setGaragePreferencesReady(true);
+    }, [garagePreferences, garagePreferencesLoaded]);
+
+    useEffect(() => {
+        if (!garagePreferencesReady) return;
+
+        void saveGaragePreferences({
+            visibleColumns: Object.entries(selectedColumns)
+                .filter(([, visible]) => visible)
+                .map(([key]) => key),
+            pageSize: limit,
+            searchType: type,
+            searchText: search,
+            sortColumn: Column,
+            sortDirection: sort,
+        });
+    }, [
+        Column,
+        garagePreferencesReady,
+        limit,
+        saveGaragePreferences,
+        search,
+        selectedColumns,
+        sort,
+        type,
+    ]);
+
+    useEffect(() => {
+        if (!garagePreferencesReady) return;
+
+        void getGarages(limit, page, search, type, Column, sort);
+    }, [
+        Column,
+        garagePreferencesReady,
+        id_user,
+        limit,
+        page,
+        search,
+        sort,
+        type,
+    ]);
 
 
     const ColumnnOptions = [
@@ -323,11 +405,14 @@ export function Garage() {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic" >
-                                <i
-                                    className="fas fa-chevron-down"
-                                    style={{ fontSize: "20" }}
-                                ></i>
+                            <Dropdown.Toggle
+                                variant="link"
+                                id="dropdown-basic"
+                                className="search-type-toggle"
+                                aria-label={`${translate("Search by")} ${typeSearch}`}
+                                title={typeSearch}
+                            >
+                                <i className="fas fa-chevron-down search-type-chevron" />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {menuItems.map((item, index) => (
@@ -343,7 +428,7 @@ export function Garage() {
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
-                        <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+                        <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} value={search} className="form-control" />
                         <Button
                             variant="secondary"
                             onClick={handleResetSearch}
@@ -361,6 +446,7 @@ export function Garage() {
                                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                                 style={{ width: "66px" }}
                                 onChange={handleSelectChange}
+                                value={limit}
                             >
                                 <option value="10">10</option>
                                 <option value="20">20</option>

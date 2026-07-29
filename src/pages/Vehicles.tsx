@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Table,
@@ -28,6 +28,7 @@ import { ButtonCustomHover } from "../components/ButtonHover";
 import { useNavigate } from "react-router-dom";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, useClipboard } from "../utilities/functions";
 import { toast } from "react-toastify"; import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
+import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
@@ -121,6 +122,28 @@ interface VehiculeListInterface {
   reference_ctr_tech_vehicule?: string;
 }
 
+const vehicleDefaultColumns = {
+  id_vehicule: true,
+  model: true,
+  immatriculation_vehicule: true,
+  state: true,
+  assignment: true,
+  vehicule_type: true,
+  nom_conducteur: true,
+  username_user: true,
+  trailer: true,
+};
+
+const vehiclePreferenceDefaults = {
+  visibleColumns: Object.keys(vehicleDefaultColumns),
+  pageSize: 10,
+  searchType: 1,
+  searchText: "",
+  sortColumn: "id_conducteur",
+  sortDirection: "ASC",
+  filters: [] as string[],
+  selectedVehicleIds: [] as string[],
+};
 
 export function Vehicles() {
   const { translate } = useTranslate();
@@ -163,8 +186,8 @@ export function Vehicles() {
 
   const handleSortingColum = (currentColumn: string) => {
     setSortColumn(currentColumn);
-    sort == "ASC" ? setSort("DESC") : setSort("ASC");
-    getVehicles(limit, currentPage, search, type, column, sort);
+    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+    setCurrentPage(1);
   };
 
   const searchColum: { [key: string]: number } = {
@@ -208,6 +231,7 @@ export function Vehicles() {
           body: JSON.stringify({
             id_user: parseInt(userID ?? "0") || 0,
             search: search,
+            type: type,
             etat: etat, // Ajout du filtre état
           }),
         }).then(res => res.json()),
@@ -282,7 +306,6 @@ export function Vehicles() {
   const handleStateFilter = (selectedStates: string[]) => {
     setSelectedStates(selectedStates);
     setCurrentPage(1); // Réinitialisation à la première page
-    getVehicles(limit, 1, search, type, column, sort, selectedStates.join(','));
   };
   const refreshVehiculeData = async () => {
     await getVehicles(
@@ -302,11 +325,6 @@ export function Vehicles() {
     const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
     setPaginatedVehicles(newPaginatedVehicles);
   }, [currentPage, vehicles, limit]);
-  useEffect(() => {
-    getVehicles(limit, currentPage, search, type, column, sort, etat);
-  }, [currentPage, etat]);
-
-
   /*useLayoutEffect(() => {
     refreshVehiculeData();
   }, [userID, limit, limit, search, type, column, sort, selectedStates]);
@@ -355,17 +373,7 @@ export function Vehicles() {
     console.log("Selected value:", selectedValue);
   };
 
-  const [selectedColumns, setSelectedColumns] = useState({
-    id_vehicule: true,
-    model: true,
-    immatriculation_vehicule: true,
-    state: true,
-    assignment: true,
-    vehicule_type: true,
-    nom_conducteur: true,
-    username_user: true,
-    trailer: true,
-  });
+  const [selectedColumns, setSelectedColumns] = useState(vehicleDefaultColumns);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -374,38 +382,95 @@ export function Vehicles() {
     }));
   };
 
-  const handleAdvancedSearch = async (event: any) => {
+  const handleAdvancedSearch = (event: any) => {
     const newValue = event.target.value;
     setSearch(newValue);
-    await getVehicles(limit, currentPage, newValue, type, column, sort);
+    setCurrentPage(1);
   };
 
-  const handleSelectChange = async (event: any) => {
+  const handleSelectChange = (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
-    setLimit(newValue);
-    const commentsFormServer = await getVehicles(
-      parseInt(newValue),
-      1,
-      search,
-      type,
-      column,
-      sort
-    ); // Ajouter await ici
-    //setVehicles(commentsFormServer);
+    setLimit(parseInt(newValue));
     window.scrollTo(0, 0);
   };
 
 
-  const handleResetSearch = async () => {
+  const handleResetSearch = () => {
     setSearch("");
-
-    await getVehicles(limit, currentPage, search, type, column, sort);
+    setCurrentPage(1);
   };
 
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const [isVehiclesSelected, setIsVehiclesSelected] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
+  const {
+    preferences: vehiclePreferences,
+    setPreferences: saveVehiclePreferences,
+    loaded: vehiclePreferencesLoaded,
+  } = useGpPagePreferences("vehicles", vehiclePreferenceDefaults);
+  const vehiclePreferencesHydratedRef = useRef(false);
+  const [vehiclePreferencesReady, setVehiclePreferencesReady] = useState(false);
+
+  useEffect(() => {
+    if (!vehiclePreferencesLoaded || vehiclePreferencesHydratedRef.current) return;
+    vehiclePreferencesHydratedRef.current = true;
+
+    const visibleColumns = new Set(vehiclePreferences.visibleColumns);
+    setSelectedColumns(
+      Object.keys(vehicleDefaultColumns).reduce(
+        (result, key) => ({
+          ...result,
+          [key]: visibleColumns.has(key),
+        }),
+        {} as typeof vehicleDefaultColumns
+      )
+    );
+    setLimit(vehiclePreferences.pageSize);
+    setType(vehiclePreferences.searchType);
+    setTypeSearch(
+      vehiclePreferences.searchType === 0
+        ? translate("ID")
+        : vehiclePreferences.searchType === 3
+          ? translate("User")
+          : translate("Immatriculation")
+    );
+    setSearch(vehiclePreferences.searchText);
+    setSortColumn(vehiclePreferences.sortColumn);
+    setSort(vehiclePreferences.sortDirection);
+    setSelectedStates(vehiclePreferences.filters);
+    setSelectedVehicles(vehiclePreferences.selectedVehicleIds);
+    setIsVehiclesSelected(vehiclePreferences.selectedVehicleIds.length > 0);
+    setVehiclePreferencesReady(true);
+  }, [vehiclePreferences, vehiclePreferencesLoaded]);
+
+  useEffect(() => {
+    if (!vehiclePreferencesReady) return;
+
+    void saveVehiclePreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(([, visible]) => visible)
+        .map(([key]) => key),
+      pageSize: limit,
+      searchType: type,
+      searchText: search,
+      sortColumn: column,
+      sortDirection: sort,
+      filters: selectedStates,
+      selectedVehicleIds: selectedVehicles,
+    });
+  }, [
+    column,
+    limit,
+    saveVehiclePreferences,
+    search,
+    selectedColumns,
+    selectedStates,
+    selectedVehicles,
+    sort,
+    type,
+    vehiclePreferencesReady,
+  ]);
 
   const handleSelectAllVehicles = (checked: boolean) => {
     setSelectAll(checked);
@@ -462,10 +527,33 @@ export function Vehicles() {
     setCurrentPage(selectedPage.selected + 1);
   };
 
-  // Charger les véhicules au montage du composant
+  // Charger/recharger uniquement après restauration des préférences.
+  // Sans cette garde, le premier appel partait avec une recherche vide puis
+  // le champ était hydraté sans que la liste ne soit recalculée.
   useEffect(() => {
-    getVehicles(limit, currentPage, search, type, column, sort, etat);
-  }, [currentPage, etat]);
+    if (!vehiclePreferencesReady) return;
+
+    void getVehicles(
+      limit,
+      currentPage,
+      search,
+      type,
+      column,
+      sort,
+      etat || selectedStates.join(",")
+    );
+  }, [
+    column,
+    currentPage,
+    etat,
+    limit,
+    search,
+    selectedStates,
+    sort,
+    type,
+    userID,
+    vehiclePreferencesReady,
+  ]);
 
 
 
@@ -689,11 +777,14 @@ export function Vehicles() {
               <div className="col-sm-12 col-md-6">
                 <div className="input-group">
                   <Dropdown>
-                    <Dropdown.Toggle variant="link" id="dropdown-basic">
-                      <i
-                        className="fas fa-chevron-down"
-                        style={{ fontSize: "20" }}
-                      ></i>
+                    <Dropdown.Toggle
+                      variant="link"
+                      id="dropdown-basic"
+                      className="search-type-toggle"
+                      aria-label={`${translate("Search by")} ${typeSearch}`}
+                      title={typeSearch}
+                    >
+                      <i className="fas fa-chevron-down search-type-chevron" />
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {menuItems.map((item, index) => (
@@ -758,6 +849,7 @@ export function Vehicles() {
                       typeSearch
                     )}`}
                     onChange={handleAdvancedSearch}
+                    value={search}
                     className="form-control"
                   />
                   <Button
@@ -782,6 +874,7 @@ export function Vehicles() {
                       className="custom-select custom-select-sm form-control form-control-sm ml-2"
                       style={{ width: "66px" }}
                       onChange={handleSelectChange}
+                      value={limit}
                     >
                       <option value="10">10</option>
                       <option value="20">20</option>

@@ -7,6 +7,8 @@ import { PropagateLoader } from "react-spinners";
 import ModalShowCardManagement from "../components/CardManagement/ShowCardManagement";
 import ModalShowCashManagement from "../components/CashManagement/ShowCashManagement";
 import ModalShowTankManagement from "../components/TankManagement/ShowTankManagement";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface FuelTotals {
     card: {
@@ -56,6 +58,15 @@ export function FuelManagement() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("date");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "fuel-consumption",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -88,6 +99,7 @@ export function FuelManagement() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("fuel-consumption", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const sourceLabels = {
         card: translate("Fuel card"),
@@ -192,6 +204,7 @@ export function FuelManagement() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         console.log("Fetching data with params:", {
             currentPage,
             limit,
@@ -208,7 +221,7 @@ export function FuelManagement() {
         };
         
         fetchData();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -318,7 +331,7 @@ export function FuelManagement() {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

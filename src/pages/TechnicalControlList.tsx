@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 // TEMPORARY ,Geoparc has no authentication.
 // LocalStorage role/id is only a placeholder.
@@ -23,6 +24,14 @@ export default function TechnicalControlList() {
   const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "administrative-technical-control",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchValue, setSearchText: setSearchValue,
+    sortColumn, setSortColumn,
+    sortDirection, setSortDirection,
+  });
 
   // === columns ===
   const columns = [
@@ -138,10 +147,11 @@ export default function TechnicalControlList() {
 
   // initial load
   useEffect(() => {
-    fetchTotal("", "", limit);
-    fetchPage(limit, 1, "", "", sortColumn, sortDirection);
+    if (!listPreferencesReady) return;
+    fetchTotal(searchValue, searchType, limit);
+    fetchPage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
     // eslint-disable-next-line
-  }, []);
+  }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
   // ============================================
   // Search input

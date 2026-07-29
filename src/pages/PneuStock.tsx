@@ -8,6 +8,8 @@ import ModalShowPneuStock from "../components/PneuStock/ShowPneuStock";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPneuStock from "../components/PneuStock/EditPneuStock";
 import ModalDeletePneuStock from "../components/PneuStock/DeletePneuStock";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface PneuStock {
     id_pneu_stock: number;
@@ -32,6 +34,15 @@ export function PneuStock() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_pneu_stock");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "tire-stock",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [selectedPneuStockId, setSelectedPneuStockId] = useState<number | null>(null);
@@ -55,6 +66,7 @@ export function PneuStock() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("tire-stock", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -146,9 +158,10 @@ export function PneuStock() {
     
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountPneuStock();
         getPneuStock();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -241,7 +254,7 @@ export function PneuStock() {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

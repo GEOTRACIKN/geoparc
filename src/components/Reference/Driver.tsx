@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useReferenceTablePreferences } from '../../hooks/useReferenceTablePreferences';
 import { Table, Button, Form, Modal, Spinner, Alert, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { useTranslate } from '../../hooks/LanguageProvider';
@@ -41,12 +42,22 @@ export default function DriversTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const {
+    currentPageSize: itemsPerPage,
+    setCurrentPageSize: setItemsPerPage,
+    currentSearchText: searchTerm,
+    setCurrentSearchText: setSearchTerm,
+    currentSortColumn: sortColumn,
+    setCurrentSortColumn: setSortColumn,
+    currentSortDirection: sortOrder,
+    setCurrentSortDirection: setSortOrder,
+    loaded: preferencesLoaded,
+  } = useReferenceTablePreferences('driver-categories', {
+    sortColumn: 'id_category',
+    sortDirection: 'DESC',
+  });
   
   // Search and sort state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState('id_category');
-  const [sortOrder, setSortOrder] = useState('DESC');
 
   const geopuserID = localStorage.getItem("GeopUserID");
 
@@ -84,8 +95,9 @@ export default function DriversTab() {
   };
 
   useEffect(() => {
+    if (!preferencesLoaded) return;
     fetchCategories();
-  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, translate]);
+  }, [currentPage, itemsPerPage, preferencesLoaded, searchTerm, sortColumn, sortOrder, translate]);
 
   const handleShowAdd = () => {
     setCurrentCategory(null);

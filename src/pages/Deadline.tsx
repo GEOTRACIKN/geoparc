@@ -23,6 +23,26 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp, useClipboard } from "../utilities/functions";
 import { set } from "lodash";
 import { toast } from "react-toastify";
+import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
+
+const deadlineDefaultColumns = {
+  id_deadline: true,
+  nom_type: true,
+  date_deadline: true,
+  date_creation: true,
+  id_item: true,
+};
+
+const deadlinePreferenceDefaults = {
+  visibleColumns: Object.keys(deadlineDefaultColumns),
+  pageSize: 10,
+  searchType: 0,
+  searchText: "",
+  sortColumn: "id_deadline",
+  sortDirection: "DESC",
+  filters: { view: "list" },
+  selectedVehicleId: null as number | null,
+};
 
 interface DeadlineInterface {
   id_deadline: number;
@@ -162,21 +182,79 @@ export function Deadline() {
   };
 
   // Define the calendar events (empty for now)
-  const initialColumns = {
-    id_deadline: true,
-    nom_type: true,
-    date_deadline: true,
-    date_creation: true,
-    id_item: true,
-  };
+  const initialColumns = deadlineDefaultColumns;
+  const [selectedColumns, setSelectedColumns] = useState(deadlineDefaultColumns);
+  const {
+    preferences: deadlinePreferences,
+    setPreferences: saveDeadlinePreferences,
+    loaded: deadlinePreferencesLoaded,
+  } = useGpPagePreferences("deadlines", deadlinePreferenceDefaults);
+  const deadlinePreferencesHydratedRef = useRef(false);
+  const [deadlinePreferencesReady, setDeadlinePreferencesReady] =
+    useState(false);
 
-  const [selectedColumns, setSelectedColumns] = useState({
-    id_deadline: true,
-    nom_type: true,
-    date_deadline: true,
-    date_creation: true,
-    id_item: true,
-  });
+  useEffect(() => {
+    if (
+      !deadlinePreferencesLoaded ||
+      deadlinePreferencesHydratedRef.current
+    ) return;
+    deadlinePreferencesHydratedRef.current = true;
+
+    const visibleColumns = new Set(deadlinePreferences.visibleColumns);
+    setSelectedColumns(
+      Object.keys(deadlineDefaultColumns).reduce(
+        (result, key) => ({
+          ...result,
+          [key]: visibleColumns.has(key),
+        }),
+        {} as typeof deadlineDefaultColumns
+      )
+    );
+    setLimit(deadlinePreferences.pageSize);
+    setType(deadlinePreferences.searchType);
+    setTypeSearch(
+      deadlinePreferences.searchType === 1
+        ? translate("Type")
+        : deadlinePreferences.searchType === 2
+          ? translate("Deadline date")
+          : deadlinePreferences.searchType === 3
+            ? translate("Creation date")
+            : deadlinePreferences.searchType === 4
+              ? translate("Deadline for")
+              : translate("ID")
+    );
+    setSearch(deadlinePreferences.searchText);
+    setSortColumn(deadlinePreferences.sortColumn);
+    setSort(deadlinePreferences.sortDirection);
+    setIsGridView(deadlinePreferences.filters.view !== "calendar");
+    setDeadlinePreferencesReady(true);
+  }, [deadlinePreferences, deadlinePreferencesLoaded]);
+
+  useEffect(() => {
+    if (!deadlinePreferencesReady) return;
+
+    void saveDeadlinePreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(([, visible]) => visible)
+        .map(([key]) => key),
+      pageSize: limit,
+      searchType: type,
+      searchText: search,
+      sortColumn: column,
+      sortDirection: sort,
+      filters: { view: isGridView ? "list" : "calendar" },
+    });
+  }, [
+    column,
+    deadlinePreferencesReady,
+    isGridView,
+    limit,
+    saveDeadlinePreferences,
+    search,
+    selectedColumns,
+    sort,
+    type,
+  ]);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -193,9 +271,8 @@ export function Deadline() {
 
   const handleSortingColumn = (currentColumn: string) => {
     setSortColumn(currentColumn);
-    sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getDeadlines(limit, currentPage, search, type, column, sort);
-
+    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+    setCurrentPage(1);
   };
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -385,26 +462,44 @@ export function Deadline() {
   };
 
   useEffect(() => {
-
-
-
+    if (!deadlinePreferencesReady) return;
 
     if (typeId) {
-
-      setSearch(getDeadlineTypeName(typeId))
+      const deadlineTypeName = getDeadlineTypeName(typeId);
+      setSearch(deadlineTypeName);
       setType(1);
       setTypeSearch(translate("Type"));
-      getDeadlines(limit, currentPage, getDeadlineTypeName(typeId), 1, column, sort);
-
+      void getDeadlines(
+        limit,
+        currentPage,
+        deadlineTypeName,
+        1,
+        column,
+        sort
+      );
+      return;
     }
-    else {
-      if (id_alarm) { getDeadlines(limit, currentPage, id_alarm, type, column, sort); }
-      else { getDeadlines(limit, currentPage, search, type, column, sort); }
 
-    }
-
-    // getCalendarDeadlines();
-  }, []);
+    void getDeadlines(
+      limit,
+      currentPage,
+      id_alarm || search,
+      type,
+      column,
+      sort
+    );
+  }, [
+    column,
+    currentPage,
+    deadlinePreferencesReady,
+    id_alarm,
+    id_user,
+    limit,
+    search,
+    sort,
+    type,
+    typeId,
+  ]);
 
   const handleTypeSearch = (selectedValue: string) => {
 
@@ -420,10 +515,10 @@ export function Deadline() {
         setType(1);
         break;
       case translate("Creation date"):
-        setType(2);
+        setType(3);
         break;
       case translate("Deadline date"):
-        setType(3);
+        setType(2);
         break;
       case translate("Deadline for"):
         setType(4);
@@ -522,26 +617,19 @@ export function Deadline() {
       </div>
     );
   };
-  const handleAdvancedSearch = async (event: any) => {
+  const handleAdvancedSearch = (event: any) => {
     setSearch(event.target.value);
     setCurrentPage(1);
-
-    const commentsFormServer = await getDeadlines(limit, currentPage, event.target.value, type, column, sort);
-    setDeadline(commentsFormServer);
   };
 
-  const handleSelectChange = async (event: any) => {
+  const handleSelectChange = (event: any) => {
     const newValue = event.target.value;
     setLimit(parseInt(newValue));
     setCurrentPage(1);
-    const commentsFormServer = await getDeadlines(parseInt(newValue), currentPage, search, type, column, sort);
-    setDeadline(commentsFormServer);
     window.scrollTo(0, 0);
   };
-  const handlePageClick = async (data: any) => {
-    let currentPage = data.selected + 1;
-    const commentsFormServer = await getDeadlines(limit, currentPage, search, type, column, sort);
-    setDeadline(commentsFormServer);
+  const handlePageClick = (data: any) => {
+    setCurrentPage(data.selected + 1);
     window.scrollTo(0, 0);
   };
 
@@ -686,11 +774,14 @@ export function Deadline() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <i
-                  className="fas fa-chevron-down"
-                  style={{ fontSize: "20px" }}
-                ></i>
+              <Dropdown.Toggle
+                variant="link"
+                id="dropdown-basic"
+                className="search-type-toggle"
+                aria-label={`${translate("Search by")} ${typeSearch}`}
+                title={typeSearch}
+              >
+                <i className="fas fa-chevron-down search-type-chevron" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {menuItems.map((item, index) => (
@@ -711,6 +802,7 @@ export function Deadline() {
               //placeholder={` By ${typeSearch}`}
               placeholder={`by ${translate(typeSearch)}`}
               onChange={handleAdvancedSearch}
+              value={search}
               className="form-control"
             />
           </div>
@@ -723,6 +815,7 @@ export function Deadline() {
                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                 style={{ width: "66px" }}
                 onChange={handleSelectChange}
+                value={limit}
               >
                 <option value="10">10</option>
                 <option value="20">20</option>
