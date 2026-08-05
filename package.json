@@ -87,7 +87,7 @@
     "build": "set \"REACT_APP_BACKEND_URL=https://geotrackon.com\" && react-scripts build",
     "copy-build": "cp -r build/* /opt/lampp/htdocs/geoparc.geotrackin.com",
     "build-and-copy": "npm run build && npm run copy-build",
-    "test": "jest",
+    "test": "react-scripts test",
     "eject": "set \"REACT_APP_BACKEND_URL=http://localhost:5000\" && react-scripts eject"
   },
   "eslintConfig": {

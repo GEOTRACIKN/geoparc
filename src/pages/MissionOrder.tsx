@@ -5,6 +5,8 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import { jsPDF } from "jspdf";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 import "jspdf-autotable";
 //import DriverModal from "../components/Driver/DriverModal";
@@ -77,6 +79,15 @@ export function MissionOrder() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState(translate("ID"));
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "mission-orders",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: colum, setSortColumn: setSortColum,
+    sortDirection: sort, setSortDirection: setSort,
+  });
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
 
@@ -165,8 +176,9 @@ export function MissionOrder() {
     window.scrollTo(0, 0);
   };
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getMissionOrder(limit, currentPage, search, type, colum, sort);
-  }, []);
+  }, [limit, currentPage, search, type, colum, sort, listPreferencesReady]);
 
   const handlePreviewClick = (missionOrder: any) => {
     console.log("Selected Mission:", missionOrder);
@@ -219,6 +231,7 @@ export function MissionOrder() {
     voucher_mission: true,
     immatriculation_vehicule: true,
   });
+  useGpVisibleColumns("mission-orders", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -416,7 +429,7 @@ export function MissionOrder() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20" }}

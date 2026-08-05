@@ -11,6 +11,8 @@ import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfir
 
 import MissionReportDeleteModal from "../components/MissionReport/MissionReportDeleteModal";
 import MissionReportPreview from "../components/MissionReport/MissionReportPreview";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 
 
@@ -67,6 +69,15 @@ export function MissionReport() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(2);
   const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "mission-reports",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: colum, setSortColumn: setSortColum,
+    sortDirection: sort, setSortDirection: setSort,
+  });
 
   const [IdMissionReport, setIdMissionReport] = useState<number>(0);
 
@@ -157,8 +168,9 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     window.scrollTo(0, 0);
   };
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getMissionReport(limit, currentPage, search, type, colum, sort);
-  }, []);
+  }, [limit, currentPage, search, type, colum, sort, listPreferencesReady]);
 
 
   const handleSelectChange = async (event: any) => {
@@ -196,6 +208,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     dist_misrap: true,
     id_user: true, // Set id_user only if not editing
   });
+  useGpVisibleColumns("mission-reports", selectedColumns, setSelectedColumns, listPreferencesReady);
   
 
   const handleColumnChange = (column: string) => {
@@ -341,7 +354,7 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic" >
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20" }}
@@ -660,4 +673,3 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
 function convertValue(maintenance: any) {
   throw new Error("Function not implemented.");
 }
-

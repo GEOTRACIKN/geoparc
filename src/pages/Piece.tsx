@@ -9,6 +9,8 @@ import ModalEditPiece from "../components/Piece/EditPiece";
 import { Link } from "react-router-dom";
 import ModalShowPiece from "../components/Piece/ShowPiece";
 import ModalDeletePiece from "../components/Piece/DeletePiece";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface Piece {
     id_piece: number;
@@ -39,6 +41,15 @@ export function Piece() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_piece");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "parts-replacements",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [selectedPieceId, setSelectedPieceId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -59,6 +70,7 @@ export function Piece() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("parts-replacements", selectedColumns, setSelectedColumns, listPreferencesReady);
     
     // Calculs après la déclaration de selectedColumns
     const pageCount = useMemo(() => Math.ceil(total / limit), [total, limit]);
@@ -141,9 +153,10 @@ export function Piece() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountPiece();
         getPiece();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     // Handlers UI
     const handleTypeSearch = (selectedValue: string) => {
@@ -251,7 +264,7 @@ export function Piece() {
                 <div className="col-md-4" style={{ margin: "10px 0", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>

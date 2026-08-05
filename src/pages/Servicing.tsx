@@ -8,6 +8,8 @@ import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
 import { Bounce, toast } from "react-toastify";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
@@ -44,6 +46,15 @@ useEffect(() => {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_servicing");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "servicing",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false); // For confirmation modal
 
@@ -116,6 +127,7 @@ useEffect(() => {
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("servicing", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -202,10 +214,11 @@ useEffect(() => {
         }
     };
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountServicing();
         
         getServicing();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
    
     
 
@@ -346,7 +359,7 @@ useEffect(() => {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}
@@ -683,4 +696,3 @@ useEffect(() => {
         </>
     );
 }
-                  

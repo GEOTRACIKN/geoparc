@@ -8,6 +8,8 @@ import ModalEditWarning from "../components/Warning/EditWarning";
 import { Bounce, toast } from "react-toastify";
 import { DownloadModal } from "../functions";
 import { generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 
 //?apikey=u3I84lt6B1sHE7z8MNwS
@@ -40,6 +42,15 @@ export function Warnings() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("ID Warning");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "warnings",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: column, setSortColumn,
+    sortDirection: sort, setSortDirection: setSort,
+  });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [warningToDelete, setWarningToDelete] = useState<number | null>(null);
   const [warningToEdit, setWarningToEdit] = useState<number | null>(null);
@@ -156,9 +167,10 @@ export function Warnings() {
     }
   };
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getCountWarning();
     getWarnings();
-  }, [currentPage, limit, search, type, column, sort]);
+  }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
   const handlePageClick = (data: any) => {
     setCurrentPage(data.selected + 1);
@@ -222,6 +234,7 @@ export function Warnings() {
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  useGpVisibleColumns("warnings", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   const handleColumnChange = (column: string) => {
     const updatedColumns = {
@@ -353,7 +366,7 @@ export function Warnings() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20px" }}

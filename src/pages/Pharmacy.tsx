@@ -3,6 +3,8 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalNewPharmacy from "../components/Pharmacy/NewPharmacy";
 import ModalShowPharmacy from "../components/Pharmacy/ShowPharmacy";
@@ -37,6 +39,15 @@ export function Pharmacy() {
     const [selectedPharmacyId, setSelectedPharmacyId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "pharmacy-boxes",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
 
     const initialColumns = {
         //ID: true,
@@ -54,6 +65,7 @@ export function Pharmacy() {
         return savedColumns ? JSON.parse(savedColumns) : initialColumns;
     };
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("pharmacy-boxes", selectedColumns, setSelectedColumns, listPreferencesReady);
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
@@ -126,9 +138,10 @@ export function Pharmacy() {
         }
     };
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountPharmacy();
         getPharmacy();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
    
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -197,7 +210,7 @@ export function Pharmacy() {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}
@@ -485,4 +498,3 @@ export function Pharmacy() {
         </>
     );
 }
-                  

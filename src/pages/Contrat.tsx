@@ -5,6 +5,8 @@ import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import ModalNewContrat from "../components/NewContart";
 import ModalEditContrat from "../components/EditContratModal";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface Contrats {
   id_contrat: number;
@@ -31,6 +33,14 @@ export function Contrat() {
   const [column, setSortColumn] = useState("id_contrat");
   const [sort, setSort] = useState("ASC");
   const [typeSearch, setTypeSearch] = useState("id_contrat");
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "contracts",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: typeSearch, setSearchType: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: column, setSortColumn,
+    sortDirection: sort, setSortDirection: setSort,
+  });
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -119,8 +129,9 @@ export function Contrat() {
   };
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     fetchData(currentPage, limit, search, typeSearch);
-  }, [currentPage, limit, search, typeSearch,column,sort]);
+  }, [currentPage, limit, search, typeSearch,column,sort,listPreferencesReady]);
 
   const handleSelectChange = async (event: any) => {
     const newValue = event.target.value;
@@ -154,6 +165,7 @@ export function Contrat() {
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  useGpVisibleColumns("contracts", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   const handleColumnChange = (column: string) => {
     const updatedColumns = {
@@ -195,7 +207,7 @@ export function Contrat() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20" }}

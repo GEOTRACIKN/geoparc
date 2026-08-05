@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
@@ -22,8 +23,14 @@ export default function DriverLicenseList() {
   const [searchType, setSearchType] = useState<string>(isAdmin ? "id" : "name");
   const [sortColumn, setSortColumn] = useState("id_conducteur");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "administrative-driver-licenses",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchValue, setSearchText: setSearchValue,
+    sortColumn, setSortColumn,
+    sortDirection, setSortDirection,
+  });
   // ===== Columns =====
   const columns = [
     ...(isAdmin ? [{ key: "id_conducteur", label: "ID" }] : []),
@@ -143,56 +150,47 @@ export default function DriverLicenseList() {
 
   // ===== Initial load =====
   useEffect(() => {
-    fetchDriverLicenseTotal("", "", limit);
-    fetchDriverLicensePage(limit, 1, "", "", sortColumn, sortDirection);
+    if (!listPreferencesReady) return;
+    const timeout = window.setTimeout(() => {
+      void fetchDriverLicenseTotal(searchValue, searchType, limit);
+      void fetchDriverLicensePage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
   // ===== Search handlers =====
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
-
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
-    searchTimeout.current = setTimeout(async () => {
-      await fetchDriverLicenseTotal(value, searchType, limit);
-      await fetchDriverLicensePage(limit, 1, value, searchType, sortColumn, sortDirection);
-    }, 300);
   };
 
-  const handleSearchTypeChange = async (typeVal: string) => {
+  const handleSearchTypeChange = (typeVal: string) => {
     setSearchType(typeVal);
     setSearchValue("");
     setCurrentPage(1);
-    await fetchDriverLicenseTotal("", typeVal, limit);
-    await fetchDriverLicensePage(limit, 1, "", typeVal, sortColumn, sortDirection);
   };
 
-  const handleResetSearch = async () => {
+  const handleResetSearch = () => {
     setSearchValue("");
     setCurrentPage(1);
-    await fetchDriverLicenseTotal("", "", limit);
-    await fetchDriverLicensePage(limit, 1, "", "", sortColumn, sortDirection);
   };
 
   // ===== Pagination =====
-  const handlePageClick = async (data: any) => {
+  const handlePageClick = (data: any) => {
     const newPage = data.selected + 1;
     setCurrentPage(newPage);
-    await fetchDriverLicensePage(limit, newPage, searchValue, searchType, sortColumn, sortDirection);
     window.scrollTo(0, 0);
   };
 
-  const handleLimitChange = async (newLimit: number) => {
+  const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setCurrentPage(1);
-    await fetchDriverLicenseTotal(searchValue, searchType, newLimit);
-    await fetchDriverLicensePage(newLimit, 1, searchValue, searchType, sortColumn, sortDirection);
   };
 
   // ===== Sorting =====
-  const handleSort = async (columnKey: string) => {
+  const handleSort = (columnKey: string) => {
     const columnMap: Record<string, string> = {
       id_conducteur: "id_conducteur",
       nom_conducteur: "nom_conducteur",
@@ -205,12 +203,9 @@ export default function DriverLicenseList() {
     const backendColumn = columnMap[columnKey] || columnKey;
     const nextSort = sortDirection === "ASC" ? "DESC" : "ASC";
     
-    setSortColumn(columnKey);
+    setSortColumn(backendColumn);
     setSortDirection(nextSort);
     setCurrentPage(1);
-
-    await fetchDriverLicenseTotal(searchValue, searchType);
-    await fetchDriverLicensePage(limit, 1, searchValue, searchType, backendColumn, nextSort);    
   };
 
   return (
