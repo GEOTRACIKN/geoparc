@@ -1,4 +1,5 @@
 import {
+  clearGpPreferencesCache,
   getGpPagePreferences,
   resetGpPagePreferences,
   saveGpPagePreferences,
@@ -14,8 +15,24 @@ function response(body: unknown, ok = true) {
 }
 
 beforeEach(() => {
+  clearGpPreferencesCache();
   fetchMock.mockReset();
   global.fetch = fetchMock;
+});
+
+test("deduplicates preference reads for the same user and page", async () => {
+  fetchMock.mockResolvedValue(
+    response({ pageKey: "vehicles", preferences: { pageSize: 20 } })
+  );
+
+  const firstRead = getGpPagePreferences("vehicles");
+  const secondRead = getGpPagePreferences("vehicles");
+
+  await expect(Promise.all([firstRead, secondRead])).resolves.toEqual([
+    { pageSize: 20 },
+    { pageSize: 20 },
+  ]);
+  expect(fetchMock).toHaveBeenCalledTimes(1);
 });
 
 test("loads the authenticated user's preferences for a page", async () => {
