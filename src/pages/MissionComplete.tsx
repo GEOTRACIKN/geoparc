@@ -32,7 +32,8 @@ export default function MissionComplete() {
     if (requestStarted.current) return;
     requestStarted.current = true;
 
-    const token = searchParams.get("t")?.trim();
+    const fragmentParams = new URLSearchParams(window.location.hash.slice(1));
+    const token = (fragmentParams.get("t") || searchParams.get("t"))?.trim();
     const queryError = searchParams.get("error");
     if (queryError || !token) {
       setState({
@@ -41,6 +42,8 @@ export default function MissionComplete() {
       });
       return;
     }
+
+    window.history.replaceState(null, "", window.location.pathname);
 
     void fetch(`${apiUrl}/api/geop/mission/close`, {
       method: "POST",
