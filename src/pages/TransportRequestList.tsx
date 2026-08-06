@@ -9,19 +9,16 @@ import {
     Row,
     Col,
     InputGroup,
-    Modal,
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import {
-    approveTransportRequestList,
     getTransportRequestList,
     getTransportRequestListCount,
-    updateTransportRequestListStatus,
 } from "../services/transportRequestList.service";
 import {
     TransportRequestListItem,
@@ -29,6 +26,7 @@ import {
 } from "../types/transportRequestList.types";
 import DetailsDrawer from "../components/TransportRequest/DetailsDrawer";
 import { formatDateToTimestamp, } from "../functions";
+import { createMissionOrderApi } from "../services/missionOrder.service";
 
 
 
@@ -46,13 +44,6 @@ type ColumnKey =
 interface ColumnOption {
     key: ColumnKey;
     label: string;
-}
-
-type TransportRequestAction = "approve" | "reject" | "cancel";
-
-interface PendingAction {
-    action: TransportRequestAction;
-    request: TransportRequestListItem;
 }
 
 const ALL_COLUMNS: ColumnOption[] = [
@@ -78,7 +69,6 @@ const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
 ];
 export function TransportRequestList() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
 
     const id_user = localStorage.getItem("GeopUserID");
 
@@ -114,47 +104,12 @@ export function TransportRequestList() {
     const [selectedRequest, setSelectedRequest] =
         useState<TransportRequestListItem | null>(null);
     const [showDrawer, setShowDrawer] = useState(false);
-    const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
-    const [isConfirmingAction, setIsConfirmingAction] = useState(false);
 
     const visibleColumns = useMemo(() => {
         return ALL_COLUMNS.filter((column) => selectedColumns.includes(column.key));
     }, [selectedColumns]);
 
     const { translate } = useTranslate();
-
-    useEffect(() => {
-        const mailDecision = searchParams.get("mailDecision");
-
-        if (mailDecision !== "approved" && mailDecision !== "rejected") {
-            return;
-        }
-
-        const alreadyDecided = searchParams.get("already_decided") === "1";
-        const toastOptions = {
-            position: "bottom-right" as const,
-            autoClose: 3000,
-            transition: Bounce,
-        };
-
-        if (mailDecision === "approved") {
-            toast.success(
-                alreadyDecided
-                    ? "Cette demande a deja ete approuvee"
-                    : "Demande approuvee depuis l'email",
-                toastOptions,
-            );
-        } else {
-            toast.warn(
-                alreadyDecided
-                    ? "Cette demande a deja ete traitee"
-                    : "Demande rejetee depuis l'email",
-                toastOptions,
-            );
-        }
-
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }, [searchParams]);
 
     const loadTransportRequests = async (
         page = currentPage,
@@ -219,35 +174,6 @@ export function TransportRequestList() {
             1,
             search,
             requestType,
-            limitValue,
-            sortColumn,
-            sortOrder,
-        );
-    };
-
-    const handleClearSearch = async () => {
-        setSearch("");
-        setCurrentPage(1);
-        await loadTransportRequests(
-            1,
-            "",
-            requestType,
-            limitValue,
-            sortColumn,
-            sortOrder,
-        );
-    };
-
-    const handleRequestTypeChange = async (
-        event: React.ChangeEvent<HTMLSelectElement>,
-    ) => {
-        const nextType = event.target.value;
-        setRequestType(nextType);
-        setCurrentPage(1);
-        await loadTransportRequests(
-            1,
-            search,
-            nextType,
             limitValue,
             sortColumn,
             sortOrder,
@@ -373,36 +299,8 @@ export function TransportRequestList() {
     //     });
     // };
 
-    const requestConfirmation = (
-        action: TransportRequestAction,
-        request: TransportRequestListItem,
-    ) => {
-        setPendingAction({ action, request });
-    };
-
-    const closeConfirmation = () => {
-        if (isConfirmingAction) return;
-        setPendingAction(null);
-    };
-
-    const persistRequestStatus = async (
-        row: TransportRequestListItem,
-        status_request: "rejected" | "cancelled",
-        approval_status: "rejected" | "cancelled",
-    ) => {
-        await updateTransportRequestListStatus({
-            id_transport_request: row.id_transport_request,
-            id_user,
-            status_request,
-            approval_status,
-            approval_required: 0,
-        });
-
-        updateRequestStatus(row.id_transport_request, status_request);
-    };
-
-    const executeReject = async (row: TransportRequestListItem) => {
-        await persistRequestStatus(row, "rejected", "rejected");
+    const handleReject = (row: TransportRequestListItem) => {
+        updateRequestStatus(row.id_transport_request, "rejected");
 
         toast.warn(`Request #${row.id_transport_request} rejected`, {
             position: "bottom-right",
@@ -411,8 +309,8 @@ export function TransportRequestList() {
         });
     };
 
-    const executeCancel = async (row: TransportRequestListItem) => {
-        await persistRequestStatus(row, "cancelled", "cancelled");
+    const handleCancel = (row: TransportRequestListItem) => {
+        updateRequestStatus(row.id_transport_request, "cancelled");
 
         toast.warn(`Request #${row.id_transport_request} cancelled`, {
             position: "bottom-right",
@@ -421,16 +319,48 @@ export function TransportRequestList() {
         });
     };
 
+    const handleCreateMission = (row: TransportRequestListItem) => {
+        updateRequestStatus(row.id_transport_request, "mission_created");
+
+        toast.success(`Request #${row.id_transport_request} converted to mission`, {
+            position: "bottom-right",
+            autoClose: 1800,
+            transition: Bounce,
+        });
+
+        closeDrawer();
+    };
+
     const handleNewRequest = () => {
         navigate("/transport-request");
     };
 
-    const executeApprove = async (row: TransportRequestListItem) => {
+    const handleApprove = async (row: TransportRequestListItem) => {
         try {
-            const result = await approveTransportRequestList({
-                id_transport_request: row.id_transport_request,
-                id_user,
-            });
+            const payload = {
+                id_vehicule: 0,
+                ref_mission: row.id_transport_request,
+                object_mission: row.object_request || "",
+                fuel_loading_mission: 0,
+                fuel_type_mission: "",
+                expenses_mission: 0,
+                tank_mission: 0,
+                trailer_mission: "0",
+                driver_mission: "",
+                accomp_mission: "",
+                dep_loc_mission: row.departure_location || "",
+                dep_date_mission: row.departure_datetime || "",
+                dep_dest_mission: row.arrival_location || "",
+                return_date_mission: row.arrival_datetime || "",
+                itinerary_mission: "",
+                new_km_mission: 0,
+                fuel_cost_mission: 0,
+                fuel_level_mission: 0,
+                voucher_mission: 0,
+                id_user: localStorage.getItem("GeopUserID"),
+            };
+            
+            const result = await createMissionOrderApi(payload);
 
             updateRequestStatus(row.id_transport_request, "mission_created");
 
@@ -447,80 +377,8 @@ export function TransportRequestList() {
                 autoClose: 2400,
                 transition: Bounce,
             });
-
-            throw error;
         }
     };
-
-    const confirmPendingAction = async () => {
-        if (!pendingAction) return;
-
-        try {
-            setIsConfirmingAction(true);
-
-            if (pendingAction.action === "approve") {
-                await executeApprove(pendingAction.request);
-            } else if (pendingAction.action === "reject") {
-                await executeReject(pendingAction.request);
-            } else {
-                await executeCancel(pendingAction.request);
-            }
-
-            setPendingAction(null);
-        } catch (error) {
-            console.error("Confirm transport request action error:", error);
-        } finally {
-            setIsConfirmingAction(false);
-        }
-    };
-
-    const handleApprove = (row: TransportRequestListItem) =>
-        requestConfirmation("approve", row);
-
-    const handleReject = (row: TransportRequestListItem) =>
-        requestConfirmation("reject", row);
-
-    const handleCancel = (row: TransportRequestListItem) =>
-        requestConfirmation("cancel", row);
-
-    const getConfirmationContent = () => {
-        if (!pendingAction) {
-            return {
-                title: "",
-                message: "",
-                confirmLabel: translate("confirm"),
-                variant: "primary",
-            };
-        }
-
-        const requestLabel = `#${pendingAction.request.id_transport_request}`;
-
-        switch (pendingAction.action) {
-            case "approve":
-                return {
-                    title: translate("Confirm approval"),
-                    message: `${translate("Approve request")} ${requestLabel} ? ${translate("A mission order will be created.")}`,
-                    confirmLabel: translate("approve"),
-                    variant: "success",
-                };
-            case "reject":
-                return {
-                    title: translate("Confirm rejection"),
-                    message: `${translate("Reject request")} ${requestLabel} ?`,
-                    confirmLabel: translate("reject"),
-                    variant: "danger",
-                };
-            default:
-                return {
-                    title: translate("Confirm cancellation"),
-                    message: `${translate("Cancel request")} ${requestLabel} ?`,
-                    confirmLabel: translate("cancel"),
-                    variant: "secondary",
-                };
-        }
-    };
-
-    const confirmationContent = getConfirmationContent();
 
     return (
         <div className="page-content">
@@ -571,11 +429,6 @@ export function TransportRequestList() {
                                     placeholder={translate("search") + "..."}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            handleSearch();
-                                        }
-                                    }}
                                     style={{
                                         height: "42px",
                                         minHeight: "42px",
@@ -590,7 +443,7 @@ export function TransportRequestList() {
                                 {search && (
                                     <Button
                                         variant="outline-secondary"
-                                        onClick={handleClearSearch}
+                                        onClick={() => setSearch("")}
                                         style={{
                                             height: "42px",
                                             minHeight: "42px",
@@ -607,7 +460,7 @@ export function TransportRequestList() {
                         <Col xl={2} lg={3} md={4}>
                             <Form.Select
                                 value={requestType}
-                                onChange={handleRequestTypeChange}
+                                onChange={(e) => setRequestType(e.target.value)}
                                 style={{ height: "42px" }}
                             >
                                 <option value="all">{translate("all")}</option>
@@ -889,38 +742,6 @@ export function TransportRequestList() {
                 onReject={handleReject}
                 onCancel={handleCancel}
             />
-
-            <Modal
-                show={Boolean(pendingAction)}
-                onHide={closeConfirmation}
-                centered
-                backdrop={isConfirmingAction ? "static" : true}
-            >
-                <Modal.Header closeButton={!isConfirmingAction}>
-                    <Modal.Title>{confirmationContent.title}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p className="mb-0">{confirmationContent.message}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button
-                        variant="light"
-                        onClick={closeConfirmation}
-                        disabled={isConfirmingAction}
-                    >
-                        {translate("cancel")}
-                    </Button>
-                    <Button
-                        variant={confirmationContent.variant}
-                        onClick={confirmPendingAction}
-                        disabled={isConfirmingAction}
-                    >
-                        {isConfirmingAction
-                            ? translate("processing")
-                            : confirmationContent.confirmLabel}
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </div>
     );
 }

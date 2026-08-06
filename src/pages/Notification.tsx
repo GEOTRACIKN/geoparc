@@ -63,6 +63,7 @@ export function Notifications() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Alarms, setAlarms] = useState<NotificationsProps[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
+  const canViewNotificationId = id_user === "1";
   const [showCreateAlarmModal, setShowCreateAlarmModal] = useState(false);
   const handleshowCreateAlarmModal = () => setShowCreateAlarmModal(true);
   const handleCloseCreateAlarmModal = () => setShowCreateAlarmModal(false);
@@ -235,7 +236,7 @@ export function Notifications() {
 
   const [selectedColumns, setSelectedColumns] = useState({
     ...notificationDefaultColumns,
-    id_notification: id_user === "1",
+    id_notification: canViewNotificationId,
   });
   const {
     preferences: notificationPreferences,
@@ -258,7 +259,10 @@ export function Notifications() {
       Object.keys(notificationDefaultColumns).reduce(
         (result, key) => ({
           ...result,
-          [key]: visibleColumns.has(key),
+          [key]:
+            key === "id_notification"
+              ? canViewNotificationId && visibleColumns.has(key)
+              : visibleColumns.has(key),
         }),
         {} as typeof notificationDefaultColumns
       )
@@ -274,14 +278,22 @@ export function Notifications() {
     setSortColum(notificationPreferences.sortColumn);
     setSort(notificationPreferences.sortDirection);
     setNotificationPreferencesReady(true);
-  }, [notificationPreferences, notificationPreferencesLoaded]);
+  }, [
+    canViewNotificationId,
+    notificationPreferences,
+    notificationPreferencesLoaded,
+  ]);
 
   useEffect(() => {
     if (!notificationPreferencesReady) return;
 
     void saveNotificationPreferences({
       visibleColumns: Object.entries(selectedColumns)
-        .filter(([, visible]) => visible)
+        .filter(
+          ([key, visible]) =>
+            visible &&
+            (key !== "id_notification" || canViewNotificationId)
+        )
         .map(([key]) => key),
       pageSize: Number(limit),
       searchType: type,
@@ -291,6 +303,7 @@ export function Notifications() {
     });
   }, [
     colum,
+    canViewNotificationId,
     limit,
     notificationPreferencesReady,
     saveNotificationPreferences,
@@ -316,6 +329,8 @@ export function Notifications() {
   ]);
 
   const handleColumnChange = (column: string) => {
+    if (column === "id_notification" && !canViewNotificationId) return;
+
     setSelectedColumns((prevState: any) => ({
       ...prevState,
       [column]: !prevState[column],
@@ -574,20 +589,22 @@ export function Notifications() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.id_notification}
-                  onChange={() => handleColumnChange("id_notification")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Notification ID")}
-                </span>
-              </Dropdown.Item>
+              {canViewNotificationId && (
+                <Dropdown.Item
+                  as="button"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={selectedColumns.id_notification}
+                    onChange={() => handleColumnChange("id_notification")}
+                  />
+                  <span style={{ marginLeft: "10px" }}>
+                    {translate("Notification ID")}
+                  </span>
+                </Dropdown.Item>
+              )}
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -691,7 +708,7 @@ export function Notifications() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_notification && id_user=="1" && (
+              {selectedColumns.id_notification && canViewNotificationId && (
                 <th
                   className="sorting"
                   onClick={() => handleSortingColum("id_notification")}
@@ -773,7 +790,7 @@ export function Notifications() {
                       <input type="checkbox" className="form-check-input" />
                     </div>
                   </td>
-                  {selectedColumns.id_notification && id_user=="1" && (
+                  {selectedColumns.id_notification && canViewNotificationId && (
                     <td>{alarme.id_notification}</td>
                   )}
                   {/* {selectedColumns.name_groupe_alarme && <td>{alarme.name_groupe_alarme}</td>}

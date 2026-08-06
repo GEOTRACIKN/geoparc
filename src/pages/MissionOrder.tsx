@@ -5,7 +5,6 @@ import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { PropagateLoader } from "react-spinners";
 import { jsPDF } from "jspdf";
-import { toast, Bounce } from "react-toastify";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
@@ -76,7 +75,7 @@ export function MissionOrder() {
   const [pageCount, setPageCount] = useState(0);
   let [total, settotal] = useState(0);
   const [colum, setSortColum] = useState("id_mission");
-  const [sort, setSort] = useState("DESC");
+  const [sort, setSort] = useState("ASC");
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState(translate("ID"));
@@ -91,9 +90,6 @@ export function MissionOrder() {
   });
 
   const [IdMissionOrder, setIdMissionOrder] = useState<number>(0);
-  const [sendingSmsMissionId, setSendingSmsMissionId] = useState<number | null>(
-    null,
-  );
 
   const [list_MissionOrder, setMissionOrder] = useState<MissionOrder[]>([]);
 
@@ -158,14 +154,13 @@ export function MissionOrder() {
       }
 
       const data = await missionOrderResponse.json();
-      const missionOrders = Array.isArray(data) ? data : data.value || [];
 
       // Calcul de la pagination
       setPageCount(Math.ceil(total / limitValue));
       setLimit(limitValue);
-      setMissionOrder(missionOrders);
+      setMissionOrder(data);
 
-      return missionOrders;
+      return data;
     } catch (error) {
       console.error("Error fetching mission orders:", error);
       // Gestion d'erreur avec toast ou autre
@@ -297,10 +292,9 @@ export function MissionOrder() {
   };
 
   const handleSortingColum = (curentColum: string) => {
-    const nextSort = colum === curentColum && sort === "DESC" ? "ASC" : "DESC";
     setSortColum(curentColum);
-    setSort(nextSort);
-    getMissionOrder(limit, currentPage, search, type, curentColum, nextSort);
+    sort === "ASC" ? setSort("DESC") : setSort("ASC");
+    getMissionOrder(limit, currentPage, search, type, colum, sort);
   };
 
   const handledeleteMissionOrder = async (id_mission: number) => {
@@ -327,53 +321,6 @@ export function MissionOrder() {
         console.error("Failed to update driver list:", error);
       },
     );
-  };
-
-  const handleSendMissionSms = async (missionOrder: MissionOrder) => {
-    if (!backendUrl) {
-      toast.error("Backend URL manquante", {
-        position: "bottom-right",
-        autoClose: 3000,
-        transition: Bounce,
-      });
-      return;
-    }
-
-    try {
-      setSendingSmsMissionId(missionOrder.id_mission);
-
-      const response = await fetch(
-        `${backendUrl}/api/geop/missionOrderManage/${missionOrder.id_mission}/send-sms`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: process.env.REACT_APP_SMS_TEST_PHONE || undefined,
-          }),
-          mode: "cors",
-        },
-      );
-
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(result.message || "Erreur lors de l'envoi SMS");
-      }
-
-      toast.success(result.message || "SMS envoye au chauffeur", {
-        position: "bottom-right",
-        autoClose: 2400,
-        transition: Bounce,
-      });
-    } catch (error: any) {
-      toast.error(error?.message || "Erreur lors de l'envoi SMS", {
-        position: "bottom-right",
-        autoClose: 3000,
-        transition: Bounce,
-      });
-    } finally {
-      setSendingSmsMissionId(null);
-    }
   };
 
   const handleResetSearch = async () => {
@@ -685,7 +632,7 @@ export function MissionOrder() {
                 <th
                   className="sorting"
                   onClick={() =>
-                    handleSortingColum("immatriculation_vehicule")
+                    handleSortingColum("immatriculation_vehicule ")
                   }
                 >
                   {translate("Vehicle")}
@@ -779,35 +726,6 @@ export function MissionOrder() {
                           style={{ fontSize: "1.2em" }}
                         ></i>
                       </Link>
-
-                      <a
-                        className="badge bg-info mr-2"
-                        onClick={() => {
-                          if (sendingSmsMissionId !== missionOrder.id_mission) {
-                            handleSendMissionSms(missionOrder);
-                          }
-                        }}
-                        title="Envoyer SMS au chauffeur"
-                        style={{
-                          pointerEvents:
-                            sendingSmsMissionId === missionOrder.id_mission
-                              ? "none"
-                              : "auto",
-                          opacity:
-                            sendingSmsMissionId === missionOrder.id_mission
-                              ? 0.65
-                              : 1,
-                        }}
-                      >
-                        <i
-                          className={
-                            sendingSmsMissionId === missionOrder.id_mission
-                              ? "las la-spinner"
-                              : "las la-sms"
-                          }
-                          style={{ fontSize: "1.2em" }}
-                        ></i>
-                      </a>
 
                       <a
                         className="badge bg-danger mr-2"

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
@@ -35,8 +35,6 @@ export default function InsuranceList() {
     sortColumn, setSortColumn,
     sortDirection, setSortDirection,
   });
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-
   const columns = [
     ...(isAdmin ? [{ key: "id_vehicule", label: "ID" }] : []),
     { key: "immatriculation_vehicule", label: "Plate" },
@@ -146,8 +144,12 @@ export default function InsuranceList() {
   // initial load
   useEffect(() => {
     if (!listPreferencesReady) return;
-    fetchInsuranceTotal(searchValue, searchType, limit);
-    fetchInsurancePage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
+    const timeout = window.setTimeout(() => {
+      void fetchInsuranceTotal(searchValue, searchType, limit);
+      void fetchInsurancePage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
@@ -155,52 +157,35 @@ export default function InsuranceList() {
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
-
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
-
-    searchTimeout.current = setTimeout(async () => {
-      await fetchInsuranceTotal(value, searchType, limit);
-      await fetchInsurancePage(limit, 1, value, searchType, sortColumn, sortDirection);
-    }, 300);
 };
 
 
-  const handleSearchTypeChange = async (typeVal: string) => {
+  const handleSearchTypeChange = (typeVal: string) => {
     setSearchType(typeVal);
     setSearchValue("");
     setCurrentPage(1);
-    // refresh
-    await fetchInsuranceTotal("", typeVal, limit);
-    await fetchInsurancePage(limit, 1, "", typeVal, sortColumn, sortDirection);
   };
 
   // Reset search
-  const handleResetSearch = async() => {
+  const handleResetSearch = () => {
     setSearchValue("");
     setCurrentPage(1);
-    await fetchInsuranceTotal( "", "", limit);
-    await fetchInsurancePage(limit, 1, "", "", sortColumn, sortDirection);
   };
 
   // Pagination handlers
-  const handlePageClick = async (data: any) => {
+  const handlePageClick = (data: any) => {
     const newPage = data.selected + 1;
     setCurrentPage(newPage);
-    await fetchInsurancePage(limit, newPage, searchValue, searchType, sortColumn, sortDirection);
     window.scrollTo(0, 0);
   };
 
-  const handleLimitChange = async (newLimit: number) => {
+  const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setCurrentPage(1);
-    await fetchInsuranceTotal(searchValue, searchType,newLimit);
-    await fetchInsurancePage(newLimit, 1, searchValue, searchType, sortColumn, sortDirection);
   };
 
   // Sorting  when column header clicked
-  const handleSort = async (columnKey: string) => {
+  const handleSort = (columnKey: string) => {
     // FE column -> DB column mapping (if needed)
     const columnMap: Record<string, string> = {
       immatriculation_vehicule: "immatriculation_vehicule",
@@ -213,15 +198,9 @@ export default function InsuranceList() {
     const backendColumn = columnMap[columnKey] || columnKey;
 
     const nextSort = sortDirection === "ASC" ? "DESC" : "ASC";
-    setSortColumn(columnKey);
+    setSortColumn(backendColumn);
     setSortDirection(nextSort);
-    setLoading(true);
-
-    // refetch total + page 1
-    await fetchInsuranceTotal(searchValue, searchType);
-    await fetchInsurancePage(limit, 1, searchValue, searchType, backendColumn, nextSort);
     setCurrentPage(1);
-    setLoading(false);
   };
 
   return (

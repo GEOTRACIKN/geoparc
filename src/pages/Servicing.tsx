@@ -3,13 +3,11 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useTheme } from "../hooks/ThemeContext";
 import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowServicing from "../components/Servicing/ShowServicing";
 import { PropagateLoader } from "react-spinners";
 import ModalEditServicing from "../components/Servicing/EditServicing";
 import { Bounce, toast } from "react-toastify";
-import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -36,8 +34,11 @@ export function Servicing() {
     const id_user = localStorage.getItem("GeopUserID");
 
     const { translate } = useTranslate();
-    const { isDarkMode } = useTheme();
     const [list_servicing, setServicing] = useState<Servicing[]>([]);
+        // Ajouter temporairement au début de votre composant
+useEffect(() => {
+    localStorage.removeItem("selectedColumns"); // À retirer après utilisation
+}, []);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [limit, setLimit] = useState(10);
     const [type, setType] = useState(0);
@@ -66,7 +67,6 @@ export function Servicing() {
 
 
 
-    const columnStorageKey = "gmao_servicing_selected_columns";
    ///voir avec Hichem + syntaxe
     const initialColumns = {
         ID: true,
@@ -126,25 +126,17 @@ export function Servicing() {
         return initialColumns;
     };
 
-    const [selectedColumns, setSelectedColumns] = useState(() =>
-        loadColumnVisibility(columnStorageKey, initialColumns)
-    );
+    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
     useGpVisibleColumns("servicing", selectedColumns, setSelectedColumns, listPreferencesReady);
 
-    const handleColumnChange = (column: keyof typeof initialColumns) => {
+    const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
+        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
     };
-
-    const pageThemeStyle = {
-        color: isDarkMode ? "#f8fafc" : undefined,
-    };
-
-    const tableClassName = `dataTable ${isDarkMode ? "table-dark" : ""}`;
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
@@ -354,13 +346,13 @@ export function Servicing() {
 
     return (
         <>
-            <div className="row" style={pageThemeStyle}>
+            <div className="row">
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Servicing")} ({total})</h4>
                 </div>
       
             </div>
-            <div className="row" style={pageThemeStyle}>
+            <div className="row">
                 <div
                     className="col-md-4"
                     style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
@@ -413,7 +405,7 @@ export function Servicing() {
                         <Dropdown.Toggle
                             variant="link"
                             id="dropdown-basic"
-                            title={translate("Display Columns")}
+                            title="Display Columns"
                         >
                             <i className="las la-eye"></i>
                         </Dropdown.Toggle>
@@ -438,9 +430,9 @@ export function Servicing() {
                 </div>
             </div>
 
-            <div className="row m-1" style={pageThemeStyle}>
-                <Table className={tableClassName} responsive>
-                    <thead className={isDarkMode ? "text-uppercase" : "bg-white text-uppercase"}>
+            <div className="row m-1">
+                <Table className="dataTable" responsive>
+                    <thead className="bg-white text-uppercase">
                         <tr className="ligth ligth-data">
                             <th className="text-center">
                                 <div className="form-check form-check-inline">
@@ -646,8 +638,8 @@ export function Servicing() {
                             ))
                         ) : (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={visibleColumnCount(selectedColumns, 2)}>
-                                    {translate("No data available")}
+                                <td colSpan={selectedColumns.length || 10}>
+                                    No data available
                                 </td>
                             </tr>
                         )}
@@ -657,7 +649,7 @@ export function Servicing() {
 
             <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
-                    <span>{translate("Displaying")} {list_servicing.length} {translate("on")} {total}</span>
+                    <span>Affichage 1 à {limit} sur {total} </span>
                 </div>
                 <div className="col-md-6">
                     <ReactPaginate
@@ -704,4 +696,3 @@ export function Servicing() {
         </>
     );
 }
-                  

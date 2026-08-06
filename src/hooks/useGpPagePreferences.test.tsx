@@ -76,8 +76,28 @@ test("persists a changed search for the GeoParc user", async () => {
     () =>
       expect(savePreferencesMock).toHaveBeenCalledWith("vehicles", {
         searchText: "nouvelle recherche",
-        searchType: 3,
       }),
     { timeout: 1500 }
   );
+});
+
+test("does not persist preferences when values are unchanged", async () => {
+  localStorage.setItem("GeopUserID", "42");
+
+  const { result } = renderHook(() =>
+    useGpPagePreferences("vehicles", defaults)
+  );
+
+  await waitFor(() => expect(result.current.loaded).toBe(true));
+
+  act(() => {
+    result.current.setPreferences({
+      searchText: "flèchebleue",
+      searchType: 3,
+      pageSize: 20,
+    });
+  });
+
+  await new Promise((resolve) => window.setTimeout(resolve, 500));
+  expect(savePreferencesMock).not.toHaveBeenCalled();
 });

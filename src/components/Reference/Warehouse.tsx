@@ -13,15 +13,6 @@ interface Depot {
   date_creation?: string;
 }
 
-interface GeocodeSuggestion {
-  place_id: number | string;
-  display_name: string;
-  lat?: string;
-  lon?: string;
-  type?: string;
-  class?: string;
-}
-
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 export default function DepotManagement() {
@@ -30,9 +21,6 @@ export default function DepotManagement() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [currentDepot, setCurrentDepot] = useState<Depot | null>(null);
-  const [locationSuggestions, setLocationSuggestions] = useState<GeocodeSuggestion[]>([]);
-  const [locationSearchLoading, setLocationSearchLoading] = useState(false);
-  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [formData, setFormData] = useState<Omit<Depot, 'id_depot' | 'date_creation'>>({ 
     nom_depot: '', 
     emplacement: '',
@@ -101,41 +89,6 @@ export default function DepotManagement() {
     }
   }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, translate, geopuserID, preferencesLoaded]);
 
-  useEffect(() => {
-    const query = formData.emplacement.trim();
-
-    if (!showModal || query.length < 3) {
-      setLocationSuggestions([]);
-      setLocationSearchLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        setLocationSearchLoading(true);
-        const response = await axios.get(`${backendUrl}/api/geocode/search`, {
-          params: { q: query },
-          signal: controller.signal,
-        });
-
-        setLocationSuggestions(Array.isArray(response.data) ? response.data : []);
-        setShowLocationSuggestions(true);
-      } catch (error) {
-        if (!axios.isCancel(error)) {
-          setLocationSuggestions([]);
-        }
-      } finally {
-        setLocationSearchLoading(false);
-      }
-    }, 350);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [formData.emplacement, showModal]);
-
   const handleShowAdd = () => {
     setCurrentDepot(null);
     setFormData({ 
@@ -143,8 +96,6 @@ export default function DepotManagement() {
       emplacement: '',
       id_user: parseInt(geopuserID || '0')
     });
-    setLocationSuggestions([]);
-    setShowLocationSuggestions(false);
     setShowModal(true);
   };
 
@@ -155,8 +106,6 @@ export default function DepotManagement() {
       emplacement: depot.emplacement || '',
       id_user: depot.id_user
     });
-    setLocationSuggestions([]);
-    setShowLocationSuggestions(false);
     setShowModal(true);
   };
 
@@ -269,35 +218,19 @@ export default function DepotManagement() {
     <div className="container mt-4">
       <h2>{translate('Depot Management')}</h2>
       
-      <div className="reference-table-toolbar">
+      <div className="d-flex justify-content-between mb-3">
         <Button variant="primary" onClick={handleShowAdd}>
           {translate('Add Depot')}
         </Button>
         
-        <div className="reference-table-controls">
-          <span className="reference-total-items">{totalItems} {translate('items')}</span>
-          <Form.Select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            aria-label={translate('Items per page')}
-          >
-            <option value={10}>10 / page</option>
-            <option value={25}>25 / page</option>
-            <option value={50}>50 / page</option>
-          </Form.Select>
+        <Form.Group className="w-25">
           <Form.Control
             type="text"
             placeholder={translate('Search...')}
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
+        </Form.Group>
       </div>
       
       {loading ? (
@@ -385,7 +318,7 @@ export default function DepotManagement() {
         </>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static" className="reference-drawer-modal">
+      <Modal show={showModal} onHide={() => setShowModal(false)} backdrop="static">
         <Modal.Header closeButton>
           <Modal.Title>
             {currentDepot ? translate('Edit Depot') : translate('Add Depot')}
@@ -403,46 +336,14 @@ export default function DepotManagement() {
                 placeholder={translate('Enter depot name')}
               />
             </Form.Group>
-            <Form.Group className="reference-address-field">
+            <Form.Group>
               <Form.Label>{translate('Location')}</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.emplacement}
-                onChange={(e) => {
-                  setFormData({...formData, emplacement: e.target.value});
-                  setShowLocationSuggestions(true);
-                }}
-                onFocus={() => setShowLocationSuggestions(true)}
+                onChange={(e) => setFormData({...formData, emplacement: e.target.value})}
                 placeholder={translate('Enter location')}
-                autoComplete="off"
               />
-              {locationSearchLoading && (
-                <div className="reference-address-loading">
-                  <Spinner animation="border" size="sm" />
-                  <span>{translate('Searching...')}</span>
-                </div>
-              )}
-              {showLocationSuggestions && locationSuggestions.length > 0 && (
-                <div className="reference-address-suggestions">
-                  {locationSuggestions.map((suggestion) => (
-                    <button
-                      type="button"
-                      key={suggestion.place_id}
-                      onClick={() => {
-                        setFormData({...formData, emplacement: suggestion.display_name});
-                        setShowLocationSuggestions(false);
-                      }}
-                    >
-                      <span>{suggestion.display_name}</span>
-                      {(suggestion.lat || suggestion.lon) && (
-                        <small>
-                          {suggestion.lat}, {suggestion.lon}
-                        </small>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
             </Form.Group>
           </Form>
         </Modal.Body>

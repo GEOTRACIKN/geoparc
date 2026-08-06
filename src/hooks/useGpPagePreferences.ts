@@ -9,6 +9,24 @@ import {
 
 const SAVE_DEBOUNCE_MS = 400;
 
+function arePreferenceValuesEqual(
+  currentValue: GpPreferences[string],
+  nextValue: GpPreferences[string]
+) {
+  if (Object.is(currentValue, nextValue)) return true;
+
+  if (
+    currentValue !== null &&
+    nextValue !== null &&
+    typeof currentValue === "object" &&
+    typeof nextValue === "object"
+  ) {
+    return JSON.stringify(currentValue) === JSON.stringify(nextValue);
+  }
+
+  return false;
+}
+
 function getStorageKey(idUser: number, pageKey: string) {
   return `gpPagePreferences:v1:${idUser}:${pageKey}`;
 }
@@ -167,6 +185,8 @@ export function useGpPagePreferences<T extends GpPreferences>(
   const setPreference = useCallback(
     <K extends keyof T>(key: K, value: T[K]) => {
       setPreferencesState((current) => {
+        if (arePreferenceValuesEqual(current[key], value)) return current;
+
         const next = { ...current, [key]: value };
         latestPreferencesRef.current = next;
 
@@ -188,13 +208,16 @@ export function useGpPagePreferences<T extends GpPreferences>(
   const setPreferences = useCallback(
     (patch: Partial<T>) => {
       setPreferencesState((current) => {
+        const changedKeys = (Object.keys(patch) as Array<keyof T>).filter(
+          (key) => !arePreferenceValuesEqual(current[key], patch[key] as T[keyof T])
+        );
+        if (changedKeys.length === 0) return current;
+
         const next = { ...current, ...patch } as T;
         latestPreferencesRef.current = next;
 
         if (idUser) {
-          (Object.keys(patch) as Array<keyof T>).forEach((key) =>
-            dirtyKeysRef.current.add(key)
-          );
+          changedKeys.forEach((key) => dirtyKeysRef.current.add(key));
           localStorage.setItem(
             getStorageKey(idUser, pageKey),
             JSON.stringify(next)
