@@ -3,6 +3,8 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import ModalNewFire from "../components/Fire/NewFire";
 
 import ModalShowFire from "../components/Fire/ShowFire";
@@ -47,6 +49,15 @@ export function Fire() {
     const [selectedFireId, setSelectedFireId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "fire-extinguishers",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
 
 
 
@@ -85,6 +96,7 @@ export function Fire() {
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("fire-extinguishers", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -174,10 +186,11 @@ export function Fire() {
         }
     };
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountFire();
         
         getFire();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
    
     
 
@@ -261,7 +274,7 @@ export function Fire() {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}
@@ -572,4 +585,3 @@ export function Fire() {
         </>
     );
 }
-                  

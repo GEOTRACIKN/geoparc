@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useReferenceTablePreferences } from '../../hooks/useReferenceTablePreferences';
 import { Table, Button, Modal, Form, Spinner, Alert, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { useTranslate } from '../../hooks/LanguageProvider';
@@ -42,12 +43,22 @@ export default function DepotManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const {
+    currentPageSize: itemsPerPage,
+    setCurrentPageSize: setItemsPerPage,
+    currentSearchText: searchTerm,
+    setCurrentSearchText: setSearchTerm,
+    currentSortColumn: sortColumn,
+    setCurrentSortColumn: setSortColumn,
+    currentSortDirection: sortOrder,
+    setCurrentSortDirection: setSortOrder,
+    loaded: preferencesLoaded,
+  } = useReferenceTablePreferences('warehouses', {
+    sortColumn: 'date_creation',
+    sortDirection: 'DESC',
+  });
   
   // Search and sort state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState('date_creation');
-  const [sortOrder, setSortOrder] = useState('DESC');
 
   const geopuserID = localStorage.getItem("GeopUserID");
 
@@ -85,45 +96,10 @@ export default function DepotManagement() {
   };
 
   useEffect(() => {
-    if (geopuserID) {
+    if (geopuserID && preferencesLoaded) {
       fetchDepots();
     }
-  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, translate, geopuserID]);
-
-  useEffect(() => {
-    const query = formData.emplacement.trim();
-
-    if (!showModal || query.length < 3) {
-      setLocationSuggestions([]);
-      setLocationSearchLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        setLocationSearchLoading(true);
-        const response = await axios.get(`${backendUrl}/api/geocode/search`, {
-          params: { q: query },
-          signal: controller.signal,
-        });
-
-        setLocationSuggestions(Array.isArray(response.data) ? response.data : []);
-        setShowLocationSuggestions(true);
-      } catch (error) {
-        if (!axios.isCancel(error)) {
-          setLocationSuggestions([]);
-        }
-      } finally {
-        setLocationSearchLoading(false);
-      }
-    }, 350);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [formData.emplacement, showModal]);
+  }, [currentPage, itemsPerPage, searchTerm, sortColumn, sortOrder, translate, geopuserID, preferencesLoaded]);
 
   const handleShowAdd = () => {
     setCurrentDepot(null);

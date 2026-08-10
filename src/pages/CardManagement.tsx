@@ -9,6 +9,8 @@ import ModalShowCardManagement from "../components/CardManagement/ShowCardManage
 import { PropagateLoader } from "react-spinners";
 import ModalEditCardManagement from "../components/CardManagement/EditCardManagement";
 import ModalDeleteCardManagement from "../components/CardManagement/DeleteCardManagement";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface FuelCard {
     id_fc: number;
@@ -37,6 +39,15 @@ export function CardManagement() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_fc");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "fuel-cards",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -59,6 +70,7 @@ export function CardManagement() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("fuel-cards", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -132,9 +144,10 @@ export function CardManagement() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountFuelCards();
         getFuelCards();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -211,7 +224,7 @@ export function CardManagement() {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

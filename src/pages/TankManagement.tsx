@@ -9,6 +9,8 @@ import ModalShowTankManagement from "../components/TankManagement/ShowTankManage
 import { PropagateLoader } from "react-spinners";
 import ModalEditTankManagement from "../components/TankManagement/EditTankManagement";
 import ModalDeleteTankManagement from "../components/TankManagement/DeleteTankManagement";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface TankRecord {
     id_ft: number;
@@ -36,6 +38,15 @@ export function TankManagement() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_ft");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "fuel-tanks",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -56,6 +67,7 @@ export function TankManagement() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("fuel-tanks", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -131,9 +143,10 @@ export function TankManagement() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountTankRecords();
         getTankRecords();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -208,7 +221,7 @@ export function TankManagement() {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

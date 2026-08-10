@@ -115,12 +115,15 @@ export const menuItems: MenuItem[] = [
       { id: 38, label: "Tire", icon: "las la-cogs", to: "/pneu_stock", permissionId: 42 },
       { id: 39, label: "Items", icon: "las la-boxes", to: "/piece_stock", permissionId: 42 },
       { id: 40, label: "Demande pièces", icon: "las la-box-open", to: "/Demandes_pieces", permissionId: 42 },
+      { id: 45, label: "Bon de réception", icon: "las la-clipboard-list", to: "/bon-reception", permissionId: 42 },
     ],
   },
 
   { id: 41, label: "Notifications", icon: "las la-bell", to: "/notifications", permissionId: 52 },
 
   { id: 42, label: "Reference", icon: "las la-check-circle", to: "/reference", permissionId: 38 },
+
+  { id: 46, label: "Reports", icon: "ri-file-chart-line", to: "/reports", permissionId: 36 },
 
   { id: 43, label: "Settings", icon: "las la-cog", to: "/Settings", permissionId: 10 },
 

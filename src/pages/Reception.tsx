@@ -9,7 +9,8 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import ModalShowIntervention from "../components/Reception/ShowIntervention";
 import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
-import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
@@ -42,6 +43,15 @@ export function Reception() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_intervention");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "reception",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [selectedInterventionId, setSelectedInterventionId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -65,7 +75,10 @@ export function Reception() {
         loadColumnVisibility(columnStorageKey, initialColumns)
     );
 
-    const handleColumnChange = (column: keyof typeof initialColumns) => {
+    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("reception", selectedColumns, setSelectedColumns, listPreferencesReady);
+
+    const handleColumnChange = (column: string) => {
         const updatedColumns = {
             ...selectedColumns,
             [column]: !selectedColumns[column],
@@ -157,9 +170,10 @@ export function Reception() {
         }
     };
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountIntervention();
         getIntervention();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
 
 
@@ -231,7 +245,7 @@ export function Reception() {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}

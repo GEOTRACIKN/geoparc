@@ -9,6 +9,8 @@ import ModalShowCashManagement from "../components/CashManagement/ShowCashManage
 import { PropagateLoader } from "react-spinners";
 import ModalEditCashManagement from "../components/CashManagement/EditCashManagement";
 import ModalDeleteCashManagement from "../components/CashManagement/DeleteCashManagement";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface CashPayment {
     id_fb: number;
@@ -38,6 +40,15 @@ export function CashManagement() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_fb");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "fuel-cash",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -58,6 +69,7 @@ export function CashManagement() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("fuel-cash", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -133,9 +145,10 @@ export function CashManagement() {
     };
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountCashPayments();
         getCashPayments();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -213,7 +226,7 @@ export function CashManagement() {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

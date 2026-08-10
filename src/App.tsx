@@ -6,6 +6,7 @@ import "./assets/vendor/remixicon/fonts/remixicon.css";
 import "./assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import "./assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
 import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 
 
 import { Vehicles } from "./pages/Vehicles";
@@ -78,6 +79,7 @@ import { UserProvider } from "./context/UserContext";
 import { TransportRequestManage } from "./pages/TransportRequest";
 import TransportRequestList from "./pages/TransportRequestList";
 import { RequestResponsibility } from "./pages/RequestResponsibility";
+import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -294,11 +296,13 @@ function App() {
                 <Route path="/piece_stock" element={<DashboardLayout><PieceStock /></DashboardLayout>} />
                 <Route path="/Demandes_pieces" element={<DashboardLayout><DemandePiece /></DashboardLayout>} />
                 <Route path="/Bon_Reception" element={<DashboardLayout><BonReception /></DashboardLayout>} />
+                <Route path="/bon-reception" element={<DashboardLayout><BonReception /></DashboardLayout>} />
                 <Route path="/Avoir" element={<DashboardLayout><Avoir /></DashboardLayout>} />
                 <Route path="/reference" element={<DashboardLayout><Reference /></DashboardLayout>} />
                 <Route path="/hse-dashboard" element={<DashboardLayout><DashboardKPI /></DashboardLayout>} />
                 <Route path="/planning-interviews" element={<DashboardLayout><InterviewSchedule /></DashboardLayout>} />
-
+                <Route path="/Reports" element={<DashboardLayout><Reports /></DashboardLayout>} /> 
+                <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} /> 
                 <Route
                   path="/login-geoparc"
                   element={

@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../functions";
 import { Bounce, toast } from "react-toastify";
 import { PropagateLoader } from "react-spinners";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 
 
@@ -35,6 +37,13 @@ export function Vehicleschecks() {
   const [showDownloadModal, setShowDownloadModal] = useState(false); // État pour le modal de téléchargement
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [type, setType] = useState(0);
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "vehicle-checks",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: searchType, setSearchTypeLabel: setSearchType,
+    searchText: searchTerm, setSearchText: setSearchTerm,
+  });
   const [selectedvehiclecheck, setSelectedvehiclecheck] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -59,6 +68,7 @@ export function Vehicleschecks() {
     return savedColumns ? JSON.parse(savedColumns) : initialColumns;
   };
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  useGpVisibleColumns("vehicle-checks", selectedColumns, setSelectedColumns, listPreferencesReady);
   const [loading, setLoading] = useState(true);
 
 
@@ -96,8 +106,9 @@ export function Vehicleschecks() {
   };
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getVehicleschecks(currentPage, limit);
-  }, [searchTerm, limit]);
+  }, [currentPage, searchTerm, type, limit, listPreferencesReady]);
 
   const refreshVehicleschecksData = async () => {
     getVehicleschecks(currentPage, limit);
@@ -339,7 +350,7 @@ export function Vehicleschecks() {
         <div className="col-md-4" style={{ margin: '0px 0px 10px 0px', padding: '10px' }}>
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
+              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                 <i
                   className="fas fa-chevron-down"
                   style={{ fontSize: "20px" }}
@@ -615,4 +626,3 @@ export function Vehicleschecks() {
     </>
   );
 }
-
