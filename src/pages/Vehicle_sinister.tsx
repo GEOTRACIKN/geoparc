@@ -5,6 +5,8 @@ import { useTranslate } from "../hooks/LanguageProvider";
 import { useState, useEffect } from "react";
 import NewSinisterModal from "../components/NewSinisterModal";
 import EditSinisterModal from "../components/EditSinisterModal";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 type Sinister = {
   id_sinistre: number;
@@ -41,6 +43,12 @@ export function VehicleSinister() {
   const [list_Sinisters, setSinisters] = useState<Sinister[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState("sinister_type"); // Default search type
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "vehicle-sinisters",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchTerm, setSearchText: setSearchTerm,
+  });
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State to control delete modal visibility
   const [showEditModal, setShowEditModal] = useState(false);
@@ -137,11 +145,13 @@ export function VehicleSinister() {
   };
 
   const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+  useGpVisibleColumns("vehicle-sinisters", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getTotalCount(searchTerm, searchType);
     getSinisters(currentPage, limit, searchTerm, searchType);
-  }, [limit, searchTerm, searchType]);
+  }, [limit, searchTerm, searchType, listPreferencesReady]);
 
   console.log(list_Sinisters);
   const handlePageClick = async (data: any) => {

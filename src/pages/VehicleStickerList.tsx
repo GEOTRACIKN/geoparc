@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import DataTable from "../components/common/DataTable";
 import TableHeader from "../components/common/TableHeader";
 import {toTimestamp} from '../functions';
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 // temp: Geoparc uses no real auth.
 // localStorage id/role is only a placeholder.
@@ -22,8 +23,14 @@ export default function VignetteList() {
   const [searchType, setSearchType] = useState(isAdmin ? "id" : "plate");
   const [sortColumn, setSortColumn] = useState("id_vehicule");
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
-
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "administrative-vehicle-stickers",
+    pageSize: limit, setPageSize: setLimit,
+    searchType, setSearchType,
+    searchText: searchValue, setSearchText: setSearchValue,
+    sortColumn, setSortColumn,
+    sortDirection, setSortDirection,
+  });
 
   // ===== COLUMNS =====
   const columns = [
@@ -135,10 +142,15 @@ export default function VignetteList() {
 
   // INITIAL LOAD
   useEffect(() => {
-    fetchTotal("", "", limit);
-    fetchPage(limit, 1, "", "", sortColumn, sortDirection);
+    if (!listPreferencesReady) return;
+    const timeout = window.setTimeout(() => {
+      void fetchTotal(searchValue, searchType, limit);
+      void fetchPage(limit, currentPage, searchValue, searchType, sortColumn, sortDirection);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
 // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, limit, searchValue, searchType, sortColumn, sortDirection, listPreferencesReady]);
 
   // ====================================================
   // SEARCH LOGIC
@@ -146,53 +158,36 @@ export default function VignetteList() {
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
-
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
-    searchTimeout.current = setTimeout(async () => {
-      await fetchTotal(value, searchType);
-      await fetchPage(limit, 1, value, searchType, sortColumn, sortDirection);
-    }, 300);
   };
 
-  const handleSearchTypeChange = async (t: string) => {
+  const handleSearchTypeChange = (t: string) => {
     setSearchType(t);
     setSearchValue("");
     setCurrentPage(1);
-
-    await fetchTotal("", t, limit);
-    await fetchPage(limit, 1, "", t, sortColumn, sortDirection);
   };
 
-  const handleResetSearch = async () => {
+  const handleResetSearch = () => {
     setSearchValue("");
     setCurrentPage(1);
-
-    await fetchTotal("", searchType);
-    await fetchPage(limit, 1, "", searchType, sortColumn, sortDirection);
   };
 
   // ====================================================
   // PAGINATION
   // ====================================================
-  const handlePageClick = async (data: any) => {
+  const handlePageClick = (data: any) => {
     const newPage = data.selected + 1;
     setCurrentPage(newPage);
-    await fetchPage(limit, newPage, searchValue, searchType, sortColumn, sortDirection);
   };
 
-  const handleLimitChange = async (newLimit: number) => {
+  const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setCurrentPage(1);
-
-    await fetchTotal(searchValue, searchType, newLimit);
-    await fetchPage(newLimit, 1, searchValue, searchType, sortColumn, sortDirection);
   };
 
   // ====================================================
   // SORTING
   // ====================================================
-  const handleSort = async (columnKey: string) => {
+  const handleSort = (columnKey: string) => {
     const map: Record<string, string> = {
       id_vehicule: "id_vehicule",
       immatriculation_vehicule: "immatriculation_vehicule",
@@ -204,12 +199,9 @@ export default function VignetteList() {
     const backendColumn = map[columnKey] || columnKey;
     const nextSort = sortDirection === "ASC" ? "DESC" : "ASC";
 
-    setSortColumn(columnKey);
+    setSortColumn(backendColumn);
     setSortDirection(nextSort);
     setCurrentPage(1);
-
-    await fetchTotal(searchValue, searchType);
-    await fetchPage(limit, 1, searchValue, searchType, backendColumn, nextSort);
   };
 
   // ====================================================

@@ -7,6 +7,8 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPlanninginterviews from "../components/Planning_interview/EditPlanning_interviews";
 import { Bounce, toast } from "react-toastify";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
@@ -35,6 +37,15 @@ export function InterviewSchedule() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_planning");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "planned-interviews",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pageCount, setPageCount] = useState(0);
@@ -59,6 +70,7 @@ export function InterviewSchedule() {
     };
 
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("planned-interviews", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -115,9 +127,10 @@ export function InterviewSchedule() {
         }
     };
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountSchedule();
         getSchedule();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
 
     const [showEditPlanninginterviewsModal, setshowEditPlanninginterviewsModal] = useState(false);
@@ -267,7 +280,7 @@ export function InterviewSchedule() {
                 >
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i
                                     className="fas fa-chevron-down"
                                     style={{ fontSize: "20px" }}

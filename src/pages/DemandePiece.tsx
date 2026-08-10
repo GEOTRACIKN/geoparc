@@ -13,6 +13,7 @@ import { FaEye, FaEdit, FaTrash, FaPrint, FaChevronDown } from "react-icons/fa";
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -146,6 +147,12 @@ const DemandePiecePage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [typeSearch, setTypeSearch] =
     useState<"num_bon" | "client" | "statut">("num_bon"); // UI only (mais utilisé pour ESLint)
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "parts-requests",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: typeSearch, setSearchType: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+  });
 
   const [selectedNumBon, setSelectedNumBon] = useState<string | null>(null);
   const [selectedNumBons, setSelectedNumBons] = useState<string[]>([]);
@@ -213,8 +220,9 @@ const DemandePiecePage: React.FC = () => {
   }, [page, limit, search, typeSearch, translate, reloadKey]);
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     fetchBons();
-  }, [fetchBons]);
+  }, [fetchBons, listPreferencesReady]);
 
   const refreshList = () => {
     setPage(1);

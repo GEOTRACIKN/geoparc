@@ -8,6 +8,8 @@ import ModalShowPieceStock from "../components/PieceStock/ShowPieceStock";
 import { PropagateLoader } from "react-spinners";
 import ModalEditPieceStock from "../components/PieceStock/EditPieceStock";
 import ModalDeletePieceStock from "../components/PieceStock/DeletePieceStock";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 interface PieceStock {
     id_piece_stock: number;
@@ -32,6 +34,15 @@ export function PieceStock() {
     const [search, setSearch] = useState("");
     const [column, setSortColumn] = useState("id_piece_stock");
     const [sort, setSort] = useState("desc");
+    const { ready: listPreferencesReady } = useListPagePreferences({
+        pageKey: "parts-stock",
+        pageSize: limit, setPageSize: setLimit,
+        searchType: type, setSearchType: setType,
+        searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+        searchText: search, setSearchText: setSearch,
+        sortColumn: column, setSortColumn,
+        sortDirection: sort, setSortDirection: setSort,
+    });
     const [total, setTotal] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [selectedPieceStockId, setSelectedPieceStockId] = useState<number | null>(null);
@@ -55,6 +66,7 @@ export function PieceStock() {
     };
     
     const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    useGpVisibleColumns("parts-stock", selectedColumns, setSelectedColumns, listPreferencesReady);
 
     const handleColumnChange = (column: string) => {
         const updatedColumns = {
@@ -144,9 +156,10 @@ export function PieceStock() {
     
 
     useEffect(() => {
+        if (!listPreferencesReady) return;
         getCountPieceStock();
         getPieceStock();
-    }, [currentPage, limit, search, type, column, sort]);
+    }, [currentPage, limit, search, type, column, sort, listPreferencesReady]);
 
     const handleTypeSearch = (event: any) => {
         const selectedValue = event.target.textContent;
@@ -241,7 +254,7 @@ const typesPiece: { [key: string]: string } = {
                 <div className="col-md-4" style={{ margin: "0px 0px 10px 0px", padding: "10px" }}>
                     <div className="input-group">
                         <Dropdown>
-                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                            <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                                 <i className="fas fa-chevron-down" style={{ fontSize: "20px" }}></i>
                             </Dropdown.Toggle>
                             <Dropdown.Menu onClick={handleTypeSearch}>

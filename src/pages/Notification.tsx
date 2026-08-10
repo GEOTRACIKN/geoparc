@@ -1,10 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dropdown, Table } from "react-bootstrap";
 import { Link, NavLink, useParams } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { formatToTimestamp, useClipboard } from "../utilities/functions";
 import { PropagateLoader } from "react-spinners";
+import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
+
+const notificationDefaultColumns = {
+  id_notification: true,
+  id_groupe_alarme: true,
+  name_groupe_alarme: true,
+  name_alarme: true,
+  type: true,
+  message: true,
+  severity: true,
+  timestamp: true,
+  infos: true,
+  attached: true,
+  date_start: true,
+  date_end: true,
+};
+
+const notificationPreferenceDefaults = {
+  visibleColumns: Object.keys(notificationDefaultColumns),
+  pageSize: 10,
+  searchType: 0,
+  searchText: "",
+  sortColumn: "0",
+  sortDirection: "ASC",
+  filters: {} as Record<string, unknown>,
+  selectedVehicleId: null as number | null,
+};
 
 interface NotificationsProps {
   id_notification: number;
@@ -36,6 +63,7 @@ export function Notifications() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [list_Alarms, setAlarms] = useState<NotificationsProps[]>([]);
   const id_user = localStorage.getItem("GeopUserID");
+  const canViewNotificationId = id_user === "1";
   const [showCreateAlarmModal, setShowCreateAlarmModal] = useState(false);
   const handleshowCreateAlarmModal = () => setShowCreateAlarmModal(true);
   const handleCloseCreateAlarmModal = () => setShowCreateAlarmModal(false);
@@ -47,6 +75,15 @@ export function Notifications() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(0);
   const [typeSearch, setTypeSearch] = useState("Notification ID");
+  const notificationSearchOptions = [
+    { type: 0, label: translate("Notification ID") },
+    { type: 1, label: translate("Groupe") },
+    { type: 2, label: translate("Alertes") },
+    { type: 3, label: translate("Détails") },
+    { type: 4, label: translate("Attaché à") },
+    { type: 5, label: translate("Date de début") },
+    { type: 6, label: translate("Date de fin") },
+  ];
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -185,100 +222,136 @@ export function Notifications() {
     }
   };
 
-  const handlePageClick = async (data: any) => {
-    let currentPage = data.selected + 1;
-    await getNotifications(limit, currentPage, search, type, colum, sort);
-    // setAlarms(commentsFormServer);
+  const handlePageClick = (data: any) => {
+    setCurrentPage(data.selected + 1);
     window.scrollTo(0, 0);
   };
 
-  useEffect(() => {
-    getNotifications(limit, currentPage, search, type, colum, sort);
-  }, []);
-
-  const handleSelectChange = async (event: any) => {
+  const handleSelectChange = (event: any) => {
     const newValue = event.target.value;
-    setCurrentPage(1); //
-    setLimit(newValue);
-    const commentsFormServer = await getNotificationsLimitValue(
-      parseInt(newValue),
-      1,
-      search,
-      type,
-      colum,
-      sort
-    );
-    setAlarms(commentsFormServer);
+    setCurrentPage(1);
+    setLimit(parseInt(newValue));
     window.scrollTo(0, 0);
   };
 
   const [selectedColumns, setSelectedColumns] = useState({
-    id_notification: id_user=="1" ? true : false,
-    id_groupe_alarme: true,
-    name_groupe_alarme: true,
-    name_alarme: true,
-    type: true,
-    message: true,
-    severity: true,
-    timestamp: true,
-    infos: true,
-    attached: true,
-    date_start: true,
-    date_end: true,
+    ...notificationDefaultColumns,
+    id_notification: canViewNotificationId,
   });
+  const {
+    preferences: notificationPreferences,
+    setPreferences: saveNotificationPreferences,
+    loaded: notificationPreferencesLoaded,
+  } = useGpPagePreferences("notifications", notificationPreferenceDefaults);
+  const notificationPreferencesHydratedRef = useRef(false);
+  const [notificationPreferencesReady, setNotificationPreferencesReady] =
+    useState(false);
+
+  useEffect(() => {
+    if (
+      !notificationPreferencesLoaded ||
+      notificationPreferencesHydratedRef.current
+    ) return;
+    notificationPreferencesHydratedRef.current = true;
+
+    const visibleColumns = new Set(notificationPreferences.visibleColumns);
+    setSelectedColumns(
+      Object.keys(notificationDefaultColumns).reduce(
+        (result, key) => ({
+          ...result,
+          [key]:
+            key === "id_notification"
+              ? canViewNotificationId && visibleColumns.has(key)
+              : visibleColumns.has(key),
+        }),
+        {} as typeof notificationDefaultColumns
+      )
+    );
+    setLimit(notificationPreferences.pageSize);
+    setType(notificationPreferences.searchType);
+    setTypeSearch(
+      notificationSearchOptions.find(
+        (option) => option.type === notificationPreferences.searchType
+      )?.label || translate("Notification ID")
+    );
+    setSearch(notificationPreferences.searchText);
+    setSortColum(notificationPreferences.sortColumn);
+    setSort(notificationPreferences.sortDirection);
+    setNotificationPreferencesReady(true);
+  }, [
+    canViewNotificationId,
+    notificationPreferences,
+    notificationPreferencesLoaded,
+  ]);
+
+  useEffect(() => {
+    if (!notificationPreferencesReady) return;
+
+    void saveNotificationPreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(
+          ([key, visible]) =>
+            visible &&
+            (key !== "id_notification" || canViewNotificationId)
+        )
+        .map(([key]) => key),
+      pageSize: Number(limit),
+      searchType: type,
+      searchText: search,
+      sortColumn: colum,
+      sortDirection: sort,
+    });
+  }, [
+    colum,
+    canViewNotificationId,
+    limit,
+    notificationPreferencesReady,
+    saveNotificationPreferences,
+    search,
+    selectedColumns,
+    sort,
+    type,
+  ]);
+
+  useEffect(() => {
+    if (!notificationPreferencesReady) return;
+
+    void getNotifications(limit, currentPage, search, type, colum, sort);
+  }, [
+    colum,
+    currentPage,
+    id_user,
+    limit,
+    notificationPreferencesReady,
+    search,
+    sort,
+    type,
+  ]);
 
   const handleColumnChange = (column: string) => {
+    if (column === "id_notification" && !canViewNotificationId) return;
+
     setSelectedColumns((prevState: any) => ({
       ...prevState,
       [column]: !prevState[column],
     }));
   };
 
-  const handleTypeSearch = (event: any) => {
-    const selectedValue = event.target.textContent;
-
-    switch (selectedValue) {
-      case translate("Notification ID"):
-        setType(0);
-        break;
-      case translate("Groupe"):
-        setType(1);
-        break;
-      case translate("Alertes"):
-        setType(2);
-        break;
-      case translate("Details"):
-        setType(3);
-        break;
-      case translate("Attaché à"):
-        setType(4);
-        break;
-      case translate("Date de début"):
-        setType(5);
-        break;
-      case translate("Date de fin"):
-        setType(6);
-        break;
-      default:
-        // console.log("Unknown selection");
-        break;
-    }
-
-    setTypeSearch(selectedValue);
-    // console.log("Selected value:", selectedValue);
+  const handleTypeSearch = (selectedType: number, selectedLabel: string) => {
+    setType(selectedType);
+    setTypeSearch(selectedLabel);
   };
 
-  const handleAdvancedSearch = async (event: any) => {
+  const handleAdvancedSearch = (event: any) => {
     const newValue = event.target.value;
     setSearch(newValue);
-    await getNotifications(limit, currentPage, newValue, type, colum, sort);
+    setCurrentPage(1);
   };
 
   const handleSortingColum = (currentColumn: string) => {
     setSortColum(currentColumn);
-    sort == "ASC" ? setSort("DESC") : setSort("ASC");
+    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
     setCurrentPage(1);
-    getNotifications(limit, 1, search, type, colum, sort);
   };
 
   const generateDescription = (alarme: NotificationsProps) => {
@@ -454,26 +527,34 @@ export function Notifications() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <i
-                  className="fas fa-chevron-down"
-                  style={{ fontSize: "20" }}
-                ></i>
+              <Dropdown.Toggle
+                variant="link"
+                id="dropdown-basic"
+                className="search-type-toggle"
+                aria-label={`${translate("Search by")} ${typeSearch}`}
+                title={typeSearch}
+              >
+                <i className="fas fa-chevron-down search-type-chevron" />
               </Dropdown.Toggle>
-              <Dropdown.Menu onClick={handleTypeSearch}>
-                <Dropdown.Item>{translate("Notification ID")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Groupe")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Alertes ")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Détails")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Attaché à")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date de début")}</Dropdown.Item>
-                <Dropdown.Item>{translate("Date de fin")}</Dropdown.Item>
+              <Dropdown.Menu>
+                {notificationSearchOptions.map((option) => (
+                  <Dropdown.Item
+                    key={option.type}
+                    active={type === option.type}
+                    onClick={() =>
+                      handleTypeSearch(option.type, option.label)
+                    }
+                  >
+                    {option.label}
+                  </Dropdown.Item>
+                ))}
               </Dropdown.Menu>
             </Dropdown>
             <input
               type="text"
               placeholder={` By ${typeSearch}`}
               onChange={handleAdvancedSearch}
+              value={search}
               className="form-control"
             />
           </div>
@@ -488,6 +569,7 @@ export function Notifications() {
                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                 style={{ width: "66px" }}
                 onChange={handleSelectChange}
+                value={limit}
               >
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -507,20 +589,22 @@ export function Notifications() {
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.id_notification}
-                  onChange={() => handleColumnChange("id_notification")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Notification ID")}
-                </span>
-              </Dropdown.Item>
+              {canViewNotificationId && (
+                <Dropdown.Item
+                  as="button"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={selectedColumns.id_notification}
+                    onChange={() => handleColumnChange("id_notification")}
+                  />
+                  <span style={{ marginLeft: "10px" }}>
+                    {translate("Notification ID")}
+                  </span>
+                </Dropdown.Item>
+              )}
               <Dropdown.Item
                 as="button"
                 style={{ display: "flex", alignItems: "center" }}
@@ -624,7 +708,7 @@ export function Notifications() {
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_notification && id_user=="1" && (
+              {selectedColumns.id_notification && canViewNotificationId && (
                 <th
                   className="sorting"
                   onClick={() => handleSortingColum("id_notification")}
@@ -706,7 +790,7 @@ export function Notifications() {
                       <input type="checkbox" className="form-check-input" />
                     </div>
                   </td>
-                  {selectedColumns.id_notification && id_user=="1" && (
+                  {selectedColumns.id_notification && canViewNotificationId && (
                     <td>{alarme.id_notification}</td>
                   )}
                   {/* {selectedColumns.name_groupe_alarme && <td>{alarme.name_groupe_alarme}</td>}

@@ -6,6 +6,8 @@ import { PropagateLoader } from 'react-spinners';
 import ReactPaginate from "react-paginate";
 import { toTimestamp } from "../utilities/functions";
 import RoleModal from "../components/Role/RoleModal";
+import { useListPagePreferences } from "../hooks/useListPagePreferences";
+import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -40,6 +42,15 @@ function Role() {
   const [pageCount, setPageCount] = useState(0);
   let [limit, setLimit] = useState(10);
   const [typeSearch, setTypeSearch] = useState(translate("Name"));
+  const { ready: listPreferencesReady } = useListPagePreferences({
+    pageKey: "roles",
+    pageSize: limit, setPageSize: setLimit,
+    searchType: type, setSearchType: setType,
+    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
+    searchText: search, setSearchText: setSearch,
+    sortColumn: colum, setSortColumn: setSortColum,
+    sortDirection: sort, setSortDirection: setSort,
+  });
 
 
 
@@ -113,8 +124,9 @@ function Role() {
   };
 
   useEffect(() => {
+    if (!listPreferencesReady) return;
     getRoles(limit, currentPage, search, type, colum, sort);
-  }, []);
+  }, [limit, currentPage, search, type, colum, sort, listPreferencesReady]);
 
 
   const refreshRoles = () => {
@@ -146,6 +158,7 @@ function Role() {
     username_user: true,
     date_creation_role: true,
   });
+  useGpVisibleColumns("roles", selectedColumns, setSelectedColumns, listPreferencesReady);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -253,7 +266,7 @@ function Role() {
           >
             <div className="input-group">
               <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic" >
+                <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
                   <i
                     className="fas fa-chevron-down"
                     style={{ fontSize: "20" }}

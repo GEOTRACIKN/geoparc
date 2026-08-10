@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Dropdown, Modal, Table } from "react-bootstrap";
 import { Form, Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
@@ -13,6 +13,7 @@ import DriverDeleteModal from "../components/Driver/DriverDeleteModal";
 import DriverDetailsModal from "../components/Driver/DriverDetailsModal";
 import { toast } from "react-toastify";
 import TrainingCalendar from "../components/Calendar/Events";
+import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
 
 
 interface Drivers {
@@ -28,6 +29,28 @@ interface Drivers {
   service_conducteur: string;
 }
 
+const driverDefaultColumns = {
+  id_conducteur: true,
+  code_conducteur: true,
+  nom_conducteur: true,
+  prenom_conducteur: true,
+  date_naissance_conducteur: true,
+  email_conducteur: true,
+  telephone_conducteur: true,
+  id_parc: true,
+  service_conducteur: true,
+};
+
+const driverPreferenceDefaults = {
+  visibleColumns: Object.keys(driverDefaultColumns),
+  pageSize: 10,
+  searchType: 2,
+  searchText: "",
+  sortColumn: "id_conducteur",
+  sortDirection: "ASC",
+  filters: {} as Record<string, unknown>,
+  selectedVehicleId: null as number | null,
+};
 
 
 export function Drivers() {
@@ -239,39 +262,100 @@ export function Drivers() {
 
 
 
-  const handlePageClick = async (data: any) => {
-    let currentPage = data.selected + 1;
-    await getDrivers(limit, currentPage, search, type, column, sort);
-    // setDrivers(commentsFormServer);
+  const handlePageClick = (data: any) => {
+    setCurrentPage(data.selected + 1);
     window.scrollTo(0, 0);
   };
 
-  useEffect(() => {
-    getDrivers(limit, currentPage, search, type, column, sort);
-  }, []);
-
-
-  const handleSelectChange = async (event: any) => {
+  const handleSelectChange = (event: any) => {
     const newValue = event.target.value;
     setCurrentPage(1); 
-    setLimit(newValue);
-    const commentsFormServer = await getDrivers(parseInt(newValue), 1, search, type, column, sort); 
-    setDrivers(commentsFormServer);
+    setLimit(parseInt(newValue));
     window.scrollTo(0, 0);
   };
 
 
-  const [selectedColumns, setSelectedColumns] = useState({
-    id_conducteur: true,
-    code_conducteur: true,
-    nom_conducteur: true,
-    prenom_conducteur: true,
-    date_naissance_conducteur: true,
-    email_conducteur: true,
-    telephone_conducteur: true,
-    id_parc: true,
-    service_conducteur: true,
-  });
+  const [selectedColumns, setSelectedColumns] = useState(driverDefaultColumns);
+  const {
+    preferences: driverPreferences,
+    setPreferences: saveDriverPreferences,
+    loaded: driverPreferencesLoaded,
+  } = useGpPagePreferences("drivers", driverPreferenceDefaults);
+  const driverPreferencesHydratedRef = useRef(false);
+  const [driverPreferencesReady, setDriverPreferencesReady] = useState(false);
+
+  useEffect(() => {
+    if (!driverPreferencesLoaded || driverPreferencesHydratedRef.current) return;
+    driverPreferencesHydratedRef.current = true;
+
+    const visibleColumns = new Set(driverPreferences.visibleColumns);
+    setSelectedColumns(
+      Object.keys(driverDefaultColumns).reduce(
+        (result, key) => ({
+          ...result,
+          [key]: visibleColumns.has(key),
+        }),
+        {} as typeof driverDefaultColumns
+      )
+    );
+    setLimit(driverPreferences.pageSize);
+    setType(driverPreferences.searchType);
+    setTypeSearch(
+      [
+        translate("ID"),
+        translate("Code"),
+        translate("Last and first name"),
+        translate("Date of birth"),
+        translate("Email"),
+        translate("Phone"),
+        translate("Park"),
+        translate("Assigned service"),
+      ][driverPreferences.searchType] || translate("Last and first name")
+    );
+    setSearch(driverPreferences.searchText);
+    setSortcolumn(driverPreferences.sortColumn);
+    setSort(driverPreferences.sortDirection);
+    setDriverPreferencesReady(true);
+  }, [driverPreferences, driverPreferencesLoaded]);
+
+  useEffect(() => {
+    if (!driverPreferencesReady) return;
+
+    void saveDriverPreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(([, visible]) => visible)
+        .map(([key]) => key),
+      pageSize: Number(limit),
+      searchType: type,
+      searchText: search,
+      sortColumn: column,
+      sortDirection: sort,
+    });
+  }, [
+    column,
+    driverPreferencesReady,
+    limit,
+    saveDriverPreferences,
+    search,
+    selectedColumns,
+    sort,
+    type,
+  ]);
+
+  useEffect(() => {
+    if (!driverPreferencesReady) return;
+
+    void getDrivers(limit, currentPage, search, type, column, sort);
+  }, [
+    column,
+    currentPage,
+    driverPreferencesReady,
+    id_user,
+    limit,
+    search,
+    sort,
+    type,
+  ]);
 
   const handleColumnChange = (column: string) => {
     setSelectedColumns((prevState: any) => ({
@@ -339,19 +423,17 @@ export function Drivers() {
     console.log('Selected value:', selectedValue);
   };
 
-  const handleAdvancedSearch = async (event: any) => {
-
+  const handleAdvancedSearch = (event: any) => {
     const newValue = event.target.value;
-    setSearch(newValue)
-    await getDrivers(limit, currentPage, newValue, type, column, sort);
+    setSearch(newValue);
+    setCurrentPage(1);
   };
 
 
   const handleSortingcolumn = (curentColumn: string) => {
-
-    setSortcolumn(curentColumn)
-    sort === "ASC" ? setSort("DESC") : setSort("ASC");
-    getDrivers(limit, currentPage, search, type, column, sort);
+    setSortcolumn(curentColumn);
+    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+    setCurrentPage(1);
   };
 
 
@@ -457,10 +539,9 @@ export function Drivers() {
     });
   };
 
-  const handleResetSearch = async () => {
-    setSearch("")
-
-    await getDrivers(limit, currentPage, search, type, column, sort)
+  const handleResetSearch = () => {
+    setSearch("");
+    setCurrentPage(1);
   };
 
 
@@ -512,11 +593,14 @@ export function Drivers() {
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic" >
-                <i
-                  className="fas fa-chevron-down"
-                  style={{ fontSize: "20" }}
-                ></i>
+              <Dropdown.Toggle
+                variant="link"
+                id="dropdown-basic"
+                className="search-type-toggle"
+                aria-label={`${translate("Search by")} ${typeSearch}`}
+                title={typeSearch}
+              >
+                <i className="fas fa-chevron-down search-type-chevron" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {menuItems.map((item, index) => (
@@ -532,7 +616,7 @@ export function Drivers() {
                 ))}
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} value={search} className="form-control" />
             <Button
               variant="secondary"
               onClick={handleResetSearch}
@@ -552,6 +636,7 @@ export function Drivers() {
                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                 style={{ width: "66px" }}
                 onChange={handleSelectChange}
+                value={limit}
               >
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -870,4 +955,3 @@ export function Drivers() {
     </>
   );
 }
-
