@@ -4,7 +4,6 @@ import { Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useTheme } from "../hooks/ThemeContext";
 import { PropagateLoader } from "react-spinners";
 import { formatDateToTimestamp } from "../utilities/functions";
 import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";
@@ -54,7 +53,6 @@ export function Garage() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const { translate } = useTranslate();
-    const { isDarkMode } = useTheme();
     const [list_garage, setGarages] = useState<Intervention[]>([]);
     const id_user = localStorage.getItem("GeopUserID");
     const [page, setPage] = useState<number>(1);
@@ -336,22 +334,11 @@ export function Garage() {
 
 
     const handleColumnnChange = (Columnn: string) => {
-        setselectedColumns((prevState: any) => {
-            const updatedColumns = {
-                ...prevState,
-                [Columnn]: !prevState[Columnn],
-            };
-
-            localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
-            return updatedColumns;
-        });
+        setselectedColumns((prevState: any) => ({
+            ...prevState,
+            [Columnn]: !prevState[Columnn],
+        }));
     };
-
-    const pageThemeStyle = {
-        color: isDarkMode ? "#f8fafc" : undefined,
-    };
-
-    const tableClassName = `dataTable ${isDarkMode ? "table-dark" : ""}`;
 
     const closeGarageModal = () => {
         setModalGarageStatus(null);
@@ -382,7 +369,7 @@ export function Garage() {
 
     return (
         <>
-            <div className="row" style={pageThemeStyle}>
+            <div className="row">
                 <div className="col-md-6 col-sm-12">
                     <h4>{translate("Garage")}</h4>
                 </div>
@@ -396,7 +383,7 @@ export function Garage() {
                     </button>
                 </div>
             </div>
-            <div className="row" style={pageThemeStyle}>
+            <div className="row">
                 <div
                     className="col-md-4"
                     style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
@@ -486,9 +473,9 @@ export function Garage() {
                 </div>
             </div>
 
-            <div className="row m-1" style={pageThemeStyle}>
-                <Table className={tableClassName} responsive>
-                    <thead className={isDarkMode ? "text-uppercase" : "bg-white text-uppercase"}>
+            <div className="row m-1">
+                <Table className="dataTable" responsive>
+                    <thead className="bg-white text-uppercase">
                         <tr className="ligth ligth-data">
                             <th>
                                 <div className="form-check form-check-inline">
@@ -648,16 +635,14 @@ export function Garage() {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={visibleColumnCount(selectedColumns, 2)} style={{ textAlign: "center" }}>
-                                {translate("No data available")}
-                            </td>
+                            <td colSpan={10} style={{ textAlign: "center" }}>Aucun conducteur disponible</td>
                         </tr>
                     )}
 
                     </tbody>
                 </Table>
             </div>
-            <div className="row" style={pageThemeStyle}>
+            <div className="row">
                 <div className="col-md-6 d-flex align-items-center">
                     <span>
                         {translate("Displaying")} {list_garage.length} {translate("on")} {total} {" "}
