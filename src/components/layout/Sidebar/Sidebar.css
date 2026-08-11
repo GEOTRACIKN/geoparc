@@ -3217,6 +3217,30 @@ body.dark-theme .iq-sidebar .iq-sidebar-menu .iq-menu > li.active-menu > a > i {
   font-weight: 600 !important;
 }
 
+.transport-request-page .request-type-box {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.transport-request-page .request-type-separator {
+  height: 1px;
+  margin: 16px 0;
+  background: #e6eaf0;
+}
+
+.transport-request-page .request-type-btn.active.one-way {
+  background: #eef6ff !important;
+  border-color: #5aa1ef !important;
+  color: #2563eb !important;
+}
+
+.transport-request-page .request-type-btn.active.round-trip {
+  background: #fff3e8 !important;
+  border-color: #ff9a4d !important;
+  color: #d95f1a !important;
+}
+
 .transport-request-page .request-type-btn.active.normal {
   background: #eef6ff !important;
   border-color: #5aa1ef !important;
