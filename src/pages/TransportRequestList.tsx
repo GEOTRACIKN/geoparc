@@ -14,7 +14,7 @@ import {
 import ReactPaginate from "react-paginate";
 import { Bounce, toast } from "react-toastify";
 import { useTranslate } from "../hooks/LanguageProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 import {

@@ -11,6 +11,7 @@ import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
+import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
@@ -70,15 +71,12 @@ export function Reception() {
         Priority: true,
         Statut: true,
     };
-
     const [selectedColumns, setSelectedColumns] = useState(() =>
         loadColumnVisibility(columnStorageKey, initialColumns)
     );
-
-    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
     useGpVisibleColumns("reception", selectedColumns, setSelectedColumns, listPreferencesReady);
 
-    const handleColumnChange = (column: string) => {
+    const handleColumnChange = (column: keyof typeof initialColumns) => {
         const updatedColumns = {
             ...selectedColumns,
             [column]: !selectedColumns[column],

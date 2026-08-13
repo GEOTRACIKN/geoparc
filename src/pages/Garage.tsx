@@ -9,6 +9,7 @@ import { PropagateLoader } from "react-spinners";
 import { formatDateToTimestamp } from "../utilities/functions";
 import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";
 import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
+import { visibleColumnCount } from "../utilities/tableColumns";
 
 const garageDefaultColumns = {
     id_garage: true,
@@ -342,7 +343,6 @@ export function Garage() {
                 [Columnn]: !prevState[Columnn],
             };
 
-            localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
             return updatedColumns;
         });
     };

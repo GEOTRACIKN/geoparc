@@ -11,6 +11,7 @@ import ModalEditServicing from "../components/Servicing/EditServicing";
 import { Bounce, toast } from "react-toastify";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
+import { visibleColumnCount } from "../utilities/tableColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 
