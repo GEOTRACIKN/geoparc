@@ -10,6 +10,20 @@ import { formatDateToTimestamp } from "../utilities/functions";
 import UpdateStatusGarageModal from "../components/Garage/updateStatusGarageModal";
 import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
 import { visibleColumnCount } from "../utilities/tableColumns";
+import {
+    GARAGE_PAGE_SIZES,
+    GARAGE_SEARCH_FIELDS,
+    GARAGE_STATUSES,
+    getGaragePriorityLabel,
+    getNextGarageSort,
+    hasGaragePermission,
+    normalizeGaragePageSize,
+    normalizeGaragePrioritySearch,
+    normalizeGarageSearchType,
+    normalizeGarageSortColumn,
+    normalizeGarageSortDirection,
+    normalizeGarageStatusSearch,
+} from "../utilities/garage";
 
 const garageDefaultColumns = {
     id_garage: true,
@@ -72,6 +86,7 @@ export function Garage() {
     const [titleGarageStatus, setTitleGarageStatus] = useState<string | null>(null);
     const [IdGarage, setIdGarage] = useState<number>(0);
     const [IdUser, setIdUser] = useState<number>(0);
+    const canReadGarage = hasGaragePermission("read");
 
     const handlePageClick = (data: any) => {
         setPage(data.selected + 1);
@@ -80,8 +95,8 @@ export function Garage() {
 
 
     const handleSortingColumn = (currentColumn: string) => {
+        setSort(getNextGarageSort(Column, sort, currentColumn));
         setSortColumn(currentColumn);
-        setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
         setPage(1);
     };
 
@@ -90,16 +105,6 @@ export function Garage() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    const searchColumn: { [key: string]: number } = {
-        id_garage: 0,
-        date_intervention: 1,
-        immatriculation_vehicule: 2,
-        subject: 3,
-        priority: 4,
-        service: 5,
-        date_update: 6,
-    };
 
     const getGarages = async (
         limit: number,
@@ -111,15 +116,24 @@ export function Garage() {
     ) => {
         try {
             setLoading(true);
+            const trimmedSearch = search.trim();
+            const apiSearch = type === 4
+                ? normalizeGaragePrioritySearch(trimmedSearch, translate("Urgent"), translate("Normal"))
+                : type === 5
+                    ? normalizeGarageStatusSearch(
+                        trimmedSearch,
+                        Object.fromEntries(GARAGE_STATUSES.map((status) => [status, translate(status)]))
+                    )
+                    : trimmedSearch;
 
             // Preparing the data to send
             const bodyData = JSON.stringify({
                 limit,
                 page,
-                search,
+                search: apiSearch,
                 type,
                 id_user,
-                Column: searchColumn[Column],
+                colum: GARAGE_SEARCH_FIELDS.indexOf(Column as typeof GARAGE_SEARCH_FIELDS[number]),
                 sort,
             });
 
@@ -165,37 +179,10 @@ export function Garage() {
         }
     };
 
-    const handleTypeSearch = (selectedValue: string) => {
-
-
-
-        switch (selectedValue) {
-            case translate("ID"):
-                setType(0);
-                break;
-            case translate("Date of request"):
-                setType(1);
-                break;
-            case translate("Vehicle"):
-                setType(2);
-                break;
-            case translate("Object"):
-                setType(3);
-                break;
-            case translate("Priority"):
-                setType(4);
-                break;
-            case translate("Status"):
-                setType(5);
-                break;
-            case translate("Updated date"):
-                setType(6);
-                break;
-            default:
-                console.log("Unknown selection");
-                break;
-        }
-        setTypeSearch(selectedValue);
+    const handleTypeSearch = (selectedIndex: number) => {
+        setType(selectedIndex);
+        setTypeSearch(menuItems[selectedIndex]);
+        setPage(1);
     };
 
     const handleAdvancedSearch = (event: any) => {
@@ -216,7 +203,8 @@ export function Garage() {
         translate("Vehicle"),
         translate("Object"),
         translate("Priority"),
-        translate("State"),
+        translate("Status"),
+        translate("Service"),
         translate("Updated date"),
     ];
 
@@ -252,8 +240,9 @@ export function Garage() {
                 {} as typeof garageDefaultColumns
             )
         );
-        setLimit(garagePreferences.pageSize);
-        setType(garagePreferences.searchType);
+        const restoredSearchType = normalizeGarageSearchType(garagePreferences.searchType);
+        setLimit(normalizeGaragePageSize(garagePreferences.pageSize));
+        setType(restoredSearchType);
         setTypeSearch(
             [
                 translate("ID"),
@@ -262,12 +251,13 @@ export function Garage() {
                 translate("Object"),
                 translate("Priority"),
                 translate("Status"),
+                translate("Service"),
                 translate("Updated date"),
-            ][garagePreferences.searchType] || translate("ID")
+            ][restoredSearchType] || translate("ID")
         );
-        setSearch(garagePreferences.searchText);
-        setSortColumn(garagePreferences.sortColumn);
-        setSort(garagePreferences.sortDirection);
+        setSearch(typeof garagePreferences.searchText === "string" ? garagePreferences.searchText : "");
+        setSortColumn(normalizeGarageSortColumn(garagePreferences.sortColumn));
+        setSort(normalizeGarageSortDirection(garagePreferences.sortDirection));
         setGaragePreferencesReady(true);
     }, [garagePreferences, garagePreferencesLoaded]);
 
@@ -283,6 +273,7 @@ export function Garage() {
             searchText: search,
             sortColumn: Column,
             sortDirection: sort,
+            filters: { searchType: type, searchText: search },
         });
     }, [
         Column,
@@ -296,11 +287,12 @@ export function Garage() {
     ]);
 
     useEffect(() => {
-        if (!garagePreferencesReady) return;
+        if (!garagePreferencesReady || !canReadGarage) return;
 
         void getGarages(limit, page, search, type, Column, sort);
     }, [
         Column,
+        canReadGarage,
         garagePreferencesReady,
         id_user,
         limit,
@@ -380,6 +372,10 @@ export function Garage() {
         });
     };
 
+    if (!canReadGarage) {
+        return <div className="alert alert-danger">{translate("You do not have permission to access this page")}</div>;
+    }
+
     return (
         <>
             <div className="row" style={pageThemeStyle}>
@@ -416,7 +412,7 @@ export function Garage() {
                                 {menuItems.map((item, index) => (
                                     <Dropdown.Item
                                         key={index}
-                                        onClick={() => handleTypeSearch(item)}
+                                        onClick={() => handleTypeSearch(index)}
                                         eventKey={item}
                                         active={typeSearch === item}
                                         className={typeSearch === item ? "select-active" : ""}
@@ -446,12 +442,9 @@ export function Garage() {
                                 onChange={handleSelectChange}
                                 value={limit}
                             >
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="200">200</option>
-                                <option value="500">500</option>
+                                {GARAGE_PAGE_SIZES.map((pageSize) => (
+                                    <option key={pageSize} value={pageSize}>{pageSize}</option>
+                                ))}
                             </select>
                         </label>
                     </div>
@@ -503,9 +496,10 @@ export function Garage() {
                             {selectedColumns.id_garage && (<th className="sorting" onClick={() => handleSortingColumn("id_garage")} >  {"Id " + translate("Garage")} </th>)}
                             {selectedColumns.immatriculation_vehicule && (<th className="sorting" onClick={() => handleSortingColumn("immatriculation_vehicule")}>    {translate("Vehicle")} </th>)}
                             {selectedColumns.subject && (<th className="sorting" onClick={() => handleSortingColumn("subject")}  > {translate("Object")} </th>)}
-                            {selectedColumns.priority && (<th className="sorting" onClick={() => handleSortingColumn("Priority")}  > {translate("Priority")}  </th>)}
+                            {selectedColumns.priority && (<th className="sorting" onClick={() => handleSortingColumn("priority")}  > {translate("Priority")}  </th>)}
                             {selectedColumns.status && (<th className="sorting" onClick={() => handleSortingColumn("status")} >   {translate("Status")}  </th>)}
                             {selectedColumns.date_intervention && (<th className="sorting" onClick={() => handleSortingColumn("date_intervention")} > {translate("Intervention Requests")}  </th>)}
+                            {selectedColumns.service && (<th className="sorting" onClick={() => handleSortingColumn("service")} > {translate("Service")} </th>)}
                             {selectedColumns.date_update && (<th className="sorting" onClick={() => handleSortingColumn("date_update")} >  {translate("Date") + " " + translate("Update")} </th>
                             )}
                             <th>{translate("Action")}</th>
@@ -541,17 +535,7 @@ export function Garage() {
                                 {selectedColumns.immatriculation_vehicule && <td>{garage.immatriculation_vehicule}</td>}
                                 {selectedColumns.subject && <td>{garage.subject}</td>}
                                 {selectedColumns.priority && <td>
-                                    {garage.priority === "Urgent" ? (
-                                        <>
-
-                                            {translate("Urgent")}
-                                        </>
-                                    ) : (
-                                        <>
-
-                                            {translate("Normal")}
-                                        </>
-                                    )}
+                                    {translate(getGaragePriorityLabel(garage.priority))}
                                 </td>}
                                 {selectedColumns.status && <td>
 
@@ -602,10 +586,11 @@ export function Garage() {
                                 </td>
                                 }
                                 {selectedColumns.date_intervention && (<td>{formatDateToTimestamp(garage.date_intervention)}</td>)}
+                                {selectedColumns.service && <td>{translate(garage.service)}</td>}
                                 {selectedColumns.date_update && <td>{formatDateToTimestamp(garage.date_update)}</td>}
                                 <td>
                                     <div className="d-flex align-items-center list-action">
-                                        <Link
+                                        {hasGaragePermission("update") && <Link
                                             to={``}
                                             onClick={() => handleUpdateGarage(garage.id_garage, id_user)}
                                             className="badge badge-success mr-2"
@@ -614,7 +599,7 @@ export function Garage() {
                                             title={translate("Status") + " " + translate("Update")}
                                         >
                                             <i className="las la-sync" style={{ fontSize: "1.2em" }}></i>
-                                        </Link>
+                                        </Link>}
                                         <Link
                                             to={``}
                                             className="badge bg-primary mr-2"
