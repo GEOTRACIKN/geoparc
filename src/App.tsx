@@ -82,10 +82,20 @@ import { RequestResponsibility } from "./pages/RequestResponsibility";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
 import MissionComplete from "./pages/MissionComplete";
+import PrivacyPolicy, { isPrivacyPolicyPath } from "./pages/PrivacyPolicy";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
+  const location = useLocation();
+
+  // Public legal pages never mount session providers or start API login.
+  if (isPrivacyPolicyPath(location.pathname)) return <PrivacyPolicy />;
+
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
   const location = useLocation();
   const navigate = useNavigate();
 
