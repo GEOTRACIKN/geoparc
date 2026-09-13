@@ -81,6 +81,7 @@ import TransportRequestList from "./pages/TransportRequestList";
 import { RequestResponsibility } from "./pages/RequestResponsibility";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
+import MissionComplete from "./pages/MissionComplete";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -174,7 +175,10 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        if (location.pathname === "/login-geoparc") {
+        if (
+          location.pathname === "/login-geoparc" ||
+          location.pathname === "/mission/complete"
+        ) {
           setBootLoading(false);
           return;
         }
@@ -259,6 +263,7 @@ function App() {
               }}
             >
               <Routes>
+                <Route path="/mission/complete" element={<MissionComplete />} />
                 <Route path="/" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
                 <Route path="/vehicles" element={<DashboardLayout><Vehicles /></DashboardLayout>} />
                 <Route path="/vehicles-forms" element={<DashboardLayout><VehiclesForms /></DashboardLayout>} />

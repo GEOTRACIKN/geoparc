@@ -135,6 +135,10 @@ export default function DetailsDrawer({
                       value={request.request_type || "-"}
                     />
                     <InfoItem
+                      label={translate("trip_type")}
+                      value={translate(request.trip_type || "one_way")}
+                    />
+                    <InfoItem
                       label={translate("Object")}
                       value={request.object_request || "-"}
                     />

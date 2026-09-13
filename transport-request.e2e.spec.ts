@@ -22,6 +22,7 @@ const responsible = {
 const transportRequest = {
   id_transport_request: 123,
   request_type: "Normal",
+  trip_type: "round_trip",
   object_request: "Transport client Oran",
   requester_phone: requester.phone,
   departure_datetime: "2026-07-08T09:00:00",
@@ -109,6 +110,7 @@ test("complete transport request process creates mission and opens edit page", a
       const payload = route.request().postDataJSON();
 
       expect(payload.object_request).toBe(transportRequest.object_request);
+      expect(payload.trip_type).toBe(transportRequest.trip_type);
       expect(payload.requester_email).toBe(requester.email);
       expect(payload.id_gp_demandeur).toBe(requester.id_demandeur);
       expect(payload.id_gp_responsable).toBe(responsible.id_responsable);
@@ -203,6 +205,8 @@ test("complete transport request process creates mission and opens edit page", a
 
   await page.goto("http://localhost:3001/transport-request");
   await page.waitForLoadState("networkidle");
+
+  await page.getByRole("button", { name: /round trip|aller-retour/i }).click();
 
   await page.locator('input[type="datetime-local"]').nth(0).fill("2026-07-08T09:00");
   await page.locator("#departure-location").fill("Oran");
