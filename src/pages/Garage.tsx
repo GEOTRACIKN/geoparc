@@ -333,22 +333,14 @@ export function Garage() {
                 [Columnn]: !prevState[Columnn],
             };
 
-            localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
             return updatedColumns;
         });
     };
-
-    const pageThemeStyle = {
-        color: isDarkMode ? "#f8fafc" : undefined,
-    };
-
-    const tableClassName = `dataTable ${isDarkMode ? "table-dark" : ""}`;
 
     const closeGarageModal = () => {
         setModalGarageStatus(null);
         setTitleGarageStatus("");
         setIdUser(0);
-        setIdGarage(0);
         setIdGarage(0);
     };
 
@@ -506,7 +498,7 @@ export function Garage() {
                     </thead>
                     <tbody className="light-body"> {loading ? (
                         <tr style={{ textAlign: "center" }}>
-                            <td className="text-center" colSpan={10}>
+                            <td className="text-center" colSpan={visibleColumnCount(selectedColumns, 2)}>
                                 <p>
                                     <PropagateLoader
                                         color={"#123abc"}
@@ -632,7 +624,7 @@ export function Garage() {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={10} style={{ textAlign: "center" }}>Aucun conducteur disponible</td>
+                            <td colSpan={visibleColumnCount(selectedColumns, 2)} style={{ textAlign: "center" }}>{translate("No data available")}</td>
                         </tr>
                     )}
 
