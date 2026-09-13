@@ -29,6 +29,17 @@ import { useNavigate } from "react-router-dom";
 import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, useClipboard } from "../utilities/functions";
 import { toast } from "react-toastify"; import VehicleModal from "../components/Vehicle/VehicleDeleteModal";
 import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
+import {
+  VEHICLE_PAGE_SIZES,
+  VEHICLE_STATES,
+  getNextVehicleSort,
+  normalizeVehiclePage,
+  normalizeVehiclePageSize,
+  normalizeVehicleSearchType,
+  normalizeVehicleSortColumn,
+  normalizeVehicleSortDirection,
+  normalizeVehicleStates,
+} from "../utilities/vehicles";
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL + "/api/geop";
@@ -127,11 +138,8 @@ const vehicleDefaultColumns = {
   model: true,
   immatriculation_vehicule: true,
   state: true,
-  assignment: true,
-  vehicule_type: true,
   nom_conducteur: true,
   username_user: true,
-  trailer: true,
 };
 
 const vehiclePreferenceDefaults = {
@@ -139,9 +147,10 @@ const vehiclePreferenceDefaults = {
   pageSize: 10,
   searchType: 1,
   searchText: "",
-  sortColumn: "id_conducteur",
+  sortColumn: "id_vehicule",
   sortDirection: "ASC",
   filters: [] as string[],
+  pageNumber: 1,
   selectedVehicleIds: [] as string[],
 };
 
@@ -151,7 +160,7 @@ export function Vehicles() {
   const [typeSearch, setTypeSearch] = useState(translate("Immatriculation"));
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0); // Nombre total de pages
-  const [column, setSortColumn] = useState("id_conducteur");
+  const [column, setSortColumn] = useState("id_vehicule");
   const [sort, setSort] = useState("ASC");
   const userID = localStorage.getItem("GeopUserID");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -167,7 +176,6 @@ export function Vehicles() {
   const [IdVehicle, setIdDVehicle] = useState<number>(0);
   const [modalStatusDetail, setModalStatusDetail] = useState<string | null>(null);
   const [titleStatusDetail, setTitleStatusDetail] = useState<string | null>(null);
-  const [paginatedVehicles, setPaginatedVehicles] = useState<VehiculeListInterface[]>([]); 
   const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
@@ -185,17 +193,9 @@ export function Vehicles() {
 
 
   const handleSortingColum = (currentColumn: string) => {
+    setSort(getNextVehicleSort(column, sort, currentColumn));
     setSortColumn(currentColumn);
-    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
     setCurrentPage(1);
-  };
-
-  const searchColum: { [key: string]: number } = {
-    id_vehicule: 0,
-    immatriculation_vehicule: 1,
-    vehicule_type: 2,
-    // nom_conducteur: 3,
-    username_user: 4,
   };
 
   const HandleDelete = async (id_vehicle: number) => {
@@ -234,35 +234,38 @@ export function Vehicles() {
             type: type,
             etat: etat, // Ajout du filtre état
           }),
-        }).then(res => res.json()),
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || "Unable to count vehicles");
+          return data;
+        }),
 
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id_user: userID,
-            page: 1, // Toujours récupérer la première page (tous les véhicules)
-            limit: 1000, // Récupérer tous les véhicules en une seule requête
-            column: searchColum[column],
+            page,
+            limit,
+            column,
             sort: sort,
             search: search,
             type: type,
             etat: etat, // Ajout du filtre état
           }),
-        }).then(res => res.json()),
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || "Unable to search vehicles");
+          return data;
+        }),
       ]);
 
       // Mise à jour CRITIQUE de la pagination
-      const newTotal = countData[0].total;
+      const newTotal = Number(countData[0]?.total || 0);
       setTotal(newTotal);
 
       // Filtrer les véhicules côté frontend
-      const filteredVehicles = etat
-        ? vehicleData.filter((vehicle: VehiculeListInterface) => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
-        : vehicleData;
-
-      // Calculer le nombre total de pages
-      const calculatedPageCount = Math.ceil(filteredVehicles.length / limit);
+      const calculatedPageCount = Math.ceil(newTotal / limit);
       setPageCount(calculatedPageCount);
 
       // Réinitialiser la page actuelle si nécessaire
@@ -271,7 +274,7 @@ export function Vehicles() {
       }
 
       // Stocker tous les véhicules filtrés
-      setVehicles(filteredVehicles);
+      setVehicles(Array.isArray(vehicleData) ? vehicleData : []);
 
     } catch (error) {
       console.error(error);
@@ -281,18 +284,6 @@ export function Vehicles() {
   };
   console.log("Valeur de etat récupérée depuis l'URL :", etat); // Vérifie la valeur
 
-
-
-  const filteredVehicles = etat
-    ? vehicles.filter(vehicle => vehicle.etat_vehicule.toUpperCase() === etat.toUpperCase())
-    : vehicles;
-
-  console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
-
-  const startIndex = (currentPage - 1) * limit;
-  const endIndex = startIndex + limit;
-  //const filteredVehicles = vehicles.filter(vehicle => selectedStates.includes(vehicle.etat_vehicule));
-  console.log("Véhicules filtrés côté frontend :", filteredVehicles); // Vérifiez les résultats 
 
 
   const handleStateChange = (state: string) => {
@@ -319,12 +310,6 @@ export function Vehicles() {
     );
   };
 
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * limit;
-    const endIndex = startIndex + limit;
-    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
-    setPaginatedVehicles(newPaginatedVehicles);
-  }, [currentPage, vehicles, limit]);
   /*useLayoutEffect(() => {
     refreshVehiculeData();
   }, [userID, limit, limit, search, type, column, sort, selectedStates]);
@@ -345,32 +330,10 @@ export function Vehicles() {
     translate("User"),
   ];
 
-  const handleTypeSearch = (selectedValue: string) => {
-    console.log(selectedValue);
-    switch (selectedValue) {
-      case translate("ID"):
-        console.log(0);
-        setType(0);
-        break;
-      case translate("Immatriculation"):
-        console.log(1);
-        setType(1);
-        break;
-      // case translate("Driver"):
-      //   console.log(2)
-      //   setType(2);
-      //  break;
-      case translate("User"):
-        console.log(3);
-        setType(3);
-        break;
-      default:
-        console.log("Unknown selection");
-        console.log(selectedValue);
-        break;
-    }
-    setTypeSearch(selectedValue);
-    console.log("Selected value:", selectedValue);
+  const handleTypeSearch = (selectedIndex: number) => {
+    setType([0, 1, 4][selectedIndex]);
+    setTypeSearch(menuItems[selectedIndex]);
+    setCurrentPage(1);
   };
 
   const [selectedColumns, setSelectedColumns] = useState(vehicleDefaultColumns);
@@ -398,7 +361,11 @@ export function Vehicles() {
 
   const handleResetSearch = () => {
     setSearch("");
+    setType(1);
+    setTypeSearch(translate("Immatriculation"));
+    setSelectedStates([]);
     setCurrentPage(1);
+    if (etat) navigate(location.pathname, { replace: true });
   };
 
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
@@ -426,19 +393,21 @@ export function Vehicles() {
         {} as typeof vehicleDefaultColumns
       )
     );
-    setLimit(vehiclePreferences.pageSize);
-    setType(vehiclePreferences.searchType);
+    const restoredSearchType = normalizeVehicleSearchType(vehiclePreferences.searchType);
+    setLimit(normalizeVehiclePageSize(vehiclePreferences.pageSize));
+    setType(restoredSearchType);
     setTypeSearch(
-      vehiclePreferences.searchType === 0
+      restoredSearchType === 0
         ? translate("ID")
-        : vehiclePreferences.searchType === 3
+        : restoredSearchType === 4
           ? translate("User")
           : translate("Immatriculation")
     );
-    setSearch(vehiclePreferences.searchText);
-    setSortColumn(vehiclePreferences.sortColumn);
-    setSort(vehiclePreferences.sortDirection);
-    setSelectedStates(vehiclePreferences.filters);
+    setSearch(typeof vehiclePreferences.searchText === "string" ? vehiclePreferences.searchText : "");
+    setSortColumn(normalizeVehicleSortColumn(vehiclePreferences.sortColumn));
+    setSort(normalizeVehicleSortDirection(vehiclePreferences.sortDirection));
+    setSelectedStates(normalizeVehicleStates(vehiclePreferences.filters));
+    setCurrentPage(normalizeVehiclePage(vehiclePreferences.pageNumber));
     setSelectedVehicles(vehiclePreferences.selectedVehicleIds);
     setIsVehiclesSelected(vehiclePreferences.selectedVehicleIds.length > 0);
     setVehiclePreferencesReady(true);
@@ -457,10 +426,12 @@ export function Vehicles() {
       sortColumn: column,
       sortDirection: sort,
       filters: selectedStates,
+      pageNumber: currentPage,
       selectedVehicleIds: selectedVehicles,
     });
   }, [
     column,
+    currentPage,
     limit,
     saveVehiclePreferences,
     search,
@@ -515,12 +486,6 @@ export function Vehicles() {
     console.log(updatedSetSelectedVehicles);
   };
 
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * limit;
-    const endIndex = startIndex + limit;
-    const newPaginatedVehicles = vehicles.slice(startIndex, endIndex);
-    setPaginatedVehicles(newPaginatedVehicles);
-  }, [currentPage, vehicles, limit]);
 
   // Gérer le changement de page
   const handlePageClick = (selectedPage: { selected: number; }) => {
@@ -709,7 +674,7 @@ export function Vehicles() {
   const closeDetailModal = () => {
     setModalStatusDetail(null);
   };
-  const totalVehiclesToDisplay = etat ? filteredVehicles.length : total;
+  const totalVehiclesToDisplay = total;
 
 
 
@@ -790,7 +755,7 @@ export function Vehicles() {
                       {menuItems.map((item, index) => (
                         <Dropdown.Item
                           key={index}
-                          onClick={() => handleTypeSearch(item)}
+                          onClick={() => handleTypeSearch(index)}
                           eventKey={item}
                           active={typeSearch === item}
                           className={typeSearch === item ? "select-active" : ""}
@@ -800,6 +765,31 @@ export function Vehicles() {
                       ))}
                     </Dropdown.Menu>
 
+                  </Dropdown>
+                  <Dropdown className="mr-2">
+                    <Dropdown.Toggle variant="secondary" id="dropdown-states">
+                      <i className="las la-filter"></i> {translate("State")}
+                      {selectedStates.length > 0 && ` (${selectedStates.length})`}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {VEHICLE_STATES.map((state) => (
+                        <Dropdown.Item
+                          key={state}
+                          as="label"
+                          onClick={(event) => event.preventDefault()}
+                        >
+                          <div className="form-check d-flex align-items-center">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              checked={selectedStates.includes(state)}
+                              onChange={() => handleStateChange(state)}
+                            />
+                            <span className="ml-2">{translate(state)}</span>
+                          </div>
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
                   </Dropdown>
                   {/*  <div className="col-sm-12 col-md-6">
               <div className="input-group">
@@ -876,12 +866,9 @@ export function Vehicles() {
                       onChange={handleSelectChange}
                       value={limit}
                     >
-                      <option value="10">10</option>
-                      <option value="20">20</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                      <option value="200">200</option>
-                      <option value="500">500</option>
+                      {VEHICLE_PAGE_SIZES.map((pageSize) => (
+                        <option key={pageSize} value={pageSize}>{pageSize}</option>
+                      ))}
                     </select>
                   </label>
                 </div>
@@ -909,6 +896,15 @@ export function Vehicles() {
                         {translate("ID")}
                       </span>
                     </Dropdown.Item>
+                    <Dropdown.Item as="button" style={{ display: "flex", alignItems: "center" }}>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.model}
+                        onChange={() => handleColumnChange("model")}
+                      />
+                      <span style={{ marginLeft: "10px" }}>{translate("Model")}</span>
+                    </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
                       style={{ display: "flex", alignItems: "center" }}
@@ -924,6 +920,15 @@ export function Vehicles() {
                       <span style={{ marginLeft: "10px" }}>
                         {translate("Matriculation")}
                       </span>
+                    </Dropdown.Item>
+                    <Dropdown.Item as="button" style={{ display: "flex", alignItems: "center" }}>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedColumns.state}
+                        onChange={() => handleColumnChange("state")}
+                      />
+                      <span style={{ marginLeft: "10px" }}>{translate("State")}</span>
                     </Dropdown.Item>
 
                     <Dropdown.Item
@@ -991,7 +996,7 @@ export function Vehicles() {
                 {selectedColumns.model && (
                   <th
                     className="sorting"
-                    onClick={() => handleSortingColum("model")}
+                    onClick={() => handleSortingColum("modele_vehicule")}
                   >
                     {translate("Model")}
                   </th>
@@ -1009,7 +1014,7 @@ export function Vehicles() {
                 {selectedColumns.state && (
                   <th
                     className="sorting"
-                    onClick={() => handleSortingColum("state")}
+                    onClick={() => handleSortingColum("etat_vehicule")}
                   >
                     {translate("State")}
                   </th>
@@ -1062,8 +1067,8 @@ export function Vehicles() {
                     </p>
                   </td>
                 </tr>
-              ) : paginatedVehicles.length > 0 ? (
-                paginatedVehicles.map((item) => (
+              ) : vehicles.length > 0 ? (
+                vehicles.map((item) => (
                   <tr key={item.id_vehicule}>
                     <td>
                       <div className="form-check form-check-inline">
