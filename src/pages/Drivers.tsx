@@ -39,6 +39,7 @@ const driverDefaultColumns = {
   telephone_conducteur: true,
   id_parc: true,
   service_conducteur: true,
+  nom_parc: true,
 };
 
 const driverPreferenceDefaults = {
@@ -218,7 +219,7 @@ export function Drivers() {
         search,
         type,
         id_user,
-        column: searchColumn[column],
+        column: searchColumn[column] ?? 0,
         sort
       });
 
@@ -233,7 +234,10 @@ export function Drivers() {
       });
 
       const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
+      const total = Array.isArray(totalPagesJson) && totalPagesJson.length > 0
+        ? totalPagesJson[0]?.count ?? 0
+        : totalPagesJson?.count ?? 0;
+
       setTotal(total);
 
       // Retrieve driver data
@@ -365,15 +369,16 @@ export function Drivers() {
   };
 
 
-  const searchColumn: { [key: string]: number } = {
+  const searchColumn: Record<string, number> = {
     id_conducteur: 0,
     code_conducteur: 1,
     nom_conducteur: 2,
-    date_naissance_conducteur: 3,
-    email_conducteur: 4,
-    telephone_conducteur: 5,
-    id_sousParc: 6,
-    service_conducteur:7
+    prenom_conducteur: 3,
+    date_naissance_conducteur: 4,
+    email_conducteur: 5,
+    telephone_conducteur: 6,
+    service_conducteur:7,
+    nom_parc: 8
   };
 
 
@@ -431,8 +436,9 @@ export function Drivers() {
 
 
   const handleSortingcolumn = (curentColumn: string) => {
+    const nextSort = sort === "ASC" ? "DESC" : "ASC";
     setSortcolumn(curentColumn);
-    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+    setSort(nextSort);
     setCurrentPage(1);
   };
 
@@ -541,7 +547,24 @@ export function Drivers() {
 
   const handleResetSearch = () => {
     setSearch("");
+    setType(2);
+    setTypeSearch(translate("Last and first name"));
+    setSortcolumn("id_conducteur");
+    setSort("ASC");
+    setLimit(10);
     setCurrentPage(1);
+
+    // Persist the reset state to the backend/localStorage
+    void saveDriverPreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(([, visible]) => visible)
+        .map(([key]) => key),
+      pageSize: 10,
+      searchType: 2,
+      searchText: "",
+      sortColumn: "id_conducteur",
+      sortDirection: "ASC",
+    });
   };
 
 
@@ -726,6 +749,21 @@ export function Drivers() {
                   {translate("Phone")}
                 </span>
               </Dropdown.Item>
+              <Dropdown.Item
+                as="button"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selectedColumns.telephone_conducteur}
+                  onChange={() => handleColumnChange("nom_parc")}
+                />
+                <span style={{ marginLeft: "10px" }}>
+                  {translate("Park")}
+                </span>
+              </Dropdown.Item>
+
 
               <Dropdown.Item
                 as="button"
@@ -780,9 +818,9 @@ export function Drivers() {
               {selectedColumns.nom_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("nom_conducteur")}>{translate("Last and first name")}</th>)}
               {selectedColumns.date_naissance_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_naissance_conducteur")}>{translate("Date of birth")}</th>)}
               {selectedColumns.code_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("code_conducteur")}>{translate("Code")}</th>)}
-              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("date_creation")}>{translate("Email")}</th>)}
-              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Phone")}</th>)}
-              {selectedColumns.id_parc && (<th className="sorting" onClick={() => handleSortingcolumn("id_parc")}>{translate("Park")}</th>)}
+              {selectedColumns.email_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("email_conducteur")}>{translate("Email")}</th>)}
+              {selectedColumns.telephone_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("telephone_conducteur")}>{translate("Phone")}</th>)}
+              {selectedColumns.nom_parc && (<th className="sorting" onClick={() => handleSortingcolumn("nom_parc")}>{translate("Park")}</th>)}
               {selectedColumns.service_conducteur && (<th className="sorting" onClick={() => handleSortingcolumn("service_conducteur")}>{translate("Assigned service")}</th>)}
             
               {<th>{translate("Action")}</th>}
@@ -822,7 +860,7 @@ export function Drivers() {
                       {selectedColumns.code_conducteur && (<td>{driver.code_conducteur}</td>)}
                       {selectedColumns.email_conducteur && (<td>{driver.email_conducteur}</td>)}
                       {selectedColumns.telephone_conducteur && (<td>{driver.telephone_conducteur}</td>)}
-                      {selectedColumns.id_parc && (<td>{driver.nom_parc}</td>)}
+                      {selectedColumns.nom_parc && (<td>{driver.nom_parc}</td>)}
                       {selectedColumns.service_conducteur && (<td>{driver.service_conducteur}</td>)}
 
                       <td>
