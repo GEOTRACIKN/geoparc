@@ -992,5 +992,9 @@
   "parks": "Parques",
   "list_parks": "Lista de parques",
   "new_park": "Nuevo parque",
-  "create_mission": "Crear misión"
+  "create_mission": "Crear misión",
+  "missionClose.title": "Confirmar la finalización de la misión",
+  "missionClose.explanation": "Pulse «Finalizar misión» solo cuando la misión haya terminado completamente. Esta acción registrará su finalización en el sistema.",
+  "missionClose.confirm": "Confirmo que la misión ha terminado completamente.",
+  "missionClose.button": "Finalizar misión"
 }

@@ -986,5 +986,9 @@
   "parks": "Parks",
   "list_parks": "List Parks",
   "new_park": "New Park",
-  "create_mission": "Create Mission"
+  "create_mission": "Create Mission",
+  "missionClose.title": "Confirm mission completion",
+  "missionClose.explanation": "Click “Complete mission” only when the mission is fully finished. This action records its completion in the system.",
+  "missionClose.confirm": "I confirm that the mission is fully finished.",
+  "missionClose.button": "Complete mission"
 }

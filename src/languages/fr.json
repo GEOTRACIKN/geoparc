@@ -986,5 +986,9 @@
   "parks": "Parcs",
   "list_parks": "Liste des parcs",
   "new_park": "Nouveau parc",
-  "create_mission": "Créer la mission"
+  "create_mission": "Créer la mission",
+  "missionClose.title": "Confirmer la fin de la mission",
+  "missionClose.explanation": "Cliquez sur « Clôturer la mission » uniquement lorsque la mission est entièrement terminée. Cette action enregistrera sa clôture dans le système.",
+  "missionClose.confirm": "Je confirme que la mission est entièrement terminée.",
+  "missionClose.button": "Clôturer la mission"
 }
