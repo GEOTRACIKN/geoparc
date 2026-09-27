@@ -131,7 +131,7 @@ export function Garage() {
                 search: apiSearch,
                 type,
                 id_user,
-                colum: GARAGE_SEARCH_FIELDS.indexOf(Column as typeof GARAGE_SEARCH_FIELDS[number]),
+                column: GARAGE_SEARCH_FIELDS.indexOf(Column as typeof GARAGE_SEARCH_FIELDS[number]),
                 sort,
             });
 
