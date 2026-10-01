@@ -4,6 +4,7 @@ import { useTranslate } from "../../hooks/LanguageProvider";
 import { Bounce, toast } from "react-toastify";
 import { Dropdown } from "react-bootstrap";
 import { PropagateLoader } from "react-spinners";
+import { GARAGE_STATUSES } from "../../utilities/garage";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -199,7 +200,7 @@ const UpdateStatusGarageModal: React.FC<UpdateStatusGarageModalProps> = ({
               { status: "OR established", icon: "fas fa-check-double", color: "#6f42c1", label: translate("OR established") },
               { status: "Pending part", icon: "fas fa-box-open", color: "#dc3545", label: translate("Pending part") },
               // { status: "Unknown", icon: "fas fa-question-circle", color: "#6c757d", label: translate("Unknown") },
-            ].map((item) => (
+            ].filter((item) => GARAGE_STATUSES.includes(item.status as typeof GARAGE_STATUSES[number])).map((item) => (
               <Dropdown.Item
                 key={item.status}
                 onClick={() => handleSelectOperation(item.status)}
