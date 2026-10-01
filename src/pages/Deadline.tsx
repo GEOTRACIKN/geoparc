@@ -3,6 +3,7 @@ import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link, useParams } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
+import { useNavigate } from "react-router-dom";
 import ModalNewDeadline from "../components/Deadline/NewDeadline";
 import CalendarDeadlineModal from "../components/Deadline/CalendarDeadline";
 import ModalShowDeadline from "../components/Deadline/ShowDeadline";
@@ -106,6 +107,7 @@ export function Deadline() {
   const [selectAll, setSelectAll] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
 
+  const navigate = useNavigate();
 
 
   const onDownloadConfirm = (format: string) => {
@@ -732,6 +734,9 @@ export function Deadline() {
   };
 
   const handleResetSearch = () => {
+    // Reset URL back to the standard base route to strip route params & query params
+    navigate("/deadline", { replace: true });
+
     setSearch("");
     setType(0);
     setTypeSearch(translate("ID"));

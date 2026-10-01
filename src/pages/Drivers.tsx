@@ -292,7 +292,14 @@ export function Drivers() {
     if (!driverPreferencesLoaded || driverPreferencesHydratedRef.current) return;
     driverPreferencesHydratedRef.current = true;
 
-    const visibleColumns = new Set(driverPreferences.visibleColumns);
+      // Normalize legacy 'id_parc' key to 'nom_parc'
+      const rawVisible: string[] = driverPreferences.visibleColumns || [];
+      const normalizedVisible = rawVisible.map((col) =>
+        col === "id_parc" ? "nom_parc" : col
+      );
+
+    const visibleColumns = new Set(normalizedVisible);
+
     setSelectedColumns(
       Object.keys(driverDefaultColumns).reduce(
         (result, key) => ({
@@ -756,7 +763,7 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-checked={selectedColumns.nom_parc}
+                  checked={selectedColumns.nom_parc}
                   onChange={() => handleColumnChange("nom_parc")}
                 />
                 <span style={{ marginLeft: "10px" }}>
