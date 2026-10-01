@@ -15,7 +15,7 @@
   box-shadow: 0 8px 25px rgb(0 0 0 / 8%);
 }
 .gp-privacy header { text-align: center; }
-.gp-privacy-brand { color: #087ff5; font-weight: 700; font-size: 24px; margin-bottom: 8px; }
+.gp-privacy-logo { display: block; width: 220px; max-width: 100%; height: auto; margin: 0 auto 24px; }
 .gp-privacy h1 { color: #1f2937; font-size: clamp(26px, 5vw, 36px); line-height: 1.25; }
 .gp-privacy .gp-privacy-date { color: #6b7280; font-size: 14px; }
 .gp-privacy h2 { color: #1f2937; font-size: 21px; margin: 30px 0 12px; line-height: 1.4; }

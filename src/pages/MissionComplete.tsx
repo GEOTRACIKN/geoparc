@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslate } from "../hooks/LanguageProvider";
 
 interface ClosedMission {
   id_mission?: number;
@@ -8,6 +9,7 @@ interface ClosedMission {
 }
 
 type CloseState =
+  | { kind: "ready" }
   | { kind: "loading" }
   | { kind: "success"; mission: ClosedMission }
   | { kind: "error"; message: string };
@@ -25,12 +27,16 @@ function errorFromCode(code: string | null) {
 
 export default function MissionComplete() {
   const [searchParams] = useSearchParams();
+  const { translate: tr } = useTranslate();
+  const initialized = useRef(false);
   const requestStarted = useRef(false);
+  const tokenRef = useRef("");
+  const [confirmed, setConfirmed] = useState(false);
   const [state, setState] = useState<CloseState>({ kind: "loading" });
 
   useEffect(() => {
-    if (requestStarted.current) return;
-    requestStarted.current = true;
+    if (initialized.current) return;
+    initialized.current = true;
 
     const fragmentParams = new URLSearchParams(window.location.hash.slice(1));
     const token = (fragmentParams.get("t") || searchParams.get("t"))?.trim();
@@ -43,12 +49,20 @@ export default function MissionComplete() {
       return;
     }
 
+    tokenRef.current = token;
     window.history.replaceState(null, "", window.location.pathname);
+    setState({ kind: "ready" });
+  }, [searchParams]);
+
+  function closeMission() {
+    if (!confirmed || state.kind !== "ready" || requestStarted.current) return;
+    requestStarted.current = true;
+    setState({ kind: "loading" });
 
     void fetch(`${apiUrl}/api/geop/mission/close`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ t: token }),
+      body: JSON.stringify({ t: tokenRef.current }),
     })
       .then(async (response) => {
         const data = await response.json().catch(() => ({}));
@@ -66,7 +80,7 @@ export default function MissionComplete() {
               : "Impossible de clôturer cette mission.",
         });
       });
-  }, [searchParams]);
+  }
 
   const success = state.kind === "success";
 
@@ -101,13 +115,31 @@ export default function MissionComplete() {
             placeItems: "center",
             color: "#fff",
             background:
-              state.kind === "loading" ? "#2563eb" : success ? "#16a34a" : "#dc2626",
+              state.kind === "ready" || state.kind === "loading" ? "#d97706" : success ? "#16a34a" : "#dc2626",
             fontSize: 34,
             fontWeight: 700,
           }}
         >
-          {state.kind === "loading" ? "…" : success ? "✓" : "!"}
+          {state.kind === "loading" ? "…" : state.kind === "ready" ? "?" : success ? "✓" : "!"}
         </div>
+
+        {state.kind === "ready" && (
+          <>
+            <h1 style={{ color: "#162233" }}>{tr("missionClose.title")}</h1>
+            <p style={{ color: "#64748b" }}>{tr("missionClose.explanation")}</p>
+            <label style={{ display: "flex", gap: 12, textAlign: "start", margin: "24px 0" }}>
+              <input type="checkbox" checked={confirmed}
+                onChange={(event) => setConfirmed(event.target.checked)} />
+              {tr("missionClose.confirm")}
+            </label>
+            <button type="button" disabled={!confirmed} onClick={closeMission}
+              style={{ background: confirmed ? "#d97706" : "#e2e8f0", color: confirmed ? "white" : "#475569",
+                border: 0, borderRadius: 8, padding: "14px 24px", fontWeight: 600,
+                cursor: confirmed ? "pointer" : "not-allowed", width: "100%" }}>
+              {tr("missionClose.button")}
+            </button>
+          </>
+        )}
 
         {state.kind === "loading" && (
           <>

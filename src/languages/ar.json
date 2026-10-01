@@ -981,5 +981,9 @@
   "list_parks": " قائمة الحدائق",
   "new_park": "حديقة جديدة",
   "create_mission": "إنشاء مهمة",
-   "Request ID": "معرّف الطلب"
+   "Request ID": "معرّف الطلب",
+  "missionClose.title": "تأكيد انتهاء المهمة",
+  "missionClose.explanation": "اضغط على «إنهاء المهمة» فقط بعد إنجاز المهمة بالكامل. سيؤدي هذا الإجراء إلى تسجيل انتهائها في النظام.",
+  "missionClose.confirm": "أؤكد أن المهمة أُنجزت بالكامل.",
+  "missionClose.button": "إنهاء المهمة"
 }

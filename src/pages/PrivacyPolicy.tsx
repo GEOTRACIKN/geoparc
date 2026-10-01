@@ -24,7 +24,11 @@ export default function PrivacyPolicy() {
     <main className="gp-privacy" lang="en">
       <article className="gp-privacy-card" aria-labelledby="privacy-title">
         <header>
-          <p className="gp-privacy-brand">GeoParc</p>
+          <img
+            className="gp-privacy-logo"
+            src="https://geoparc.geotrackin.com/asset/images/logo.png"
+            alt="GeoParc"
+          />
           <h1 id="privacy-title">Privacy Policy</h1>
           <p className="gp-privacy-date">Last updated: September 13, 2026</p>
           <p>This policy covers the GeoParc platform and its mobile fleet management application.</p>
