@@ -264,14 +264,18 @@ export function Deadline() {
   };
 
   const refreshDeadline = () => {
-    getDeadlines(limit, currentPage, search, type, column, "ASC");
+    getDeadlines(limit, currentPage, search, type, column, sort);
 
   };
 
 
   const handleSortingColumn = (currentColumn: string) => {
+    if (column === currentColumn){
+      setSort((prevSort) => (prevSort === "ASC" ? "DESC" : "ASC"));
+    } else {
     setSortColumn(currentColumn);
-    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
+    setSort("ASC");
+    }
     setCurrentPage(1);
   };
 
@@ -320,6 +324,7 @@ export function Deadline() {
     date_creation: 3,
     status: 4,
     description: 5,
+    id_item: 6,
   };
 
   const getDeadlines = async (
@@ -726,6 +731,27 @@ export function Deadline() {
     }
   };
 
+  const handleResetSearch = () => {
+    setSearch("");
+    setType(0);
+    setTypeSearch(translate("ID"));
+    setSortColumn("id_deadline");
+    setSort("DESC");
+    setLimit(10);
+    setCurrentPage(1);
+
+    void saveDeadlinePreferences({
+      visibleColumns: Object.entries(selectedColumns)
+        .filter(([, visible]) => visible)
+        .map(([key]) => key),
+      pageSize: 10,
+      searchType: 0,
+      searchText: "",
+      sortColumn: "id_deadline",
+      sortDirection: "DESC",
+      filters: { view: isGridView ? "list" : "calendar" },
+    });
+  };
 
 
   return (
@@ -805,6 +831,13 @@ export function Deadline() {
               value={search}
               className="form-control"
             />
+            <Button
+            variant="secondary"
+            onClick={handleResetSearch}
+            className="btn-reset"
+          >
+            <i className="las la-times" style={{ color: "#fff" }}></i>
+          </Button>
           </div>
         </div>
         <div className="col-md-8 d-flex justify-content-end align-items-center">
