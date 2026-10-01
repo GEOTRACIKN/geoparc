@@ -756,7 +756,7 @@ export function Drivers() {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.telephone_conducteur}
+checked={selectedColumns.nom_parc}
                   onChange={() => handleColumnChange("nom_parc")}
                 />
                 <span style={{ marginLeft: "10px" }}>
