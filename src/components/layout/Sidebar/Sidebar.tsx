@@ -311,6 +311,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
                   title={translate("Logout")}
                   margin="ml-3"
                 />
+                <li
+                  aria-label="GeoParc version"
+                  style={{
+                    padding: "12px 20px",
+                    color: "#8a91a5",
+                    fontSize: "11px",
+                    textAlign: "center",
+                  }}
+                >
+                  GeoParc v1.0.1
+                </li>
               </ul>
             </nav>
           </div>

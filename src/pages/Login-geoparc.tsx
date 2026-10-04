@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BeatLoader } from "react-spinners"; // Import the loader component
 import "../assets/css/bootstrap/bootstrap.css";
@@ -17,7 +17,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 interface LoginFormProps {
-  onLogin: (token: string) => void;
+  onLogin: (credentials: { username: string; password: string }) => Promise<void>;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
@@ -28,7 +28,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const { translate } = useTranslate();
   const { lang, setLang } = useTranslate();
-  const location = useLocation();
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -65,57 +64,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     };
   }, []);
 
-  function generateRandomString(length:number) {
-    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let randomString = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      randomString += characters[randomIndex];
-    }
-    return randomString;
-  }
-  // Fonction pour ajouter des caractères supplémentaires au mot de passe
-function addExtraCharactersToPassword(password:String) {
-  // Ajoutez ici les caractères supplémentaires
-  const extraCharacters = generateRandomString(7); // Par exemple, ajoutez 10 caractères aléatoires
-  return extraCharacters + password;
-}
-
   const handleLogin = async () => {
-     // Ajoutez des caractères supplémentaires au mot de passe
-     const securedPassword = addExtraCharactersToPassword(password);
-
     try {
       setLoading(true);
-      const response = await axios.post(`${backendUrl}/api/login`, {
-        
+      await onLogin({
         username,
-        password:securedPassword,
+        password,
       });
-
-      onLogin(response.data);
-      localStorage.setItem("authToken", response.data.token);
-   
-      const loginTime = new Date().getTime(); // Store current time
-      localStorage.setItem("loginTime", loginTime.toString());
-      localStorage.setItem("GeopUserID", response.data.id_user);
-      localStorage.setItem("username", response.data.username);
-      localStorage.setItem("api_key", response.data.api_key); 
-      localStorage.setItem("id_role", response.data.id_role);
-      localStorage.setItem("theme_mode", response.data.profile_settings.theme_mode);
-      localStorage.setItem("language", response.data.profile_settings.language);
-      localStorage.setItem("timezone", response.data.profile_settings.timezone);
-
-      
-      // Fetch permissions for the user
-      const permissionsResponse = await axios.get(
-        `${backendUrl}/api/geop/permission/all/${response.data.id_role}`
-      );
-      localStorage.setItem(
-        "geop_userPermissions",
-        JSON.stringify(permissionsResponse.data)
-      );
-
       navigate("/");
     } catch (error) {
       if ((error as any).response && (error as any).response.status === 401) {
@@ -136,21 +91,6 @@ function addExtraCharactersToPassword(password:String) {
       setLoading(false); // Set loading to false on login completion (success or failure)
     }
   };
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("authToken");
-    const savedUserID = localStorage.getItem("GeopUserID");
-    if (savedToken && savedUserID === "1") {
-      navigate("/"); // Rediriger directement vers la page principale si l'userID est égal à 1
-    }
-  }, []);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("authToken");
-    if (savedToken) {
-      navigate(location.pathname); // Rediriger l'utilisateur vers la page d'accueil s'il est déjà connecté
-    }
-  }, [location.pathname]);
 
   // Refs for form fields
   const firstNameRef = useRef(null);

@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        const res = await net.fetchJson<AuthUser>(`${BACKEND_URL}/api/me`, {
+        const res = await net.fetchJson<AuthUser>(`${BACKEND_URL}/api/geop/me`, {
           method: "GET",
           credentials: "include",
           headers: { Accept: "application/json" },
@@ -164,7 +164,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
 
       } catch (error) {
-        console.error("/api/me error", error);
+        console.error("/api/geop/me error", error);
         setLoading(false);
         return; // Ne pas déconnecter
       }
@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async () => {
     if (net.quality === "offline") return;
 
-    const res = await net.fetchJson<AuthUser>(`${BACKEND_URL}/api/me`, {
+    const res = await net.fetchJson<AuthUser>(`${BACKEND_URL}/api/geop/me`, {
       method: "GET",
       credentials: "include",
       headers: { Accept: "application/json" },
@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       if (net.quality !== "offline") {
-        await axios.post(`${BACKEND_URL}/api/logout`, {}, { withCredentials: true });
+        await axios.post(`${BACKEND_URL}/api/logoutgeop`, {}, { withCredentials: true });
       }
       setUser(null);
       clearUserFromLocalStorage();

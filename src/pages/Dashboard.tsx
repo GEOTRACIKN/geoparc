@@ -107,7 +107,7 @@ export function Dashboard() {
       try {
         // Fetch total number of drivers
         const responseDrivers = await fetch(
-          `${backendUrl}/api/dash/driver/${userID}`,
+          `${backendUrl}/api/geop/dashboard/driver`,
           { mode: "cors" }
         );
         if (responseDrivers.ok) {
@@ -121,7 +121,7 @@ export function Dashboard() {
 
         // Fetch total number of vehicle
         const responseVehicles = await fetch(
-          `${backendUrl}/api/vehicle/totalpage/${userID}`,
+          `${backendUrl}/api/geop/dashboard/vehicles`,
           { mode: "cors" }
         );
         if (responseVehicles.ok) {
@@ -140,7 +140,7 @@ export function Dashboard() {
         });
 
         const responseVehicleState = await fetch(
-          `${backendUrl}/api/etat/totalpage/${userID}`,
+          `${backendUrl}/api/geop/dashboard/vehicle-states`,
           { mode: "cors" }
         );
         if (responseVehicleState.ok) {
@@ -198,7 +198,7 @@ export function Dashboard() {
             mode: "cors",
           }
         );
-        if (responseVehicles.ok) {
+        if (responseNotifications.ok) {
           const totalNotificationsData = await responseNotifications.json();
 
           setNotifications(totalNotificationsData);
@@ -261,7 +261,7 @@ export function Dashboard() {
 
         // Fetch total number of users
         const responseUsers = await fetch(
-          `${backendUrl}/api/user/totalpage/${userID}`,
+          `${backendUrl}/api/geop/dashboard/users`,
           { mode: "cors" }
         );
         if (responseUsers.ok) {
@@ -279,7 +279,7 @@ export function Dashboard() {
 
       try {
         const responseimmatriculation = await fetch(
-          `${backendUrl}/api/immatriculation/${userID}`
+          `${backendUrl}/api/geop/dashboard/immatriculations`
         );
         if (responseimmatriculation.ok) {
           const data = await responseimmatriculation.json();
@@ -320,7 +320,7 @@ export function Dashboard() {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/api/dash-data/${userID}`);
+      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`);
       if (response.ok) {
         const data: SearchResult[] = await response.json();
 
@@ -383,7 +383,7 @@ export function Dashboard() {
       setRefreshing(true);
 
       try {
-        const response = await fetch(`${backendUrl}/api/dash-data/${userID}`);
+      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`);
         if (response.ok) {
           const data = await response.json();
           setDashData(data);
