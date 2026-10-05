@@ -149,6 +149,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (res.status === 401) {
           clearUserFromLocalStorage();
           setUser(null);
+          if (window.location.pathname !== "/login-geoparc") {
+            window.location.replace("/login-geoparc");
+          }
           setLoading(false);
           return;
         }
