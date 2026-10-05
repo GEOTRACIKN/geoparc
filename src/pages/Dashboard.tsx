@@ -108,7 +108,7 @@ export function Dashboard() {
         // Fetch total number of drivers
         const responseDrivers = await fetch(
           `${backendUrl}/api/geop/dashboard/driver`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseDrivers.ok) {
           const totalDriversData = await responseDrivers.json();
@@ -122,7 +122,7 @@ export function Dashboard() {
         // Fetch total number of vehicle
         const responseVehicles = await fetch(
           `${backendUrl}/api/geop/dashboard/vehicles`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseVehicles.ok) {
           const totalVehiclesData = await responseVehicles.json();
@@ -141,7 +141,7 @@ export function Dashboard() {
 
         const responseVehicleState = await fetch(
           `${backendUrl}/api/geop/dashboard/vehicle-states`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseVehicleState.ok) {
           const vehicleStateData = await responseVehicleState.json();
@@ -155,7 +155,7 @@ export function Dashboard() {
         // Fetch total number of training
         const responseTraining = await fetch(
           `${backendUrl}/api/geop/training/count/${userID}`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseTraining.ok) {
           const totalTrainingsData = await responseTraining.json();
@@ -173,7 +173,7 @@ export function Dashboard() {
         // Fetch total number of training
         const responseFire = await fetch(
           `${backendUrl}/api/geop/fire/count/${userID}`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseFire.ok) {
           const totalFiresData = await responseFire.json();
@@ -196,6 +196,7 @@ export function Dashboard() {
             },
             body: bodyData,
             mode: "cors",
+            credentials: "include",
           }
         );
         if (responseNotifications.ok) {
@@ -251,7 +252,7 @@ export function Dashboard() {
 
         const responseTrainings = await fetch(
           `${backendUrl}/api/geop/training/all/${userID}`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseTrainings.ok) {
           const trainingsData = await responseTrainings.json();
@@ -262,7 +263,7 @@ export function Dashboard() {
         // Fetch total number of users
         const responseUsers = await fetch(
           `${backendUrl}/api/geop/dashboard/users`,
-          { mode: "cors" }
+          { mode: "cors", credentials: "include" }
         );
         if (responseUsers.ok) {
           const totalUsersData = await responseUsers.json();
@@ -279,7 +280,8 @@ export function Dashboard() {
 
       try {
         const responseimmatriculation = await fetch(
-          `${backendUrl}/api/geop/dashboard/immatriculations`
+          `${backendUrl}/api/geop/dashboard/immatriculations`,
+          { credentials: "include" }
         );
         if (responseimmatriculation.ok) {
           const data = await responseimmatriculation.json();
@@ -320,7 +322,9 @@ export function Dashboard() {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`);
+      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`, {
+        credentials: "include",
+      });
       if (response.ok) {
         const data: SearchResult[] = await response.json();
 
@@ -383,7 +387,9 @@ export function Dashboard() {
       setRefreshing(true);
 
       try {
-      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`);
+      const response = await fetch(`${backendUrl}/api/geop/dashboard/positions`, {
+        credentials: "include",
+      });
         if (response.ok) {
           const data = await response.json();
           setDashData(data);
@@ -613,7 +619,9 @@ export function Dashboard() {
   useEffect(() => {
     const getMarkers = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/map/find/${userID}`);
+        const response = await fetch(`${backendUrl}/api/map/find/${userID}`, {
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
           setMarkers(data);
