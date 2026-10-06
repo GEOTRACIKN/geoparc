@@ -421,6 +421,15 @@ export function Vehicles() {
     vehiclePreferencesHydratedRef.current = true;
 
     const visibleColumns = new Set(vehiclePreferences.visibleColumns);
+    const migrationKey = `gpPagePreferences:v1:${
+      localStorage.getItem("GeopUserID") || localStorage.getItem("userid") || "anonymous"
+    }:vehicles:odometer-default-v1`;
+    const needsOdometerMigration = !localStorage.getItem(migrationKey);
+    if (needsOdometerMigration) {
+      visibleColumns.add("GPSDIST");
+      localStorage.setItem(migrationKey, "1");
+      saveVehiclePreferences({ visibleColumns: Array.from(visibleColumns) });
+    }
     setSelectedColumns(
       Object.keys(vehicleDefaultColumns).reduce(
         (result, key) => ({

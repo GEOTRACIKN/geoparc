@@ -9,7 +9,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 
 interface LogoutButtonProps {
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
   activeMenu: string;
   title: string;
   margin: string;
@@ -55,14 +55,16 @@ const Logout: React.FC<LogoutButtonProps> = ({ onLogout, activeMenu, title, marg
     }
   }
 
-  // Proceed with logout actions
+  await onLogout();
+
+  // Proceed with local cleanup and return to the GeoParc login screen.
   localStorage.removeItem("authToken");
   localStorage.removeItem("GeoploginTime");
   localStorage.removeItem("GeopUserID");
   localStorage.removeItem("geop_userPermissions");
   cookies.remove("jwtToken");
   cookies.remove("jwtTokenGEOP");
-  window.location.href ="https://geotrackin.com";
+  navigate("/login-geoparc", { replace: true });
 };
 
   
