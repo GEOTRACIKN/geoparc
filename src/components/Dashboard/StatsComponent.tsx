@@ -47,11 +47,11 @@ const StatsComponent: React.FC<StatsComponentProps> = ({ psn }) => {
     const dateF = currentDate.toISOString();
 
     try {
-      const response = await axios.post<StatsData>(`${backendUrl}/api/getStats`, {
-        dateD: dateD,
-        dateF: dateF,
-        PSN: psn // Utilisez le PSN fourni
-      });
+    const response = await axios.post<StatsData>(`${backendUrl}/api/geop/dashboard/stats`, {
+      dateD: dateD,
+      dateF: dateF,
+      PSN: psn // Utilisez le PSN fourni
+    }, { withCredentials: true });
       setStats(response.data);
     } catch (error: any) {
       setError(error.message || 'Internal Server Error');

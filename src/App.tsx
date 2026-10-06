@@ -86,6 +86,11 @@ import PrivacyPolicy, { isPrivacyPolicyPath } from "./pages/PrivacyPolicy";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+type GeoParcLoginCredentials = {
+  username: string;
+  password: string;
+};
+
 function App() {
   const location = useLocation();
 
@@ -128,23 +133,22 @@ function AuthenticatedApp() {
     window.history.replaceState({}, document.title, window.location.pathname);
   };
 
-  const handleLogin = async (apiKeyOverride?: string) => {
-    const currentApiKey = (
-      apiKeyOverride ||
-      localStorage.getItem("api_key") ||
-      ""
-    ).trim();
-
-    if (!currentApiKey) {
-      clearGeoparcSession();
-      throw new Error("API key GeoParc manquante");
-    }
-
+  const handleLogin = async (
+    credentials?: GeoParcLoginCredentials | string,
+  ) => {
     try {
-      const response = await axios.get(
-        `${backendUrl}/api/logingeop?apiKey=${encodeURIComponent(currentApiKey)}`,
-        { withCredentials: true }
-      );
+      const response = typeof credentials === "object"
+        ? await axios.post(`${backendUrl}/api/loginGeoParc`, credentials, {
+            withCredentials: true,
+          })
+        : typeof credentials === "string"
+        ? await axios.get(
+            `${backendUrl}/api/logingeop?apiKey=${encodeURIComponent(
+              credentials.trim(),
+            )}`,
+            { withCredentials: true },
+          )
+        : await axios.get(`${backendUrl}/api/geop/me`, { withCredentials: true });
 
       const data = response.data;
 
@@ -160,13 +164,23 @@ function AuthenticatedApp() {
       localStorage.setItem("Geopusername", String(data.username ?? ""));
       localStorage.setItem("GeopRoleID", String(data.id_role ?? ""));
 
+      if (data.profile_settings) {
+        const { theme_mode, language, timezone } = data.profile_settings;
+        if (theme_mode !== undefined) localStorage.setItem("theme_mode", String(theme_mode));
+        if (language !== undefined) localStorage.setItem("language", String(language));
+        if (timezone !== undefined) localStorage.setItem("timezone", String(timezone));
+      }
+
       // Clé existante dans ton projet.
       // Elle est remplacée uniquement quand GeoParc reçoit une nouvelle api_key.
-      localStorage.setItem("api_key", String(data.api_key || currentApiKey));
+      const receivedApiKey = typeof credentials === "string"
+        ? credentials
+        : localStorage.getItem("api_key") || "";
+      localStorage.setItem("api_key", String(data.api_key || receivedApiKey));
 
       const permissionsResponse = await axios.get(
         `${backendUrl}/api/geop/permission/all/${data.id_role}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       localStorage.setItem(

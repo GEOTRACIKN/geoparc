@@ -405,7 +405,9 @@ export function MissionReportManage() {
   };
 
   const getVehicleKm = async (id_vehicule: string | number) => {
-    const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+    const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`, {
+      credentials: "include",
+    });
     if (!res.ok) throw new Error("Erreur recuperation km");
     return res.json();
   };
