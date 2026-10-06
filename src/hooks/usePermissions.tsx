@@ -30,7 +30,10 @@ const usePermissions = (roleId: string | null) => {
     const fetchPermissions = async () => {
       setLoading(true);
       try {
-        const response = await axios.get<Permission[]>(`${backendUrl}/api/geop/permission/all/${roleId}`);
+        const response = await axios.get<Permission[]>(
+          `${backendUrl}/api/geop/permission/all/${roleId}`,
+          { withCredentials: true },
+        );
         setUserPermissions(response.data);
       } catch (err) {
         console.error("Error fetching permissions:", err);

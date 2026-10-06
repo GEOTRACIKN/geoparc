@@ -85,7 +85,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarPinned, onToggleSidebar }) =
     };
   }, []);
 
-  const roleId = localStorage.getItem("id_role");
+  // GeoParc stores the authenticated role under its namespaced key.
+  // Reading the generic GeoTracking key leaves the menu without a role after
+  // the GeoTracking -> GeoParc session bridge.
+  const roleId = localStorage.getItem("GeopRoleID");
   const { userPermissions, loading } = usePermissions(roleId);
   const checkPermission = (idPermission: number): boolean => {
     return userPermissions.some(
