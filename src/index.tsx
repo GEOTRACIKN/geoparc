@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import "bootstrap/dist/css/bootstrap.min.css"
 import { BrowserRouter } from 'react-router-dom';
+import axios from 'axios';
 import App from './App';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+axios.defaults.withCredentials = true;
 const nativeFetch = window.fetch.bind(window);
 window.fetch = (input, init = {}) => {
   const requestUrl = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -22,5 +24,4 @@ window.fetch = (input, init = {}) => {
    
   </React.StrictMode>
 )
-
 

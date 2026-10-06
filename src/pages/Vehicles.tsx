@@ -425,7 +425,7 @@ export function Vehicles() {
       Object.keys(vehicleDefaultColumns).reduce(
         (result, key) => ({
           ...result,
-          [key]: key === "GPSDIST" || visibleColumns.has(key),
+          [key]: visibleColumns.has(key),
         }),
         {} as typeof vehicleDefaultColumns
       )
