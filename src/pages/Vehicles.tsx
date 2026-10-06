@@ -120,6 +120,7 @@ interface VehiculeListInterface {
   kilometrage_prochain_entretien?: number;
   nom_marque?: string;
   reference_ctr_tech_vehicule?: string;
+  GPSDIST?: number | string | null;
 }
 
 const vehicleDefaultColumns = {
@@ -131,6 +132,7 @@ const vehicleDefaultColumns = {
   vehicule_type: true,
   nom_conducteur: true,
   username_user: true,
+  GPSDIST: true,
   trailer: true,
 };
 
@@ -228,6 +230,7 @@ export function Vehicles() {
         fetch(`${backendUrl}/vehicles/count`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({
             id_user: parseInt(userID ?? "0") || 0,
             search: search,
@@ -239,6 +242,7 @@ export function Vehicles() {
         fetch(`${backendUrl}/vehicles/search`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({
             id_user: userID,
             page: 1, // Toujours récupérer la première page (tous les véhicules)
@@ -421,7 +425,7 @@ export function Vehicles() {
       Object.keys(vehicleDefaultColumns).reduce(
         (result, key) => ({
           ...result,
-          [key]: visibleColumns.has(key),
+          [key]: key === "GPSDIST" || visibleColumns.has(key),
         }),
         {} as typeof vehicleDefaultColumns
       )
@@ -565,6 +569,7 @@ export function Vehicles() {
     translate("Assignment"),
     translate("Driver"),
     translate("User"),
+    translate("Odometer"),
     translate("Trailer"),
   ];
 
@@ -684,7 +689,8 @@ export function Vehicles() {
       vehicle.etat_vehicule,
       vehicle.affectation,
       vehicle.driver_first_name + ' ' + vehicle.driver_last_name,
-      vehicle.username_user,
+        vehicle.username_user,
+        `${(Number(vehicle.GPSDIST) || 0) / 1000} km`,
     ]);
     generatePDFFile(translate("List") + ' ' + translate("Vehicles"), vehicleHeaders, selectedData);
   };
@@ -916,6 +922,20 @@ export function Vehicles() {
                       <input
                         type="checkbox"
                         className="form-check-input"
+                        checked={selectedColumns.GPSDIST}
+                        onChange={() => handleColumnChange("GPSDIST")}
+                      />
+                      <span style={{ marginLeft: "10px" }}>
+                        {translate("Odometer")}
+                      </span>
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      as="button"
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
                         checked={selectedColumns.immatriculation_vehicule}
                         onChange={() =>
                           handleColumnChange("immatriculation_vehicule")
@@ -1038,6 +1058,14 @@ export function Vehicles() {
                     {translate("User")}
                   </th>
                 )}
+                {selectedColumns.GPSDIST && (
+                  <th
+                    className="sorting"
+                    onClick={() => handleSortingColum("GPSDIST")}
+                  >
+                    {translate("Odometer")}
+                  </th>
+                )}
                 {/* {selectedColumns.trailer && (
                   <th
                     className="sorting"
@@ -1118,6 +1146,13 @@ export function Vehicles() {
                     {/* {selectedColumns.assignment && (<td className="text-center">{item.affectation}</td>)} */}
                     {selectedColumns.nom_conducteur && (<td className="text-center">{item.driver_first_name} - {item.driver_last_name} </td>)}
                     {selectedColumns.username_user && (<td className="text-center">{item.username_user}</td>)}
+                    {selectedColumns.GPSDIST && (
+                      <td className="text-center">
+                        {`${((Number(item.GPSDIST) || 0) / 1000).toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })} km`}
+                      </td>
+                    )}
                     {/* {selectedColumns.trailer && (<td className="text-center">{}</td>)} */}
                     <td>
                       <div className="d-flex align-items-center list-action">
