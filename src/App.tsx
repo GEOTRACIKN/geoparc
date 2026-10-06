@@ -164,6 +164,13 @@ function AuthenticatedApp() {
       localStorage.setItem("Geopusername", String(data.username ?? ""));
       localStorage.setItem("GeopRoleID", String(data.id_role ?? ""));
 
+      if (data.profile_settings) {
+        const { theme_mode, language, timezone } = data.profile_settings;
+        if (theme_mode !== undefined) localStorage.setItem("theme_mode", String(theme_mode));
+        if (language !== undefined) localStorage.setItem("language", String(language));
+        if (timezone !== undefined) localStorage.setItem("timezone", String(timezone));
+      }
+
       // Clé existante dans ton projet.
       // Elle est remplacée uniquement quand GeoParc reçoit une nouvelle api_key.
       const receivedApiKey = typeof credentials === "string"

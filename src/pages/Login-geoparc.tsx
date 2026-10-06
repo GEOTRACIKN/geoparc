@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BeatLoader } from "react-spinners"; // Import the loader component
 import "../assets/css/bootstrap/bootstrap.css";
@@ -35,7 +34,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [selectedProblem, setSelectedProblem] = useState("forgotPassword");
   const [otherMessage, setOtherMessage] = useState("");
 
-  const navigate = useNavigate(); // Utilisation de useNavigate pour la navigation
 
   const strLang = {
     en: "English",
@@ -71,7 +69,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         username,
         password,
       });
-      navigate("/");
+      window.location.replace("/");
     } catch (error) {
       if ((error as any).response && (error as any).response.status === 401) {
         setAlertMessage(translate("incorrectCredentials")); // Translate the message
