@@ -499,7 +499,9 @@ export function MissionOrderManage() {
 
   const fetchVehicleKm = async (id_vehicule: number) => {
     try {
-      const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+      const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Failed to get vehicle KM");
       const data = await res.json();
       return data.kilometrage_vehicule || 0;
@@ -687,7 +689,9 @@ export function MissionOrderManage() {
     }
   };
   const getVehicleKm = async (id_vehicule: string | number) => {
-    const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`);
+    const res = await fetch(`${backendUrl}/api/geop/vehicule_km/${id_vehicule}`, {
+      credentials: "include",
+    });
     if (!res.ok) throw new Error("Erreur récupération km");
     return res.json();
   };
