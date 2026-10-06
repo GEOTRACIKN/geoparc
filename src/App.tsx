@@ -141,12 +141,14 @@ function AuthenticatedApp() {
         ? await axios.post(`${backendUrl}/api/loginGeoParc`, credentials, {
             withCredentials: true,
           })
-        : await axios.get(
+        : typeof credentials === "string"
+        ? await axios.get(
             `${backendUrl}/api/logingeop?apiKey=${encodeURIComponent(
-              (credentials || localStorage.getItem("api_key") || "").trim(),
+              credentials.trim(),
             )}`,
             { withCredentials: true },
-          );
+          )
+        : await axios.get(`${backendUrl}/api/geop/me`, { withCredentials: true });
 
       const data = response.data;
 
