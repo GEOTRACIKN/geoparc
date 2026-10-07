@@ -211,7 +211,7 @@ export function Driver() {
         mode: "cors",
         body: JSON.stringify({
           code_conducteur: driver.code_conducteur,
-          updated_code_conducteur: driver.code_conducteur,
+          updated_code_conducteur: updatedCodeConducteur,
           updated: driver.code_conducteur === updatedCodeConducteur ? 0 : 1,
         }),
       });
@@ -960,4 +960,3 @@ export function Driver() {
     </>
   );
 }
-
