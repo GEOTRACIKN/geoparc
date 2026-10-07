@@ -888,7 +888,7 @@ export function Vehicle() {
 
         VehicleData = Object.fromEntries(
           Object.entries(Vehicle)
-            .filter(([_, value]) => value !== null)
+            .filter(([key, value]) => key !== 'kilometrage_vehicule' && value !== null)
             .map(([key, value]) => {
               // Check if the key is one of the specific date fields
               if (dateFields.includes(key)) {
