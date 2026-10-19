@@ -1,4 +1,5 @@
 export type TransportRequestType = "Normal" | "Urgent";
+export type TransportTripType = "one_way" | "round_trip";
 
 export type TransportRequestStatus =
   | "pending_manager_approval"
@@ -11,6 +12,7 @@ export type TransportRequestStatus =
 export interface TransportRequestInterface {
   object_request: string;
   request_type: "Normal" | "Urgent";
+  trip_type: TransportTripType;
   requester_phone: string;
   requester_email: string;
   id_gp_demandeur?: number | null;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dropdown, Table, Modal, Button, Form } from "react-bootstrap";
+import { Dropdown, Table, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router-dom";
 import { useTranslate } from "../hooks/LanguageProvider";
@@ -10,7 +10,9 @@ import { PropagateLoader } from "react-spinners";
 import ModalEditIntervention from "../components/Reception/EditIntervention";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
+import { loadColumnVisibility, visibleColumnCount } from "../utilities/tableColumns";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const columnStorageKey = "receptionSelectedColumns";
 
 
 interface Intervention {
@@ -67,30 +69,25 @@ export function Reception() {
         Km: true,
         Client: true,
     };
-
-    // Load selected columns from localStorage or use initial state
-    const loadSelectedColumns = () => {
-        const savedColumns = localStorage.getItem("selectedColumns");
-        return savedColumns ? JSON.parse(savedColumns) : initialColumns;
-    };
-
-    const [selectedColumns, setSelectedColumns] = useState(loadSelectedColumns);
+    const [selectedColumns, setSelectedColumns] = useState(() =>
+        loadColumnVisibility(columnStorageKey, initialColumns)
+    );
     useGpVisibleColumns("reception", selectedColumns, setSelectedColumns, listPreferencesReady);
 
-    const handleColumnChange = (column: string) => {
+    const handleColumnChange = (column: keyof typeof initialColumns) => {
         const updatedColumns = {
             ...selectedColumns,
             [column]: !selectedColumns[column],
         };
         setSelectedColumns(updatedColumns);
-        localStorage.setItem("selectedColumns", JSON.stringify(updatedColumns)); // Save selected columns to localStorage
+        localStorage.setItem(columnStorageKey, JSON.stringify(updatedColumns));
     };
 
     const handleSortingColumn = (currentColumn: string) => {
         const newSortOrder = column === currentColumn && sort === "ASC" ? "DESC" : "ASC";
         setSortColumn(currentColumn);
         setSort(newSortOrder);
-        getIntervention();
+        setCurrentPage(1);
     };
 
     const [showNewInterventionModal, setShowNewInterventionModal] = useState(false);
@@ -182,6 +179,7 @@ export function Reception() {
                 break;
         }
         setTypeSearch(selectedValue);
+        setCurrentPage(1);
 
     }
 
@@ -242,6 +240,7 @@ export function Reception() {
                         <input
                             type="text"
                             placeholder={` By ${typeSearch}`}
+                            value={search}
                             onChange={handleAdvancedSearch}
                             className="form-control"
                         />
@@ -255,6 +254,7 @@ export function Reception() {
                                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
                                 style={{ width: "66px" }}
                                 onChange={handleSelectChange}
+                                value={limit}
                             >
                                 <option value="10">10</option>
                                 <option value="20">20</option>
@@ -372,7 +372,7 @@ export function Reception() {
                     <tbody className="light-body">
                         {loading ? (
                             <tr style={{ textAlign: "center" }}>
-                                <td className="text-center" colSpan={10}>
+                                <td className="text-center" colSpan={visibleColumnCount(selectedColumns, 2)}>
                                     <p>
                                         <PropagateLoader
                                             color={"#123abc"}
@@ -492,7 +492,7 @@ export function Reception() {
                             ))
                         ) : (
                             <tr style={{ textAlign: "center" }}>
-                                <td colSpan={selectedColumns.length || 10}>
+                                <td colSpan={visibleColumnCount(selectedColumns, 2)}>
                                     No data available
                                 </td>
                             </tr>
@@ -511,6 +511,7 @@ export function Reception() {
                         nextLabel={"next"}
                         breakLabel={"..."}
                         pageCount={pageCount}
+                        forcePage={pageCount > 0 ? Math.min(currentPage - 1, pageCount - 1) : 0}
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
                         onPageChange={handlePageClick}

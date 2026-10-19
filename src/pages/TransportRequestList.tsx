@@ -32,6 +32,7 @@ import { createMissionOrderApi } from "../services/missionOrder.service";
 
 type ColumnKey =
     | "id_transport_request"
+    | "trip_type"
     | "request_type"
     | "object_request"
     | "departure_location"
@@ -48,6 +49,7 @@ interface ColumnOption {
 
 const ALL_COLUMNS: ColumnOption[] = [
     { key: "id_transport_request", label: "ID" },
+    { key: "trip_type", label: "trip_type" },
     { key: "request_type", label: "Type" },
     { key: "object_request", label: "Object" },
     { key: "departure_location", label: "Departure" },
@@ -60,6 +62,7 @@ const ALL_COLUMNS: ColumnOption[] = [
 
 const DEFAULT_SELECTED_COLUMNS: ColumnKey[] = [
     "id_transport_request",
+    "trip_type",
     "request_type",
     "object_request",
     "departure_location",
@@ -595,6 +598,13 @@ export function TransportRequestList() {
                                                         return (
                                                             <td key={column.key}>
                                                                 {translate(row.request_type)}
+                                                            </td>
+                                                        );
+
+                                                    case "trip_type":
+                                                        return (
+                                                            <td key={column.key}>
+                                                                {translate(row.trip_type || "one_way")}
                                                             </td>
                                                         );
 

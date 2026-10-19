@@ -7,10 +7,12 @@ export type TransportRequestListStatus =
   | "mission_created";
 
 export type TransportRequestListType = "Normal" | "Urgent";
+export type TransportRequestListTripType = "one_way" | "round_trip";
 
 export interface TransportRequestListItem {
   id_transport_request: number;
   request_type: TransportRequestListType;
+  trip_type?: TransportRequestListTripType | null;
   object_request: string;
   requester_phone: string;
   departure_datetime: string | null;

@@ -141,6 +141,7 @@ export function TransportRequestManage() {
   const [request, setRequest] = useState<TransportRequestInterface>({
     object_request: "",
     request_type: "Normal",
+    trip_type: "one_way",
     requester_phone: "",
     requester_email: "",
     id_gp_demandeur: null,
@@ -486,7 +487,9 @@ export function TransportRequestManage() {
 
         <TransportRequestTypeCard
           translate={translate}
+          tripType={request.trip_type}
           requestType={request.request_type}
+          onTripTypeChange={(value) => handleChange("trip_type", value)}
           onChange={(value) => handleChange("request_type", value)}
         />
 
