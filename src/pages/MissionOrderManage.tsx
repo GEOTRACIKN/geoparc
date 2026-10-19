@@ -557,6 +557,7 @@ export function MissionOrderManage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(missionOrderData),
       });
 
@@ -635,6 +636,7 @@ export function MissionOrderManage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         mode: "cors",
         body: JSON.stringify(missionOrderData),
       });
