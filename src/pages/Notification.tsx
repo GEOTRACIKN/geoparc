@@ -1,863 +1,5307 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Dropdown, Table } from "react-bootstrap";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { getNotificationType } from "../config/notificationTypes";
+
+
+
+import React, {
+
+  useCallback,
+
+  useEffect,
+
+  useMemo,
+
+  useRef,
+
+  useState,
+
+} from "react";
+
+
+
+import {
+
+  Button,
+
+  Dropdown,
+
+  Modal,
+
+  Table,
+
+} from "react-bootstrap";
+
+
+
+import { Link } from "react-router-dom";
+
 import ReactPaginate from "react-paginate";
+
+
+
+import { getNotificationRoute } from "../utilities/notificationRoute";
+
+
+
 import { useTranslate } from "../hooks/LanguageProvider";
-import { formatToTimestamp, useClipboard } from "../utilities/functions";
+
+import { useClipboard } from "../utilities/functions";
+
+
+
 import { PropagateLoader } from "react-spinners";
+
 import { useGpPagePreferences } from "../hooks/useGpPagePreferences";
 
+
+
+import {
+
+  deleteNotification,
+
+  getNotificationDetail,
+
+  getNotificationsTotalPage,
+
+  searchNotifications,
+
+  updateNotification,
+
+} from "../services/notificationApi";
+
+
+
+/* ============================================================
+
+   COLONNES
+
+   ============================================================ */
+
+
+
 const notificationDefaultColumns = {
+
   id_notification: true,
-  id_groupe_alarme: true,
+
   name_groupe_alarme: true,
+
   name_alarme: true,
-  type: true,
+
   message: true,
-  severity: true,
-  timestamp: true,
-  infos: true,
+
   attached: true,
-  date_start: true,
-  date_end: true,
+
+  timestamp: true,
+
+  date_modification: true,
+
+  infos: true,
+
 };
+
+
+
+type NotificationColumn =
+
+  keyof typeof notificationDefaultColumns;
+
+
+
+/* ============================================================
+
+   PREFERENCES
+
+   ============================================================ */
+
+
 
 const notificationPreferenceDefaults = {
-  visibleColumns: Object.keys(notificationDefaultColumns),
+
+  visibleColumns: [
+
+    "name_groupe_alarme",
+
+    "name_alarme",
+
+    "message",
+
+    "attached",
+
+    "timestamp",
+
+    "date_modification",
+
+    "infos",
+
+  ],
+
+
+
   pageSize: 10,
+
   searchType: 0,
+
   searchText: "",
-  sortColumn: "0",
-  sortDirection: "ASC",
-  filters: {} as Record<string, unknown>,
+
+  sortColumn: "timestamp",
+
+  sortDirection: "DESC",
+
+
+
+  filters: {
+
+    columnsVersion: 3,
+
+  } as Record<string, unknown>,
+
+
+
   selectedVehicleId: null as number | null,
+
 };
 
+
+
+/* ============================================================
+
+   TYPES
+
+   ============================================================ */
+
+
+
 interface NotificationsProps {
+
   id_notification: number;
-  id_groupe_alarme: number;
-  name_groupe_alarme: string;
-  name_alarme: string;
+
+
+
+  id_alarme?: number | null;
+
+  id_alarm?: number | null;
+
+
+
+  id_groupe_alarme?: number | null;
+
+
+
+  name_groupe_alarme?: string | null;
+
+  name_alarme?: string | null;
+
+
+
   id_user: number;
-  id_item: number;
-  id_type: number;
-  message: string;
-  severity: number;
-  timestamp: string;
-  state: number;
-  attached: number;
-  date_start: string;
-  immatriculation_vehicule: string;
-  training_prenom_conducteur: string;
-  feu_immatriculation_vehicule: string;
-  prenom_conducteur: string;
-  training_nom_conducteur: string;
-  nom_conducteur: string;
-  id_alarm: number;
+
+
+
+  id_item?: number | null;
+
+  id_type?: number | null;
+
+
+
+  type?: string | null;
+
+  message?: string | null;
+
+  severity?: number | null;
+
+
+
+  timestamp?: string | null;
+
+  date_modification?: string | null;
+
+
+
+  state?: number | null;
+
+
+
+  attached?: number | null;
+
+
+
+  item_name?: string | null;
+
+
+
+  immatriculation_vehicule?: string | null;
+
+
+
+  training_prenom_conducteur?: string | null;
+
+  training_nom_conducteur?: string | null;
+
+
+
+  feu_immatriculation_vehicule?: string | null;
+
+
+
+  prenom_conducteur?: string | null;
+
+  nom_conducteur?: string | null;
+
 }
 
+
+
+/* ============================================================
+
+   TRI
+
+   ============================================================ */
+
+
+
+const SORTABLE_COLUMNS = new Set([
+
+  "id_notification",
+
+  "message",
+
+  "timestamp",
+
+]);
+
+
+
+/* ============================================================
+
+   PAGE
+
+   ============================================================ */
+
+
+
 export function Notifications() {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
   const { translate } = useTranslate();
-  let [limit, setLimit] = useState(10);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [list_Alarms, setAlarms] = useState<NotificationsProps[]>([]);
-  const id_user = localStorage.getItem("GeopUserID");
-  const canViewNotificationId = id_user === "1";
-  const [showCreateAlarmModal, setShowCreateAlarmModal] = useState(false);
-  const handleshowCreateAlarmModal = () => setShowCreateAlarmModal(true);
-  const handleCloseCreateAlarmModal = () => setShowCreateAlarmModal(false);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [pageCount, setPageCount] = useState(0);
-  let [total, setTotal] = useState(0);
-  const [colum, setSortColum] = useState("0");
-  const [sort, setSort] = useState("ASC");
-  const [search, setSearch] = useState("");
-  const [type, setType] = useState(0);
-  const [typeSearch, setTypeSearch] = useState("Notification ID");
-  const notificationSearchOptions = [
-    { type: 0, label: translate("Notification ID") },
-    { type: 1, label: translate("Groupe") },
-    { type: 2, label: translate("Alertes") },
-    { type: 3, label: translate("Détails") },
-    { type: 4, label: translate("Attaché à") },
-    { type: 5, label: translate("Date de début") },
-    { type: 6, label: translate("Date de fin") },
-  ];
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const handleSubmit = () => {
-    // Votre logique de soumission ici
-  };
 
-      const { copyToClipboard, copiedId } = useClipboard(translate("Matriculation Copied"));
 
-  const getNotifications = async (
-    limitValue: number,
-    currentPage: number,
-    search: string,
-    type: number,
-    colum: string,
-    sort: string
-  ) => {
-    try {
-      setLoading(true);
 
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum,
-        sort,
-      });
+  const id_user =
 
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(
-        `${backendUrl}/api/geop/notification/totalpage`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: bodyData,
-          mode: "cors",
-        }
-      );
+    localStorage.getItem("GeopUserID");
 
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      setTotal(total);
 
-      // Récupération des données d'alarmes
-      const alarmsResponse = await fetch(
-        `${backendUrl}/api/geop/notification/search`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: bodyData,
-          mode: "cors",
-        }
-      );
 
-      const data = await alarmsResponse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue);
-      setAlarms(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const canViewNotificationId =
 
-  const refreshAlarms = () => {
-    getNotifications(limit, currentPage, search, type, colum, sort);
-  };
+    id_user === "1";
 
-  const getNotificationsLimitValue = async (
-    limitValue: number,
-    currentPage: number,
-    search: string,
-    type: number,
-    colum: string,
-    sort: string
-  ) => {
-    try {
-      setLoading(true);
 
-      // Préparation des données à envoyer
-      const bodyData = JSON.stringify({
-        limitValue,
-        currentPage,
-        search,
-        type,
-        id_user,
-        colum,
-        sort,
-      });
 
-      // Récupération du nombre total de pages
-      const totalPagesResponse = await fetch(
-        `${backendUrl}/api/alarm/totalpage`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: bodyData,
-          mode: "cors",
-        }
-      );
+  /* ============================================================
 
-      const totalPagesJson = await totalPagesResponse.json();
-      const total = totalPagesJson[0]["count"];
-      setTotal(total);
+     PAGINATION
 
-      // Récupération des données d'alarmes
-      const alarmsResponse = await fetch(`${backendUrl}/api/alarm/search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: bodyData,
-        mode: "cors",
-      });
+     ============================================================ */
 
-      const data = await alarmsResponse.json();
-      setPageCount(Math.ceil(total / limitValue));
-      setLimit(limitValue);
 
-      return data;
-    } catch (error) {
-      console.error(error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handlePageClick = (data: any) => {
-    setCurrentPage(data.selected + 1);
-    window.scrollTo(0, 0);
-  };
+  const [limit, setLimit] =
 
-  const handleSelectChange = (event: any) => {
-    const newValue = event.target.value;
-    setCurrentPage(1);
-    setLimit(parseInt(newValue));
-    window.scrollTo(0, 0);
-  };
+    useState(10);
 
-  const [selectedColumns, setSelectedColumns] = useState({
-    ...notificationDefaultColumns,
-    id_notification: canViewNotificationId,
-  });
+
+
+  const [
+
+    currentPage,
+
+    setCurrentPage,
+
+  ] = useState<number>(1);
+
+
+
+  const [
+
+    pageCount,
+
+    setPageCount,
+
+  ] = useState(0);
+
+
+
+  const [
+
+    total,
+
+    setTotal,
+
+  ] = useState(0);
+
+
+
+  /* ============================================================
+
+     DONNEES
+
+     ============================================================ */
+
+
+
+  const [
+
+    list_Alarms,
+
+    setAlarms,
+
+  ] = useState<NotificationsProps[]>([]);
+
+
+
+  const [
+
+    loading,
+
+    setLoading,
+
+  ] = useState(true);
+
+
+
+  /* ============================================================
+
+     RECHERCHE / TRI
+
+     ============================================================ */
+
+
+
+  const [
+
+    search,
+
+    setSearch,
+
+  ] = useState("");
+
+
+
+  const [
+
+    type,
+
+    setType,
+
+  ] = useState(0);
+
+
+
+  const [
+
+    colum,
+
+    setSortColum,
+
+  ] = useState("timestamp");
+
+
+
+  const [
+
+    sort,
+
+    setSort,
+
+  ] = useState("DESC");
+
+
+
+  /* ============================================================
+
+     ERREUR
+
+     ============================================================ */
+
+
+
+  const [
+
+    apiError,
+
+    setApiError,
+
+  ] = useState<string | null>(
+
+    null
+
+  );
+
+
+
+  /* ============================================================
+
+     DETAILS / ACTIONS
+
+     ============================================================ */
+
+
+
+  const [
+
+    selectedNotification,
+
+    setSelectedNotification,
+
+  ] = useState<NotificationsProps | null>(
+
+    null
+
+  );
+
+
+
+  const [
+
+    detailLoading,
+
+    setDetailLoading,
+
+  ] = useState(false);
+
+
+
+  const [
+
+    actionLoadingId,
+
+    setActionLoadingId,
+
+  ] = useState<number | null>(
+
+    null
+
+  );
+
+
+
+  /* ============================================================
+
+     COPIER
+
+     ============================================================ */
+
+
+
   const {
-    preferences: notificationPreferences,
-    setPreferences: saveNotificationPreferences,
-    loaded: notificationPreferencesLoaded,
-  } = useGpPagePreferences("notifications", notificationPreferenceDefaults);
-  const notificationPreferencesHydratedRef = useRef(false);
-  const [notificationPreferencesReady, setNotificationPreferencesReady] =
-    useState(false);
+
+    copyToClipboard,
+
+    copiedId,
+
+  } = useClipboard(
+
+    translate(
+
+      "Matriculation Copied"
+
+    )
+
+  );
+
+
+
+  /* ============================================================
+
+     RECHERCHE
+
+     ============================================================ */
+
+
+
+  const notificationSearchOptions =
+
+    useMemo(
+
+      () => [
+
+        {
+
+          type: 0,
+
+          label: translate(
+
+            "Notification ID"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 1,
+
+          label: translate(
+
+            "Groupe"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 2,
+
+          label: translate(
+
+            "Alertes"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 3,
+
+          label: translate(
+
+            "Détails"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 4,
+
+          label: translate(
+
+            "Attaché à"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 5,
+
+          label: translate(
+
+            "Date de début"
+
+          ),
+
+        },
+
+
+
+        {
+
+          type: 6,
+
+          label: translate(
+
+            "Date de fin"
+
+          ),
+
+        },
+
+      ],
+
+      [translate]
+
+    );
+
+
+
+  const typeSearch =
+
+    notificationSearchOptions.find(
+
+      (option) =>
+
+        option.type === type
+
+    )?.label ||
+
+    translate(
+
+      "Notification ID"
+
+    );
+
+
+
+  /* ============================================================
+
+     COLONNES
+
+     ============================================================ */
+
+
+
+  const [
+
+    selectedColumns,
+
+    setSelectedColumns,
+
+  ] = useState({
+
+    ...notificationDefaultColumns,
+
+
+
+    id_notification:
+
+      canViewNotificationId,
+
+  });
+
+
+
+  /* ============================================================
+
+     PREFERENCES
+
+     ============================================================ */
+
+
+
+  const {
+
+    preferences:
+
+      notificationPreferences,
+
+
+
+    setPreferences:
+
+      saveNotificationPreferences,
+
+
+
+    resetPreferences:
+
+      resetNotificationPreferences,
+
+
+
+    loaded:
+
+      notificationPreferencesLoaded,
+
+
+
+    saving:
+
+      notificationPreferencesSaving,
+
+  } = useGpPagePreferences(
+
+    "notifications",
+
+    notificationPreferenceDefaults
+
+  );
+
+
+
+  const
+
+    notificationPreferencesHydratedRef =
+
+      useRef(false);
+
+
+
+  const [
+
+    notificationPreferencesReady,
+
+    setNotificationPreferencesReady,
+
+  ] = useState(false);
+
+
+
+  /* ============================================================
+
+     CHARGER PREFERENCES
+
+     ============================================================ */
+
+
 
   useEffect(() => {
-    if (
-      !notificationPreferencesLoaded ||
-      notificationPreferencesHydratedRef.current
-    ) return;
-    notificationPreferencesHydratedRef.current = true;
 
-    const visibleColumns = new Set(notificationPreferences.visibleColumns);
-    setSelectedColumns(
-      Object.keys(notificationDefaultColumns).reduce(
-        (result, key) => ({
-          ...result,
-          [key]:
-            key === "id_notification"
-              ? canViewNotificationId && visibleColumns.has(key)
-              : visibleColumns.has(key),
-        }),
-        {} as typeof notificationDefaultColumns
+    if (
+
+      !notificationPreferencesLoaded ||
+
+      notificationPreferencesHydratedRef
+
+        .current
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    notificationPreferencesHydratedRef
+
+      .current = true;
+
+
+
+    setSelectedColumns({
+
+      ...notificationDefaultColumns,
+
+
+
+      id_notification:
+
+        canViewNotificationId,
+
+    });
+
+
+
+    const savedPageSize =
+
+      Number(
+
+        notificationPreferences
+
+          .pageSize
+
+      );
+
+
+
+    setLimit(
+
+      savedPageSize > 0
+
+        ? savedPageSize
+
+        : 10
+
+    );
+
+
+
+    const savedSearchType =
+
+      Number(
+
+        notificationPreferences
+
+          .searchType
+
+      );
+
+
+
+    setType(
+
+      notificationSearchOptions.some(
+
+        (option) =>
+
+          option.type ===
+
+          savedSearchType
+
       )
+
+        ? savedSearchType
+
+        : 0
+
     );
-    setLimit(notificationPreferences.pageSize);
-    setType(notificationPreferences.searchType);
-    setTypeSearch(
-      notificationSearchOptions.find(
-        (option) => option.type === notificationPreferences.searchType
-      )?.label || translate("Notification ID")
+
+
+
+    setSearch(
+
+      String(
+
+        notificationPreferences
+
+          .searchText ||
+
+          ""
+
+      )
+
     );
-    setSearch(notificationPreferences.searchText);
-    setSortColum(notificationPreferences.sortColumn);
-    setSort(notificationPreferences.sortDirection);
-    setNotificationPreferencesReady(true);
+
+
+
+    const savedSortColumn =
+
+      String(
+
+        notificationPreferences
+
+          .sortColumn ||
+
+          "timestamp"
+
+      );
+
+
+
+    setSortColum(
+
+      SORTABLE_COLUMNS.has(
+
+        savedSortColumn
+
+      )
+
+        ? savedSortColumn
+
+        : "timestamp"
+
+    );
+
+
+
+    setSort(
+
+      String(
+
+        notificationPreferences
+
+          .sortDirection
+
+      ).toUpperCase() ===
+
+        "ASC"
+
+        ? "ASC"
+
+        : "DESC"
+
+    );
+
+
+
+    setNotificationPreferencesReady(
+
+      true
+
+    );
+
   }, [
+
     canViewNotificationId,
+
     notificationPreferences,
+
     notificationPreferencesLoaded,
+
+    notificationSearchOptions,
+
   ]);
 
+
+
+  /* ============================================================
+
+     SAUVEGARDER PREFERENCES
+
+     ============================================================ */
+
+
+
   useEffect(() => {
-    if (!notificationPreferencesReady) return;
+
+    if (
+
+      !notificationPreferencesReady
+
+    ) {
+
+      return;
+
+    }
+
+
 
     void saveNotificationPreferences({
-      visibleColumns: Object.entries(selectedColumns)
-        .filter(
-          ([key, visible]) =>
-            visible &&
-            (key !== "id_notification" || canViewNotificationId)
-        )
-        .map(([key]) => key),
-      pageSize: Number(limit),
-      searchType: type,
-      searchText: search,
-      sortColumn: colum,
-      sortDirection: sort,
+
+      visibleColumns: [
+
+        "name_groupe_alarme",
+
+        "name_alarme",
+
+        "message",
+
+        "attached",
+
+        "timestamp",
+
+        "date_modification",
+
+        "infos",
+
+
+
+        ...(canViewNotificationId
+
+          ? [
+
+              "id_notification",
+
+            ]
+
+          : []),
+
+      ],
+
+
+
+      pageSize:
+
+        Number(limit),
+
+
+
+      searchType:
+
+        type,
+
+
+
+      searchText:
+
+        search,
+
+
+
+      sortColumn:
+
+        colum,
+
+
+
+      sortDirection:
+
+        sort,
+
+
+
+      filters: {
+
+        columnsVersion: 3,
+
+      },
+
     });
+
   }, [
-    colum,
+
     canViewNotificationId,
+
+    colum,
+
     limit,
+
     notificationPreferencesReady,
+
     saveNotificationPreferences,
+
     search,
-    selectedColumns,
+
     sort,
+
     type,
+
   ]);
+
+
+
+  /* ============================================================
+
+     API
+
+     ============================================================ */
+
+
+
+  const getNotifications =
+
+    useCallback(
+
+      async (
+
+        limitValue: number,
+
+        currentPageValue: number,
+
+        searchValue: string,
+
+        typeValue: number,
+
+        columnValue: string,
+
+        sortValue: string
+
+      ) => {
+
+        if (!id_user) {
+
+          setApiError(
+
+            translate(
+
+              "User ID is missing"
+
+            )
+
+          );
+
+
+
+          setLoading(false);
+
+
+
+          return;
+
+        }
+
+
+
+        try {
+
+          setLoading(true);
+
+
+
+          setApiError(null);
+
+
+
+          const [
+
+            totalPagesJson,
+
+            data,
+
+          ] =
+
+            await Promise.all([
+
+              getNotificationsTotalPage({
+
+                id_user,
+
+
+
+                search:
+
+                  searchValue,
+
+
+
+                type:
+
+                  typeValue,
+
+              }),
+
+
+
+              searchNotifications({
+
+                limitValue,
+
+
+
+                currentPage:
+
+                  currentPageValue,
+
+
+
+                search:
+
+                  searchValue,
+
+
+
+                type:
+
+                  typeValue,
+
+
+
+                id_user,
+
+
+
+                column:
+
+                  columnValue,
+
+
+
+                sort:
+
+                  sortValue,
+
+              }),
+
+            ]);
+
+
+
+          const totalValue =
+
+            Number(
+
+              totalPagesJson?.[0]
+
+                ?.count ?? 0
+
+            );
+
+
+
+          setTotal(
+
+            totalValue
+
+          );
+
+
+
+          setPageCount(
+
+            Math.ceil(
+
+              totalValue /
+
+                limitValue
+
+            )
+
+          );
+
+
+
+          setAlarms(
+
+            Array.isArray(
+
+              data
+
+            )
+
+              ? data
+
+              : []
+
+          );
+
+        } catch (error) {
+
+          console.error(
+
+            "Error loading notifications:",
+
+            error
+
+          );
+
+
+
+          setAlarms([]);
+
+
+
+          setTotal(0);
+
+
+
+          setPageCount(0);
+
+
+
+          setApiError(
+
+            error instanceof Error
+
+              ? error.message
+
+              : translate(
+
+                  "Unable to load notifications"
+
+                )
+
+          );
+
+        } finally {
+
+          setLoading(false);
+
+        }
+
+      },
+
+      [
+
+        id_user,
+
+        translate,
+
+      ]
+
+    );
+
+
+
+  /* ============================================================
+
+     RECHARGEMENT
+
+     ============================================================ */
+
+
 
   useEffect(() => {
-    if (!notificationPreferencesReady) return;
 
-    void getNotifications(limit, currentPage, search, type, colum, sort);
+    if (
+
+      !notificationPreferencesReady
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    void getNotifications(
+
+      limit,
+
+      currentPage,
+
+      search,
+
+      type,
+
+      colum,
+
+      sort
+
+    );
+
   }, [
+
     colum,
+
     currentPage,
-    id_user,
+
+    getNotifications,
+
     limit,
+
     notificationPreferencesReady,
+
     search,
+
     sort,
+
     type,
+
   ]);
 
-  const handleColumnChange = (column: string) => {
-    if (column === "id_notification" && !canViewNotificationId) return;
 
-    setSelectedColumns((prevState: any) => ({
-      ...prevState,
-      [column]: !prevState[column],
-    }));
-  };
 
-  const handleTypeSearch = (selectedType: number, selectedLabel: string) => {
-    setType(selectedType);
-    setTypeSearch(selectedLabel);
-  };
+  /* ============================================================
 
-  const handleAdvancedSearch = (event: any) => {
-    const newValue = event.target.value;
-    setSearch(newValue);
-    setCurrentPage(1);
-  };
+     PAGINATION
 
-  const handleSortingColum = (currentColumn: string) => {
-    setSortColum(currentColumn);
-    setSort((currentSort) => currentSort === "ASC" ? "DESC" : "ASC");
-    setCurrentPage(1);
-  };
+     ============================================================ */
 
-  const generateDescription = (alarme: NotificationsProps) => {
-    const highlight = (value: any, copyKey?: string) => {
-      const isCopied = copiedId === copyKey;
-      const color = isCopied ? "#28a745" : "#3b82f6";
-      return (
-        <span
-          onClick={() => {
-            if (value && copyKey) {
-              copyToClipboard(value, copyKey);
-            }
-          }}
-          title={copyKey ? translate("Click to copy") : ""}
-          style={{
-            color,
-            cursor: copyKey ? "pointer" : "default",
-            position: "relative",
-            fontWeight: 600,
-          }}
-        >
-          {value}
-          {isCopied && (
-            <span
-              style={{
-                position: 'absolute',
-                top: '-20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: '#28a745',
-                color: '#fff',
-                padding: '2px 5px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                zIndex: 10,
-              }}
-            >
-              {translate("Copied")}
-            </span>
-          )}
-        </span>
-      );
-    };
-  
-    switch (alarme.id_type) {
-      case 1: // Driving license
-        return (
-          <>
-            {translate("The driving license of")}{" "}
-            {highlight(alarme.nom_conducteur, `nom-${alarme.id_item}`)}{" "}
-            {highlight(alarme.prenom_conducteur, `prenom-${alarme.id_item}`)}{" "}
-            {translate("will expire on")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 2: // Vehicle insurance
-        return (
-          <>
-            {translate("The insurance for")}{" "}
-            {highlight(alarme.id_item)}{" "}
-            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
-            {translate("will expire on")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 3: // Maintenance
-        return (
-          <>
-            {translate("The next maintenance for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
-            {translate("is due by")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 4: // Training
-        return (
-          <>
-            {translate("The training certificate of")}{" "}
-            {highlight(alarme.training_nom_conducteur, `train-nom-${alarme.id_item}`)}{" "}
-            {highlight(alarme.training_prenom_conducteur, `train-prenom-${alarme.id_item}`)}{" "}
-            {translate("will expire on")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 5: // Fire extinguisher verification
-        return (
-          <>
-            {translate("The fire extinguisher verification for vehicle")}{" "}
-            {highlight(alarme.feu_immatriculation_vehicule, `feu-${alarme.id_item}`)}{" "}
-            {translate("is due by")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 6: // Technical control
-        return (
-          <>
-            {translate("The technical inspection for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
-            {translate("must be done before")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 7: // Sticker
-        return (
-          <>
-            {translate("The vehicle sticker verification for")}{" "}
-            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
-            {translate("should be done by")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      case 8: // Draining
-        return (
-          <>
-            {translate("The draining verification for vehicle")}{" "}
-            {highlight(alarme.immatriculation_vehicule, `immat-${alarme.id_item}`)}{" "}
-            {translate("is scheduled for")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
-  
-      default:
-        return (
-          <>
-            {translate("The deadline for")}{" "}
-            {highlight(alarme.id_item)} (
-            {highlight(alarme.immatriculation_vehicule, `default-${alarme.id_item}`)}){" "}
-            {translate("is set for")}{" "}
-            {highlight(alarme.timestamp.split("T")[0])}
-          </>
-        );
+
+
+  const handlePageClick = (
+
+    data: {
+
+      selected: number;
+
     }
+
+  ) => {
+
+    setCurrentPage(
+
+      data.selected + 1
+
+    );
+
+
+
+    window.scrollTo(
+
+      0,
+
+      0
+
+    );
+
   };
-  
-  return (
-    <>
-      <div className="row">
-        <div className="col-md-6 col-sm-12">
-          <h4>
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                className="feather feather-bell"
-              >
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-            </span>
-            {translate("Notifications")} ({total})
-          </h4>
-        </div>
-        <div className="col-md-6 col-sm-12 text-right"></div>
-      </div>
-      <div className="row">
-        <div
-          className="col-md-4"
-          style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
-        >
-          <div className="input-group">
-            <Dropdown>
-              <Dropdown.Toggle
-                variant="link"
-                id="dropdown-basic"
-                className="search-type-toggle"
-                aria-label={`${translate("Search by")} ${typeSearch}`}
-                title={typeSearch}
-              >
-                <i className="fas fa-chevron-down search-type-chevron" />
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {notificationSearchOptions.map((option) => (
-                  <Dropdown.Item
-                    key={option.type}
-                    active={type === option.type}
-                    onClick={() =>
-                      handleTypeSearch(option.type, option.label)
+
+
+
+  /* ============================================================
+
+     LIMITE
+
+     ============================================================ */
+
+
+
+  const handleSelectChange = (
+
+    event:
+
+      React.ChangeEvent<
+
+        HTMLSelectElement
+
+      >
+
+  ) => {
+
+    setCurrentPage(1);
+
+
+
+    setLimit(
+
+      Number(
+
+        event.target.value
+
+      )
+
+    );
+
+
+
+    window.scrollTo(
+
+      0,
+
+      0
+
+    );
+
+  };
+
+
+
+  /* ============================================================
+
+     COLONNES
+
+     ============================================================ */
+
+
+
+  const handleColumnChange = (
+
+    column:
+
+      NotificationColumn
+
+  ) => {
+
+    if (
+
+      column ===
+
+        "id_notification" &&
+
+      !canViewNotificationId
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    setSelectedColumns(
+
+      (current) => ({
+
+        ...current,
+
+
+
+        [column]:
+
+          !current[column],
+
+      })
+
+    );
+
+  };
+
+
+
+  /* ============================================================
+
+     TYPE RECHERCHE
+
+     ============================================================ */
+
+
+
+  const handleTypeSearch = (
+
+    selectedType:
+
+      number
+
+  ) => {
+
+    setType(
+
+      selectedType
+
+    );
+
+
+
+    setCurrentPage(1);
+
+  };
+
+
+
+  /* ============================================================
+
+     TEXTE RECHERCHE
+
+     ============================================================ */
+
+
+
+  const handleAdvancedSearch = (
+
+    event:
+
+      React.ChangeEvent<
+
+        HTMLInputElement
+
+      >
+
+  ) => {
+
+    setSearch(
+
+      event.target.value
+
+    );
+
+
+
+    setCurrentPage(1);
+
+  };
+
+
+
+  /* ============================================================
+
+     TRI
+
+     ============================================================ */
+
+
+
+  const handleSortingColum = (
+
+    currentColumn:
+
+      string
+
+  ) => {
+
+    if (
+
+      !SORTABLE_COLUMNS.has(
+
+        currentColumn
+
+      )
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    setCurrentPage(1);
+
+
+
+    if (
+
+      colum ===
+
+      currentColumn
+
+    ) {
+
+      setSort(
+
+        (
+
+          currentSort
+
+        ) =>
+
+          currentSort ===
+
+          "ASC"
+
+            ? "DESC"
+
+            : "ASC"
+
+      );
+
+
+
+      return;
+
+    }
+
+
+
+    setSortColum(
+
+      currentColumn
+
+    );
+
+
+
+    setSort(
+
+      "ASC"
+
+    );
+
+  };
+
+
+
+  /* ============================================================
+
+     RESET
+
+     ============================================================ */
+
+
+
+  const handleResetPreferences =
+
+    async () => {
+
+      try {
+
+        await resetNotificationPreferences();
+
+
+
+        setCurrentPage(1);
+
+
+
+        setLimit(
+
+          notificationPreferenceDefaults
+
+            .pageSize
+
+        );
+
+
+
+        setType(
+
+          notificationPreferenceDefaults
+
+            .searchType
+
+        );
+
+
+
+        setSearch(
+
+          notificationPreferenceDefaults
+
+            .searchText
+
+        );
+
+
+
+        setSortColum(
+
+          notificationPreferenceDefaults
+
+            .sortColumn
+
+        );
+
+
+
+        setSort(
+
+          notificationPreferenceDefaults
+
+            .sortDirection
+
+        );
+
+
+
+        setSelectedColumns({
+
+          ...notificationDefaultColumns,
+
+
+
+          id_notification:
+
+            canViewNotificationId,
+
+        });
+
+
+
+        window.scrollTo(
+
+          0,
+
+          0
+
+        );
+
+      } catch (error) {
+
+        console.error(
+
+          "Error resetting notification preferences:",
+
+          error
+
+        );
+
+      }
+
+    };
+
+
+
+  /* ============================================================
+
+     MARQUER LU
+
+     ============================================================ */
+
+
+
+  const handleMarkAsRead =
+
+    async (
+
+      alarme:
+
+        NotificationsProps
+
+    ) => {
+
+      if (
+
+        !id_user ||
+
+        alarme.state === 0
+
+      ) {
+
+        return;
+
+      }
+
+
+
+      try {
+
+        setActionLoadingId(
+
+          alarme.id_notification
+
+        );
+
+
+
+        setApiError(null);
+
+
+
+        await updateNotification({
+
+          id_notification:
+
+            alarme.id_notification,
+
+
+
+          id_user,
+
+        });
+
+
+
+        setAlarms(
+
+          (current) =>
+
+            current.map(
+
+              (item) =>
+
+                item.id_notification ===
+
+                alarme.id_notification
+
+                  ? {
+
+                      ...item,
+
+                      state: 0,
+
                     }
-                  >
-                    {option.label}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-            <input
-              type="text"
-              placeholder={` By ${typeSearch}`}
-              onChange={handleAdvancedSearch}
-              value={search}
-              className="form-control"
-            />
-          </div>
-        </div>
-        <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
-            <label style={{ marginBottom: "0" }}>
-              {translate("Show")}
-              <select
-                name="DataTables_Table_0_length"
-                aria-controls="DataTables_Table_0"
-                className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: "66px" }}
-                onChange={handleSelectChange}
-                value={limit}
-              >
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="500">500</option>
-              </select>
-            </label>
-          </div>
-          <Dropdown>
-            <Dropdown.Toggle
-              variant=""
-              id="dropdown-basic"
-              title="Colonnes dʼaffichage"
+
+                  : item
+
+            )
+
+        );
+
+
+
+        setSelectedNotification(
+
+          (current) =>
+
+            current &&
+
+            current.id_notification ===
+
+              alarme.id_notification
+
+              ? {
+
+                  ...current,
+
+                  state: 0,
+
+                }
+
+              : current
+
+        );
+
+      } catch (error) {
+
+        console.error(
+
+          "Error updating notification:",
+
+          error
+
+        );
+
+
+
+        setApiError(
+
+          error instanceof Error
+
+            ? error.message
+
+            : translate(
+
+                "Unable to update notification"
+
+              )
+
+        );
+
+      } finally {
+
+        setActionLoadingId(
+
+          null
+
+        );
+
+      }
+
+    };
+
+
+
+  /* ============================================================
+
+     DETAIL
+
+     ============================================================ */
+
+
+
+  const handleViewNotification =
+
+    async (
+
+      alarme:
+
+        NotificationsProps
+
+    ) => {
+
+      if (!id_user) {
+
+        return;
+
+      }
+
+
+
+      try {
+
+        setDetailLoading(
+
+          true
+
+        );
+
+
+
+        setApiError(null);
+
+
+
+        const result =
+
+          await getNotificationDetail(
+
+            alarme.id_notification,
+
+            id_user
+
+          );
+
+
+
+        const notification =
+
+          result?.data ||
+
+          alarme;
+
+
+
+        setSelectedNotification(
+
+          notification
+
+        );
+
+
+
+        if (
+
+          alarme.state === 1
+
+        ) {
+
+          await handleMarkAsRead(
+
+            alarme
+
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+
+          "Error loading notification detail:",
+
+          error
+
+        );
+
+
+
+        setSelectedNotification(
+
+          alarme
+
+        );
+
+
+
+        setApiError(
+
+          error instanceof Error
+
+            ? error.message
+
+            : translate(
+
+                "Unable to load notification detail"
+
+              )
+
+        );
+
+      } finally {
+
+        setDetailLoading(
+
+          false
+
+        );
+
+      }
+
+    };
+
+
+
+  /* ============================================================
+
+     SUPPRESSION
+
+     ============================================================ */
+
+
+
+  const handleDeleteNotification =
+
+    async (
+
+      alarme:
+
+        NotificationsProps
+
+    ) => {
+
+      if (!id_user) {
+
+        return;
+
+      }
+
+
+
+      const confirmed =
+
+        window.confirm(
+
+          translate(
+
+            "Are you sure you want to delete this notification?"
+
+          )
+
+        );
+
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+
+      try {
+
+        setActionLoadingId(
+
+          alarme.id_notification
+
+        );
+
+
+
+        setApiError(null);
+
+
+
+        await deleteNotification(
+
+          alarme.id_notification,
+
+          id_user
+
+        );
+
+
+
+        const nextPage =
+
+          list_Alarms.length ===
+
+            1 &&
+
+          currentPage > 1
+
+            ? currentPage -
+
+              1
+
+            : currentPage;
+
+
+
+        if (
+
+          nextPage !==
+
+          currentPage
+
+        ) {
+
+          setCurrentPage(
+
+            nextPage
+
+          );
+
+        } else {
+
+          await getNotifications(
+
+            limit,
+
+            currentPage,
+
+            search,
+
+            type,
+
+            colum,
+
+            sort
+
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+
+          "Error deleting notification:",
+
+          error
+
+        );
+
+
+
+        setApiError(
+
+          error instanceof Error
+
+            ? error.message
+
+            : translate(
+
+                "Unable to delete notification"
+
+              )
+
+        );
+
+      } finally {
+
+        setActionLoadingId(
+
+          null
+
+        );
+
+      }
+
+    };
+
+
+
+  /* ============================================================
+
+     DATE
+
+     ============================================================ */
+
+
+
+  const formatNotificationDate = (
+
+    value?:
+
+      string | null
+
+  ) => {
+
+    if (!value) {
+
+      return "-";
+
+    }
+
+
+
+    const date =
+
+      new Date(value);
+
+
+
+    if (
+
+      Number.isNaN(
+
+        date.getTime()
+
+      )
+
+    ) {
+
+      return value;
+
+    }
+
+
+
+    return date.toLocaleString(
+
+      "fr-FR",
+
+      {
+
+        timeZone:
+
+          "Africa/Algiers",
+
+
+
+        day:
+
+          "2-digit",
+
+
+
+        month:
+
+          "2-digit",
+
+
+
+        year:
+
+          "numeric",
+
+
+
+        hour:
+
+          "2-digit",
+
+
+
+        minute:
+
+          "2-digit",
+
+
+
+        second:
+
+          "2-digit",
+
+
+
+        hour12:
+
+          false,
+
+      }
+
+    );
+
+  };
+
+
+
+  /* ============================================================
+
+     ATTACHE A
+
+     ============================================================ */
+
+
+
+  const getAttachedValue = (
+
+    alarme:
+
+      NotificationsProps
+
+  ) => {
+
+    if (
+
+      alarme.item_name
+
+    ) {
+
+      return alarme
+
+        .item_name;
+
+    }
+
+
+
+    if (
+
+      alarme
+
+        .immatriculation_vehicule
+
+    ) {
+
+      return alarme
+
+        .immatriculation_vehicule;
+
+    }
+
+
+
+    if (
+
+      alarme
+
+        .feu_immatriculation_vehicule
+
+    ) {
+
+      return alarme
+
+        .feu_immatriculation_vehicule;
+
+    }
+
+
+
+    const driverName = [
+
+      alarme
+
+        .prenom_conducteur,
+
+
+
+      alarme
+
+        .nom_conducteur,
+
+    ]
+
+      .filter(Boolean)
+
+      .join(" ");
+
+
+
+    if (
+
+      driverName
+
+    ) {
+
+      return driverName;
+
+    }
+
+
+
+    const trainingDriverName =
+
+      [
+
+        alarme
+
+          .training_prenom_conducteur,
+
+
+
+        alarme
+
+          .training_nom_conducteur,
+
+      ]
+
+        .filter(Boolean)
+
+        .join(" ");
+
+
+
+    if (
+
+      trainingDriverName
+
+    ) {
+
+      return trainingDriverName;
+
+    }
+
+
+
+    if (
+
+      alarme.id_item !==
+
+        null &&
+
+      alarme.id_item !==
+
+        undefined
+
+    ) {
+
+      return String(
+
+        alarme.id_item
+
+      );
+
+    }
+
+
+
+    return "-";
+
+  };
+
+
+
+  /* ============================================================
+
+     DESCRIPTION
+
+     ============================================================ */
+
+
+
+  const generateDescription = (
+
+    alarme:
+
+      NotificationsProps
+
+  ) => {
+
+    const highlight = (
+
+      value:
+
+        unknown,
+
+
+
+      copyKey?:
+
+        string
+
+    ) => {
+
+      const displayValue =
+
+        value === null ||
+
+        value ===
+
+          undefined ||
+
+        value === ""
+
+          ? "-"
+
+          : String(
+
+              value
+
+            );
+
+
+
+      const isCopied =
+
+        copiedId ===
+
+        copyKey;
+
+
+
+      const color =
+
+        isCopied
+
+          ? "#28a745"
+
+          : "#3b82f6";
+
+
+
+      return (
+
+        <span
+
+          onClick={() => {
+
+            if (
+
+              displayValue !==
+
+                "-" &&
+
+              copyKey
+
+            ) {
+
+              copyToClipboard(
+
+                displayValue,
+
+                copyKey
+
+              );
+
+            }
+
+          }}
+
+          title={
+
+            copyKey
+
+              ? translate(
+
+                  "Click to copy"
+
+                )
+
+              : ""
+
+          }
+
+          style={{
+
+            color,
+
+
+
+            cursor:
+
+              copyKey
+
+                ? "pointer"
+
+                : "default",
+
+
+
+            position:
+
+              "relative",
+
+
+
+            fontWeight:
+
+              600,
+
+          }}
+
+        >
+
+          {displayValue}
+
+
+
+          {isCopied && (
+
+            <span
+
+              style={{
+
+                position:
+
+                  "absolute",
+
+
+
+                top:
+
+                  "-20px",
+
+
+
+                left:
+
+                  "50%",
+
+
+
+                transform:
+
+                  "translateX(-50%)",
+
+
+
+                backgroundColor:
+
+                  "#28a745",
+
+
+
+                color:
+
+                  "#fff",
+
+
+
+                padding:
+
+                  "2px 5px",
+
+
+
+                borderRadius:
+
+                  "4px",
+
+
+
+                fontSize:
+
+                  "12px",
+
+
+
+                zIndex:
+
+                  10,
+
+              }}
+
             >
-              <i className="las la-eye"></i>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {canViewNotificationId && (
-                <Dropdown.Item
-                  as="button"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={selectedColumns.id_notification}
-                    onChange={() => handleColumnChange("id_notification")}
-                  />
-                  <span style={{ marginLeft: "10px" }}>
-                    {translate("Notification ID")}
-                  </span>
-                </Dropdown.Item>
-              )}
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.name_groupe_alarme}
-                  onChange={() => handleColumnChange("name_groupe_alarme")}
-                />
-                <span style={{ marginLeft: "10px" }}>{translate("Group")}</span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.name_alarme}
-                  onChange={() => handleColumnChange("name_alarme")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Alarms")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.message}
-                  onChange={() => handleColumnChange("message")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Détails")}
-                </span>
-              </Dropdown.Item>
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.attached}
-                  onChange={() => handleColumnChange("attached")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Attached to")}
-                </span>
-              </Dropdown.Item>
 
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.date_start}
-                  onChange={() => handleColumnChange("date_start")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Creation date")}
-                </span>
-              </Dropdown.Item>
+              {translate(
 
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.date_end}
-                  onChange={() => handleColumnChange("date_end")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Date end")}
-                </span>
-              </Dropdown.Item>
+                "Copied"
 
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              ></Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-      </div>
-      <div className="row m-1 table-responsive">
-        <Table className="dataTable">
-          <thead className="bg-white text-uppercase">
-            <tr className="ligth ligth-data">
-              <th>
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
-                  <label className="form-check-label"></label>
-                </div>
-              </th>
-              {selectedColumns.id_notification && canViewNotificationId && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("id_notification")}
-                >
-                  {translate("Notification ID")}
-                </th>
-              )}
-              {/* {selectedColumns.name_groupe_alarme && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("name_groupe_alarme")}
-                >
-                  {translate("Group")}
-                </th>
-              )} 
-              {selectedColumns.name_alarme && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("name_alarme")}
-                >
-                  {translate("Alarmes")}
-                </th>
-              )} */}
-              {selectedColumns.message && (
-                <th
-                  style={{ minWidth: "250px" }}
-                  className="sorting"
-                  onClick={() => handleSortingColum("message")}
-                >
-                  {translate("Détails")}
-                </th>
-              )}
-              {/* {selectedColumns.attached && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("attached")}
-                >
-                  {translate("Attaché à ")}
-                </th>
-              )} */}
-              {selectedColumns.date_start && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("date_start")}
-                >
-                  {translate("Creation date")}
-                </th>
               )}
 
-              {/* {selectedColumns.date_end && (
-                <th
-                  className="sorting"
-                  onClick={() => handleSortingColum("date_end")}
-                >
-                  {translate("Date end ")}
-                </th>
-              )} */}
-              {<th>{translate("Infos")}</th>}
-            </tr>
-          </thead>
-          <tbody key="#" className="ligth-body">
-            {loading ? (
-              <tr>
-                <td className="text-center" colSpan={7}>
-                  <p>
-                    <PropagateLoader
-                      color={"#123abc"}
-                      loading={loading}
-                      size={20}
-                    />
-                  </p>
-                </td>
-              </tr>
-            ) : list_Alarms.length > 0 ? (
-              list_Alarms.map((alarme) => (
-                <tr key={alarme.id_notification}>
-                  <td>
-                    <div className="form-check form-check-inline">
-                      <input type="checkbox" className="form-check-input" />
-                    </div>
-                  </td>
-                  {selectedColumns.id_notification && canViewNotificationId && (
-                    <td>{alarme.id_notification}</td>
-                  )}
-                  {/* {selectedColumns.name_groupe_alarme && <td>{alarme.name_groupe_alarme}</td>}
-                  {selectedColumns.name_alarme && <td>{alarme.name_alarme}</td>} */}
-                  {selectedColumns.message && (
-                    <td>{generateDescription(alarme)}</td>
-                  )}
-                  {/* {selectedColumns.attached && (<td>{alarme.immatriculation_vehicule}</td>)} */}
-                  {selectedColumns.date_start && (
-                    <td>{formatToTimestamp(alarme.timestamp.split("T")[0])}</td>
-                  )}
-                  {/* {selectedColumns.date_end && (<td>{formatToTimestamp(alarme.timestamp.split("T")[0])}</td>)} */}
-                  <td>
-                    <div className="d-flex align-items-center list-action">
-                      <Link
-                        to={`/deadline/${alarme.id_alarm}/0`}
-                        className="badge badge-success mr-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="View alarm"
-                      >
-                        <i
-                          className="ri-share-forward-fill  mr-0"
-                          style={{ fontSize: "1.2em" }}
-                        ></i>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7}>No notification available</td>
-              </tr>
+            </span>
+
+          )}
+
+        </span>
+
+      );
+
+    };
+
+
+
+    const date =
+
+      alarme.timestamp
+
+        ? formatNotificationDate(
+
+            alarme.timestamp
+
+          )
+
+        : "-";
+
+
+
+    if (
+
+      !alarme.id_type
+
+    ) {
+
+      return (
+
+        <>
+
+          {alarme.message ||
+
+            "-"}
+
+        </>
+
+      );
+
+    }
+
+
+
+    switch (
+
+      Number(
+
+        alarme.id_type
+
+      )
+
+    ) {
+
+      case 1:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The driving license of"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme.nom_conducteur,
+
+
+
+                  `nom-${alarme.id_item}`
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme.prenom_conducteur,
+
+
+
+                  `prenom-${alarme.id_item}`
+
+                )}
+
+              </>
+
             )}
-          </tbody>
-        </Table>
-      </div>
+
+          </>
+
+        );
+
+
+
+      case 2:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The insurance for"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .immatriculation_vehicule,
+
+
+
+                  `immat-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 3:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The next maintenance for vehicle"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .immatriculation_vehicule,
+
+
+
+                  `maintenance-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 4:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The training certificate of"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .training_nom_conducteur,
+
+
+
+                  `training-nom-${alarme.id_item}`
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .training_prenom_conducteur,
+
+
+
+                  `training-prenom-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 5:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The fire extinguisher verification for vehicle"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .feu_immatriculation_vehicule,
+
+
+
+                  `fire-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 6:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The technical inspection for vehicle"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .immatriculation_vehicule,
+
+
+
+                  `immat-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 7:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The vehicle sticker verification for"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .immatriculation_vehicule,
+
+
+
+                  `immat-${alarme.id_item}`
+
+                )}{" "}
+
+
+
+                {translate(
+
+                  "should be done by"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  date
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      case 8:
+
+        return (
+
+          <>
+
+            {alarme.message || (
+
+              <>
+
+                {translate(
+
+                  "The next oil change for vehicle"
+
+                )}{" "}
+
+
+
+                {highlight(
+
+                  alarme
+
+                    .immatriculation_vehicule,
+
+
+
+                  `oil-${alarme.id_item}`
+
+                )}
+
+              </>
+
+            )}
+
+          </>
+
+        );
+
+
+
+      default: {
+
+        const notificationType =
+
+          getNotificationType(
+
+            alarme.id_type
+
+          );
+
+        return (
+
+          <>
+
+            {notificationType.label}
+
+          </>
+
+        );
+
+      }
+
+    }
+
+  };
+
+
+
+  /* ============================================================
+
+     COLSPAN
+
+     ============================================================ */
+
+
+
+  const visibleColumnCount =
+
+    1 +
+
+    Object.entries(
+
+      selectedColumns
+
+    ).filter(
+
+      (
+
+        [
+
+          key,
+
+          visible,
+
+        ]
+
+      ) =>
+
+        visible &&
+
+        (
+
+          key !==
+
+            "id_notification" ||
+
+          canViewNotificationId
+
+        )
+
+    ).length;
+
+
+
+  /* ============================================================
+
+     RENDER
+
+     ============================================================ */
+
+
+
+  return (
+
+    <>
+
       <div className="row">
-        <div className="col-md-6 d-flex align-items-center">
-          <span>
-            {translate("Displaying")} {list_Alarms.length} {translate("out of")}{" "}
-            {total}
-          </span>
+
+        <div className="col-md-6 col-sm-12">
+
+          <h4>
+
+            <span>
+
+              <svg
+
+                xmlns="http://www.w3.org/2000/svg"
+
+                width="20"
+
+                height="20"
+
+                viewBox="0 0 24 24"
+
+                fill="none"
+
+                stroke="currentColor"
+
+                strokeWidth="2"
+
+                strokeLinecap="round"
+
+                strokeLinejoin="round"
+
+              >
+
+                <path
+
+                  d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+
+                />
+
+
+
+                <path
+
+                  d="M13.73 21a2 2 0 0 1-3.46 0"
+
+                />
+
+              </svg>
+
+            </span>{" "}
+
+
+
+            {translate(
+
+              "Notifications"
+
+            )}{" "}
+
+
+
+            ({total})
+
+          </h4>
+
         </div>
-        <div className="col-md-6">
-          <ReactPaginate
-            previousLabel={translate("previous")}
-            nextLabel={translate("next")}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination justify-content-center"}
-            pageClassName={"page-item"}
-            pageLinkClassName={"page-link"}
-            previousClassName={"page-item"}
-            previousLinkClassName={"page-link"}
-            nextClassName={"page-item"}
-            nextLinkClassName={"page-link"}
-            breakClassName={"page-item"}
-            breakLinkClassName={"page-link"}
-            activeClassName={"active"}
-          />
-        </div>
+
       </div>
+
+
+
+      <div className="row">
+
+        <div
+
+          className="col-md-4"
+
+          style={{
+
+            margin:
+
+              "0px 0px 10px 0px",
+
+
+
+            padding:
+
+              "10px",
+
+          }}
+
+        >
+
+          <div className="input-group">
+
+            <Dropdown>
+
+              <Dropdown.Toggle
+
+                variant="link"
+
+                id="notification-search-type"
+
+                className="search-type-toggle"
+
+                aria-label={`${translate(
+
+                  "Search by"
+
+                )} ${typeSearch}`}
+
+                title={
+
+                  typeSearch
+
+                }
+
+              >
+
+                <i
+
+                  className="fas fa-chevron-down search-type-chevron"
+
+                />
+
+              </Dropdown.Toggle>
+
+
+
+              <Dropdown.Menu>
+
+                {notificationSearchOptions.map(
+
+                  (
+
+                    option
+
+                  ) => (
+
+                    <Dropdown.Item
+
+                      key={
+
+                        option.type
+
+                      }
+
+                      active={
+
+                        type ===
+
+                        option.type
+
+                      }
+
+                      onClick={() =>
+
+                        handleTypeSearch(
+
+                          option.type
+
+                        )
+
+                      }
+
+                    >
+
+                      {
+
+                        option.label
+
+                      }
+
+                    </Dropdown.Item>
+
+                  )
+
+                )}
+
+              </Dropdown.Menu>
+
+            </Dropdown>
+
+
+
+            <input
+
+              type="text"
+
+              placeholder={`${translate(
+
+                "Search by"
+
+              )} ${typeSearch}`}
+
+              onChange={
+
+                handleAdvancedSearch
+
+              }
+
+              value={
+
+                search
+
+              }
+
+              className="form-control"
+
+            />
+
+          </div>
+
+        </div>
+
+
+
+        <div
+
+          className="col-md-8 d-flex justify-content-end align-items-center"
+
+        >
+
+          <div
+
+            className="dataTables_length"
+
+            id="DataTables_Table_0_length"
+
+          >
+
+            <label
+
+              style={{
+
+                marginBottom:
+
+                  "0",
+
+              }}
+
+            >
+
+              {translate(
+
+                "Show"
+
+              )}
+
+
+
+              <select
+
+                name="DataTables_Table_0_length"
+
+                aria-controls="DataTables_Table_0"
+
+                className="custom-select custom-select-sm form-control form-control-sm ml-2"
+
+                style={{
+
+                  width:
+
+                    "66px",
+
+                }}
+
+                onChange={
+
+                  handleSelectChange
+
+                }
+
+                value={
+
+                  limit
+
+                }
+
+              >
+
+                {[
+
+                  10,
+
+                  20,
+
+                  50,
+
+                  100,
+
+                  200,
+
+                  500,
+
+                ].map(
+
+                  (
+
+                    size
+
+                  ) => (
+
+                    <option
+
+                      key={
+
+                        size
+
+                      }
+
+                      value={
+
+                        size
+
+                      }
+
+                    >
+
+                      {size}
+
+                    </option>
+
+                  )
+
+                )}
+
+              </select>
+
+            </label>
+
+          </div>
+
+
+
+          <Dropdown>
+
+            <Dropdown.Toggle
+
+              variant=""
+
+              id="notification-columns-dropdown"
+
+              title={translate(
+
+                "Colonnes d'affichage"
+
+              )}
+
+            >
+
+              <i
+
+                className="las la-eye"
+
+              />
+
+            </Dropdown.Toggle>
+
+
+
+            <Dropdown.Menu>
+
+              {canViewNotificationId && (
+
+                <ColumnToggle
+
+                  checked={
+
+                    selectedColumns
+
+                      .id_notification
+
+                  }
+
+                  label={translate(
+
+                    "Notification ID"
+
+                  )}
+
+                  onChange={() =>
+
+                    handleColumnChange(
+
+                      "id_notification"
+
+                    )
+
+                  }
+
+                />
+
+              )}
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .name_groupe_alarme
+
+                }
+
+                label={translate(
+
+                  "Groupe"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "name_groupe_alarme"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .name_alarme
+
+                }
+
+                label={translate(
+
+                  "Alarmes"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "name_alarme"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .message
+
+                }
+
+                label={translate(
+
+                  "Détails"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "message"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .attached
+
+                }
+
+                label={translate(
+
+                  "Attaché à"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "attached"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .timestamp
+
+                }
+
+                label={translate(
+
+                  "Date création"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "timestamp"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .date_modification
+
+                }
+
+                label={translate(
+
+                  "Date fin"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "date_modification"
+
+                  )
+
+                }
+
+              />
+
+
+
+              <ColumnToggle
+
+                checked={
+
+                  selectedColumns
+
+                    .infos
+
+                }
+
+                label={translate(
+
+                  "Infos"
+
+                )}
+
+                onChange={() =>
+
+                  handleColumnChange(
+
+                    "infos"
+
+                  )
+
+                }
+
+              />
+
+            </Dropdown.Menu>
+
+          </Dropdown>
+
+
+
+          <button
+
+            type="button"
+
+            className="btn btn-outline-secondary btn-sm ml-2"
+
+            onClick={
+
+              handleResetPreferences
+
+            }
+
+            disabled={
+
+              notificationPreferencesSaving
+
+            }
+
+            title={translate(
+
+              "Reset preferences"
+
+            )}
+
+          >
+
+            <i
+
+              className="ri-refresh-line mr-1"
+
+            />
+
+
+
+            {translate(
+
+              "Reset"
+
+            )}
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      {apiError && (
+
+        <div
+
+          className="alert alert-danger"
+
+        >
+
+          {apiError}
+
+        </div>
+
+      )}
+
+
+
+      <div
+
+        className="row m-1 table-responsive"
+
+      >
+
+        <Table
+
+          className="dataTable"
+
+        >
+
+          <thead
+
+            className="bg-white text-uppercase"
+
+          >
+
+            <tr
+
+              className="ligth ligth-data"
+
+            >
+
+              <th>
+
+                <div
+
+                  className="form-check form-check-inline"
+
+                >
+
+                  <input
+
+                    className="form-check-input"
+
+                    type="checkbox"
+
+                  />
+
+
+
+                  <label
+
+                    className="form-check-label"
+
+                  />
+
+                </div>
+
+              </th>
+
+
+
+              {selectedColumns
+
+                .id_notification &&
+
+                canViewNotificationId && (
+
+                  <SortableHeader
+
+                    label={translate(
+
+                      "Notification ID"
+
+                    )}
+
+                    column="id_notification"
+
+                    currentColumn={
+
+                      colum
+
+                    }
+
+                    direction={
+
+                      sort
+
+                    }
+
+                    onSort={
+
+                      handleSortingColum
+
+                    }
+
+                  />
+
+                )}
+
+
+
+              {selectedColumns
+
+                .name_groupe_alarme && (
+
+                <th>
+
+                  {translate(
+
+                    "Groupe"
+
+                  )}
+
+                </th>
+
+              )}
+
+
+
+              {selectedColumns
+
+                .name_alarme && (
+
+                <th>
+
+                  {translate(
+
+                    "Alarmes"
+
+                  )}
+
+                </th>
+
+              )}
+
+
+
+              {selectedColumns
+
+                .message && (
+
+                <SortableHeader
+
+                  label={translate(
+
+                    "Détails"
+
+                  )}
+
+                  column="message"
+
+                  currentColumn={
+
+                    colum
+
+                  }
+
+                  direction={
+
+                    sort
+
+                  }
+
+                  onSort={
+
+                    handleSortingColum
+
+                  }
+
+                  style={{
+
+                    minWidth:
+
+                      "250px",
+
+                  }}
+
+                />
+
+              )}
+
+
+
+              {selectedColumns
+
+                .attached && (
+
+                <th>
+
+                  {translate(
+
+                    "Attaché à"
+
+                  )}
+
+                </th>
+
+              )}
+
+
+
+              {selectedColumns
+
+                .timestamp && (
+
+                <SortableHeader
+
+                  label={translate(
+
+                    "Date Création"
+
+                  )}
+
+                  column="timestamp"
+
+                  currentColumn={
+
+                    colum
+
+                  }
+
+                  direction={
+
+                    sort
+
+                  }
+
+                  onSort={
+
+                    handleSortingColum
+
+                  }
+
+                />
+
+              )}
+
+
+
+              {selectedColumns
+
+                .date_modification && (
+
+                <th>
+
+                  {translate(
+
+                    "Date Fin"
+
+                  )}
+
+                </th>
+
+              )}
+
+
+
+              {selectedColumns
+
+                .infos && (
+
+                <th>
+
+                  {translate(
+
+                    "Infos"
+
+                  )}
+
+                </th>
+
+              )}
+
+            </tr>
+
+          </thead>
+
+
+
+          <tbody
+
+            className="ligth-body"
+
+          >
+
+            {loading ? (
+
+              <tr>
+
+                <td
+
+                  className="text-center"
+
+                  colSpan={
+
+                    visibleColumnCount
+
+                  }
+
+                >
+
+                  <PropagateLoader
+
+                    color="#123abc"
+
+                    loading={
+
+                      loading
+
+                    }
+
+                    size={
+
+                      20
+
+                    }
+
+                  />
+
+                </td>
+
+              </tr>
+
+            ) : list_Alarms.length >
+
+              0 ? (
+
+              list_Alarms.map(
+
+                (
+
+                  alarme
+
+                ) => {
+
+                  const notificationType =
+
+                    getNotificationType(
+
+                      alarme.id_type
+
+                    );
+
+
+
+                  return (
+
+                    <tr
+
+                      key={
+
+                        alarme.id_notification
+
+                      }
+
+                    >
+
+                      <td>
+
+                        <div
+
+                          className="form-check form-check-inline"
+
+                        >
+
+                          <input
+
+                            type="checkbox"
+
+                            className="form-check-input"
+
+                          />
+
+                        </div>
+
+                      </td>
+
+
+
+                      {selectedColumns
+
+                        .id_notification &&
+
+                        canViewNotificationId && (
+
+                          <td>
+
+                            {
+
+                              alarme.id_notification
+
+                            }
+
+                          </td>
+
+                        )}
+
+
+
+                      {selectedColumns
+
+                        .name_groupe_alarme && (
+
+                        <td>
+
+                          {
+
+                            notificationType
+
+                              .group
+
+                          }
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .name_alarme && (
+
+                        <td>
+
+                          {
+
+                            notificationType
+
+                              .label
+
+                          }
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .message && (
+
+                        <td>
+
+                          {generateDescription(
+
+                            alarme
+
+                          )}
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .attached && (
+
+                        <td>
+
+                          {getAttachedValue(
+
+                            alarme
+
+                          )}
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .timestamp && (
+
+                        <td>
+
+                          {formatNotificationDate(
+
+                            alarme.timestamp
+
+                          )}
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .date_modification && (
+
+                        <td>
+
+                          {formatNotificationDate(
+
+                            alarme.date_modification
+
+                          )}
+
+                        </td>
+
+                      )}
+
+
+
+                      {selectedColumns
+
+                        .infos && (
+
+                        <td>
+
+                          <div
+
+                            className="d-flex align-items-center list-action"
+
+                          >
+
+                            <button
+
+                              type="button"
+
+                              className="badge badge-primary border-0 mr-2"
+
+                              title={translate(
+
+                                "View details"
+
+                              )}
+
+                              onClick={() =>
+
+                                handleViewNotification(
+
+                                  alarme
+
+                                )
+
+                              }
+
+                              disabled={
+
+                                detailLoading
+
+                              }
+
+                            >
+
+                              <i
+
+                                className="ri-eye-line mr-0"
+
+                                style={{
+
+                                  fontSize:
+
+                                    "1.2em",
+
+                                }}
+
+                              />
+
+                            </button>
+
+
+
+                            {alarme.state ===
+
+                              1 && (
+
+                              <button
+
+                                type="button"
+
+                                className="badge badge-info border-0 mr-2"
+
+                                title={translate(
+
+                                  "Mark as read"
+
+                                )}
+
+                                onClick={() =>
+
+                                  handleMarkAsRead(
+
+                                    alarme
+
+                                  )
+
+                                }
+
+                                disabled={
+
+                                  actionLoadingId ===
+
+                                  alarme.id_notification
+
+                                }
+
+                              >
+
+                                <i
+
+                                  className="ri-mail-open-line mr-0"
+
+                                  style={{
+
+                                    fontSize:
+
+                                      "1.2em",
+
+                                  }}
+
+                                />
+
+                              </button>
+
+                            )}
+
+
+
+                            <Link
+
+                              to={getNotificationRoute(
+
+                                alarme
+
+                              )}
+
+                              className="badge badge-success mr-2"
+
+                              data-toggle="tooltip"
+
+                              data-placement="top"
+
+                              title={translate(
+
+                                "View alarm"
+
+                              )}
+
+                            >
+
+                              <i
+
+                                className="ri-share-forward-fill mr-0"
+
+                                style={{
+
+                                  fontSize:
+
+                                    "1.2em",
+
+                                }}
+
+                              />
+
+                            </Link>
+
+
+
+                            <button
+
+                              type="button"
+
+                              className="badge badge-danger border-0"
+
+                              title={translate(
+
+                                "Delete"
+
+                              )}
+
+                              onClick={() =>
+
+                                handleDeleteNotification(
+
+                                  alarme
+
+                                )
+
+                              }
+
+                              disabled={
+
+                                actionLoadingId ===
+
+                                alarme.id_notification
+
+                              }
+
+                            >
+
+                              <i
+
+                                className="ri-delete-bin-line mr-0"
+
+                                style={{
+
+                                  fontSize:
+
+                                    "1.2em",
+
+                                }}
+
+                              />
+
+                            </button>
+
+                          </div>
+
+                        </td>
+
+                      )}
+
+                    </tr>
+
+                  );
+
+                }
+
+              )
+
+            ) : (
+
+              <tr>
+
+                <td
+
+                  colSpan={
+
+                    visibleColumnCount
+
+                  }
+
+                  className="text-center"
+
+                >
+
+                  {translate(
+
+                    "No notification available"
+
+                  )}
+
+                </td>
+
+              </tr>
+
+            )}
+
+          </tbody>
+
+        </Table>
+
+      </div>
+
+
+
+      <div
+
+        className="row"
+
+      >
+
+        <div
+
+          className="col-md-6 d-flex align-items-center"
+
+        >
+
+          <span>
+
+            {translate(
+
+              "Displaying"
+
+            )}{" "}
+
+
+
+            {
+
+              list_Alarms.length
+
+            }{" "}
+
+
+
+            {translate(
+
+              "out of"
+
+            )}{" "}
+
+
+
+            {total}
+
+          </span>
+
+        </div>
+
+
+
+        <div
+
+          className="col-md-6"
+
+        >
+
+          <ReactPaginate
+
+            previousLabel={translate(
+
+              "previous"
+
+            )}
+
+            nextLabel={translate(
+
+              "next"
+
+            )}
+
+            breakLabel="..."
+
+            pageCount={
+
+              pageCount
+
+            }
+
+            marginPagesDisplayed={
+
+              2
+
+            }
+
+            pageRangeDisplayed={
+
+              3
+
+            }
+
+            onPageChange={
+
+              handlePageClick
+
+            }
+
+            forcePage={Math.max(
+
+              currentPage -
+
+                1,
+
+
+
+              0
+
+            )}
+
+            containerClassName="pagination justify-content-center"
+
+            pageClassName="page-item"
+
+            pageLinkClassName="page-link"
+
+            previousClassName="page-item"
+
+            previousLinkClassName="page-link"
+
+            nextClassName="page-item"
+
+            nextLinkClassName="page-link"
+
+            breakClassName="page-item"
+
+            breakLinkClassName="page-link"
+
+            activeClassName="active"
+
+          />
+
+        </div>
+
+      </div>
+
+
+
+      <Modal
+
+        show={Boolean(
+
+          selectedNotification
+
+        )}
+
+        onHide={() =>
+
+          setSelectedNotification(
+
+            null
+
+          )
+
+        }
+
+        centered
+
+        size="lg"
+
+      >
+
+        <Modal.Header
+
+          closeButton
+
+        >
+
+          <Modal.Title>
+
+            {translate(
+
+              "Notification details"
+
+            )}
+
+          </Modal.Title>
+
+        </Modal.Header>
+
+
+
+        <Modal.Body>
+
+          {selectedNotification ? (
+
+            <div>
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Notification ID"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {selectedNotification
+
+                  .id_notification ??
+
+                  "-"}
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Groupe"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {
+
+                  getNotificationType(
+
+                    selectedNotification
+
+                      .id_type
+
+                  ).group
+
+                }
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Alarmes"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {
+
+                  getNotificationType(
+
+                    selectedNotification
+
+                      .id_type
+
+                  ).label
+
+                }
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Détails"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {getNotificationType(
+
+                  selectedNotification
+
+                    .id_type
+
+                ).label}
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Attaché à"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {getAttachedValue(
+
+                  selectedNotification
+
+                )}
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Date Création"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {formatNotificationDate(
+
+                  selectedNotification
+
+                    .timestamp
+
+                )}
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "Date Fin"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {formatNotificationDate(
+
+                  selectedNotification
+
+                    .date_modification
+
+                )}
+
+              </p>
+
+
+
+              <p>
+
+                <strong>
+
+                  {translate(
+
+                    "State"
+
+                  )}
+
+                  :
+
+                </strong>{" "}
+
+
+
+                {Number(
+
+                  selectedNotification
+
+                    .state
+
+                ) === 0
+
+                  ? translate(
+
+                      "Read"
+
+                    )
+
+                  : translate(
+
+                      "Unread"
+
+                    )}
+
+              </p>
+
+            </div>
+
+          ) : null}
+
+        </Modal.Body>
+
+
+
+        <Modal.Footer>
+
+          <Button
+
+            variant="secondary"
+
+            onClick={() =>
+
+              setSelectedNotification(
+
+                null
+
+              )
+
+            }
+
+          >
+
+            {translate(
+
+              "Close"
+
+            )}
+
+          </Button>
+
+        </Modal.Footer>
+
+      </Modal>
+
     </>
+
   );
+
+}
+
+
+
+/* ============================================================
+
+   CHECKBOX COLONNE
+
+   ============================================================ */
+
+
+
+function ColumnToggle({
+
+  checked,
+
+  label,
+
+  onChange,
+
+}: {
+
+  checked:
+
+    boolean;
+
+
+
+  label:
+
+    string;
+
+
+
+  onChange:
+
+    () => void;
+
+}) {
+
+  return (
+
+    <Dropdown.Item
+
+      as="button"
+
+      onClick={(
+
+        event
+
+      ) =>
+
+        event.stopPropagation()
+
+      }
+
+      style={{
+
+        display:
+
+          "flex",
+
+
+
+        alignItems:
+
+          "center",
+
+      }}
+
+    >
+
+      <input
+
+        type="checkbox"
+
+        className="form-check-input"
+
+        checked={
+
+          checked
+
+        }
+
+        onChange={
+
+          onChange
+
+        }
+
+      />
+
+
+
+      <span
+
+        style={{
+
+          marginLeft:
+
+            "10px",
+
+        }}
+
+      >
+
+        {label}
+
+      </span>
+
+    </Dropdown.Item>
+
+  );
+
+}
+
+
+
+/* ============================================================
+
+   HEADER TRI
+
+   ============================================================ */
+
+
+
+function SortableHeader({
+
+  label,
+
+  column,
+
+  currentColumn,
+
+  direction,
+
+  onSort,
+
+  style,
+
+}: {
+
+  label:
+
+    string;
+
+
+
+  column:
+
+    string;
+
+
+
+  currentColumn:
+
+    string;
+
+
+
+  direction:
+
+    string;
+
+
+
+  onSort:
+
+    (
+
+      column:
+
+        string
+
+    ) => void;
+
+
+
+  style?:
+
+    React.CSSProperties;
+
+}) {
+
+  return (
+
+    <th
+
+      className="sorting"
+
+      onClick={() =>
+
+        onSort(
+
+          column
+
+        )
+
+      }
+
+      style={{
+
+        cursor:
+
+          "pointer",
+
+
+
+        ...style,
+
+      }}
+
+    >
+
+      {label}
+
+
+
+      {currentColumn ===
+
+      column
+
+        ? ` ${
+
+            direction ===
+
+            "ASC"
+
+              ? "▲"
+
+              : "▼"
+
+          }`
+
+        : ""}
+
+    </th>
+
+  );
+
 }

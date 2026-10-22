@@ -1,196 +1,426 @@
-import React, { useState, useEffect } from "react";
-import { Button, Dropdown, Modal, Table } from "react-bootstrap";
-import { Form, Link, NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Button, Dropdown, Table } from "react-bootstrap";
+import { Link, NavLink } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import { useTranslate } from "../hooks/LanguageProvider";
-import { PropagateLoader } from 'react-spinners';
-//import DriverModal from "../components/Driver/DriverModal";
-import ConfirmSalaryModal from "../components/Driver/ConfirmSalaryModal";
-import DriverAssignmentModal from "../components/Driver/DriverAssignmentModal";
-import { DownloadModal, generateExcelFile, generatePDFFile, handleDownloadConfirm, toTimestamp } from "../utilities/functions";
+import { PropagateLoader } from "react-spinners";
 
+import { useTranslate } from "../hooks/LanguageProvider";
 import MissionReportDeleteModal from "../components/MissionReport/MissionReportDeleteModal";
 import MissionReportPreview from "../components/MissionReport/MissionReportPreview";
 import { useListPagePreferences } from "../hooks/useListPagePreferences";
 import { useGpVisibleColumns } from "../hooks/useGpVisibleColumns";
 
-
-
 interface MissionReport {
-  id_misrap: number;            
-  ref_misrap: string;            
-  objt_misrap: string;         
-  carb_misrap: string;            
-  frais_misrap: number; 
-  immatriculation_vehicule : string;       
-  remorque_misrap: string;     
-  cond_misrap: string;         
-  acc_misrap: string;          
-  itnr_misrap: string;         
-  amort_misrap: number;        
-  dep_misrap: string;             
-  date_dep_misrap: string;        
-  lieu_misrap: string;         
-  date_arr_misrap: string;        
-  km_dep_misrap: number;          
-  nuit_misrap: number;         
-  immob_misrap: number;        
-  durr_misrap: number;         
-  km_ret_misrap: number;          
+  id_misrap: number;
+  ref_misrap: string;
+  objt_misrap: string;
+  carb_misrap: string;
+  frais_misrap: number;
+  immatriculation_vehicule: string;
+  remorque_misrap: string;
+  cond_misrap: string;
+  acc_misrap: string;
+  itnr_misrap: string;
+  amort_misrap: number;
+  dep_misrap: string;
+  date_dep_misrap: string;
+  lieu_misrap: string;
+  date_arr_misrap: string;
+  km_dep_misrap: number;
+  nuit_misrap: number;
+  immob_misrap: number;
+  durr_misrap: number;
+  km_ret_misrap: number;
   dist_misrap: number;
- id_vehicule : number;
+  id_vehicule: number;
   id_user: string;
-
-
 }
 
-
+type ReportingStatus =
+  | "soumis"
+  | "valide"
+  | "refuse"
+  | "disponible";
 
 export function MissionReport() {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  const backendUrl =
+    process.env.REACT_APP_BACKEND_URL;
+
   const { translate } = useTranslate();
-  let [limit, setLimit] = useState(10);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const id_user = localStorage.getItem("GeopUserID");
-   const [selectedMissionReport, setSelectedMissionReport] = useState<any | null>(null);
- 
-  const [modalStatus, setModalStatus] = useState<string | null>(null);
-  const [titleStatus, setTitleStatus] = useState<string | null>(null);
 
-  const [IdUser, setIdUser] = useState<number>(0);
-   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Modal pour aperçu
- 
+  const [limit, setLimit] =
+    useState<number>(10);
 
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [pageCount, setPageCount] = useState(0);
-  let [total, settotal] = useState(0);
-  const [colum, setSortColum] = useState("id_conducteur");
-  const [sort, setSort] = useState("ASC");
-  const [search, setSearch] = useState("");
-  const [type, setType] = useState(2);
-  const [typeSearch, setTypeSearch] = useState(translate("Last and first name"));
-  const { ready: listPreferencesReady } = useListPagePreferences({
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState<number>(1);
+
+  const id_user =
+    localStorage.getItem("GeopUserID");
+
+  const [
+    selectedMissionReport,
+    setSelectedMissionReport,
+  ] = useState<MissionReport | null>(
+    null
+  );
+
+  const [
+    modalStatus,
+    setModalStatus,
+  ] = useState<string | null>(null);
+
+  const [
+    titleStatus,
+    setTitleStatus,
+  ] = useState<string | null>(null);
+
+  const [
+    IdUser,
+    setIdUser,
+  ] = useState<number>(0);
+
+  const [
+    isPreviewModalOpen,
+    setIsPreviewModalOpen,
+  ] = useState(false);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    pageCount,
+    setPageCount,
+  ] = useState(0);
+
+  const [
+    total,
+    settotal,
+  ] = useState(0);
+
+  const [
+    colum,
+    setSortColum,
+  ] = useState("id_misrap");
+
+  const [
+    sort,
+    setSort,
+  ] = useState("ASC");
+
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    type,
+    setType,
+  ] = useState(2);
+
+  const [
+    typeSearch,
+    setTypeSearch,
+  ] = useState(
+    translate("Last and first name")
+  );
+
+  const [
+    IdMissionReport,
+    setIdMissionReport,
+  ] = useState<number>(0);
+
+  const [
+    list_MissionReport,
+    setMissionReport,
+  ] = useState<MissionReport[]>([]);
+
+  /*
+   * Permet d'éviter plusieurs clics
+   * pendant la création de la notification.
+   */
+  const [
+    statusLoadingId,
+    setStatusLoadingId,
+  ] = useState<number | null>(null);
+
+  const {
+    ready: listPreferencesReady,
+  } = useListPagePreferences({
     pageKey: "mission-reports",
-    pageSize: limit, setPageSize: setLimit,
-    searchType: type, setSearchType: setType,
-    searchTypeLabel: typeSearch, setSearchTypeLabel: setTypeSearch,
-    searchText: search, setSearchText: setSearch,
-    sortColumn: colum, setSortColumn: setSortColum,
-    sortDirection: sort, setSortDirection: setSort,
+
+    pageSize: limit,
+    setPageSize: setLimit,
+
+    searchType: type,
+    setSearchType: setType,
+
+    searchTypeLabel: typeSearch,
+    setSearchTypeLabel:
+      setTypeSearch,
+
+    searchText: search,
+    setSearchText: setSearch,
+
+    sortColumn: colum,
+    setSortColumn:
+      setSortColum,
+
+    sortDirection: sort,
+    setSortDirection: setSort,
   });
 
-  const [IdMissionReport, setIdMissionReport] = useState<number>(0);
+  /* ============================================================
+     RECHERCHE / LISTE RAPPORTS
+     ============================================================ */
 
+  const getMissionReport = async (
+    limitValue: number,
+    pageValue: number,
+    searchValue: string,
+    typeValue: number,
+    columnValue: string,
+    sortValue: string
+  ): Promise<MissionReport[]> => {
+    try {
+      setLoading(true);
 
-  const [list_MissionReport, setMissionReport] = useState<MissionReport[]>([]);
+      const bodyData =
+        JSON.stringify({
+          limitValue,
+          currentPage:
+            pageValue,
+          search:
+            searchValue,
+          type:
+            typeValue,
+          id_user,
+          colum:
+            columnValue,
+          sort:
+            sortValue,
+        });
 
+      /*
+       * TOTAL
+       */
+      const totalPagesResponse =
+        await fetch(
+          `${backendUrl}/api/geop/missionReportManage/totalpage`,
+          {
+            method: "POST",
 
-  const driverHeaders = [
-    translate("ID"),
-    translate("Code"),
-    translate("Last and first name"),
-    translate("Date of birth"),
-    translate("Phone"),
-    translate("Email"),
-    translate("Park")
-  ];
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-  
+            body:
+              bodyData,
 
-const getMissionReport = async (limitValue: number, currentPage: number, search: string, type: number, colum: string, sort: string): Promise<MissionReport[]> => {
-  try {
-    setLoading(true);
-        const allowedSortColumns = {
-      id_misrap: "mr.id_misrap",
-      objt_misrap: "mr.objt_misrap",
-      ref_misrap: "mr.ref_misrap",
-      date_dep_misrap: "mr.date_dep_misrap",
-  immatriculation_vehicule: "v.immatriculation_vehicule",
-   // Nom complet de colonne SQL
+            mode:
+              "cors",
+          }
+        );
+
+      if (
+        !totalPagesResponse.ok
+      ) {
+        throw new Error(
+          "Erreur récupération total rapports"
+        );
+      }
+
+      const totalPagesJson =
+        await totalPagesResponse.json();
+
+      const totalValue =
+        Number(
+          totalPagesJson.total ??
+            totalPagesJson.count ??
+            0
+        );
+
+      settotal(
+        totalValue
+      );
+
+      /*
+       * LISTE
+       */
+      const MissionReportResponse =
+        await fetch(
+          `${backendUrl}/api/geop/missionReportManage/search`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              bodyData,
+
+            mode:
+              "cors",
+          }
+        );
+
+      if (
+        !MissionReportResponse.ok
+      ) {
+        throw new Error(
+          "Erreur récupération rapports"
+        );
+      }
+
+      const data =
+        await MissionReportResponse.json();
+
+      const reports =
+        Array.isArray(data)
+          ? data
+          : [];
+
+      setPageCount(
+        Math.ceil(
+          totalValue /
+            limitValue
+        )
+      );
+
+      setMissionReport(
+        reports
+      );
+
+      return reports;
+    } catch (error) {
+      console.error(
+        "Error fetching mission reports:",
+        error
+      );
+
+      setMissionReport(
+        []
+      );
+
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ============================================================
+     PAGINATION
+     ============================================================ */
+
+  const handlePageClick =
+    async (data: any) => {
+      const newPage =
+        data.selected + 1;
+
+      setCurrentPage(
+        newPage
+      );
+
+      await getMissionReport(
+        limit,
+        newPage,
+        search,
+        type,
+        colum,
+        sort
+      );
+
+      window.scrollTo(
+        0,
+        0
+      );
     };
-        const validatedColumn = searchColum[colum] || "id_misrap";
-    const validatedSortOrder = ["ASC", "DESC"].includes(sort.toUpperCase()) 
-      ? sort.toUpperCase() 
-      : "ASC";
-      const validatedSortColumn = allowedSortColumns[colum as keyof typeof allowedSortColumns] || "mr.id_misrap";
 
-     const bodyData = JSON.stringify({
-      limitValue,
+  useEffect(() => {
+    if (
+      !listPreferencesReady
+    ) {
+      return;
+    }
+
+    getMissionReport(
+      limit,
       currentPage,
       search,
       type,
-      id_user,
-      colum,  // Envoyez directement le nom de la colonne
-      sort    // 'ASC' ou 'DESC'
-    });
-  
+      colum,
+      sort
+    );
 
-    // Récupération du total
-    const totalPagesResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/totalpage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: bodyData,
-      mode: 'cors',
-    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    limit,
+    currentPage,
+    search,
+    type,
+    colum,
+    sort,
+    listPreferencesReady,
+  ]);
 
-    const totalPagesJson = await totalPagesResponse.json();
-    const total = totalPagesJson.total || totalPagesJson.count;
-    settotal(total);
+  /* ============================================================
+     NOMBRE DE LIGNES
+     ============================================================ */
 
-    // Récupération des données
-    const MissionReportResponse = await fetch(`${backendUrl}/api/geop/missionReportManage/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: bodyData,
-      mode: 'cors',
-    });
+  const handleSelectChange =
+    async (
+      event: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+      const newValue =
+        parseInt(
+          event.target.value,
+          10
+        );
 
-    const data = await MissionReportResponse.json();
-    
-    setPageCount(Math.ceil(total / limitValue));
-    setMissionReport(data);
-    return data; // Ajout du return explicite
-  } catch (error) {
-    console.error("Error fetching mission reports:", error);
-    return []; // Retourner un tableau vide en cas d'erreur
-  } finally {
-    setLoading(false);
-  }
-};
-  const handlePageClick = async (data: any) => {
-    let currentPage = data.selected + 1;
-    await getMissionReport(limit, currentPage, search, type, colum, sort);
-    //setDrivers(commentsFormServer);
-    window.scrollTo(0, 0);
-  };
-  useEffect(() => {
-    if (!listPreferencesReady) return;
-    getMissionReport(limit, currentPage, search, type, colum, sort);
-  }, [limit, currentPage, search, type, colum, sort, listPreferencesReady]);
+      setCurrentPage(1);
+      setLimit(newValue);
 
+      const reports =
+        await getMissionReport(
+          newValue,
+          1,
+          search,
+          type,
+          colum,
+          sort
+        );
 
-  const handleSelectChange = async (event: any) => {
-    const newValue = event.target.value;
-    setCurrentPage(1); // Réinitialiser currentPage à 1 lorsque la limite change
-    setLimit(newValue);
-    const commentsFormServer = await getMissionReport(parseInt(newValue), 1, search, type, colum, sort); // Ajouter await ici
-    setMissionReport(commentsFormServer);
-    window.scrollTo(0, 0);
-  };
+      setMissionReport(
+        reports
+      );
 
+      window.scrollTo(
+        0,
+        0
+      );
+    };
 
-  const [selectedColumns, setSelectedColumns] = useState({
-    
+  /* ============================================================
+     COLONNES
+     ============================================================ */
+
+  const [
+    selectedColumns,
+    setSelectedColumns,
+  ] = useState({
     id_misrap: true,
     ref_misrap: true,
     objt_misrap: true,
     carb_misrap: true,
     frais_misrap: true,
-    immatriculation_vehicule : true,
+    immatriculation_vehicule:
+      true,
     remorque_misrap: true,
     cond_misrap: true,
     acc_misrap: true,
@@ -206,470 +436,1392 @@ const getMissionReport = async (limitValue: number, currentPage: number, search:
     durr_misrap: true,
     km_ret_misrap: true,
     dist_misrap: true,
-    id_user: true, // Set id_user only if not editing
+    id_user: true,
   });
-  useGpVisibleColumns("mission-reports", selectedColumns, setSelectedColumns, listPreferencesReady);
-  
 
-  const handleColumnChange = (column: string) => {
-    setSelectedColumns((prevState: any) => ({
-      ...prevState,
-      [column]: !prevState[column],
-    }));
+  useGpVisibleColumns(
+    "mission-reports",
+    selectedColumns,
+    setSelectedColumns,
+    listPreferencesReady
+  );
+
+  const handleColumnChange = (
+    column: string
+  ) => {
+    setSelectedColumns(
+      (
+        prevState:
+          any
+      ) => ({
+        ...prevState,
+
+        [column]:
+          !prevState[
+            column
+          ],
+      })
+    );
   };
 
+  /* ============================================================
+     TYPE RECHERCHE
+     ============================================================ */
 
-  const searchColum: { [key: string]: number } = {
-    id_misrap: 0,
-    objt_misrap: 1,
-    ref_misrap: 2,
-    date_dep_misrap: 3,
-    immatriculation_vehicule : 4,
-    cond_misrap: 5
-  };
-
-
-
-  const handleTypeSearch = (selectedValue: string) => {
-
-    console.log(selectedValue)
-    switch (selectedValue) {
-      case translate("ID"):
-        console.log(0)
+  const handleTypeSearch = (
+    selectedValue: string
+  ) => {
+    switch (
+      selectedValue
+    ) {
+      case translate(
+        "ID"
+      ):
         setType(0);
         break;
-      case translate("Object"):
-        console.log(1)
+
+      case translate(
+        "Object"
+      ):
         setType(1);
         break;
-      case translate("Reference"):
-        console.log(2)
+
+      case translate(
+        "Reference"
+      ):
         setType(2);
         break;
-      case translate("Departure Date"):
-        console.log(3)
+
+      case translate(
+        "Departure Date"
+      ):
         setType(3);
         break;
-      case translate("Vehicle"):
-        console.log(4)
+
+      case translate(
+        "Vehicle"
+      ):
         setType(4);
         break;
-      case translate("Driver"):
-        console.log(5)
+
+      case translate(
+        "Driver"
+      ):
         setType(5);
         break;
+
       default:
-        console.log('Unknown selection');
-        console.log(selectedValue)
         break;
     }
-    setTypeSearch(selectedValue);
-    console.log('Selected value:', selectedValue);
+
+    setTypeSearch(
+      selectedValue
+    );
   };
 
-  const handleAdvancedSearch = async (event: any) => {
+  /* ============================================================
+     RECHERCHE
+     ============================================================ */
 
-    const newValue = event.target.value;
-    setSearch(newValue)
-    await getMissionReport(limit, currentPage, newValue, type, colum, sort);
+  const handleAdvancedSearch =
+    async (
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const newValue =
+        event.target.value;
+
+      setCurrentPage(1);
+      setSearch(newValue);
+
+      await getMissionReport(
+        limit,
+        1,
+        newValue,
+        type,
+        colum,
+        sort
+      );
+    };
+
+  const handleResetSearch =
+    async () => {
+      setSearch("");
+      setCurrentPage(1);
+
+      await getMissionReport(
+        limit,
+        1,
+        "",
+        type,
+        colum,
+        sort
+      );
+    };
+
+  /* ============================================================
+     TRI
+     ============================================================ */
+
+  const handleSortingColum = (
+    currentColumn: string
+  ) => {
+    const newSortOrder =
+      sort === "ASC"
+        ? "DESC"
+        : "ASC";
+
+    setSortColum(
+      currentColumn
+    );
+
+    setSort(
+      newSortOrder
+    );
+
+    getMissionReport(
+      limit,
+      currentPage,
+      search,
+      type,
+      currentColumn,
+      newSortOrder
+    );
   };
 
+  /* ============================================================
+     SUPPRESSION
+     ============================================================ */
 
-  const handleSortingColum = (currentColumn: string) => {
-  setSortColum(currentColumn);
-  const newSortOrder = sort === "ASC" ? "DESC" : "ASC";
-  setSort(newSortOrder);
-  getMissionReport(limit, currentPage, search, type, currentColumn, newSortOrder);
-};
+  const handledeleteMissionReport =
+    async (
+      id_misrap: number
+    ) => {
+      try {
+        setModalStatus(
+          `${translate(
+            "Do you want to delete this"
+          )} ${translate(
+            "Mission Report"
+          )}?`
+        );
 
-  const handledeleteMissionReport = async (id_misrap: number) => {
-    try {
-      console.log(id_misrap);
-            setModalStatus(`${translate('Do you want to delete this')} ${translate('Mission Report')}?`);
+        setTitleStatus(
+          "Delete MissionReport"
+        );
 
-      setTitleStatus('Delete MissionReport');
-      setIdUser(parseInt(id_user || '0', 0));
-      setIdMissionReport(id_misrap);
+        setIdUser(
+          parseInt(
+            id_user ||
+              "0",
+            10
+          )
+        );
 
-    
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        setIdMissionReport(
+          id_misrap
+        );
+      } catch (error) {
+        console.error(
+          error
+        );
+      }
+    };
 
-  const closeModal = () => {
-    setModalStatus(null);
-  };
+  const closeModal =
+    () => {
+      setModalStatus(
+        null
+      );
+    };
 
+  const handleUpdateMissionReportList =
+    () => {
+      getMissionReport(
+        limit,
+        currentPage,
+        search,
+        type,
+        colum,
+        sort
+      ).catch(
+        (error) => {
+          console.error(
+            "Failed to update mission report list:",
+            error
+          );
+        }
+      );
+    };
 
-  const handleUpdateMissionReportList = () => {
-    getMissionReport(limit, currentPage, search, type, colum, sort).catch(error => {
-      console.error('Failed to update driver list:', error);
-    });
-  };
+  /* ============================================================
+     GD6 - NOTIFICATIONS REPORTING 28 → 31
 
-  const handleResetSearch = async () => {
-    setSearch("")
+     soumis      -> type 28
+     valide      -> type 29
+     refuse      -> type 30
+     disponible  -> type 31
+     ============================================================ */
 
-    await getMissionReport(limit, currentPage, search, type, colum, sort)
-  };
+  const handleMissionReportStatus =
+    async (
+      id_misrap: number,
+      statut_misrap:
+        ReportingStatus
+    ) => {
+      try {
+        if (
+          !id_user
+        ) {
+          alert(
+            "Utilisateur introuvable"
+          );
+
+          return;
+        }
+
+        setStatusLoadingId(
+          id_misrap
+        );
+
+        const response =
+          await fetch(
+            `${backendUrl}/api/geop/missionReportManage/status`,
+            {
+              method:
+                "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              mode:
+                "cors",
+
+              body:
+                JSON.stringify(
+                  {
+                    id_misrap,
+                    id_user,
+                    statut_misrap,
+                  }
+                ),
+            }
+          );
+
+        let data:
+          any = null;
+
+        try {
+          data =
+            await response.json();
+        } catch {
+          data =
+            null;
+        }
+
+        if (
+          !response.ok
+        ) {
+          throw new Error(
+            data?.message ||
+              data?.error ||
+              `Erreur HTTP ${response.status}`
+          );
+        }
+
+        console.log(
+          "Notification Reporting créée:",
+          data
+        );
+
+        /*
+         * Message de confirmation.
+         */
+        switch (
+          statut_misrap
+        ) {
+          case "soumis":
+            alert(
+              "Notification : Rapport soumis"
+            );
+            break;
+
+          case "valide":
+            alert(
+              "Notification : Rapport validé"
+            );
+            break;
+
+          case "refuse":
+            alert(
+              "Notification : Rapport refusé"
+            );
+            break;
+
+          case "disponible":
+            alert(
+              "Notification : Rapport disponible"
+            );
+            break;
+        }
+      } catch (error) {
+        console.error(
+          "Erreur notification Reporting:",
+          error
+        );
+
+        alert(
+          error instanceof
+            Error
+            ? error.message
+            : "Erreur lors de la création de la notification"
+        );
+      } finally {
+        setStatusLoadingId(
+          null
+        );
+      }
+    };
+
+  /* ============================================================
+     MENU RECHERCHE
+     ============================================================ */
 
   const menuItems = [
     translate("ID"),
     translate("Object"),
     translate("Reference"),
-    translate("Departure Date"),
+    translate(
+      "Departure Date"
+    ),
     translate("Vehicle"),
-    translate("Driver")
-   ];
+    translate("Driver"),
+  ];
 
-    function formatDatetimeLocal(dateString: string): string {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        }
+  /* ============================================================
+     FORMAT DATE
+     ============================================================ */
 
+  function formatDatetimeLocal(
+    dateString: string
+  ): string {
+    if (
+      !dateString
+    ) {
+      return "";
+    }
+
+    const date =
+      new Date(
+        dateString
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return dateString;
+    }
+
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute:
+          "2-digit",
+      }
+    )}`;
+  }
 
   return (
     <>
+      {/* ======================================================
+          HEADER
+          ====================================================== */}
+
       <div className="row">
         <div className="col-md-6 col-sm-12">
           <h4>
             <i className="las la-tasks"></i>
-  {translate("Missions Report")} <span>{total < 10 ? `0${total}` : total}</span>          </h4>
+
+            {" "}
+            {translate(
+              "Missions Report"
+            )}{" "}
+
+            <span>
+              {total <
+              10
+                ? `0${total}`
+                : total}
+            </span>
+          </h4>
         </div>
+
         <div className="col-md-6 col-sm-12 text-right">
-
-          <NavLink to="/mission-report-manage/add" className="btn btn-primary mt-2 mr-1">
+          <NavLink
+            to="/mission-report-manage/add"
+            className="btn btn-primary mt-2 mr-1"
+          >
             <i className="las la-plus mr-3"></i>
-            {translate("New")} {translate("Missions Report")}
-          </NavLink>
 
+            {translate(
+              "New"
+            )}{" "}
+            {translate(
+              "Missions Report"
+            )}
+          </NavLink>
         </div>
       </div>
+
+      {/* ======================================================
+          RECHERCHE + OPTIONS
+          ====================================================== */}
+
       <div className="row">
         <div
           className="col-md-4"
-          style={{ margin: "0px 0px 10px 0px", padding: "10px" }}
+          style={{
+            margin:
+              "0px 0px 10px 0px",
+            padding:
+              "10px",
+          }}
         >
           <div className="input-group">
             <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic" className="search-type-toggle">
+              <Dropdown.Toggle
+                variant="link"
+                id="mission-search-type"
+                className="search-type-toggle"
+              >
                 <i
                   className="fas fa-chevron-down"
-                  style={{ fontSize: "20" }}
+                  style={{
+                    fontSize:
+                      "20px",
+                  }}
                 ></i>
               </Dropdown.Toggle>
+
               <Dropdown.Menu>
-                {menuItems.map((item, index) => (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleTypeSearch(item)}
-                    eventKey={item}
-                    active={typeSearch === item}
-                    className={typeSearch === item ? "select-active" : ""}
-                  >
-                    {item}
-                  </Dropdown.Item>
-                ))}
+                {menuItems.map(
+                  (
+                    item,
+                    index
+                  ) => (
+                    <Dropdown.Item
+                      key={
+                        index
+                      }
+                      onClick={() =>
+                        handleTypeSearch(
+                          item
+                        )
+                      }
+                      eventKey={
+                        item
+                      }
+                      active={
+                        typeSearch ===
+                        item
+                      }
+                      className={
+                        typeSearch ===
+                        item
+                          ? "select-active"
+                          : ""
+                      }
+                    >
+                      {
+                        item
+                      }
+                    </Dropdown.Item>
+                  )
+                )}
               </Dropdown.Menu>
             </Dropdown>
-            <input type="text" placeholder={` ${translate("Search by")} ${translate(typeSearch)}`} onChange={handleAdvancedSearch} className="form-control" />
+
+            <input
+              type="text"
+              value={
+                search
+              }
+              placeholder={` ${translate(
+                "Search by"
+              )} ${translate(
+                typeSearch
+              )}`}
+              onChange={
+                handleAdvancedSearch
+              }
+              className="form-control"
+            />
+
             <Button
               variant="secondary"
-              onClick={handleResetSearch}
+              onClick={
+                handleResetSearch
+              }
               className="btn-reset"
             >
-              <i className="las la-times" style={{ color: "#fff" }}></i>
+              <i
+                className="las la-times"
+                style={{
+                  color:
+                    "#fff",
+                }}
+              ></i>
             </Button>
           </div>
         </div>
+
         <div className="col-md-8 d-flex justify-content-end align-items-center">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
-            <label style={{ marginBottom: "0" }}>
-              {translate("Show")}
+          <div
+            className="dataTables_length"
+            id="DataTables_Table_0_length"
+          >
+            <label
+              style={{
+                marginBottom:
+                  "0",
+              }}
+            >
+              {translate(
+                "Show"
+              )}
+
               <select
                 name="DataTables_Table_0_length"
                 aria-controls="DataTables_Table_0"
                 className="custom-select custom-select-sm form-control form-control-sm ml-2"
-                style={{ width: "66px" }}
-                onChange={handleSelectChange}
+                style={{
+                  width:
+                    "66px",
+                }}
+                value={
+                  limit
+                }
+                onChange={
+                  handleSelectChange
+                }
               >
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="500">500</option>
+                <option value="10">
+                  10
+                </option>
+
+                <option value="20">
+                  20
+                </option>
+
+                <option value="50">
+                  50
+                </option>
+
+                <option value="100">
+                  100
+                </option>
+
+                <option value="200">
+                  200
+                </option>
+
+                <option value="500">
+                  500
+                </option>
               </select>
             </label>
           </div>
+
           <Dropdown>
             <Dropdown.Toggle
               variant=""
-              id="dropdown-basic"
-              title={translate("Display columns")}
+              id="mission-display-columns"
+              title={translate(
+                "Display columns"
+              )}
             >
               <i className="las la-eye"></i>
             </Dropdown.Toggle>
+
             <Dropdown.Menu>
-      
-            <Dropdown.Item
+              <Dropdown.Item
                 as="button"
-                style={{ display: "flex", alignItems: "center" }}
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
               >
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.id_misrap}
-                  onChange={() => handleColumnChange("id_misrap")}
+                  checked={
+                    selectedColumns.id_misrap
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "id_misrap"
+                    )
+                  }
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("ID")}
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "ID"
+                  )}
                 </span>
               </Dropdown.Item>
 
               <Dropdown.Item
                 as="button"
-                style={{ display: "flex", alignItems: "center" }}
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
               >
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.ref_misrap}
-                  onChange={() => handleColumnChange("ref_misrap")}
+                  checked={
+                    selectedColumns.ref_misrap
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "ref_misrap"
+                    )
+                  }
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Reference")}
-                </span>
-              </Dropdown.Item>
-              
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.objt_misrap}
-                  onChange={() => handleColumnChange("objt_misrap")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Object")}
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "Reference"
+                  )}
                 </span>
               </Dropdown.Item>
 
               <Dropdown.Item
                 as="button"
-                style={{ display: "flex", alignItems: "center" }}
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
               >
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.cond_misrap}
-                  onChange={() => handleColumnChange("cond_misrap")}
+                  checked={
+                    selectedColumns.objt_misrap
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "objt_misrap"
+                    )
+                  }
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Driver")}
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "Object"
+                  )}
                 </span>
               </Dropdown.Item>
-
 
               <Dropdown.Item
                 as="button"
-                style={{ display: "flex", alignItems: "center" }}
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
               >
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  checked={selectedColumns.date_dep_misrap}
-                  onChange={() => handleColumnChange("date_dep_misrap")}
+                  checked={
+                    selectedColumns.cond_misrap
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "cond_misrap"
+                    )
+                  }
                 />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Departure Date")}
-                </span>
-              </Dropdown.Item>
-             
-              <Dropdown.Item
-                as="button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={selectedColumns.immatriculation_vehicule  }
-                  onChange={() => handleColumnChange("immatriculation_vehicule  ")}
-                />
-                <span style={{ marginLeft: "10px" }}>
-                  {translate("Vehicle")}
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "Driver"
+                  )}
                 </span>
               </Dropdown.Item>
 
+              <Dropdown.Item
+                as="button"
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={
+                    selectedColumns.date_dep_misrap
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "date_dep_misrap"
+                    )
+                  }
+                />
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "Departure Date"
+                  )}
+                </span>
+              </Dropdown.Item>
+
+              <Dropdown.Item
+                as="button"
+                style={{
+                  display:
+                    "flex",
+                  alignItems:
+                    "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={
+                    selectedColumns.immatriculation_vehicule
+                  }
+                  onChange={() =>
+                    handleColumnChange(
+                      "immatriculation_vehicule"
+                    )
+                  }
+                />
+
+                <span
+                  style={{
+                    marginLeft:
+                      "10px",
+                  }}
+                >
+                  {translate(
+                    "Vehicle"
+                  )}
+                </span>
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
       </div>
+
+      {/* ======================================================
+          TABLE
+          ====================================================== */}
+
       <div className="row m-1 table-responsive">
         <Table className="dataTable">
           <thead className="bg-white text-uppercase">
             <tr className="ligth ligth-data">
               <th>
                 <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="checkbox" />
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                  />
+
                   <label className="form-check-label"></label>
                 </div>
               </th>
-              {selectedColumns.id_misrap && (<th className="sorting" onClick={() => handleSortingColum("id_misrap")}>{translate("ID")}</th>)}
-              {selectedColumns.ref_misrap && (<th className="sorting" onClick={() => handleSortingColum("ref_misrap")}>{translate("Reference")}</th>)}
-              {selectedColumns.objt_misrap && (<th className="sorting" onClick={() => handleSortingColum("objt_misrap")}>{translate("Object")}</th>)}
-              {selectedColumns.date_dep_misrap && (<th className="sorting" onClick={() => handleSortingColum("date_dep_misrap")}>{translate("Departure Date")}</th>)}
-              {selectedColumns.immatriculation_vehicule   && (<th className="sorting" onClick={() => handleSortingColum("immatriculation_vehicule  ")}>{translate("Vehicle")}</th>)}  
-              {selectedColumns.cond_misrap && (<th className="sorting" onClick={() => handleSortingColum("cond_misrap")}>{translate("Driver")}</th>)}
 
+              {selectedColumns.id_misrap && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "id_misrap"
+                    )
+                  }
+                >
+                  {translate(
+                    "ID"
+                  )}
+                </th>
+              )}
 
-              {<th>{translate("Action")}</th>}
+              {selectedColumns.ref_misrap && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "ref_misrap"
+                    )
+                  }
+                >
+                  {translate(
+                    "Reference"
+                  )}
+                </th>
+              )}
+
+              {selectedColumns.objt_misrap && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "objt_misrap"
+                    )
+                  }
+                >
+                  {translate(
+                    "Object"
+                  )}
+                </th>
+              )}
+
+              {selectedColumns.date_dep_misrap && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "date_dep_misrap"
+                    )
+                  }
+                >
+                  {translate(
+                    "Departure Date"
+                  )}
+                </th>
+              )}
+
+              {selectedColumns.immatriculation_vehicule && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "immatriculation_vehicule"
+                    )
+                  }
+                >
+                  {translate(
+                    "Vehicle"
+                  )}
+                </th>
+              )}
+
+              {selectedColumns.cond_misrap && (
+                <th
+                  className="sorting"
+                  onClick={() =>
+                    handleSortingColum(
+                      "cond_misrap"
+                    )
+                  }
+                >
+                  {translate(
+                    "Driver"
+                  )}
+                </th>
+              )}
+
+              <th>
+                {translate(
+                  "Action"
+                )}
+              </th>
             </tr>
           </thead>
-          <tbody key="#" className="ligth-body">
+
+          <tbody
+            key="#"
+            className="ligth-body"
+          >
             {loading ? (
-              <tr style={{ textAlign: "center" }}>
-                <td className="text-center" colSpan={10}>
-                  <p><PropagateLoader
-                    color={"#123abc"}
-                    loading={loading}
-                    size={20}
-                  /></p>
+              <tr
+                style={{
+                  textAlign:
+                    "center",
+                }}
+              >
+                <td
+                  className="text-center"
+                  colSpan={
+                    10
+                  }
+                >
+                  <p>
+                    <PropagateLoader
+                      color={
+                        "#123abc"
+                      }
+                      loading={
+                        loading
+                      }
+                      size={
+                        20
+                      }
+                    />
+                  </p>
                 </td>
               </tr>
-            ) :
-              (
-                list_MissionReport.length > 0 ? (
-                  list_MissionReport.map((missionReport) => (
-                    <tr key={missionReport.id_misrap}>
+            ) : list_MissionReport.length >
+              0 ? (
+              list_MissionReport.map(
+                (
+                  missionReport
+                ) => (
+                  <tr
+                    key={
+                      missionReport.id_misrap
+                    }
+                  >
+                    <td>
+                      <div className="form-check form-check-inline">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                        />
+                      </div>
+                    </td>
+
+                    {selectedColumns.id_misrap && (
                       <td>
-                        <div className="form-check form-check-inline">
-                          <input type="checkbox" className="form-check-input" />
-                        </div>
+                        {
+                          missionReport.id_misrap
+                        }
                       </td>
-                      {selectedColumns.id_misrap && (<td>{missionReport.id_misrap}</td>)}
-                      {selectedColumns.ref_misrap && (<td>{missionReport.ref_misrap}</td>)}
-                      {selectedColumns.objt_misrap && (<td>{missionReport.objt_misrap}</td>)}
-                      {selectedColumns.date_dep_misrap && (<td>{formatDatetimeLocal(missionReport.date_dep_misrap)}</td>)}
-                      {selectedColumns.immatriculation_vehicule   && (<td>{missionReport.immatriculation_vehicule  }</td>)}
-                      {selectedColumns.cond_misrap && (<td>{missionReport.cond_misrap}</td>)}
+                    )}
 
-
-                      
-
+                    {selectedColumns.ref_misrap && (
                       <td>
-                        <div className="d-flex align-items-center list-action">
-                           <a
-                          className="badge bg-primary mr-2"
+                        {
+                          missionReport.ref_misrap
+                        }
+                      </td>
+                    )}
+
+                    {selectedColumns.objt_misrap && (
+                      <td>
+                        {
+                          missionReport.objt_misrap
+                        }
+                      </td>
+                    )}
+
+                    {selectedColumns.date_dep_misrap && (
+                      <td>
+                        {formatDatetimeLocal(
+                          missionReport.date_dep_misrap
+                        )}
+                      </td>
+                    )}
+
+                    {selectedColumns.immatriculation_vehicule && (
+                      <td>
+                        {
+                          missionReport.immatriculation_vehicule
+                        }
+                      </td>
+                    )}
+
+                    {selectedColumns.cond_misrap && (
+                      <td>
+                        {
+                          missionReport.cond_misrap
+                        }
+                      </td>
+                    )}
+
+                    {/* ==============================
+                        ACTIONS
+                        ============================== */}
+
+                    <td>
+                      <div className="d-flex align-items-center list-action flex-wrap">
+
+                        {/* APERÇU */}
+                        <button
+                          type="button"
+                          className="badge bg-primary mr-2 border-0"
                           onClick={() => {
-                            console.log("Selected Mission:", missionReport);
-                            setSelectedMissionReport(missionReport); // Set the mission
-                            setIsPreviewModalOpen(true); // Open the modal
-                          }}
-                          title={translate("Preview") + " " + translate("Mission Order")}
-                        >
-                          <i className="las la-eye" style={{ fontSize: "1.2em" }}></i>
-                        </a>
-                          <Link
-                            to={`/mission-report-manage/edit/${missionReport.id_misrap}`}
-                            className="badge badge-success mr-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title={translate("Edit") + " " + translate("Missions Report")}
-                          >
-                            <i
-                              className="las la-edit"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </Link>
-                         
-                          
-                          <a className="badge bg-danger mr-2" onClick={() => handledeleteMissionReport(missionReport.id_misrap)} title={translate("Delete")} >
-                            <i
-                              className="las la-trash"
-                              style={{ fontSize: "1.2em" }}
-                            ></i>
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))) : (
+                            setSelectedMissionReport(
+                              missionReport
+                            );
 
-                  <tr>
-                    <td colSpan={9}>No Mission Reports available</td>
+                            setIsPreviewModalOpen(
+                              true
+                            );
+                          }}
+                          title={
+                            translate(
+                              "Preview"
+                            ) +
+                            " " +
+                            translate(
+                              "Mission Order"
+                            )
+                          }
+                        >
+                          <i
+                            className="las la-eye"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+
+                        {/* MODIFIER */}
+                        <Link
+                          to={`/mission-report-manage/edit/${missionReport.id_misrap}`}
+                          className="badge badge-success mr-2"
+                          data-toggle="tooltip"
+                          data-placement="top"
+                          title={
+                            translate(
+                              "Edit"
+                            ) +
+                            " " +
+                            translate(
+                              "Missions Report"
+                            )
+                          }
+                        >
+                          <i
+                            className="las la-edit"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </Link>
+
+                        {/* ==========================
+                            TYPE 28
+                            RAPPORT SOUMIS
+                            ========================== */}
+                        <button
+                          type="button"
+                          className="badge bg-info mr-2 border-0"
+                          disabled={
+                            statusLoadingId ===
+                            missionReport.id_misrap
+                          }
+                          onClick={() =>
+                            handleMissionReportStatus(
+                              missionReport.id_misrap,
+                              "soumis"
+                            )
+                          }
+                          title="Rapport soumis"
+                        >
+                          <i
+                            className="las la-paper-plane"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+
+                        {/* ==========================
+                            TYPE 29
+                            RAPPORT VALIDÉ
+                            ========================== */}
+                        <button
+                          type="button"
+                          className="badge bg-success mr-2 border-0"
+                          disabled={
+                            statusLoadingId ===
+                            missionReport.id_misrap
+                          }
+                          onClick={() =>
+                            handleMissionReportStatus(
+                              missionReport.id_misrap,
+                              "valide"
+                            )
+                          }
+                          title="Rapport validé"
+                        >
+                          <i
+                            className="las la-check"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+
+                        {/* ==========================
+                            TYPE 30
+                            RAPPORT REFUSÉ
+                            ========================== */}
+                        <button
+                          type="button"
+                          className="badge bg-warning mr-2 border-0"
+                          disabled={
+                            statusLoadingId ===
+                            missionReport.id_misrap
+                          }
+                          onClick={() =>
+                            handleMissionReportStatus(
+                              missionReport.id_misrap,
+                              "refuse"
+                            )
+                          }
+                          title="Rapport refusé"
+                        >
+                          <i
+                            className="las la-times"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+
+                        {/* ==========================
+                            TYPE 31
+                            RAPPORT DISPONIBLE
+                            ========================== */}
+                        <button
+                          type="button"
+                          className="badge bg-secondary mr-2 border-0"
+                          disabled={
+                            statusLoadingId ===
+                            missionReport.id_misrap
+                          }
+                          onClick={() =>
+                            handleMissionReportStatus(
+                              missionReport.id_misrap,
+                              "disponible"
+                            )
+                          }
+                          title="Rapport disponible"
+                        >
+                          <i
+                            className="las la-file-alt"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+
+                        {/* SUPPRIMER */}
+                        <button
+                          type="button"
+                          className="badge bg-danger mr-2 border-0"
+                          onClick={() =>
+                            handledeleteMissionReport(
+                              missionReport.id_misrap
+                            )
+                          }
+                          title={translate(
+                            "Delete"
+                          )}
+                        >
+                          <i
+                            className="las la-trash"
+                            style={{
+                              fontSize:
+                                "1.2em",
+                            }}
+                          ></i>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 )
-              )}
+              )
+            ) : (
+              <tr>
+                <td colSpan={9}>
+                  No Mission Reports available
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
+
+      {/* ======================================================
+          PAGINATION
+          ====================================================== */}
+
       <div className="row">
         <div className="col-md-6 d-flex align-items-center">
           <span>
-            {translate("Displaying")} {list_MissionReport.length} {translate("on")}{" "}
+            {translate(
+              "Displaying"
+            )}{" "}
+            {
+              list_MissionReport.length
+            }{" "}
+            {translate(
+              "on"
+            )}{" "}
             {total}
           </span>
         </div>
+
         <div className="col-md-6 d-flex justify-content-end">
           <ReactPaginate
-            previousLabel={translate("previous")}
-            nextLabel={translate("next")}
+            previousLabel={translate(
+              "previous"
+            )}
+            nextLabel={translate(
+              "next"
+            )}
             breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination justify-right"}
-            pageClassName={"page-item"}
-            pageLinkClassName={"page-link"}
-            previousClassName={"page-item"}
-            previousLinkClassName={"page-link"}
-            nextClassName={"page-item"}
-            nextLinkClassName={"page-link"}
-            breakClassName={"page-item"}
-            breakLinkClassName={"page-link"}
-            activeClassName={"active"}
+            pageCount={
+              pageCount
+            }
+            marginPagesDisplayed={
+              2
+            }
+            pageRangeDisplayed={
+              3
+            }
+            onPageChange={
+              handlePageClick
+            }
+            containerClassName={
+              "pagination justify-right"
+            }
+            pageClassName={
+              "page-item"
+            }
+            pageLinkClassName={
+              "page-link"
+            }
+            previousClassName={
+              "page-item"
+            }
+            previousLinkClassName={
+              "page-link"
+            }
+            nextClassName={
+              "page-item"
+            }
+            nextLinkClassName={
+              "page-link"
+            }
+            breakClassName={
+              "page-item"
+            }
+            breakLinkClassName={
+              "page-link"
+            }
+            activeClassName={
+              "active"
+            }
           />
         </div>
 
+        {/* ====================================================
+            MODAL SUPPRESSION
+            ==================================================== */}
+
         <MissionReportDeleteModal
-          show={modalStatus !== null}
-          onHide={closeModal}
-          status={modalStatus}
-          title={titleStatus}
-          IdUser={IdUser}
-          IdMissionReport={IdMissionReport}
-          updateMissionReportList={handleUpdateMissionReportList}
+          show={
+            modalStatus !==
+            null
+          }
+          onHide={
+            closeModal
+          }
+          status={
+            modalStatus
+          }
+          title={
+            titleStatus
+          }
+          IdUser={
+            IdUser
+          }
+          IdMissionReport={
+            IdMissionReport
+          }
+          updateMissionReportList={
+            handleUpdateMissionReportList
+          }
         />
 
+        {/* ====================================================
+            APERÇU
+            ==================================================== */}
+
         <MissionReportPreview
-            show={isPreviewModalOpen} // Contrôle si le modal est ouvert
-            onHide={() => setIsPreviewModalOpen(false)} // Fonction pour fermer le modal
-            status={modalStatus} // Statut de la mission (peut être null)
-            title={titleStatus} // Titre du modal
-            IdUser={IdUser} // Id de l'utilisateur
-            IdMissionReport={IdMissionReport} // Id de la mission
-            selectedMissionReport={selectedMissionReport} // Mission sélectionnée
-            updateMissionReportList={handleUpdateMissionReportList} // Fonction pour mettre à jour la liste
-          />
-
-
-        
-
-      
+          show={
+            isPreviewModalOpen
+          }
+          onHide={() =>
+            setIsPreviewModalOpen(
+              false
+            )
+          }
+          status={
+            modalStatus
+          }
+          title={
+            titleStatus
+          }
+          IdUser={
+            IdUser
+          }
+          IdMissionReport={
+            IdMissionReport
+          }
+          selectedMissionReport={
+            selectedMissionReport
+          }
+          updateMissionReportList={
+            handleUpdateMissionReportList
+          }
+        />
       </div>
-      
-        
-
-      
-      
     </>
   );
-}
-function convertValue(maintenance: any) {
-  throw new Error("Function not implemented.");
 }
