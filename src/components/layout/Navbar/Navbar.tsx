@@ -470,16 +470,23 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
       // A frontend address is distinct from the API address, especially locally.
       const configuredUrl = process.env.REACT_APP_GEOTRACKING_URL;
       const isLocal = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
-      if (isLocal && !configuredUrl) {
-        throw new Error("Configurez REACT_APP_GEOTRACKING_URL avec l'adresse locale de Geotracking.");
-      }
-      const target = new URL(configuredUrl || "https://geotrackin.com");
+      const target = new URL(configuredUrl || (isLocal
+        ? `${window.location.protocol}//${window.location.hostname}:3000`
+        : "https://geotrackin.com"));
       const targetIsLocal = ["localhost", "127.0.0.1", "[::1]"].includes(target.hostname);
       if ((target.protocol !== "https:" && !(target.protocol === "http:" && targetIsLocal)) ||
           target.username || target.password || target.origin === window.location.origin) {
         throw new Error("L'adresse de retour Geotracking est invalide.");
       }
-      await axios.post(`${backendUrl}/api/returnGeoTrackingFromSession`, {}, { withCredentials: true });
+      const [geoparc, geotracking] = await Promise.all([
+        axios.get(`${backendUrl}/api/geop/me`, { withCredentials: true }),
+        axios.get(`${backendUrl}/api/me`, { withCredentials: true }),
+      ]);
+      const geoparcId = Number(geoparc.data?.id_user);
+      if (!Number.isSafeInteger(geoparcId) || geoparcId <= 0 ||
+          geoparcId !== Number(userID) || geoparcId !== Number(geotracking.data?.id_user)) {
+        throw new Error("Les comptes Geoparc et Geotracking ne correspondent pas. Reconnectez-vous au même compte.");
+      }
       window.location.assign(target.toString());
     } catch (error: any) {
       toast.error(error?.response?.status === 401

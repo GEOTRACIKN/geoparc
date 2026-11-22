@@ -2,27 +2,21 @@
 
 ## Retour Geoparc → Geotracking
 
-Le bouton GEOTRACKING de la barre supérieure vérifie les deux sessions auprès
-de l'API commune avant le retour. Elles doivent être valides et appartenir au
-même utilisateur actif. Il ne crée pas de droits Geotracking à partir d'un
-compte Geoparc et ne transmet aucune clé dans l'URL. Si la session Geotracking
-est expirée ou correspond à un autre compte, reconnectez-vous à ce compte dans
+Le bouton GEOTRACKING de la barre supérieure vérifie les sessions via les
+routes existantes `GET /api/geop/me` et `GET /api/me`. Les deux sessions doivent
+correspondre au compte affiché dans Geoparc. Si la session Geotracking est
+expirée ou correspond à un autre compte, reconnectez-vous au même compte dans
 Geotracking puis utilisez à nouveau le bouton GEOPARC.
-
-La route `POST /api/returnGeoTrackingFromSession` du dépôt Geotracking doit être
-disponible pour utiliser le bouton.
 
 `REACT_APP_GEOTRACKING_URL` est lu par le frontend à la compilation : il désigne
 l'adresse du frontend Geotracking, pas celle de l'API. Sans cette variable, la
-destination est `https://geotrackin.com` en hébergement distant. Sur localhost,
-elle est obligatoire pour éviter d'envoyer les essais locaux en production.
+destination est `https://geotrackin.com` en hébergement distant et le port
+`3000` sur le même hôte en local.
 Une adresse invalide ou celle de Geoparc lui-même bloque le retour avec un message.
 
 Exemple local : Geotracking sur `http://localhost:3000`, Geoparc sur
 `http://localhost:3001`, et la même API locale pour les deux applications.
-Configurer `REACT_APP_GEOTRACKING_URL=http://localhost:3000` pour Geoparc et
-`REACT_APP_BACKEND_URL_GEO_PARC=http://localhost:3001` pour Geotracking avant
-leur démarrage. Utiliser le même hôte (`localhost`) pour les deux, puis tester
+Utiliser le même hôte (`localhost`) pour les deux, puis tester
 Geotracking → GEOPARC → GEOTRACKING avec un compte de test. Un changement de
 compte dans un autre onglet ou une session expirée doit empêcher le retour.
 
