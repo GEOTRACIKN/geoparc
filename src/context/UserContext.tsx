@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { buildProfileImageUrl } from "../utilities/profileImage";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -36,7 +37,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (!currentUserId) return;
 
-      const response = await fetch(`${backendUrl}/api/profile/${currentUserId}`);
+      const response = await fetch(`${backendUrl}/api/profile/${currentUserId}`, {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Échec de la récupération du profil");
       
       const data = await response.json();
@@ -44,16 +47,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (!profile) throw new Error("Aucune donnée de profil");
 
-      // ▼▼▼ Modification clé ici ▼▼▼
-      const newPath = `${"https://geotrackin.com"}/react/public/${profile.img}?t=${Date.now()}`;
-      localStorage.setItem("GeopProfileImage", newPath);
-      // ▲▲▲ Suppression de la distinction default/dynamic ▲▲▲
-
-      setPathImg(newPath);
+      setPathImg(buildProfileImageUrl(profile.img));
     } catch (error) {
       console.error("Erreur :", error);
-      const storedImage = localStorage.getItem("GeopProfileImage");
-      setPathImg(storedImage || "asset/images/logo.png");
+      setPathImg("");
     } finally {
       isRefreshingRef.current = false;
       setIsLoading(false);

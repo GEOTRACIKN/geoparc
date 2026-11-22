@@ -13,6 +13,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { Bounce, toast } from 'react-toastify';
 import axios from 'axios';
 import { useUser } from '../../../context/UserContext';
+import { defaultProfileImage, showDefaultProfileImage } from '../../../utilities/profileImage';
 
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -737,7 +738,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
                         <div className="card-body p-0 text-center">
                           <div className="media-body profile-detail text-center">
                             <img src="asset/images/page-img/profile-bg.jpg" alt="profile-bg" className="rounded-top img-fluid mb-4" />
-                            <img src={pathImg || "asset/images/user/blank.png"} alt="profile-img" className="rounded profile-img img-fluid avatar-70" />
+                            <img src={pathImg || defaultProfileImage} onError={showDefaultProfileImage} alt="profile-img" className="rounded profile-img img-fluid avatar-70" />
                           </div>
                           <div className="p-3">
                             <h5 className="mb-1">{userName}</h5>
