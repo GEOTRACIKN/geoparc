@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
   const { pathImg } = useUser();
   const handleLanguageChange = (newLang: any) => { setLang(newLang); };
   const userID = localStorage.getItem("GeopUserID");
-  const APIkey = localStorage.getItem("api_key");
+  const [returningToGeotracking, setReturningToGeotracking] = useState(false);
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   const strLang = {
@@ -463,6 +463,40 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
     }
   };
 
+  const handleReturnToGeotracking = async () => {
+    if (returningToGeotracking) return;
+    setReturningToGeotracking(true);
+    try {
+      // A frontend address is distinct from the API address, especially locally.
+      const configuredUrl = process.env.REACT_APP_GEOTRACKING_URL;
+      const isLocal = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
+      const target = new URL(configuredUrl || (isLocal
+        ? `${window.location.protocol}//${window.location.hostname}:3000`
+        : "https://geotrackin.com"));
+      const targetIsLocal = ["localhost", "127.0.0.1", "[::1]"].includes(target.hostname);
+      if ((target.protocol !== "https:" && !(target.protocol === "http:" && targetIsLocal)) ||
+          target.username || target.password || target.origin === window.location.origin) {
+        throw new Error("L'adresse de retour Geotracking est invalide.");
+      }
+      const [geoparc, geotracking] = await Promise.all([
+        axios.get(`${backendUrl}/api/geop/me`, { withCredentials: true }),
+        axios.get(`${backendUrl}/api/me`, { withCredentials: true }),
+      ]);
+      const geoparcId = Number(geoparc.data?.id_user);
+      if (!Number.isSafeInteger(geoparcId) || geoparcId <= 0 ||
+          geoparcId !== Number(userID) || geoparcId !== Number(geotracking.data?.id_user)) {
+        throw new Error("Les comptes Geoparc et Geotracking ne correspondent pas. Reconnectez-vous au même compte.");
+      }
+      window.location.assign(target.toString());
+    } catch (error: any) {
+      toast.error(error?.response?.status === 401
+        ? "Votre session a expiré. Reconnectez-vous au même compte dans Geotracking."
+        : error?.response?.data?.message || error?.message || "Retour vers Geotracking impossible.");
+    } finally {
+      setReturningToGeotracking(false);
+    }
+  };
+
   return (
     <div className={`iq-top-navbar  ${changNavbar ? "navbar-push" : "navbar-pool"}`} >
       <div className="iq-navbar-custom">
@@ -545,14 +579,12 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebarInNavbar, changNavbar })
             <div className={`navbar-collapse collapse ${showMenu}`} id="navbarSupportedContent">
               <ul className="navbar-nav ml-auto navbar-list align-items-center">
 
-                {checkPermission(27) && (<li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title={translate("Click here to access GEOPARC")}>
-                  {userID === "1" && (
-                    <a href={`https://geoparc.geotrackin.com?apikey=${APIkey}`} className="gp">
+                <li className="nav-item nav-icon dropdown" style={{ margin: "12px 5px" }} title="Retour à Geotracking">
+                    <button type="button" onClick={handleReturnToGeotracking} disabled={returningToGeotracking} className="gp" aria-label="Retour à Geotracking">
                       <i className="las la-sign-in-alt" style={{ fontSize: "29px" }}></i>
-                      <span style={{ fontSize: "16px" }}> GEOPARC</span>
-                    </a>
-                  )}
-                </li>)}
+                      <span style={{ fontSize: "16px" }}> GEOTRACKING</span>
+                    </button>
+                </li>
 
                 <li className="nav-item nav-icon dropdown" style={{ margin: "0 5px" }}>
                   <NavDropdown

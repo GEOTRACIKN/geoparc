@@ -1,5 +1,25 @@
 # Getting Started with Create React App
 
+## Retour Geoparc → Geotracking
+
+Le bouton GEOTRACKING de la barre supérieure vérifie les sessions via les
+routes existantes `GET /api/geop/me` et `GET /api/me`. Les deux sessions doivent
+correspondre au compte affiché dans Geoparc. Si la session Geotracking est
+expirée ou correspond à un autre compte, reconnectez-vous au même compte dans
+Geotracking puis utilisez à nouveau le bouton GEOPARC.
+
+`REACT_APP_GEOTRACKING_URL` est lu par le frontend à la compilation : il désigne
+l'adresse du frontend Geotracking, pas celle de l'API. Sans cette variable, la
+destination est `https://geotrackin.com` en hébergement distant et le port
+`3000` sur le même hôte en local.
+Une adresse invalide ou celle de Geoparc lui-même bloque le retour avec un message.
+
+Exemple local : Geotracking sur `http://localhost:3000`, Geoparc sur
+`http://localhost:3001`, et la même API locale pour les deux applications.
+Utiliser le même hôte (`localhost`) pour les deux, puis tester
+Geotracking → GEOPARC → GEOTRACKING avec un compte de test. Un changement de
+compte dans un autre onglet ou une session expirée doit empêcher le retour.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
