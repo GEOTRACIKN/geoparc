@@ -7,6 +7,7 @@ import "../assets/css/profile.css";
 import { useTranslate } from "../hooks/LanguageProvider";
 import { useUser } from "../context/UserContext";
 import { useTheme } from "../hooks/ThemeContext";
+import { buildProfileImageUrl, defaultProfileImage, showDefaultProfileImage } from "../utilities/profileImage";
 import {
   dispatchSidebarAppearanceChange,
   dispatchSidebarPinnedChange,
@@ -23,7 +24,6 @@ import {
 } from "../utilities/sidebarPreference";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const profileImageBaseUrl = "https://geotrackin.com/react/public";
 const maxProfileImageSize = 2 * 1024 * 1024;
 
 type Language = "en" | "fr" | "ar" | "es";
@@ -33,7 +33,7 @@ interface UserInfo {
   username?: string;
   email_user?: string;
   email?: string;
-  img: string;
+  img?: string | null;
   timezone?: string;
   language?: Language;
   theme_mode?: string | number | boolean;
@@ -46,7 +46,7 @@ function Profile() {
   const { isDarkMode, setThemeMode } = useTheme();
 
   const [showModalImg, setShowModalImg] = useState(false);
-  const [pathImg, setPathImg] = useState<string | null>(localStorage.getItem("GeopProfileImage"));
+  const [pathImg, setPathImg] = useState("");
   const [emailValue, setEmailValue] = useState("");
   const [usernameValue, setUsernameValue] = useState(localStorage.getItem("Geopusername") || "");
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -109,9 +109,6 @@ function Profile() {
     });
   };
 
-  const buildProfileImageUrl = (imagePath: string) =>
-    `${profileImageBaseUrl}/${imagePath}?t=${Date.now()}`;
-
   const fetchInfo = async () => {
     if (!idUser) return;
 
@@ -142,7 +139,6 @@ function Profile() {
       setUserInfo(profile);
       setThemeMode(profileDarkMode);
 
-      localStorage.setItem("GeopProfileImage", imageUrl);
       localStorage.setItem("Geopusername", username);
       localStorage.setItem("timezone", timezone);
 
@@ -358,9 +354,7 @@ function Profile() {
 
       if (!response.ok) throw new Error("Delete failed");
 
-      const fallbackImage = `asset/images/user/blank.png?t=${Date.now()}`;
-      setPathImg(fallbackImage);
-      localStorage.setItem("GeopProfileImage", fallbackImage);
+      setPathImg("");
       await refreshImage();
       showSuccess("Image deleted successfully");
     } catch (error) {
@@ -404,7 +398,7 @@ function Profile() {
                   onClick={() => setShowModalImg(true)}
                   disabled={!pathImg}
                 >
-                  {pathImg && <img src={pathImg} alt={translate("Profile picture")} />}
+                  <img src={pathImg || defaultProfileImage} alt={translate("Profile picture")} onError={showDefaultProfileImage} />
                 </button>
 
                 <div className="profile-photo-actions">
@@ -419,7 +413,7 @@ function Profile() {
                     {imageSaving && <Spinner animation="border" size="sm" className="mr-2" />}
                     {translate("Choose a photo")}
                   </label>
-                  <Button variant="outline-danger" onClick={deleteImage} disabled={imageSaving}>
+                  <Button variant="outline-danger" onClick={deleteImage} disabled={imageSaving || !pathImg}>
                     {translate("Delete photo")}
                   </Button>
                 </div>
@@ -640,6 +634,7 @@ function Profile() {
             <img
               src={pathImg}
               alt={translate("Preview Image")}
+              onError={showDefaultProfileImage}
               className="img-fluid"
               style={{ maxWidth: "100%", height: "auto" }}
             />
