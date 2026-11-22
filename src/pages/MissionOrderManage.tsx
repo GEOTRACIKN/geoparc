@@ -8,6 +8,7 @@ import { MissionOrder } from "./MissionOrder";
 import Select, { SingleValue } from "react-select";
 import { useAuth } from "../context/AuthContext";
 import AddressAutocompleteInput from "../components/TransportRequest/AddressAutocompleteInput";
+import { missionDatesError, parseMissionDatetime } from "../utilities/missionDates";
 import {
   autoAssignMissionVehicle,
   formatMissionAssignmentDistance,
@@ -592,10 +593,20 @@ export function MissionOrderManage() {
   };
 
   const createMission = async (mission: MissionOrderInterface) => {
+    const datesError = missionDatesError(mission.dep_date_mission, mission.return_date_mission);
+    if (datesError) {
+      setDateError(datesError);
+      setActiveTab("general");
+      toast.warn(datesError);
+      setButtonClicked(false);
+      return;
+    }
     try {
       let missionOrderData = Object.fromEntries(
         Object.entries(mission).filter(([_, value]) => value !== null)
       );
+      // The optional itinerary is stored in a NOT NULL text column.
+      missionOrderData.itinerary_mission = mission.itinerary_mission ?? "";
 
       const dateFields = ['dep_date_mission', 'return_date_mission'];
 
@@ -822,13 +833,7 @@ export function MissionOrderManage() {
   };
 
   const parseDatetimeLocal = (localString: string): string | null => {
-    if (!localString) return null;
-    try {
-      const [datePart, timePart] = localString.split('T');
-      return `${datePart}T${timePart || '00:00'}:00`;
-    } catch {
-      return null;
-    }
+    return parseMissionDatetime(localString);
   };
 
   // Gestionnaire d'événements avec typage
@@ -852,7 +857,7 @@ export function MissionOrderManage() {
       [name]: isoValue
     };
 
-    setMission(updatedMission);
+    setMission((previous) => previous ? { ...previous, [name]: isoValue } : previous);
 
     // Validation des dates
     if (updatedMission.dep_date_mission && updatedMission.return_date_mission) {
@@ -866,15 +871,7 @@ export function MissionOrderManage() {
   // Fonction générique de gestion des changements dans les formulaires
   const handleChange = (name: string, value: string) => {
     if (mission) {
-      const updatedMission = {
-        ...mission,
-        [name]: value,
-      };
-
-      setMission(updatedMission);
-
-      // Valider les dates après la mise à jour
-
+      setMission((previous) => previous ? { ...previous, [name]: value } : previous);
     }
   };
 
